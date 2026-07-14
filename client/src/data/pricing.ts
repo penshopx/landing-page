@@ -65,7 +65,7 @@ export const TRILOGI = {
       "Buku 1: DIALOG (PDF, 166 halaman) — Akses Segera",
       "Buku 2: KOLABORASI (PDF) — Dikirim saat rilis",
       "Buku 3: KREASI (PDF) — Dikirim saat rilis",
-      "Full E-Course Pendamping — Modul praktik video untuk ke-3 buku",
+      "Akses AI Mentor Gustafta — Tanya jawab langsung soal isi ke-3 buku, kapan saja",
       "Prompt Trilogi Lengkap — Panduan siap pakai: Dialog → Kolaborasi → Kreasi",
       "Trial Gustafta Builder 7 Hari — Bonus eksklusif senilai Rp 150.000",
     ],
@@ -85,7 +85,7 @@ export const TRILOGI = {
     savings: "Hemat Rp 158.000",
     bonuses: [
       "Buku 1: DIALOG (PDF, 166 halaman) — Akses Segera",
-      "E-Course Pendamping Modul 1 — Video tutorial praktik step-by-step",
+      "Akses AI Mentor Gustafta — Tanya jawab langsung soal isi Buku 1",
       "Prompt Dasar Trilogi — Panduan bertanya yang efektif untuk menggali pengetahuan",
       "Akses Lifetime — Sekali beli, miliki selamanya",
       "Update Konten Minor — Gratis update konten",
