@@ -8,12 +8,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
   Upload, FileText, MessageSquare, CheckSquare, Trash2,
   AlertTriangle, Clock, CheckCircle2, XCircle, ChevronRight,
   Send, Loader2, FileSearch, Lock, Sparkles, RotateCcw,
-  ListChecks, BookOpen, ShieldAlert, Lightbulb,
+  ListChecks, BookOpen, ShieldAlert, Lightbulb, Download, Package,
 } from "lucide-react";
 
 interface DocAnalysis {
@@ -37,6 +38,233 @@ interface ChecklistCategory {
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+}
+
+// ── KTK PDF Generator ─────────────────────────────────────────────────────────
+function computeTrafficLight(checklist: ChecklistCategory[]) {
+  let ada = 0, tidakAda = 0, perluDicek = 0;
+  checklist.forEach(cat => cat.items?.forEach(item => {
+    if (item.status === "ada") ada++;
+    else if (item.status === "tidak_ada") tidakAda++;
+    else perluDicek++;
+  }));
+  const total = ada + tidakAda + perluDicek;
+  const score = total > 0 ? Math.round(((ada + perluDicek * 0.5) / total) * 100) : 0;
+  const color = tidakAda > 0 ? "red" : perluDicek > 0 ? "yellow" : "green";
+  const label = tidakAda > 0 ? "🔴 Perlu Perbaikan Segera" : perluDicek > 0 ? "🟡 Ada Catatan Minor" : "🟢 Siap Diajukan";
+  return { ada, tidakAda, perluDicek, score, color, label };
+}
+
+function getActionItems(checklist: ChecklistCategory[]) {
+  const actions: { kategori: string; item: string; status: string; catatan?: string }[] = [];
+  checklist.forEach(cat => cat.items?.forEach(item => {
+    if (item.status !== "ada") {
+      actions.push({ kategori: cat.kategori, item: item.item, status: item.status, catatan: item.catatan });
+    }
+  }));
+  return actions;
+}
+
+function generateKTKHTML(doc: DocAnalysis, bureauName: string) {
+  const checklist = Array.isArray(doc.checklist) ? doc.checklist : [];
+  const tl = computeTrafficLight(checklist);
+  const actions = getActionItems(checklist);
+  let meta: { key_points?: string[]; risiko?: string[]; rekomendasi?: string[] } = {};
+  try { meta = doc.error_msg ? JSON.parse(doc.error_msg) : {}; } catch {}
+  const docTypeLabel = DOC_TYPE_LABELS[doc.doc_type]?.label ?? "Dokumen";
+  const tanggal = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+  const tlBg = tl.color === "red" ? "#FEE2E2" : tl.color === "yellow" ? "#FEF9C3" : "#DCFCE7";
+  const tlBorder = tl.color === "red" ? "#EF4444" : tl.color === "yellow" ? "#EAB308" : "#22C55E";
+
+  const actionRows = actions.map((a, i) => `
+    <tr style="background:${i % 2 === 0 ? "#f9fafb" : "#fff"}">
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-size:13px;">${i + 1}</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-size:13px;">${a.item}</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-size:13px;color:${a.status === "tidak_ada" ? "#dc2626" : "#d97706"}">${a.status === "tidak_ada" ? "Tidak Ada" : "Perlu Dicek"}</td>
+      <td style="padding:8px 12px;border:1px solid #e5e7eb;font-size:13px;">${a.catatan ?? "-"}</td>
+    </tr>`).join("");
+
+  const risikoRows = (meta.risiko ?? []).map(r => `<li style="margin:4px 0;font-size:13px;">⚠️ ${r}</li>`).join("");
+  const rekomenRows = (meta.rekomendasi ?? []).map(r => `<li style="margin:4px 0;font-size:13px;">→ ${r}</li>`).join("");
+
+  return `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<title>Knowledge Transfer Kit — ${doc.original_name}</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, Arial, sans-serif; color: #111827; background: #fff; padding: 40px; max-width: 820px; margin: 0 auto; }
+  @media print {
+    body { padding: 0; }
+    .no-print { display: none; }
+    @page { margin: 20mm 15mm; size: A4; }
+  }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #1d4ed8; padding-bottom: 16px; margin-bottom: 24px; }
+  .logo-area h1 { font-size: 20px; font-weight: 700; color: #1d4ed8; }
+  .logo-area p { font-size: 12px; color: #6b7280; margin-top: 2px; }
+  .kit-title { text-align: right; }
+  .kit-title .badge { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600; display: inline-block; margin-bottom: 4px; }
+  .kit-title h2 { font-size: 15px; font-weight: 700; color: #111827; }
+  .kit-title p { font-size: 12px; color: #6b7280; }
+  .tl-box { border: 2px solid ${tlBorder}; background: ${tlBg}; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; }
+  .tl-label { font-size: 22px; font-weight: 700; }
+  .tl-score { text-align: right; }
+  .tl-score .score { font-size: 36px; font-weight: 700; color: ${tlBorder}; }
+  .tl-score .score-sub { font-size: 12px; color: #6b7280; }
+  .tl-stats { display: flex; gap: 16px; margin-top: 8px; }
+  .tl-stat { font-size: 12px; }
+  section { margin-bottom: 24px; }
+  section h3 { font-size: 14px; font-weight: 700; color: #1d4ed8; border-left: 4px solid #1d4ed8; padding-left: 10px; margin-bottom: 12px; }
+  .summary-text { font-size: 13px; line-height: 1.7; color: #374151; white-space: pre-wrap; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #1d4ed8; color: #fff; padding: 8px 12px; font-size: 12px; text-align: left; border: 1px solid #1e40af; }
+  .footer { border-top: 2px solid #e5e7eb; padding-top: 16px; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #9ca3af; }
+  .footer strong { color: #374151; }
+  .print-btn { position: fixed; bottom: 24px; right: 24px; background: #1d4ed8; color: #fff; border: none; border-radius: 10px; padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(29,78,216,0.4); }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo-area">
+    <h1>${bureauName || "Biro Jasa Anda"}</h1>
+    <p>Dokumen Analisis Profesional</p>
+  </div>
+  <div class="kit-title">
+    <span class="badge">📦 Knowledge Transfer Kit</span>
+    <h2>${docTypeLabel}</h2>
+    <p>${tanggal}</p>
+  </div>
+</div>
+
+<div class="tl-box">
+  <div>
+    <div class="tl-label">${tl.label}</div>
+    <div class="tl-stats">
+      <span class="tl-stat">✅ Terpenuhi: <strong>${tl.ada}</strong></span>
+      <span class="tl-stat">🟡 Perlu Dicek: <strong>${tl.perluDicek}</strong></span>
+      <span class="tl-stat">❌ Tidak Ada: <strong>${tl.tidakAda}</strong></span>
+    </div>
+    <div style="font-size:12px;color:#6b7280;margin-top:6px;">Dokumen: ${doc.original_name}</div>
+  </div>
+  <div class="tl-score">
+    <div class="score">${tl.score}%</div>
+    <div class="score-sub">Tingkat Kesiapan</div>
+  </div>
+</div>
+
+${doc.summary ? `
+<section>
+  <h3>📋 Ringkasan Eksekutif</h3>
+  <p class="summary-text">${doc.summary.substring(0, 800)}${doc.summary.length > 800 ? "…" : ""}</p>
+</section>` : ""}
+
+${(meta.risiko ?? []).length > 0 ? `
+<section>
+  <h3>⚠️ Catatan Risiko & Regulasi Terbaru</h3>
+  <ul style="padding-left:8px;list-style:none;">${risikoRows}</ul>
+</section>` : ""}
+
+${actions.length > 0 ? `
+<section>
+  <h3>✅ Action Plan — Langkah yang Perlu Dilakukan Klien</h3>
+  <table>
+    <tr>
+      <th style="width:40px">#</th>
+      <th>Item Dokumen</th>
+      <th style="width:110px">Status</th>
+      <th>Catatan</th>
+    </tr>
+    ${actionRows}
+  </table>
+</section>` : `
+<section>
+  <h3>✅ Action Plan</h3>
+  <p style="font-size:13px;color:#16a34a;">Semua item terpenuhi — dokumen siap untuk diajukan.</p>
+</section>`}
+
+${(meta.rekomendasi ?? []).length > 0 ? `
+<section>
+  <h3>💡 Rekomendasi Tindak Lanjut</h3>
+  <ul style="padding-left:8px;list-style:none;">${rekomenRows}</ul>
+</section>` : ""}
+
+<div class="footer">
+  <div>Dibuat oleh: <strong>${bureauName || "Biro Jasa Anda"}</strong></div>
+  <div>Didukung teknologi <strong>Gustafta AI</strong> &nbsp;|&nbsp; gustafta.com</div>
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">🖨️ Simpan / Cetak PDF</button>
+</body>
+</html>`;
+}
+
+function KTKExportModal({ doc, onClose }: { doc: DocAnalysis; onClose: () => void }) {
+  const [bureauName, setBureauName] = useState("");
+  const [generating, setGenerating] = useState(false);
+  const { toast } = useToast();
+
+  const handleGenerate = () => {
+    setGenerating(true);
+    try {
+      const html = generateKTKHTML(doc, bureauName);
+      const win = window.open("", "_blank");
+      if (!win) {
+        toast({ title: "Popup diblokir", description: "Izinkan popup di browser Anda lalu coba lagi.", variant: "destructive" });
+        return;
+      }
+      win.document.write(html);
+      win.document.close();
+      onClose();
+    } catch (e) {
+      toast({ title: "Gagal membuat KTK", description: "Terjadi kesalahan.", variant: "destructive" });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  return (
+    <DialogContent className="max-w-md">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Package className="h-5 w-5 text-primary" />
+          Generate Knowledge Transfer Kit
+        </DialogTitle>
+      </DialogHeader>
+      <div className="space-y-4 py-2">
+        <p className="text-sm text-muted-foreground">
+          KTK adalah PDF ringkasan siap kirim ke klien — berisi status kesiapan, risiko, dan action plan dalam bahasa yang mudah dipahami.
+        </p>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium">Nama Biro Jasa / Konsultan Anda</label>
+          <input
+            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            placeholder="Contoh: CV Maju Konsultan Konstruksi"
+            value={bureauName}
+            onChange={e => setBureauName(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") handleGenerate(); }}
+            autoFocus
+          />
+          <p className="text-xs text-muted-foreground">Akan tercetak di header dan footer PDF.</p>
+        </div>
+        <div className="bg-muted/40 rounded-xl p-3 space-y-1.5 text-xs text-muted-foreground border border-border/50">
+          <p className="font-semibold text-foreground text-sm">PDF akan berisi:</p>
+          <p>🟢🟡🔴 Status kesiapan dokumen (traffic light)</p>
+          <p>📋 Ringkasan eksekutif singkat</p>
+          <p>⚠️ Catatan risiko & regulasi relevan</p>
+          <p>✅ Action plan langkah-langkah yang perlu klien lakukan</p>
+        </div>
+      </div>
+      <DialogFooter className="gap-2">
+        <Button variant="outline" onClick={onClose}>Batal</Button>
+        <Button onClick={handleGenerate} disabled={generating} className="gap-2">
+          {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          Generate PDF
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  );
 }
 
 const DOC_TYPE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
@@ -405,6 +633,7 @@ function BedahDokumenContent() {
   const { toast } = useToast();
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [ktkModal, setKtkModal] = useState(false);
 
   const { data: docs = [], isLoading } = useQuery<DocAnalysis[]>({
     queryKey: ["/api/bedah-dokumen/my"],
@@ -451,6 +680,12 @@ function BedahDokumenContent() {
   const docCount = docs.length;
 
   return (
+    <>
+    <Dialog open={ktkModal} onOpenChange={setKtkModal}>
+      {selectedDoc && ktkModal && (
+        <KTKExportModal doc={selectedDoc} onClose={() => setKtkModal(false)} />
+      )}
+    </Dialog>
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-6">
@@ -590,7 +825,20 @@ function BedahDokumenContent() {
                     <span className="text-xs text-muted-foreground">{formatDate(selectedDoc.created_at)}</span>
                   </div>
                 </div>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                  {isPremium && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-xs h-8 border-primary/30 text-primary hover:bg-primary/5"
+                      onClick={() => setKtkModal(true)}
+                    >
+                      <Package className="h-3.5 w-3.5" />
+                      Export KTK
+                    </Button>
+                  )}
+                </div>
               </div>
 
               {/* Tabs */}
@@ -626,6 +874,7 @@ function BedahDokumenContent() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
