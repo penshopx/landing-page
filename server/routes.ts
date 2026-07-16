@@ -3477,6 +3477,230 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
     }
   });
 
+  // ==================== BEDAH DOKUMEN ROUTES ====================
+  // Upload PDF/TXT → AI otomatis buat ringkasan, checklist, & chat
+
+  app.get("/api/bedah-dokumen/my", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      const { sql: sqlBD } = await import("drizzle-orm");
+      const rows = await db.execute(sqlBD`
+        SELECT id, user_id, original_name, doc_type, status, summary, checklist, file_size, created_at
+        FROM document_analyses WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 50
+      `);
+      res.json(rows.rows);
+    } catch (err) {
+      res.status(500).json({ error: "Gagal mengambil daftar dokumen" });
+    }
+  });
+
+  app.get("/api/bedah-dokumen/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      const { sql: sqlBD } = await import("drizzle-orm");
+      const [row] = (await db.execute(sqlBD`
+        SELECT * FROM document_analyses WHERE id = ${parseInt(req.params.id)} AND user_id = ${userId}
+      `)).rows as any[];
+      if (!row) return res.status(404).json({ error: "Dokumen tidak ditemukan" });
+      res.json(row);
+    } catch (err) {
+      res.status(500).json({ error: "Gagal mengambil dokumen" });
+    }
+  });
+
+  app.post("/api/bedah-dokumen/upload", isAuthenticated, upload.single("file"), async (req: any, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      if (!userId) return res.status(401).json({ error: "Tidak terautentikasi" });
+      if (!req.file) return res.status(400).json({ error: "File tidak ditemukan" });
+
+      const ext = path.extname(req.file.originalname).toLowerCase();
+      if (![".pdf", ".txt"].includes(ext)) {
+        return res.status(400).json({ error: "Format tidak didukung. Gunakan PDF atau TXT." });
+      }
+
+      // Free user: max 1 dokumen
+      const role = await getDbRole(req);
+      if (role !== "superadmin" && role !== "admin") {
+        const { resolvePlan } = await import("@shared/feature-plans");
+        const sub = await storage.getActiveSubscription(userId);
+        const plan = resolvePlan(sub?.plan, sub?.status === "active");
+        if (plan.tier === 0) {
+          const { sql: sqlBD } = await import("drizzle-orm");
+          const [countRow] = (await db.execute(sqlBD`
+            SELECT COUNT(*)::int AS cnt FROM document_analyses WHERE user_id = ${userId}
+          `)).rows as any[];
+          if ((countRow?.cnt ?? 0) >= 1) {
+            return res.status(403).json({ error: "Batas gratis: 1 dokumen. Upgrade ke Starter untuk lebih banyak.", code: "LIMIT_REACHED" });
+          }
+        }
+      }
+
+      // Ekstrak teks
+      let extractedText = "";
+      try {
+        if (ext === ".pdf") {
+          const fileBuffer = fs.readFileSync(req.file.path);
+          extractedText = await parsePdfBuffer(fileBuffer);
+        } else {
+          extractedText = fs.readFileSync(req.file.path, "utf-8");
+        }
+      } catch (_e) { extractedText = ""; }
+
+      // Deteksi jenis dokumen
+      const textLow = (extractedText + req.file.originalname).toLowerCase();
+      let docType = "lainnya";
+      if (/tender|lelang|rks|hps|pengadaan|pokja/.test(textLow)) docType = "tender";
+      else if (/\bsbu\b|skk|lpjk|sertifikat kompetensi|kualifikasi badan usaha/.test(textLow)) docType = "skk_sbu";
+      else if (/kontrak|perjanjian|\bspk\b|surat perintah kerja/.test(textLow)) docType = "kontrak";
+
+      const { sql: sqlBD } = await import("drizzle-orm");
+      const [docRow] = (await db.execute(sqlBD`
+        INSERT INTO document_analyses (user_id, filename, original_name, file_size, doc_type, extracted_text, status)
+        VALUES (${userId}, ${req.file.filename}, ${req.file.originalname}, ${req.file.size}, ${docType}, ${extractedText.substring(0, 50000)}, 'analyzing')
+        RETURNING id
+      `)).rows as any[];
+      const docId = docRow.id;
+      res.json({ id: docId, status: "analyzing", docType, originalName: req.file.originalname });
+
+      // Analisis background
+      (async () => {
+        try {
+          const docLabel: Record<string, string> = { tender: "Dokumen Tender (RKS/HPS)", skk_sbu: "Dokumen SKK/SBU Konstruksi", kontrak: "Kontrak Konstruksi", lainnya: "Dokumen Konstruksi/Proyek" };
+          const snippet = extractedText.substring(0, 12000);
+          const analysisPrompt = `Kamu adalah analis dokumen konstruksi Indonesia senior. Analisis dokumen ini.
+
+JENIS: ${docLabel[docType] || "Dokumen"}
+NAMA FILE: ${req.file.originalname}
+
+ISI DOKUMEN:
+${snippet}${extractedText.length > 12000 ? "\n[... dipotong ...]" : ""}
+
+Hasilkan analisis JSON:
+{
+  "summary": "Ringkasan eksekutif 3-5 paragraf (isi, tujuan, pihak terlibat, poin penting)",
+  "doc_type_detail": "Jenis spesifik (mis: RKS Pekerjaan Konstruksi Gedung)",
+  "key_points": ["poin 1","poin 2","..."],
+  "checklist": [{"kategori":"Kelengkapan","items":[{"item":"...","status":"ada|tidak_ada|perlu_dicek","catatan":"..."}]}],
+  "risiko": ["risiko 1","..."],
+  "rekomendasi": ["rekomendasi 1","..."]
+}`;
+
+          let parsed: any = null;
+          try {
+            const r = await openai.chat.completions.create({ model: SMART_MODEL, messages: [{ role: "user", content: analysisPrompt }], temperature: 0.3, max_tokens: 3000, response_format: { type: "json_object" } });
+            parsed = JSON.parse(r.choices[0]?.message?.content ?? "{}");
+          } catch {
+            try {
+              const ds = new OpenAI({ apiKey: process.env.DEEPSEEK_API_KEY, baseURL: "https://api.deepseek.com" });
+              const r2 = await ds.chat.completions.create({ model: "deepseek-chat", messages: [{ role: "user", content: analysisPrompt }], temperature: 0.3, max_tokens: 3000, response_format: { type: "json_object" } });
+              parsed = JSON.parse(r2.choices[0]?.message?.content ?? "{}");
+            } catch {
+              try {
+                const nv = new OpenAI({ apiKey: process.env.NVIDIA_API_KEY, baseURL: NVIDIA_BASE_URL });
+                const r3 = await nv.chat.completions.create({ model: NVIDIA_MODEL, messages: [{ role: "user", content: analysisPrompt }], temperature: 0.3, max_tokens: 3000 });
+                const raw3 = r3.choices[0]?.message?.content ?? "{}"; const m3 = raw3.match(/\{[\s\S]*\}/);
+                parsed = JSON.parse(m3 ? m3[0] : raw3);
+              } catch {
+                const or = new OpenAI({ apiKey: process.env.OPENROUTER_API_KEY, baseURL: OPENROUTER_BASE_URL });
+                const r4 = await or.chat.completions.create({ model: OPENROUTER_MODEL, messages: [{ role: "user", content: analysisPrompt }], temperature: 0.3, max_tokens: 3000 });
+                const raw4 = r4.choices[0]?.message?.content ?? "{}"; const m4 = raw4.match(/\{[\s\S]*\}/);
+                parsed = JSON.parse(m4 ? m4[0] : raw4);
+              }
+            }
+          }
+
+          const summaryText = typeof parsed.summary === "string" ? parsed.summary : JSON.stringify(parsed);
+          const checklistData = JSON.stringify(Array.isArray(parsed.checklist) ? parsed.checklist : []);
+          const metaData = JSON.stringify({ key_points: parsed.key_points || [], risiko: parsed.risiko || [], rekomendasi: parsed.rekomendasi || [], doc_type_detail: parsed.doc_type_detail || "" });
+
+          await db.execute(sqlBD`
+            UPDATE document_analyses
+            SET status = 'done', summary = ${summaryText}, checklist = ${checklistData}::jsonb,
+                doc_type = COALESCE(NULLIF(${parsed.doc_type_detail || ""}, ''), doc_type),
+                error_msg = ${metaData}, updated_at = NOW()
+            WHERE id = ${docId}
+          `);
+        } catch (err: any) {
+          const { sql: sqlBD2 } = await import("drizzle-orm");
+          await db.execute(sqlBD2`
+            UPDATE document_analyses SET status = 'error', error_msg = ${(err?.message || "error").substring(0, 300)}, updated_at = NOW()
+            WHERE id = ${docId}
+          `);
+        }
+      })();
+    } catch (err: any) {
+      res.status(500).json({ error: "Upload gagal: " + (err?.message || "unknown") });
+    }
+  });
+
+  app.post("/api/bedah-dokumen/:id/chat", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      const { sql: sqlBD } = await import("drizzle-orm");
+      const [doc] = (await db.execute(sqlBD`
+        SELECT * FROM document_analyses WHERE id = ${parseInt(req.params.id)} AND user_id = ${userId}
+      `)).rows as any[];
+      if (!doc) return res.status(404).json({ error: "Dokumen tidak ditemukan" });
+
+      const { message } = req.body;
+      if (!message?.trim()) return res.status(400).json({ error: "Pesan tidak boleh kosong" });
+
+      const textCtx = (doc.extracted_text || "").substring(0, 10000);
+      const sysPrompt = `Kamu adalah analis dokumen konstruksi Indonesia yang ahli. Jawab pertanyaan berdasarkan dokumen berikut.
+
+NAMA: ${doc.original_name} | JENIS: ${doc.doc_type}
+
+ISI DOKUMEN:
+${textCtx}${(doc.extracted_text || "").length > 10000 ? "\n[... dipotong ...]" : ""}
+
+Jawab berdasarkan isi dokumen. Jika tidak ada di dokumen, katakan dengan jelas. Gunakan bahasa Indonesia profesional.`;
+
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+
+      let fullReply = "";
+      try {
+        const stream = await openai.chat.completions.create({
+          model: SMART_MODEL,
+          messages: [{ role: "system", content: sysPrompt }, { role: "user", content: message }],
+          stream: true, temperature: 0.3, max_tokens: 1500,
+        });
+        for await (const chunk of stream) {
+          const delta = chunk.choices[0]?.delta?.content || "";
+          if (delta) { fullReply += delta; res.write(`data: ${JSON.stringify({ chunk: delta })}\n\n`); }
+        }
+      } catch {
+        const or = new OpenAI({ apiKey: process.env.OPENROUTER_API_KEY, baseURL: OPENROUTER_BASE_URL });
+        const r = await or.chat.completions.create({ model: OPENROUTER_MODEL, messages: [{ role: "system", content: sysPrompt }, { role: "user", content: message }], temperature: 0.3, max_tokens: 1500 });
+        fullReply = r.choices[0]?.message?.content || "";
+        res.write(`data: ${JSON.stringify({ chunk: fullReply })}\n\n`);
+      }
+
+      const hist = Array.isArray(doc.chat_history) ? doc.chat_history : [];
+      const newHist = [...hist, { role: "user", content: message }, { role: "assistant", content: fullReply }].slice(-20);
+      await db.execute(sqlBD`UPDATE document_analyses SET chat_history = ${JSON.stringify(newHist)}::jsonb, updated_at = NOW() WHERE id = ${parseInt(req.params.id)}`);
+
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+    } catch (err: any) {
+      res.write(`data: ${JSON.stringify({ error: err?.message || "error" })}\n\n`);
+      res.end();
+    }
+  });
+
+  app.delete("/api/bedah-dokumen/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      const { sql: sqlBD } = await import("drizzle-orm");
+      await db.execute(sqlBD`DELETE FROM document_analyses WHERE id = ${parseInt(req.params.id)} AND user_id = ${userId}`);
+      res.json({ success: true });
+    } catch {
+      res.status(500).json({ error: "Gagal menghapus dokumen" });
+    }
+  });
+
   // ==================== Tender Document Catalog Routes (Perpres 46/2025) ====================
   // Katalog ini publik (data referensi), filterable. Mutasi (POST/DELETE) butuh auth.
 

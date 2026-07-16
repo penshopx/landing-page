@@ -97,6 +97,7 @@ import PaperlessAsesmenPage from "@/pages/paperless-asesmen";
 import ManajemenLspTukPage from "@/pages/manajemen-lsp-tuk";
 import LexKonstruksiSengketaPage from "@/pages/lex-konstruksi-sengketa";
 import KonsultanDokumenProyekPage from "@/pages/konsultan-dokumen-proyek";
+import BedahDokumenPage from "@/pages/bedah-dokumen";
 import KonsultanPancekSmapPage from "@/pages/konsultan-pancek-smap";
 import KonsultanIsoSmmPage from "@/pages/konsultan-iso-smm";
 import KonsultanIsoSmlPage from "@/pages/konsultan-iso-sml";
@@ -545,6 +546,7 @@ function Router() {
       <Route path="/brain-project" component={BrainProjectPage} />
       <Route path="/konsultan-kontrak" component={KonsultanKontrakPage} />
       <Route path="/konsultan-dokumen-proyek" component={KonsultanDokumenProyekPage} />
+      <Route path="/bedah-dokumen" component={BedahDokumenPage} />
       <Route path="/konsultan-pancek-smap" component={KonsultanPancekSmapPage} />
       <Route path="/konsultan-iso-smm" component={KonsultanIsoSmmPage} />
       <Route path="/konsultan-iso-sml" component={KonsultanIsoSmlPage} />
