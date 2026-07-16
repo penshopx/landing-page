@@ -16524,7 +16524,10 @@ Return JSON format:
 
   app.get("/api/landing/:agentId", async (req, res) => {
     try {
-      const agent = await storage.getAgent(req.params.agentId as string);
+      const raw = req.params.agentId as string;
+      const agent = /^\d+$/.test(raw)
+        ? await storage.getAgent(raw)
+        : await storage.getAgentBySlug(raw);
       if (!agent) {
         return res.status(404).json({ error: "Landing page not found" });
       }
