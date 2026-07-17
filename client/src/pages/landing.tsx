@@ -1032,9 +1032,9 @@ export default function Landing() {
                 color: "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20",
                 badge: "bg-amber-600",
                 title: "AI adalah Aset — Bukan Sekadar Alat",
-                desc: "\"Nilai\" bukan hanya uang. Bisa berupa waktu, produktivitas, reputasi, kompetensi, atau penghasilan nyata. Jual hasil rakitan Anda melalui Creator Marketplace — atau gunakan AI untuk membuka layanan baru bagi klien.",
-                items: ["Jual chatbot di Creator Marketplace", "Revenue sharing 80/20 untuk creator", "Layanan konsultasi berbasis AI", "Penghasilan dari kompetensi yang Anda miliki"],
-                cta: "Lihat Program Affiliate & Creator", href: "/affiliate",
+                desc: "\"Nilai\" bukan hanya uang. Bisa berupa waktu, produktivitas, reputasi, kompetensi, atau penghasilan nyata. Gunakan AI untuk membuka layanan baru, mempercepat pekerjaan, dan memperkuat keunggulan profesional Anda.",
+                items: ["Layanan konsultasi berbasis AI", "Percepat penyelesaian proyek & dokumen", "Penghasilan dari kompetensi yang Anda miliki", "Program afiliasi 30% recurring"],
+                cta: "Lihat Program Afiliasi", href: "/affiliate",
               },
               {
                 emoji: "🚀", num: "05", label: "BERKEMBANG",
@@ -1543,7 +1543,7 @@ export default function Landing() {
                 {[
                   "Template siap pakai — tinggal isi form konfigurasi",
                   "Monetisasi keahlian Anda langsung ke klien",
-                  "Revenue sharing 80/20 di Template Marketplace",
+                  "Komisi afiliasi 30% recurring",
                   "Bangun personal brand digital tanpa tim IT",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
@@ -1552,7 +1552,7 @@ export default function Landing() {
                 ))}
               </ul>
               <Button asChild variant="outline" className="w-full gap-2 border-violet-400 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40">
-                <Link href={builderUrl}>Jadi Creator <ArrowRight className="w-3.5 h-3.5" /></Link>
+                <Link href={builderUrl}>Mulai Gunakan AI <ArrowRight className="w-3.5 h-3.5" /></Link>
               </Button>
             </div>
           </div>
@@ -1658,7 +1658,7 @@ export default function Landing() {
                 Untuk lembaga atau profesional yang ingin merakit platform digital dengan identitas organisasi sendiri — tanpa coding.
               </p>
               <ul className="space-y-2 text-xs text-blue-200">
-                {["Branding penuh (logo, nama, warna Anda)", "Knowledge base skala besar", "Revenue sharing 80/20 di Marketplace", "Tidak perlu tim IT"].map((i) => (
+                {["Branding penuh (logo, nama, warna Anda)", "Knowledge base skala besar", "Akses produk AI seluruh katalog", "Tidak perlu tim IT"].map((i) => (
                   <li key={i} className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-yellow-400 shrink-0" />{i}</li>
                 ))}
               </ul>
@@ -1699,7 +1699,7 @@ export default function Landing() {
               },
               {
                 q: "Bisakah saya menghasilkan uang dari Gustafta?",
-                a: "Bisa. Lewat Creator Marketplace dengan revenue sharing 80/20, atau langsung ke klien Anda sendiri lewat layanan yang Anda atur. Pengetahuan Anda adalah aset — Gustafta membantu mengubahnya menjadi produk.",
+                a: "Bisa. Lewat program afiliasi dengan komisi 30% recurring, atau gunakan langsung untuk layanan ke klien Anda sendiri. Pengetahuan Anda adalah aset — Gustafta membantu mengubahnya menjadi produktivitas nyata.",
               },
               {
                 q: "Apakah Gustafta hanya untuk sektor konstruksi?",

@@ -93,8 +93,8 @@ export default function Penghasilan() {
             <Wallet className="h-5 w-5 text-rose-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold" data-testid="text-page-title">Penghasilan Kreator</h1>
-            <p className="text-slate-400 text-sm">Bagi hasil 80/20 dari lisensi produk Anda di marketplace — terkumpul otomatis.</p>
+            <h1 className="text-xl font-bold" data-testid="text-page-title">Penghasilan Afiliasi</h1>
+            <p className="text-slate-400 text-sm">Komisi dari program afiliasi & referral aktif — terkumpul otomatis.</p>
           </div>
           <Button asChild variant="outline" size="sm" className="border-slate-700">
             <Link href="/os">Gustafta OS</Link>

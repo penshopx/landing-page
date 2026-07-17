@@ -1179,8 +1179,8 @@ export default function Dashboard() {
                       <Wallet className="w-4 h-4 text-rose-500" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">Penghasilan Kreator</p>
-                      <p className="text-xs text-muted-foreground">Lacak bagi hasil penjualan produk Anda</p>
+                      <p className="text-sm font-medium">Penghasilan Afiliasi</p>
+                      <p className="text-xs text-muted-foreground">Lacak komisi dari program afiliasi Anda</p>
                     </div>
                     <ArrowRight className="w-4 h-4 text-rose-500 shrink-0" />
                   </div>

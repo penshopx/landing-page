@@ -65,7 +65,7 @@ export default function MitraPage() {
             Anda sudah punya pengetahuan. Anda sudah punya pengalaman. Gustafta memberi Anda
             platform, payment gateway, marketplace, dan dukungan penuh — tanpa modal besar.
           </p>
-          <p className="text-sm text-emerald-200 mb-8 font-semibold">Revenue Sharing 80/20 · Tanpa Risiko · Mulai Kapan Saja</p>
+          <p className="text-sm text-emerald-200 mb-8 font-semibold">Kemitraan Institusional · Tanpa Risiko · Mulai Kapan Saja</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={WA_URL} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold gap-2 px-8 h-12" data-testid="btn-hero-jadi-mitra">
@@ -79,7 +79,7 @@ export default function MitraPage() {
             </Link>
           </div>
           <div className="flex flex-wrap gap-6 text-xs text-emerald-200 mt-8 justify-center">
-            {["80% revenue untuk Anda", "Infrastruktur lengkap tersedia", "Support penuh dari tim"].map((s) => (
+            {["Akses platform penuh", "Infrastruktur lengkap tersedia", "Support penuh dari tim"].map((s) => (
               <span key={s} className="flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-emerald-300" />{s}
               </span>

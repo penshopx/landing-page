@@ -126,7 +126,7 @@ export function ChaesaWidget() {
     { emoji: "🛠️", text: "AI Tools apa saja yang siap pakai (RAB, K3 Vision, Proposal)?" },
     { emoji: "🧭", text: "Saya mau mulai dari nol — harus dari mana dulu?" },
     { emoji: "🏗️", text: "Saya kontraktor/konsultan konstruksi — tools paling cocok apa?" },
-    { emoji: "💰", text: "Bagaimana jadi Creator & jual chatbot (bagi hasil 80/20)?" },
+    { emoji: "🏗️", text: "Bagaimana Brain Project membantu pendampingan proyek konstruksi?" },
     { emoji: "💳", text: "Harga paket Gustafta & cara berlangganan?" },
   ];
 

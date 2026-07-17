@@ -73,7 +73,6 @@ export default function SyaratKetentuan() {
               <li>Setiap pengguna <strong>wajib memiliki lisensi</strong> (hak pakai) untuk menggunakan chatbot. Pada jalur Jasa Order, lisensi sudah termasuk dalam biaya setup dan tidak ditagih terpisah.</li>
               <li><strong>Biaya bulanan (hosting &amp; token) dikenakan untuk semua produk</strong> — baik chatbot biasa maupun premium — dan sepenuhnya menjadi hak Gustafta.</li>
               <li>Perbedaan chatbot biasa dan premium hanya terletak pada <strong>biaya lisensi</strong>; biaya bulanan mengikuti tier langganan yang sama.</li>
-              <li>Pada Program Creator (marketplace), bagi hasil <strong>80% Creator / 20% Gustafta dihitung hanya dari biaya lisensi</strong>; biaya bulanan tetap 100% menjadi hak Gustafta.</li>
               <li>Layanan <strong>tidak menyediakan akses gratis permanen</strong>. Masa uji coba (bila ada) bersifat sementara sesuai ketentuan yang ditampilkan saat pendaftaran.</li>
             </ul>
             <p className="mt-2">Rincian harga terkini ditampilkan pada halaman produk/harga di dalam Layanan. Harga dapat berubah sewaktu-waktu; perubahan tidak berlaku surut atas periode yang sudah dibayar.</p>
@@ -94,12 +93,7 @@ export default function SyaratKetentuan() {
           </section>
 
           <section>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">7. Program Creator (Marketplace)</h2>
-            <p>Creator dapat menjual chatbot premium melalui toko Gustafta dengan skema bagi hasil sebagaimana diatur di dalam Layanan. Creator bertanggung jawab atas keaslian, legalitas, dan kualitas produk yang dijual.</p>
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">8. Penggunaan yang Dilarang</h2>
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-2">7. Penggunaan yang Dilarang</h2>
             <ul className="list-disc pl-5 space-y-1">
               <li>Melanggar hukum yang berlaku di Republik Indonesia.</li>
               <li>Menyalahgunakan Layanan untuk penipuan, ujaran kebencian, konten ilegal, atau merugikan pihak lain.</li>

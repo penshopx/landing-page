@@ -67,7 +67,7 @@ const CREATOR_STEPS = [
   {
     label: "Submit ke Gustafta",
     icon: "📤",
-    desc: "Daftarkan chatbotmu ke Creator Marketplace",
+    desc: "Ajukan produk AI ke tim kurasi Gustafta",
     content: () => (
       <div className="space-y-3">
         <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
@@ -387,7 +387,7 @@ const AFFILIATE_STEPS = [
 ];
 
 function InteractiveSimulator() {
-  const [activeTab, setActiveTab] = useState<"creator" | "affiliate">("creator");
+  const [activeTab, setActiveTab] = useState<"creator" | "affiliate">("affiliate");
   const [step, setStep] = useState(0);
 
   const steps = activeTab === "creator" ? CREATOR_STEPS : AFFILIATE_STEPS;
@@ -409,29 +409,13 @@ function InteractiveSimulator() {
           Jelajahi alur step by step — klik untuk melihat apa yang terjadi di setiap tahap.
         </p>
 
-        {/* Tab selector */}
+        {/* Tab selector — hanya affiliate */}
         <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
           <button
-            onClick={() => handleTab("creator")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-              activeTab === "creator"
-                ? "bg-white text-violet-700 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-            data-testid="tab-creator"
-          >
-            🏪 Jalur Creator
-          </button>
-          <button
-            onClick={() => handleTab("affiliate")}
-            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-              activeTab === "affiliate"
-                ? "bg-white text-violet-700 shadow-sm"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold bg-white text-violet-700 shadow-sm"
             data-testid="tab-affiliate"
           >
-            🔗 Jalur Affiliate
+            🔗 Jalur Affiliate & Kemitraan
           </button>
         </div>
 
@@ -510,7 +494,7 @@ function InteractiveSimulator() {
                 data-testid="button-step-cta"
               >
                 <Share2 className="h-3.5 w-3.5" />
-                {activeTab === "creator" ? "Daftar Creator →" : "Daftar Affiliate →"}
+                Daftar Affiliate →
               </Button>
             </a>
           )}
@@ -553,11 +537,11 @@ export default function AffiliatePage() {
             Ubah AI yang kamu rakit menjadi penghasilan nyata
           </h2>
           <p className="text-sm text-violet-700 dark:text-violet-300 mb-5 max-w-3xl leading-relaxed">
-            AI yang kamu buat bisa menghasilkan uang — dijual ke orang lain, atau dikomersialisasikan lewat program affiliate. Ini bukan tentang merakit lagi, ini tentang memonetisasi hasil rakitanmu.
+            Rekomendasikan solusi AI Gustafta ke kontraktor, konsultan, dan praktisi konstruksi — dan dapatkan komisi recurring dari setiap referral yang aktif berlangganan.
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
             {[
-              { icon: "🏪", label: "Creator Marketplace", sub: "Jual chatbot, prompt & template buatanmu" },
+              { icon: "🤝", label: "Kemitraan Institusi", sub: "Distribusikan solusi AI ke jaringan Anda" },
               { icon: "💰", label: "Royalti Rekurring", sub: "Terima komisi tiap bulan selagi produkmu aktif" },
               { icon: "📦", label: "Knowledge Pack", sub: "Jual paket pengetahuan domain spesialismu" },
               { icon: "🔗", label: "Affiliate Program", sub: "30% komisi rekurring dari setiap referral" },
@@ -572,7 +556,7 @@ export default function AffiliatePage() {
           <div className="flex flex-wrap gap-3">
             <a href={WA_URL} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">
               <button className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
-                <Star className="h-3.5 w-3.5" /> Daftar Creator Marketplace
+                <Star className="h-3.5 w-3.5" /> Info Program Kemitraan
               </button>
             </a>
             <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tahu%20program%20Affiliate%20Gustafta" target="_blank" rel="noopener noreferrer">
@@ -593,15 +577,15 @@ export default function AffiliatePage() {
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-xs font-semibold mb-6">
             <Share2 className="h-3.5 w-3.5" />
-            Program Affiliate & Reseller · Creator Marketplace
+            Program Affiliate & Kemitraan Institusional
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">
             Pengetahuanmu Punya Nilai.<br />
             <span className="text-violet-200">Sekarang Saatnya Dimonetisasi.</span>
           </h1>
           <p className="text-base md:text-lg text-violet-100 mb-4 max-w-2xl mx-auto leading-relaxed">
-            Jual AI yang kamu rakit di Creator Marketplace — atau hasilkan komisi hingga 30% berulang setiap bulan
-            dari program affiliate, tanpa harus membuat produk sendiri.
+            Hasilkan komisi hingga 30% berulang setiap bulan dari program afiliasi Gustafta —
+            rekomendasikan platform AI konstruksi terbaik dan dapatkan penghasilan pasif.
           </p>
           <div className="flex items-center justify-center gap-6 mb-8 text-white">
             {[["30%", "Komisi Maks"], ["Recurring", "Tiap Bulan"], ["Rp 0", "Modal Awal"]].map(([num, label]) => (

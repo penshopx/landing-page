@@ -80,7 +80,7 @@ const ALUR = [
   { step: "1", label: "Daftar Tunggu", desc: "Masukkan nomor WhatsApp — kami kabari saat slot tersedia", icon: MessageCircle, color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
   { step: "2", label: "3 Sesi Workshop", desc: "Online · 2 jam/sesi · Hands-on di platform langsung", icon: GraduationCap, color: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300" },
   { step: "3", label: "Mentoring Implementasi", desc: "Pendampingan aplikasi materi ke domain chatbot Anda sendiri", icon: Brain, color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
-  { step: "4", label: "Sertifikat + Creator", desc: "Ujian praktik → lulus → boleh jual chatbot di Store Creator", icon: Award, color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
+  { step: "4", label: "Sertifikat Kompetensi", desc: "Ujian praktik → lulus → terima sertifikat Gustafta Certified AI Assembler", icon: Award, color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
 ];
 
 export default function WorkshopPage() {
@@ -335,7 +335,7 @@ export default function WorkshopPage() {
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {[
-              { icon: Users, title: "Konsultan & Praktisi Domain", desc: "Ingin tambah layanan AI ke klien — setelah bersertifikat bisa jual chatbot di Store Creator" },
+              { icon: Users, title: "Konsultan & Praktisi Domain", desc: "Ingin tambah layanan AI ke klien — setelah bersertifikat langsung bisa deploy untuk proyek nyata" },
               { icon: Lightbulb, title: "Builder yang Sudah Punya Akun", desc: "Sudah berlangganan tapi belum maksimalkan semua panel — ini shortcut menguasai semuanya" },
               { icon: FileText, title: "Penulis & Kreator Konten", desc: "Ingin chatbot yang menghasilkan dokumen nyata, bukan hanya menjawab pertanyaan" },
               { icon: Zap, title: "Operator & Admin Bisnis", desc: "Ingin konfigurasi yang benar dari awal — bukan trial and error yang menghabiskan waktu" },

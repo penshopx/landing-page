@@ -751,41 +751,7 @@ export default function StoreFeatured() {
         </div>
       </section>
 
-      {/* ── 7. PRODUCT GRID — Mitra ── */}
-      <section className="py-14 px-4 bg-gray-50 border-b border-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-start justify-between mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0">
-                  <Users className="h-4 w-4 text-white" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">Produk Mitra Bersertifikat</h2>
-                <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-[10px] font-bold">BERSERTIFIKAT</Badge>
-              </div>
-              <p className="text-sm text-gray-500 ml-10">
-                Dibuat oleh creator bersertifikat — lulus workshop Gustafta, direview tim, dikurasi sebelum tayang.
-              </p>
-            </div>
-            <Link href="/store/katalog">
-              <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 text-xs gap-1 shrink-0" data-testid="link-lihat-semua-mitra">
-                Lihat Semua <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-          {isLoading ? <SkeletonGrid /> : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {mitra.length > 0
-                ? mitra.map(agent => (
-                    <FeaturedCard key={String(agent.id)} agent={agent} onBuy={handleBuy} onDemo={handleDemo} />
-                  ))
-                : <GroupEmptyState isGustafta={false} />}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── 8. FAQ ── */}
+      {/* ── 7. FAQ ── */}
       <section className="py-16 px-4 bg-white border-b border-gray-100">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
