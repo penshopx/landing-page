@@ -901,14 +901,6 @@ function RuangSimpanLandingPage() {
             );
           })}
         </div>
-
-        {/* Cost transparency note */}
-        <div className="mt-8 bg-muted/40 border border-border rounded-xl p-4 text-center text-xs text-muted-foreground max-w-2xl mx-auto">
-          <span className="font-semibold text-foreground">Transparansi biaya:</span>{" "}
-          Penyimpanan kami menggunakan infrastruktur cloud object storage dengan biaya
-          ~Rp 200–Rp 5.700/bulan per pengguna. Selisih menutupi biaya AI processing,
-          pengembangan fitur, dan dukungan teknis. Tidak ada biaya tersembunyi.
-        </div>
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────────────────────── */}
