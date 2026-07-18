@@ -17,7 +17,7 @@ import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const FREE_QUOTA_BYTES  = 50 * 1024 * 1024;  // 50 MB
+const FREE_QUOTA_BYTES  = 15 * 1024 * 1024;  // 15 MB (free tier)
 const MAX_FILE_BYTES    = 20 * 1024 * 1024;  // 20 MB per file
 const CHUNK_SIZE        = 600;               // chars per KB chunk
 const CHUNK_OVERLAP     = 80;

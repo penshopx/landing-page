@@ -17,9 +17,11 @@ import {
   FileSpreadsheet, Loader2, Trash2, Download, Pencil, Plus, LogIn,
   Sparkles, CheckCircle2, Clock, AlertCircle, X, Shield, Wrench,
   Calculator, Award, BarChart3, Folder, ChevronRight, RefreshCw,
-  Brain, Eye, Link2, Info,
+  Brain, Eye, Link2, Info, Check, ArrowRight, Zap, Lock,
+  DatabaseZap, ScanSearch, BrainCircuit, ClipboardList, Star,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { RUANG_SIMPAN_PLANS } from "@/data/pricing";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -183,17 +185,7 @@ export default function RuangSimpanPage() {
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
     </div>
   );
-  if (!user) return (
-    <div className="min-h-screen bg-background">
-      <SharedHeader />
-      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
-        <HardDrive className="h-16 w-16 text-muted-foreground mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Ruang Simpan</h1>
-        <p className="text-muted-foreground mb-6 max-w-sm">Gudang dokumen perusahaan yang bisa dikurasi oleh seluruh fitur AI Gustafta.</p>
-        <Link href="/masuk"><Button size="lg" className="gap-2"><LogIn className="h-4 w-4" /> Masuk ke Akun</Button></Link>
-      </div>
-    </div>
-  );
+  if (!user) return <RuangSimpanLandingPage />;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background">
@@ -214,7 +206,7 @@ export default function RuangSimpanPage() {
             <div className="flex items-center gap-2 text-xs text-indigo-200 w-full justify-between">
               <span>{formatBytes(usage?.used || 0)}</span>
               <span className="text-white/40">/</span>
-              <span>50 MB gratis</span>
+              <span>15 MB gratis</span>
               <span className={`font-bold ml-auto ${usagePct > 80 ? "text-red-400" : usagePct > 50 ? "text-amber-400" : "text-emerald-400"}`}>{usagePct}%</span>
             </div>
             <Progress value={usagePct} className="h-1.5 w-full bg-white/10" />
@@ -677,5 +669,287 @@ function NewFolderDialog({ onClose, onCreated }: { onClose: () => void; onCreate
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ── Landing Page (unauthenticated) ────────────────────────────────────────────
+
+const PLAN_COLOR_MAP: Record<string, { badge: string; ring: string; btn: string; glow: string }> = {
+  gray:   { badge: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300", ring: "border-border", btn: "bg-gray-800 hover:bg-gray-700 text-white", glow: "" },
+  blue:   { badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300", ring: "border-blue-300 dark:border-blue-700", btn: "bg-blue-600 hover:bg-blue-700 text-white", glow: "" },
+  indigo: { badge: "bg-indigo-600 text-white", ring: "border-indigo-500 ring-2 ring-indigo-400/30", btn: "bg-indigo-600 hover:bg-indigo-700 text-white", glow: "shadow-indigo-200 dark:shadow-indigo-900/40 shadow-xl" },
+  violet: { badge: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300", ring: "border-violet-300 dark:border-violet-700", btn: "bg-violet-600 hover:bg-violet-700 text-white", glow: "" },
+};
+
+function RuangSimpanLandingPage() {
+  return (
+    <div className="min-h-screen bg-background">
+      <SharedHeader />
+
+      {/* ── HERO ─────────────────────────────────────────────────────────────── */}
+      <section className="relative bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white overflow-hidden">
+        {/* grid accent */}
+        <div className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: "linear-gradient(rgba(99,102,241,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.3) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+        <div className="relative max-w-5xl mx-auto px-4 py-20 text-center">
+          <div className="inline-flex items-center gap-2 bg-indigo-500/20 border border-indigo-500/30 rounded-full px-4 py-1.5 text-indigo-300 text-xs font-semibold mb-6">
+            <HardDrive className="h-3.5 w-3.5" /> Ruang Simpan — Beta
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black leading-tight mb-4">
+            Bukan sekadar{" "}
+            <span className="line-through opacity-40">Google Drive</span>.<br />
+            <span className="bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+              Dokumen yang berpikir.
+            </span>
+          </h1>
+          <p className="text-indigo-200 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+            Simpan dokumen perusahaan BUJK Anda — lalu biarkan seluruh fitur AI Gustafta
+            membaca, memahami, dan menggunakannya sebagai konteks secara otomatis.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/masuk">
+              <Button size="lg" className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8">
+                <LogIn className="h-4 w-4" /> Mulai Gratis — 15 MB
+              </Button>
+            </Link>
+            <a href="#pricing">
+              <Button size="lg" variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10">
+                Lihat Tarif Sewa <ArrowRight className="h-4 w-4" />
+              </Button>
+            </a>
+          </div>
+          {/* social proof mini */}
+          <div className="flex flex-wrap justify-center gap-6 mt-10 text-xs text-indigo-300/70">
+            <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" /> Data terenkripsi</span>
+            <span className="flex items-center gap-1.5"><Shield className="h-3 w-3" /> Khusus pemilik akun</span>
+            <span className="flex items-center gap-1.5"><Brain className="h-3 w-3" /> AI siap dalam menit</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MASALAH ──────────────────────────────────────────────────────────── */}
+      <section className="bg-muted/30 border-y border-border py-14 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-center text-xl font-bold text-foreground mb-8">
+            Google Drive menyimpan dokumen. Gustafta Ruang Simpan <em>mengaktifkannya.</em>
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {/* Google Drive column */}
+            <div className="bg-white dark:bg-card border border-border rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                  <Folder className="h-4 w-4 text-gray-400" />
+                </div>
+                <span className="font-bold text-muted-foreground">Google Drive / OneDrive</span>
+              </div>
+              <ul className="space-y-2.5 text-sm text-muted-foreground">
+                {[
+                  "Simpan file ✓  — tapi AI tidak tahu isinya",
+                  "Cari nama file — tidak bisa cari isi dokumen",
+                  "Buka manual setiap kali butuh",
+                  "Tidak terhubung ke proses bisnis konstruksi",
+                  "Storage besar, tapi dokumen mati",
+                ].map(t => (
+                  <li key={t} className="flex items-start gap-2">
+                    <X className="h-4 w-4 text-red-400 shrink-0 mt-0.5" /> {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Ruang Simpan column */}
+            <div className="bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30 border border-indigo-200 dark:border-indigo-800/40 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+                  <HardDrive className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-bold text-indigo-700 dark:text-indigo-300">Gustafta Ruang Simpan</span>
+              </div>
+              <ul className="space-y-2.5 text-sm text-foreground">
+                {[
+                  "Simpan file + AI baca & pahami isinya",
+                  "Cari di dalam isi dokumen (full-text)",
+                  "Konteks otomatis ke Klinik, Bedah Dokumen, Tender",
+                  "Terintegrasi Ruang Kelola — link dokumen legal langsung",
+                  "15 MB gratis, upgrade saat sudah butuh lebih",
+                ].map(t => (
+                  <li key={t} className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-indigo-600 shrink-0 mt-0.5" /> {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CARA KERJA ───────────────────────────────────────────────────────── */}
+      <section className="py-16 px-4 max-w-4xl mx-auto">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-indigo-500 mb-2">Cara Kerja</p>
+        <h2 className="text-center text-2xl font-bold text-foreground mb-10">3 langkah — dokumen Anda jadi cerdas</h2>
+        <div className="grid sm:grid-cols-3 gap-6">
+          {[
+            { step: "1", icon: Upload, title: "Upload Dokumen", desc: "Drag & drop PDF, DOCX, XLSX, JPG, atau PNG ke folder perusahaan Anda. Maks 20 MB per file.", color: "text-blue-600 bg-blue-100 dark:bg-blue-900/30" },
+            { step: "2", icon: BrainCircuit, title: "AI Proses Otomatis", desc: "Gustafta mengekstrak teks, memotong jadi chunk, dan mengindeks isi dokumen dalam menit.", color: "text-violet-600 bg-violet-100 dark:bg-violet-900/30" },
+            { step: "3", icon: Sparkles, title: "Gunakan di Semua Fitur", desc: "Buka Klinik, Bedah Dokumen, Brain Project — AI langsung punya konteks dari dokumen Anda.", color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30" },
+          ].map(({ step, icon: Icon, title, desc, color }) => (
+            <div key={step} className="relative text-center bg-white dark:bg-card border border-border rounded-2xl p-6">
+              <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mx-auto mb-4`}>
+                <Icon className="h-6 w-6" />
+              </div>
+              <div className="absolute -top-3 -right-3 w-7 h-7 rounded-full bg-indigo-600 text-white text-xs font-bold flex items-center justify-center shadow">{step}</div>
+              <h3 className="font-bold text-foreground mb-2">{title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FITUR DETAIL ─────────────────────────────────────────────────────── */}
+      <section className="bg-muted/20 border-y border-border py-14 px-4">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-center text-xs font-bold uppercase tracking-widest text-indigo-500 mb-2">Fitur Utama</p>
+          <h2 className="text-center text-2xl font-bold text-foreground mb-10">Semuanya sudah terhubung</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { icon: ScanSearch,    color:"text-blue-600 bg-blue-50 dark:bg-blue-900/20",    title:"Cari Isi Dokumen",        desc:"Full-text search ke dalam konten PDF, DOCX, dan TXT — bukan hanya nama file." },
+              { icon: BrainCircuit,  color:"text-violet-600 bg-violet-50 dark:bg-violet-900/20", title:"Konteks AI Otomatis",    desc:"Semua fitur AI Gustafta otomatis membaca dokumen Anda saat Anda menggunakannya." },
+              { icon: ClipboardList, color:"text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20", title:"Link ke Ruang Kelola", desc:"Hubungkan file scan dengan catatan SBU, NIB, SKK — satu klik dari dashboard." },
+              { icon: FolderOpen,    color:"text-orange-600 bg-orange-50 dark:bg-orange-900/20", title:"Folder Terstruktur",    desc:"7 kategori default: Legalitas, Teknis, Tender, SDM, dan lainnya. Buat folder sendiri." },
+              { icon: Shield,        color:"text-red-600 bg-red-50 dark:bg-red-900/20",     title:"Aman & Privat",           desc:"Dokumen hanya bisa diakses pemilik akun. Terenkripsi, audit log lengkap." },
+              { icon: DatabaseZap,   color:"text-teal-600 bg-teal-50 dark:bg-teal-900/20",  title:"Preview & Download",      desc:"Lihat gambar langsung di browser. Download kapan saja, tanpa batas." },
+            ].map(({ icon: Icon, color, title, desc }) => (
+              <div key={title} className="bg-white dark:bg-card border border-border rounded-xl p-5">
+                <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-3`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="font-bold text-sm text-foreground mb-1">{title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING ──────────────────────────────────────────────────────────── */}
+      <section id="pricing" className="py-16 px-4 max-w-5xl mx-auto">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-indigo-500 mb-2">Tarif Sewa</p>
+        <h2 className="text-center text-2xl font-bold text-foreground mb-2">Mulai gratis, upgrade saat butuh</h2>
+        <p className="text-center text-sm text-muted-foreground mb-10 max-w-xl mx-auto">
+          Harga terjangkau karena nilai utamanya bukan ukuran storage — melainkan integrasi AI
+          yang membuat dokumen Anda bekerja untuk bisnis konstruksi Anda.
+        </p>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {RUANG_SIMPAN_PLANS.map(plan => {
+            const colors = PLAN_COLOR_MAP[plan.color] || PLAN_COLOR_MAP.gray;
+            return (
+              <div
+                key={plan.key}
+                className={`relative bg-white dark:bg-card border-2 rounded-2xl p-5 flex flex-col transition-transform hover:-translate-y-1 ${colors.ring} ${colors.glow}`}
+              >
+                {/* Badge */}
+                {plan.badge && (
+                  <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold ${colors.badge}`}>
+                    {plan.badge}
+                  </div>
+                )}
+
+                <div className="mb-4">
+                  <p className="font-bold text-foreground">{plan.label}</p>
+                  <div className="mt-1.5">
+                    <span className="text-2xl font-black text-foreground">{plan.price}</span>
+                    {plan.amount > 0 && <span className="text-xs text-muted-foreground ml-1">/bulan</span>}
+                  </div>
+                  <div className="mt-1 inline-flex items-center gap-1 bg-muted px-2 py-0.5 rounded text-xs font-semibold text-foreground">
+                    <HardDrive className="h-3 w-3" /> {plan.storage}
+                  </div>
+                </div>
+
+                <ul className="space-y-2 text-xs text-foreground mb-5 flex-1">
+                  {plan.features.map(f => (
+                    <li key={f} className="flex items-start gap-1.5">
+                      <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                  {plan.limits.map(l => (
+                    <li key={l} className="flex items-start gap-1.5 text-muted-foreground">
+                      <AlertCircle className="h-3.5 w-3.5 text-amber-400 shrink-0 mt-0.5" />
+                      <span>{l}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {plan.ctaHref.startsWith("http") ? (
+                  <a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
+                    <button className={`w-full py-2 rounded-xl text-sm font-bold transition-colors ${colors.btn}`}>
+                      {plan.cta}
+                    </button>
+                  </a>
+                ) : (
+                  <Link href={plan.ctaHref}>
+                    <button className={`w-full py-2 rounded-xl text-sm font-bold transition-colors ${colors.btn}`}>
+                      {plan.cta}
+                    </button>
+                  </Link>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Cost transparency note */}
+        <div className="mt-8 bg-muted/40 border border-border rounded-xl p-4 text-center text-xs text-muted-foreground max-w-2xl mx-auto">
+          <span className="font-semibold text-foreground">Transparansi biaya:</span>{" "}
+          Penyimpanan kami menggunakan infrastruktur cloud object storage dengan biaya
+          ~Rp 200–Rp 5.700/bulan per pengguna. Selisih menutupi biaya AI processing,
+          pengembangan fitur, dan dukungan teknis. Tidak ada biaya tersembunyi.
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────────── */}
+      <section className="bg-muted/20 border-t border-border py-14 px-4">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-center text-xl font-bold text-foreground mb-8">Pertanyaan Umum</h2>
+          <div className="space-y-4">
+            {[
+              { q: "Apakah dokumen saya aman?", a: "Ya. Setiap dokumen hanya bisa diakses oleh pemilik akun. Kami tidak berbagi data Anda dengan siapapun. Semua akses tercatat di audit log." },
+              { q: "Format file apa saja yang didukung?", a: "PDF, DOCX, XLSX (data tabel), JPG, PNG, TXT, CSV, dan Markdown. Maks 20 MB per file." },
+              { q: "Berapa lama AI memproses dokumen saya?", a: "Biasanya kurang dari 1 menit untuk PDF dan TXT. File gambar memerlukan OCR — sekitar 1–3 menit tergantung kompleksitas." },
+              { q: "Apakah 15 MB gratis cukup untuk mencoba?", a: "Cukup untuk 3–5 dokumen SBU, NIB, atau NIK ukuran standar. Tujuannya agar Anda bisa merasakan manfaat AI sebelum memutuskan upgrade." },
+              { q: "Bisakah saya batalkan langganan kapan saja?", a: "Ya. Tidak ada kontrak jangka panjang. Batalkan kapan saja dan data Anda tetap aman selama 30 hari setelah pembatalan." },
+            ].map(({ q, a }) => (
+              <div key={q} className="bg-white dark:bg-card border border-border rounded-xl p-4">
+                <p className="font-semibold text-sm text-foreground mb-1.5">{q}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA FINAL ────────────────────────────────────────────────────────── */}
+      <section className="bg-gradient-to-br from-indigo-600 to-violet-700 py-16 px-4 text-center text-white">
+        <h2 className="text-2xl sm:text-3xl font-black mb-3">Mulai gratis hari ini.</h2>
+        <p className="text-indigo-200 mb-7 max-w-md mx-auto text-sm leading-relaxed">
+          15 MB cukup untuk membuktikan bahwa dokumen Anda bisa bekerja lebih keras dari sekadar diarsipkan.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/masuk">
+            <Button size="lg" className="gap-2 bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-8">
+              <LogIn className="h-4 w-4" /> Buat Akun Gratis
+            </Button>
+          </Link>
+          <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Simpan" target="_blank" rel="noopener noreferrer">
+            <Button size="lg" variant="outline" className="gap-2 border-white/30 text-white hover:bg-white/10">
+              Tanya via WhatsApp
+            </Button>
+          </a>
+        </div>
+      </section>
+
+      {/* footer gap */}
+      <div className="h-12 bg-background" />
+    </div>
   );
 }
