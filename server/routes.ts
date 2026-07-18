@@ -778,7 +778,7 @@ export async function registerRoutes(
   registerOrganizationEngineRoutes(app);
 
   // Ruang Kelola — pengelolaan legalitas, SBU, SKK, perizinan, tender BUJK.
-  registerRuangKelolaRoutes(app);
+  await registerRuangKelolaRoutes(app);
 
   // MIME type lookup for proper Content-Type headers
   const mimeTypes: Record<string, string> = {
