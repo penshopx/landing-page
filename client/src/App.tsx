@@ -470,6 +470,7 @@ function Router() {
       <Route path="/bootstrap-admin" component={BootstrapAdmin} />
       <Route path="/admin/audit" component={AdminAudit} />
       <Route path="/login" component={LoginPage} />
+      <Route path="/masuk" component={LoginPage} />
       <Route path="/auth" component={LoginPage} />
       <Route path="/register" component={() => { window.location.replace("/login?mode=register"); return null; }} />
       <Route path="/daftar" component={() => { window.location.replace("/login?mode=register"); return null; }} />
