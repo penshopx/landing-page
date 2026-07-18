@@ -16,7 +16,8 @@ import {
   CheckCircle2, Clock, Building2, FileText, Shield,
   Award, BarChart3, ChevronRight, Loader2, X, LogIn,
   Bell, Search, RefreshCw, ScanLine, Upload, Sparkles,
-  PhoneCall, Send,
+  PhoneCall, Send, Check, ArrowRight, Lock, CalendarClock,
+  BrainCircuit, Smartphone, HardDrive, BadgeCheck, Wrench,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useRef } from "react";
@@ -248,21 +249,7 @@ export default function RuangKelolaPage() {
     </div>
   );
 
-  if (!user) return (
-    <div className="min-h-screen bg-background">
-      <SharedHeader />
-      <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center">
-        <ClipboardList className="h-16 w-16 text-muted-foreground mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Ruang Kelola</h1>
-        <p className="text-muted-foreground mb-6 max-w-sm">
-          Masuk terlebih dahulu untuk mengelola legalitas, SBU, SKK, perizinan, dan tender perusahaan Anda.
-        </p>
-        <Link href="/masuk">
-          <Button size="lg" className="gap-2"><LogIn className="h-4 w-4" /> Masuk ke Akun</Button>
-        </Link>
-      </div>
-    </div>
-  );
+  if (!user) return <RuangKelolaLandingPage />;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-background">
@@ -1077,5 +1064,227 @@ function BiroJasaDialog({ open, onClose, doc, companyName }: {
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ── Landing Page (unauthenticated) ────────────────────────────────────────────
+
+function RuangKelolaLandingPage() {
+  const CATEGORIES = [
+    { icon: Shield,      color: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",      label: "Legalitas",   desc: "NIB, NPWP, Akta, SK Kemenkumham, PKP" },
+    { icon: BadgeCheck,  color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20", label: "SBU",     desc: "Sertifikat Badan Usaha semua subklasifikasi" },
+    { icon: Award,       color: "text-violet-600 bg-violet-50 dark:bg-violet-900/20", label: "SKK",        desc: "SKK Ahli Muda / Madya / Utama" },
+    { icon: FileText,    color: "text-orange-600 bg-orange-50 dark:bg-orange-900/20", label: "Perizinan",  desc: "IMB/PBG, ISO, CSMS, lingkungan" },
+    { icon: BarChart3,   color: "text-red-600 bg-red-50 dark:bg-red-900/20",          label: "Tender",     desc: "Status & deadline proyek aktif" },
+  ];
+
+  const FEATURES = [
+    { icon: Bell,         color: "text-amber-600 bg-amber-50 dark:bg-amber-900/20",    title: "Alarm Dokumen Kedaluwarsa",  desc: "Notifikasi otomatis 30 hari & 7 hari sebelum expired — dikirim ke WhatsApp perusahaan Anda." },
+    { icon: ScanLine,     color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20", title: "Scan OCR Gemini AI",          desc: "Foto dokumen fisik → AI baca & isi formulir otomatis. Tidak perlu ketik manual." },
+    { icon: Wrench,       color: "text-teal-600 bg-teal-50 dark:bg-teal-900/20",       title: "Biro Jasa Terintegrasi",     desc: "Dokumen expired? Ajukan bantuan pengurusan langsung dari dashboard — tim Gustafta siap bantu." },
+    { icon: HardDrive,    color: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",       title: "Link ke Ruang Simpan",       desc: "Hubungkan file scan asli ke catatan dokumen — arsip digital terpadu satu klik." },
+    { icon: Lock,         color: "text-slate-600 bg-slate-50 dark:bg-slate-900/20",    title: "Keamanan 10 Layer",          desc: "Zod validation, UUID guard, rate limiting, ownership check, audit log — data legal Anda aman." },
+    { icon: BrainCircuit, color: "text-violet-600 bg-violet-50 dark:bg-violet-900/20", title: "Konteks untuk Semua AI",     desc: "Data dokumen bisa dijadikan konteks oleh Klinik, Brain Project, dan fitur AI lainnya." },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SharedHeader />
+
+      {/* HERO */}
+      <section className="relative bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: "linear-gradient(rgba(59,130,246,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.3) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+        <div className="relative max-w-5xl mx-auto px-4 py-20 text-center">
+          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 rounded-full px-4 py-1.5 text-blue-300 text-xs font-semibold mb-6">
+            <ClipboardList className="h-3.5 w-3.5" /> Ruang Kelola — Gratis untuk BUJK
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-black leading-tight mb-4">
+            Jangan sampai SBU/SKK expired<br />
+            <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              di tengah proses tender.
+            </span>
+          </h1>
+          <p className="text-blue-200 text-base sm:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+            Dashboard legalitas khusus BUJK — pantau semua dokumen perusahaan,
+            terima peringatan sebelum kedaluwarsa, dan urus langsung via Biro Jasa terintegrasi.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link href="/masuk">
+              <Button size="lg" className="gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8">
+                <LogIn className="h-4 w-4" /> Mulai Gratis Sekarang
+              </Button>
+            </Link>
+            <a href="#fitur">
+              <Button size="lg" variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10">
+                Lihat Fitur <ArrowRight className="h-4 w-4" />
+              </Button>
+            </a>
+          </div>
+          <div className="flex flex-wrap justify-center gap-6 mt-10 text-xs text-blue-300/70">
+            <span className="flex items-center gap-1.5"><Check className="h-3 w-3" /> 100% gratis untuk semua user</span>
+            <span className="flex items-center gap-1.5"><Lock className="h-3 w-3" /> Data hanya milik Anda</span>
+            <span className="flex items-center gap-1.5"><Bell className="h-3 w-3" /> Reminder WA otomatis</span>
+          </div>
+        </div>
+      </section>
+
+      {/* MASALAH */}
+      <section className="bg-muted/30 border-y border-border py-14 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-xl font-bold text-foreground mb-3">Berapa kerugian akibat dokumen yang tidak terpantau?</h2>
+          <p className="text-sm text-muted-foreground mb-8 max-w-xl mx-auto">
+            Satu dokumen expired bisa menggugurkan seluruh proses tender — padahal sudah mengeluarkan biaya penawaran.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {[
+              { icon: "❌", title: "Gugur Tender", desc: "SBU/SKK kedaluwarsa = gugur di verifikasi administrasi, meski penawaran sudah terbaik." },
+              { icon: "⏰", title: "Pengurusan Mendadak", desc: "Urus SBU darurat memakan 1–3 bulan + biaya lebih mahal karena tidak direncanakan." },
+              { icon: "😓", title: "Lupa Tanggal Expired", desc: "Ratusan dokumen, puluhan tanggal — tidak ada sistem yang mengingatkan tepat waktu." },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="bg-white dark:bg-card border border-border rounded-xl p-5 text-left">
+                <div className="text-2xl mb-2">{icon}</div>
+                <h3 className="font-bold text-sm text-foreground mb-1">{title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* KATEGORI */}
+      <section className="py-14 px-4 max-w-4xl mx-auto">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-blue-500 mb-2">5 Kategori Dokumen</p>
+        <h2 className="text-center text-2xl font-bold text-foreground mb-8">Semua dokumen BUJK dalam satu tempat</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {CATEGORIES.map(({ icon: Icon, color, label, desc }) => (
+            <div key={label} className="bg-white dark:bg-card border border-border rounded-xl p-4 text-center hover:shadow-md transition-shadow">
+              <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mx-auto mb-2`}>
+                <Icon className="h-5 w-5" />
+              </div>
+              <p className="font-bold text-sm text-foreground mb-1">{label}</p>
+              <p className="text-[10px] text-muted-foreground leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FITUR */}
+      <section id="fitur" className="bg-muted/20 border-y border-border py-14 px-4">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-center text-xs font-bold uppercase tracking-widest text-blue-500 mb-2">Fitur Utama</p>
+          <h2 className="text-center text-2xl font-bold text-foreground mb-10">Lebih dari sekadar spreadsheet</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {FEATURES.map(({ icon: Icon, color, title, desc }) => (
+              <div key={title} className="bg-white dark:bg-card border border-border rounded-xl p-5">
+                <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-3`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="font-bold text-sm text-foreground mb-1">{title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CARA KERJA */}
+      <section className="py-16 px-4 max-w-4xl mx-auto">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-blue-500 mb-2">Cara Kerja</p>
+        <h2 className="text-center text-2xl font-bold text-foreground mb-10">Siap pakai dalam 3 langkah</h2>
+        <div className="grid sm:grid-cols-3 gap-6">
+          {[
+            { step: "1", icon: Building2, color: "text-blue-600 bg-blue-100 dark:bg-blue-900/30",       title: "Lengkapi Profil Perusahaan", desc: "Isi nama perusahaan, NIB, NPWP, dan kelas BUJK. Sistem langsung siap digunakan." },
+            { step: "2", icon: ScanLine,  color: "text-violet-600 bg-violet-100 dark:bg-violet-900/30", title: "Input atau Scan Dokumen",    desc: "Tambah manual atau foto dokumen fisik — AI OCR mengisi formulir otomatis dalam detik." },
+            { step: "3", icon: Bell,      color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30", title: "Terima Reminder & Kelola", desc: "WA reminder otomatis 30 & 7 hari sebelum expired. Urus via Biro Jasa jika perlu." },
+          ].map(({ step, icon: Icon, color, title, desc }) => (
+            <div key={step} className="relative text-center bg-white dark:bg-card border border-border rounded-2xl p-6">
+              <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mx-auto mb-4`}>
+                <Icon className="h-6 w-6" />
+              </div>
+              <div className="absolute -top-3 -right-3 w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow">{step}</div>
+              <h3 className="font-bold text-foreground mb-2">{title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* BIRO JASA */}
+      <section className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-y border-amber-200 dark:border-amber-900/30 py-14 px-4">
+        <div className="max-w-3xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-full px-4 py-1.5 text-amber-700 dark:text-amber-400 text-xs font-semibold mb-4">
+            <Wrench className="h-3.5 w-3.5" /> Biro Jasa Terintegrasi
+          </div>
+          <h2 className="text-2xl font-black text-foreground mb-3">Dokumen expired? Kami yang urus.</h2>
+          <p className="text-sm text-muted-foreground mb-6 max-w-xl mx-auto leading-relaxed">
+            Ketika sistem mendeteksi dokumen kedaluwarsa, tombol <strong>Biro Jasa</strong> muncul
+            otomatis di dashboard. Pilih layanan — tim Gustafta menghubungi Anda untuk tindak lanjut.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-3 mb-6 text-left">
+            {[
+              "Pengurusan SBU & Perpanjangan",
+              "SKK & Sertifikasi Kompetensi",
+              "NIB / BUJK & OSS",
+              "Perizinan Lingkungan & ISO",
+              "IMB / PBG",
+              "Konsultasi & Bimbingan Tender",
+            ].map(s => (
+              <div key={s} className="flex items-center gap-2 text-xs text-foreground bg-white dark:bg-card border border-amber-200 dark:border-amber-900/30 rounded-lg px-3 py-2">
+                <Check className="h-3.5 w-3.5 text-amber-600 shrink-0" /> {s}
+              </div>
+            ))}
+          </div>
+          <Link href="/masuk">
+            <Button className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
+              <LogIn className="h-4 w-4" /> Coba Ruang Kelola — Gratis
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-14 px-4">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-center text-xl font-bold text-foreground mb-8">Pertanyaan Umum</h2>
+          <div className="space-y-3">
+            {[
+              { q: "Apakah Ruang Kelola benar-benar gratis?", a: "Ya, 100% gratis. Semua fitur dashboard — input dokumen, reminder, OCR scan, dan monitoring — tersedia tanpa biaya. Biro Jasa (pengurusan dokumen) berbayar sesuai layanan yang dipilih." },
+              { q: "Bagaimana reminder WA bekerja?", a: "Sistem otomatis mengirim pesan WhatsApp ke nomor perusahaan yang Anda daftarkan — 30 hari dan 7 hari sebelum dokumen expired. Tidak perlu setting apapun." },
+              { q: "Apakah data dokumen saya aman?", a: "Ya. Setiap dokumen hanya bisa diakses oleh pemilik akun. Sistem dilindungi 10 layer keamanan termasuk audit log, rate limiting, dan ownership check pada setiap operasi." },
+              { q: "Bisakah saya scan dokumen fisik?", a: "Bisa. Fitur OCR menggunakan Gemini AI — foto dokumen SBU, SKK, atau NIB fisik, sistem otomatis membaca dan mengisi formulir tanpa ketik manual." },
+              { q: "Apa bedanya dengan spreadsheet Excel?", a: "Excel tidak mengirim reminder, tidak bisa scan dokumen, tidak terhubung ke fitur AI lain, dan tidak ada Biro Jasa. Ruang Kelola adalah sistem aktif yang bekerja untuk Anda." },
+            ].map(({ q, a }) => (
+              <div key={q} className="bg-white dark:bg-card border border-border rounded-xl p-4">
+                <p className="font-semibold text-sm text-foreground mb-1.5">{q}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA FINAL */}
+      <section className="bg-gradient-to-br from-blue-700 to-slate-900 py-16 px-4 text-center text-white">
+        <h2 className="text-2xl sm:text-3xl font-black mb-3">Mulai pantau legalitas BUJK Anda hari ini.</h2>
+        <p className="text-blue-200 mb-7 max-w-md mx-auto text-sm leading-relaxed">
+          Gratis selamanya. Tidak perlu kartu kredit. Cukup daftar dan masukkan dokumen pertama Anda.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/masuk">
+            <Button size="lg" className="gap-2 bg-white text-blue-700 hover:bg-blue-50 font-bold px-8">
+              <LogIn className="h-4 w-4" /> Daftar & Mulai Gratis
+            </Button>
+          </Link>
+          <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Kelola%20Gustafta" target="_blank" rel="noopener noreferrer">
+            <Button size="lg" variant="outline" className="gap-2 border-white/30 text-white hover:bg-white/10">
+              <PhoneCall className="h-4 w-4" /> Tanya via WhatsApp
+            </Button>
+          </a>
+        </div>
+      </section>
+
+      <div className="h-12 bg-background" />
+    </div>
   );
 }
