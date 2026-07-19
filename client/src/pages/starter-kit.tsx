@@ -11,11 +11,13 @@ import {
 
 import { trackLead } from "@/lib/meta-pixel";
 const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Starter%20Kit";
+const SCALEV_STARTER_KIT = "https://app.scalev.com/checkout/gustafta-starter-kit";
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }
-
-const CHECKOUT_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%21%20Saya%20tertarik%20berlangganan.%20Mohon%20informasi%20cara%20pembayarannya.";
+function handleBuyClick() {
+  trackLead({ content_name: "Starter Kit — Beli Scalev" });
+}
 
 // Data riset/lembaga (konteks umum, bukan janji hasil produk). Diverifikasi via sumber publik.
 const STATS_STARTER = [
@@ -76,9 +78,9 @@ export default function StarterKitPage() {
             ))}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
+            <a href={SCALEV_STARTER_KIT} onClick={handleBuyClick} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-white text-blue-700 hover:bg-sky-50 font-bold gap-2 px-8 h-12" data-testid="btn-hero-beli-starter">
-                <Zap className="h-5 w-5" /> Tanya Info Pembayaran via WA — {PRICING.starterKit.price}
+                <Zap className="h-5 w-5" /> Beli Starter Kit — {PRICING.starterKit.price}
               </Button>
             </a>
             <a href={WA_URL} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">
@@ -304,9 +306,9 @@ export default function StarterKitPage() {
                   </li>
                 ))}
               </ul>
-              <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
+              <a href={SCALEV_STARTER_KIT} onClick={handleBuyClick} target="_blank" rel="noopener noreferrer">
                 <Button className="w-full h-11 bg-sky-600 hover:bg-sky-500 text-white font-bold" data-testid="btn-pricing-kit">
-                  Tanya Info Pembayaran via WA →
+                  Beli Sekarang — {PRICING.starterKit.price}
                 </Button>
               </a>
               <p className="text-xs text-gray-400 mt-2 text-center">Pembayaran aman via Scalev</p>
@@ -333,9 +335,9 @@ export default function StarterKitPage() {
           </p>
           <p className="text-sky-200 mb-8 text-sm">Starter Kit ini adalah langkah pertama yang paling masuk akal — sebelum investasi lebih besar.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
+            <a href={SCALEV_STARTER_KIT} onClick={handleBuyClick} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-white text-blue-700 hover:bg-sky-50 font-bold gap-2 px-8 h-12" data-testid="btn-final-cta">
-                Tanya Info Pembayaran via WA Sekarang <ArrowRight className="h-5 w-5" />
+                Beli Starter Kit Sekarang <ArrowRight className="h-5 w-5" />
               </Button>
             </a>
             <a href={WA_URL} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">

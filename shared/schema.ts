@@ -2213,11 +2213,14 @@ export type ResearchReport = typeof researchReports.$inferSelect;
 export const scalevMappings = pgTable("scalev_mappings", {
   id: serial("id").primaryKey(),
   scalevProductName: text("scalev_product_name").notNull(),
-  type: text("type").notNull().default("chatbot"), // "chatbot" | "modul" | "bundle" | "ebook"
+  // "chatbot"|"modul"|"bundle"|"ebook"|"starter_kit"|"jasa"|"klinik"|"credit"|"storage_plan"
+  type: text("type").notNull().default("chatbot"),
   agentId: integer("agent_id"),
   bigIdeaId: integer("big_idea_id"),
   agentIds: jsonb("agent_ids").$type<number[]>(), // for "bundle" type
   label: text("label").notNull().default(""),
+  scalevSlug: text("scalev_slug").default(""),   // checkout slug, e.g. "gustafta-starter-kit"
+  meta: jsonb("meta").$type<Record<string, any>>().default({}), // flexible: {credits,plan,durationDays}
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

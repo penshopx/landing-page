@@ -385,7 +385,7 @@ export const RUANG_SIMPAN_PLANS = [
     ],
     limits: [],
     cta: "Pilih Esensial",
-    ctaHref: "/masuk",
+    ctaHref: "https://app.scalev.com/checkout/gustafta-ruang-simpan-esensial",
   },
   {
     key:        "profesional",
@@ -409,7 +409,7 @@ export const RUANG_SIMPAN_PLANS = [
     ],
     limits: [],
     cta: "Pilih Profesional",
-    ctaHref: "/masuk",
+    ctaHref: "https://app.scalev.com/checkout/gustafta-ruang-simpan-profesional",
   },
   {
     key:        "perusahaan",

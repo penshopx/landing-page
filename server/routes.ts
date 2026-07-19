@@ -6849,20 +6849,27 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       const waUrl = `https://wa.me/6282299417818?text=${waMsg}`;
 
       // ── Scalev checkout otomatis ───────────────────────────────────────────
-      // Bila SCALEV_CHATBOT_SLUG tersedia (env), arahkan ke Scalev checkout.
-      // agent_id & order_ref dikirim sebagai custom_field → dibaca webhook
-      // untuk mengaktifkan clone chatbot secara otomatis setelah bayar.
-      // Fallback ke waUrl bila slug belum dikonfigurasi.
+      // Per-agent: cek dulu apakah agen ini punya produk Scalev sendiri
+      // di scalev_mappings (scalevSlug non-kosong). Kalau tidak ada,
+      // gunakan SCALEV_CHATBOT_SLUG env (slug global) sebagai fallback.
       const scalevChatbotSlug = process.env.SCALEV_CHATBOT_SLUG;
       let scalevUrl: string | null = null;
-      if (scalevChatbotSlug && resolvedAgentId) {
-        const qs = new URLSearchParams();
-        qs.set("pre_fill[name]", String(name));
-        qs.set("pre_fill[email]", String(email));
-        if (phone) qs.set("pre_fill[phone]", String(phone));
-        qs.set("agent_id", String(resolvedAgentId));
-        qs.set("order_ref", orderId);
-        scalevUrl = `https://app.scalev.com/checkout/${scalevChatbotSlug}?${qs.toString()}`;
+      if (resolvedAgentId) {
+        let effectiveSlug: string | null = null;
+        try {
+          const agentMapping = await storage.getScalevMappingByAgentId(resolvedAgentId);
+          if (agentMapping?.scalevSlug) effectiveSlug = agentMapping.scalevSlug;
+        } catch {}
+        if (!effectiveSlug) effectiveSlug = scalevChatbotSlug || null;
+        if (effectiveSlug) {
+          const qs = new URLSearchParams();
+          qs.set("pre_fill[name]", String(name));
+          qs.set("pre_fill[email]", String(email));
+          if (phone) qs.set("pre_fill[phone]", String(phone));
+          qs.set("agent_id", String(resolvedAgentId));
+          qs.set("order_ref", orderId);
+          scalevUrl = `https://app.scalev.com/checkout/${effectiveSlug}?${qs.toString()}`;
+        }
       }
       // ──────────────────────────────────────────────────────────────────────
 
@@ -18660,7 +18667,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
 
   app.post("/api/admin/scalev-mappings", isAuthenticated, requireAdmin, async (req: any, res: any) => {
     try {
-      const { scalevProductName, type, agentId, bigIdeaId, agentIds, label } = req.body;
+      const { scalevProductName, type, agentId, bigIdeaId, agentIds, label, scalevSlug, meta } = req.body;
       if (!scalevProductName) return res.status(400).json({ error: "scalevProductName wajib diisi." });
       // Parse agentIds for bundle type
       let parsedAgentIds: number[] | null = null;
@@ -18676,6 +18683,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         bigIdeaId: bigIdeaId ? parseInt(bigIdeaId) : null,
         agentIds: parsedAgentIds,
         label: label || scalevProductName,
+        scalevSlug: scalevSlug?.trim() || "",
+        meta: meta || {},
       } as any);
       res.json(mapping);
     } catch (err: any) {
@@ -18686,7 +18695,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   app.patch("/api/admin/scalev-mappings/:id", isAuthenticated, requireAdmin, async (req: any, res: any) => {
     try {
       const { id } = req.params;
-      const { scalevProductName, type, agentId, bigIdeaId, agentIds, label } = req.body;
+      const { scalevProductName, type, agentId, bigIdeaId, agentIds, label, scalevSlug, meta } = req.body;
       const updates: any = {};
       if (scalevProductName !== undefined) updates.scalevProductName = scalevProductName.trim();
       if (type !== undefined) updates.type = type;
@@ -18702,6 +18711,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         }
       }
       if (label !== undefined) updates.label = label;
+      if (scalevSlug !== undefined) updates.scalevSlug = scalevSlug?.trim() || "";
+      if (meta !== undefined) updates.meta = meta || {};
       const updated = await storage.updateScalevMapping(parseInt(id), updates);
       if (!updated) return res.status(404).json({ error: "Mapping tidak ditemukan." });
       res.json(updated);
@@ -19328,6 +19339,115 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
             }).catch((emailErr: any) => console.error(`[Scalev] Gagal kirim email ebook ke ${customerEmail}:`, emailErr?.message));
           }
           console.log(`[Scalev] Ebook Buku I — DIALOG order diproses untuk ${customerEmail}`);
+        } else if (matchedMapping.type === "starter_kit") {
+          // ── Starter Kit: trial 7 hari + email konfirmasi ───────────────────
+          await storage.createStoreOrder({
+            productId: 0, customerName: customerName || "Customer",
+            customerEmail, customerPhone,
+            amount: Math.round(grossRevenue),
+            midtransOrderId: `scalev_${orderId}`, accessToken, status: "paid",
+          });
+          let trialGranted = false;
+          if (customerEmail) {
+            try {
+              const buyer = await storage.getUserByEmail(customerEmail);
+              if (buyer) {
+                const now = new Date();
+                const endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+                await storage.createSubscription({
+                  userId: buyer.id, plan: "free_trial", status: "active",
+                  amount: 0, currency: "IDR", chatbotLimit: 1,
+                  mayarOrderId: `scalev_starterkit_${orderId}`,
+                  startDate: now.toISOString(), endDate: endDate.toISOString(),
+                } as any);
+                trialGranted = true;
+              } else {
+                await storage.addPendingPremiumDelivery({ masterAgentId: 0, email: customerEmail, source: "scalev" }).catch(() => {});
+              }
+            } catch (skErr: any) {
+              console.error(`[Scalev] Starter Kit trial gagal untuk ${customerEmail}:`, skErr?.message);
+            }
+          }
+          if (customerEmail) {
+            const { sendEmail } = await import("./lib/email");
+            sendEmail({
+              to: customerEmail,
+              subject: "🎉 Starter Kit Gustafta — Akses Siap!",
+              html: `<h2>Halo ${customerName || ""}!</h2><p>Terima kasih sudah membeli <strong>Starter Kit Gustafta (Rp 245.000)</strong>.</p>${trialGranted ? "<p>✅ <strong>Trial 7 hari platform sudah aktif</strong> di akun kamu. Login di <a href='https://gustafta.my.id'>gustafta.my.id</a>.</p>" : "<p>Daftar akun di <a href='https://gustafta.my.id/masuk'>gustafta.my.id/masuk</a> untuk mengaktifkan trial 7 hari kamu.</p>"}<p>Salam,<br>Tim Gustafta</p>`,
+            }).catch(() => {});
+          }
+          console.log(`[Scalev] Starter Kit diproses untuk ${customerEmail} — trial: ${trialGranted}`);
+        } else if (matchedMapping.type === "jasa" || matchedMapping.type === "klinik") {
+          // ── Jasa / Klinik: catat order + notif admin ───────────────────────
+          await storage.createStoreOrder({
+            productId: 0, customerName: customerName || "Customer",
+            customerEmail, customerPhone,
+            amount: Math.round(grossRevenue),
+            midtransOrderId: `scalev_${orderId}`, accessToken, status: "paid",
+          });
+          const typeLabel = matchedMapping.type === "jasa" ? "Jasa Order" : "Klinik";
+          const { sendEmail } = await import("./lib/email");
+          sendEmail({
+            to: process.env.SUPERADMIN_EMAILS?.split(",")[0] || "penshopx@gmail.com",
+            subject: `[${typeLabel}] Pesanan Baru — ${matchedMapping.label || "Produk"} · ${customerName}`,
+            html: `<h3>Pesanan ${typeLabel} Baru</h3><table style="border-collapse:collapse"><tr><td style="padding:4px 12px"><b>Produk</b></td><td>${matchedMapping.label}</td></tr><tr><td style="padding:4px 12px"><b>Nama</b></td><td>${customerName}</td></tr><tr><td style="padding:4px 12px"><b>Email</b></td><td>${customerEmail}</td></tr><tr><td style="padding:4px 12px"><b>Telepon</b></td><td>${customerPhone}</td></tr><tr><td style="padding:4px 12px"><b>Jumlah</b></td><td>Rp ${Math.round(grossRevenue).toLocaleString("id-ID")}</td></tr><tr><td style="padding:4px 12px"><b>Order ID</b></td><td>scalev_${orderId}</td></tr></table>`,
+          }).catch(() => {});
+          console.log(`[Scalev] ${typeLabel} order — ${matchedMapping.label} untuk ${customerEmail}`);
+        } else if (matchedMapping.type === "credit") {
+          // ── Kredit Pesan: tambah extra_message_credits ke user ─────────────
+          await storage.createStoreOrder({
+            productId: 0, customerName: customerName || "Customer",
+            customerEmail, customerPhone,
+            amount: Math.round(grossRevenue),
+            midtransOrderId: `scalev_${orderId}`, accessToken, status: "paid",
+          });
+          const meta = (matchedMapping.meta as any) || {};
+          const credits = meta.credits ?? 500;
+          if (customerEmail) {
+            try {
+              const buyer = await storage.getUserByEmail(customerEmail);
+              if (buyer) {
+                const { db: dbInst } = await import("./db");
+                const { users: usersTbl } = await import("@shared/models/auth");
+                const { eq: eqFn, sql: sqlFn } = await import("drizzle-orm");
+                await dbInst.update(usersTbl)
+                  .set({ extraMessageCredits: sqlFn`extra_message_credits + ${credits}` } as any)
+                  .where(eqFn(usersTbl.id, buyer.id));
+                console.log(`[Scalev] Credit ${credits} pesan ditambahkan untuk ${customerEmail} (user ${buyer.id})`);
+              }
+            } catch (credErr: any) {
+              console.error(`[Scalev] Gagal tambah kredit untuk ${customerEmail}:`, credErr?.message);
+            }
+          }
+        } else if (matchedMapping.type === "storage_plan") {
+          // ── Ruang Simpan berbayar: update storage_plan user ────────────────
+          await storage.createStoreOrder({
+            productId: 0, customerName: customerName || "Customer",
+            customerEmail, customerPhone,
+            amount: Math.round(grossRevenue),
+            midtransOrderId: `scalev_${orderId}`, accessToken, status: "paid",
+          });
+          const meta = (matchedMapping.meta as any) || {};
+          const plan = meta.plan || "esensial";
+          const durationDays = meta.durationDays || 30;
+          if (customerEmail) {
+            try {
+              const buyer = await storage.getUserByEmail(customerEmail);
+              if (buyer) {
+                const { db: dbInst } = await import("./db");
+                const { users: usersTbl } = await import("@shared/models/auth");
+                const { eq: eqFn } = await import("drizzle-orm");
+                const endsAt = new Date();
+                endsAt.setDate(endsAt.getDate() + durationDays);
+                await dbInst.update(usersTbl)
+                  .set({ storagePlan: plan, storagePlanEndsAt: endsAt } as any)
+                  .where(eqFn(usersTbl.id, buyer.id));
+                console.log(`[Scalev] Storage plan "${plan}" (${durationDays}d) aktif untuk ${customerEmail}`);
+              }
+            } catch (storErr: any) {
+              console.error(`[Scalev] Gagal update storage plan untuk ${customerEmail}:`, storErr?.message);
+            }
+          }
         }
       } else {
         // No mapping found — create a generic store order as placeholder (productId=0)

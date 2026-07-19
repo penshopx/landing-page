@@ -19,6 +19,30 @@ import { uploadFile, downloadFile, deleteFile } from "./lib/object-storage";
 // ── Constants ──────────────────────────────────────────────────────────────
 
 const FREE_QUOTA_BYTES  = 15 * 1024 * 1024;  // 15 MB (free tier)
+
+const STORAGE_PLAN_QUOTA: Record<string, number> = {
+  gratis:      FREE_QUOTA_BYTES,
+  esensial:   500  * 1024 * 1024,        // 500 MB
+  profesional: 5   * 1024 * 1024 * 1024, // 5 GB
+  perusahaan: 25   * 1024 * 1024 * 1024, // 25 GB
+};
+
+async function getQuotaForUser(userId: string): Promise<number> {
+  try {
+    const result = await pool.query<{ storage_plan: string | null; storage_plan_ends_at: Date | null }>(
+      "SELECT storage_plan, storage_plan_ends_at FROM users WHERE id = $1",
+      [userId]
+    );
+    if (!result.rows[0]) return FREE_QUOTA_BYTES;
+    const { storage_plan, storage_plan_ends_at } = result.rows[0];
+    if (storage_plan && storage_plan !== "gratis") {
+      if (!storage_plan_ends_at || storage_plan_ends_at > new Date()) {
+        return STORAGE_PLAN_QUOTA[storage_plan] ?? FREE_QUOTA_BYTES;
+      }
+    }
+  } catch {}
+  return FREE_QUOTA_BYTES;
+}
 const MAX_FILE_BYTES    = 20 * 1024 * 1024;  // 20 MB per file
 const CHUNK_SIZE        = 600;               // chars per KB chunk
 const CHUNK_OVERLAP     = 80;
@@ -241,7 +265,7 @@ export function registerRuangSimpanRoutes(app: Express): void {
       ]);
       res.json({
         folders:     foldersRes.rows,
-        usage:       { used: parseInt(usageRes.rows[0].used), quota: FREE_QUOTA_BYTES,
+        usage:       { used: parseInt(usageRes.rows[0].used), quota: await getQuotaForUser(userId),
                        total_files: usageRes.rows[0].total_files, ai_ready: usageRes.rows[0].ai_ready },
         recent_files: recentRes.rows,
         stats:       statsRes.rows[0],
@@ -284,13 +308,14 @@ export function registerRuangSimpanRoutes(app: Express): void {
 
     // Quota check
     const used = await getUsedBytes(userId);
-    if (used + req.file.size > FREE_QUOTA_BYTES) {
-      const remaining = Math.max(0, FREE_QUOTA_BYTES - used);
+    const quotaBytes = await getQuotaForUser(userId);
+    if (used + req.file.size > quotaBytes) {
+      const remaining = Math.max(0, quotaBytes - used);
       return res.status(402).json({
-        error: `Kuota storage hampir penuh. Tersisa ${(remaining / 1024 / 1024).toFixed(1)} MB dari 50 MB gratis.`,
+        error: `Kuota storage penuh. Tersisa ${(remaining / 1024 / 1024).toFixed(1)} MB. Upgrade Ruang Simpan kamu di /ruang-simpan.`,
         quota_exceeded: true,
         used_bytes: used,
-        quota_bytes: FREE_QUOTA_BYTES,
+        quota_bytes: quotaBytes,
       });
     }
 
@@ -544,10 +569,11 @@ export function registerRuangSimpanRoutes(app: Express): void {
     if (!userId) return;
     try {
       const used = await getUsedBytes(userId);
-      res.json({ used_bytes: used, quota_bytes: FREE_QUOTA_BYTES,
+      const quotaBytes = await getQuotaForUser(userId);
+      res.json({ used_bytes: used, quota_bytes: quotaBytes,
                  used_mb: (used / 1024 / 1024).toFixed(2),
-                 quota_mb: (FREE_QUOTA_BYTES / 1024 / 1024).toFixed(0),
-                 pct: Math.min(100, Math.round((used / FREE_QUOTA_BYTES) * 100)) });
+                 quota_mb: (quotaBytes / 1024 / 1024).toFixed(0),
+                 pct: Math.min(100, Math.round((used / quotaBytes) * 100)) });
     } catch (e) { safeErr(res, e, "GET usage"); }
   });
 }

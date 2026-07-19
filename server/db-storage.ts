@@ -4592,6 +4592,13 @@ export class DatabaseStorage implements IStorage {
     return rows[0];
   }
 
+  async getScalevMappingByAgentId(agentId: number): Promise<ScalevMapping | undefined> {
+    const rows = await db.select().from(scalevMappings)
+      .where(and(eq(scalevMappings.agentId, agentId), sql`scalev_slug != '' AND scalev_slug IS NOT NULL`))
+      .limit(1);
+    return rows[0];
+  }
+
   async createScalevMapping(data: InsertScalevMapping): Promise<ScalevMapping> {
     const rows = await db.insert(scalevMappings).values(data as any).returning();
     return rows[0];
