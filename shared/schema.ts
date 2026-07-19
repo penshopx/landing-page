@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { pgTable, text, boolean, timestamp, real, integer, bigint, jsonb, varchar, serial, uniqueIndex, index } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, timestamp, date, real, integer, bigint, jsonb, varchar, serial, uuid, uniqueIndex, index } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 
@@ -2679,3 +2679,52 @@ export const rateLimitBuckets = pgTable("rate_limit_buckets", {
 });
 
 export type RateLimitBucket = typeof rateLimitBuckets.$inferSelect;
+
+// ─── Ruang Kelola — Manajemen Legalitas & Dokumen BUJK ────────────────────────
+// Empat tabel berikut HARUS ada sebelum `ensureRuangKelolaTables()` (di
+// ruang-kelola-routes.ts) bisa membuat tabel pendukung (audit_log dan
+// biro_requests — keduanya punya FK ke ruang_kelola_documents).
+//
+// Urutan DDL:
+//   1. ruang_kelola_profiles      — profil perusahaan per user
+//   2. ruang_kelola_documents     — dokumen legalitas (SBU, SKK, perizinan, dst.)
+//   3. ruang_kelola_audit_log     — jejak create/update/delete (buat oleh ensureRuangKelolaTables)
+//   4. ruang_kelola_biro_requests — permintaan Biro Jasa (buat oleh ensureRuangKelolaTables)
+
+export const ruangKelolaProfiles = pgTable("ruang_kelola_profiles", {
+  id:           uuid("id").primaryKey().defaultRandom(),
+  userId:       text("user_id").notNull().unique(),
+  companyName:  text("company_name").notNull(),
+  nib:          text("nib"),
+  npwp:         text("npwp"),
+  bujkClass:    text("bujk_class"),
+  province:     text("province"),
+  phone:        text("phone"),
+  email:        text("email"),
+  address:      text("address"),
+  updatedAt:    timestamp("updated_at").defaultNow().notNull(),
+  createdAt:    timestamp("created_at").defaultNow().notNull(),
+});
+
+export const ruangKelolaDocuments = pgTable("ruang_kelola_documents", {
+  id:               uuid("id").primaryKey().defaultRandom(),
+  userId:           text("user_id").notNull(),
+  category:         text("category").notNull(),  // legalitas|sbu|skk|perizinan|tender
+  docType:          text("doc_type").notNull(),
+  docName:          text("doc_name").notNull(),
+  docNumber:        text("doc_number"),
+  issuedBy:         text("issued_by"),
+  issuedDate:       date("issued_date"),
+  expiredDate:      date("expired_date"),
+  status:           text("status").notNull().default("active"),
+  notes:            text("notes"),
+  reminderSent30d:  boolean("reminder_sent_30d").notNull().default(false),
+  reminderSent7d:   boolean("reminder_sent_7d").notNull().default(false),
+  createdAt:        timestamp("created_at").defaultNow().notNull(),
+  updatedAt:        timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  index("rk_docs_user_expired_idx").on(table.userId, table.expiredDate),
+]);
+
+export type RuangKelolaProfile = typeof ruangKelolaProfiles.$inferSelect;
+export type RuangKelolaDocument = typeof ruangKelolaDocuments.$inferSelect;
