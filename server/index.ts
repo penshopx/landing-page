@@ -418,7 +418,17 @@ for (const envVar of requiredEnvVars) {
     },
     async () => {
       log(`serving on port ${port}`);
-      
+
+      // ── AI PROVIDER STATUS ────────────────────────────────────────────────
+      try {
+        const { getActiveProviders } = await import("./lib/model-router");
+        const providers = getActiveProviders();
+        const active = Object.entries(providers)
+          .map(([k, v]) => `${k}:${v ? "✓" : "✗"}`)
+          .join("  ");
+        log(`AI providers — ${active}`);
+      } catch (_) {}
+
       // ── ORPHAN CLEANUP — hapus toolboxes/agents yang induknya sudah hilang ──
       // Berlaku di dev & prod sebagai defense-in-depth. Idempoten: hanya menghapus baris yang
       // big_idea_id/series_id-nya tidak lagi punya induk valid; aman dijalankan tiap boot.
