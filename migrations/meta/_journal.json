@@ -71,6 +71,13 @@
       "when": 1752192000000,
       "tag": "0009_otp_channel_phone",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1784484286950,
+      "tag": "0010_init_full",
+      "breakpoints": true
     }
   ]
 }
