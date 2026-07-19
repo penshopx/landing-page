@@ -136,3 +136,9 @@ Semua pakai `PremiumPageGuard` feature="advanced_ai_tools" requiredPlan="profesi
 - Re-imported again; `node_modules` missing (`tsx: not found`) — ran `npm install`, ran `npx drizzle-kit push` (fresh empty Postgres DB, all seed tables missing), restarted workflow. Landing page confirmed rendering.
 - **Same plaintext-secret leak recurred**: `.replit` `[userenv.shared]` again had `BREVO_API_KEY` and `SCALEV_API_KEY` as plaintext values (re-introduced by a prior commit/import). Removed them from `.replit` again — they remain set as proper Replit Secrets. **User should rotate both keys** on Brevo/Scalev if not already done after the previous incident.
 - `OPENAI_API_KEY` is not set in this environment — AI chat features won't work until it's added.
+
+## Replit setup (2026-07-19)
+- `node_modules` missing again (`tsx: not found`) — ran `npm install` (tsx v4.23.1 restored), ran `npx drizzle-kit push` (schema applied to fresh Replit PostgreSQL), restarted "Start application" workflow. Landing page confirmed rendering on port 5000.
+- **Secrets currently set**: `SESSION_SECRET`, `BREVO_API_KEY`, `SCALEV_API_KEY`. Env vars (shared): `ADMIN_EMAILS`, `ADMIN_USER_IDS`, `BREVO_SENDER_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SUPERADMIN_EMAILS`.
+- **Not yet set**: `OPENAI_API_KEY` (AI chat/embeddings won't work), `GEMINI_API_KEY`, `DEEPSEEK_API_KEY`, `MIDTRANS_SERVER_KEY`/`MIDTRANS_CLIENT_KEY`, `TENDER_INGEST_KEY`.
+- After any re-import: run `npm install`, then `npx drizzle-kit push`, then restart the "Start application" workflow.
