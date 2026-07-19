@@ -241,45 +241,13 @@ const ocrUpload = multer({
   },
 });
 
-// ── Boot-time DDL (called once at registration) ────────────────────────────
-
-async function ensureRuangKelolaTables(): Promise<void> {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS ruang_kelola_audit_log (
-      id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id     text NOT NULL,
-      action      text NOT NULL CHECK (action IN ('create','update','delete')),
-      doc_id      uuid,
-      detail      jsonb,
-      ip_address  text,
-      user_agent  text,
-      created_at  timestamptz NOT NULL DEFAULT now()
-    )
-  `);
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS ruang_kelola_biro_requests (
-      id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id      text NOT NULL,
-      doc_id       uuid REFERENCES ruang_kelola_documents(id) ON DELETE SET NULL,
-      service_type text NOT NULL,
-      notes        text,
-      status       text NOT NULL DEFAULT 'pending',
-      created_at   timestamptz NOT NULL DEFAULT now()
-    )
-  `);
-  // Indexes for audit log (filter by user, time)
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_rk_audit_user_time ON ruang_kelola_audit_log (user_id, created_at DESC)`);
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_rk_biro_user ON ruang_kelola_biro_requests (user_id, created_at DESC)`);
-}
+// ── Boot-time DDL ─────────────────────────────────────────────────────────
+// ruang_kelola_audit_log and ruang_kelola_biro_requests are now declared in
+// shared/schema.ts and created by drizzle-kit push/migrate. Nothing to do here.
 
 // ── Main registration ──────────────────────────────────────────────────────
 
 export async function registerRuangKelolaRoutes(app: Express): Promise<void> {
-  // Create supporting tables at startup (idempotent)
-  await ensureRuangKelolaTables().catch(e =>
-    console.error("[RuangKelola] DDL init error:", e.message)
-  );
-
   // ── GET /api/ruang-kelola/profile ────────────────────────────────────────
   app.get("/api/ruang-kelola/profile", isAuthenticated, async (req: any, res) => {
     const userId = extractUserId(req, res);

@@ -2684,15 +2684,13 @@ export const rateLimitBuckets = pgTable("rate_limit_buckets", {
 export type RateLimitBucket = typeof rateLimitBuckets.$inferSelect;
 
 // ─── Ruang Kelola — Manajemen Legalitas & Dokumen BUJK ────────────────────────
-// Empat tabel berikut HARUS ada sebelum `ensureRuangKelolaTables()` (di
-// ruang-kelola-routes.ts) bisa membuat tabel pendukung (audit_log dan
-// biro_requests — keduanya punya FK ke ruang_kelola_documents).
+// Empat tabel berikut semuanya dikelola Drizzle (drizzle-kit push/migrate).
 //
-// Urutan DDL:
+// Urutan DDL (diikuti oleh Drizzle):
 //   1. ruang_kelola_profiles      — profil perusahaan per user
 //   2. ruang_kelola_documents     — dokumen legalitas (SBU, SKK, perizinan, dst.)
-//   3. ruang_kelola_audit_log     — jejak create/update/delete (buat oleh ensureRuangKelolaTables)
-//   4. ruang_kelola_biro_requests — permintaan Biro Jasa (buat oleh ensureRuangKelolaTables)
+//   3. ruang_kelola_audit_log     — jejak create/update/delete
+//   4. ruang_kelola_biro_requests — permintaan Biro Jasa (FK → ruang_kelola_documents)
 
 export const ruangKelolaProfiles = pgTable("ruang_kelola_profiles", {
   id:           uuid("id").primaryKey().defaultRandom(),
@@ -2729,5 +2727,36 @@ export const ruangKelolaDocuments = pgTable("ruang_kelola_documents", {
   index("rk_docs_user_expired_idx").on(table.userId, table.expiredDate),
 ]);
 
+// Jejak audit setiap create/update/delete pada dokumen legalitas.
+// Drizzle menggantikan CREATE TABLE IF NOT EXISTS di ensureRuangKelolaTables().
+export const ruangKelolaAuditLog = pgTable("ruang_kelola_audit_log", {
+  id:          uuid("id").primaryKey().defaultRandom(),
+  userId:      text("user_id").notNull(),
+  action:      text("action").notNull(),   // 'create' | 'update' | 'delete'
+  docId:       uuid("doc_id"),
+  detail:      jsonb("detail"),
+  ipAddress:   text("ip_address"),
+  userAgent:   text("user_agent"),
+  createdAt:   timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index("idx_rk_audit_user_time").on(table.userId, table.createdAt),
+]);
+
+// Permintaan Biro Jasa (pengurusan SBU, SKK, perizinan, dst.).
+// FK ke ruang_kelola_documents dengan ON DELETE SET NULL.
+export const ruangKelolaBiroRequests = pgTable("ruang_kelola_biro_requests", {
+  id:          uuid("id").primaryKey().defaultRandom(),
+  userId:      text("user_id").notNull(),
+  docId:       uuid("doc_id").references(() => ruangKelolaDocuments.id, { onDelete: "set null" }),
+  serviceType: text("service_type").notNull(),
+  notes:       text("notes"),
+  status:      text("status").notNull().default("pending"),
+  createdAt:   timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index("idx_rk_biro_user").on(table.userId, table.createdAt),
+]);
+
 export type RuangKelolaProfile = typeof ruangKelolaProfiles.$inferSelect;
 export type RuangKelolaDocument = typeof ruangKelolaDocuments.$inferSelect;
+export type RuangKelolaAuditLog = typeof ruangKelolaAuditLog.$inferSelect;
+export type RuangKelolaBiroRequest = typeof ruangKelolaBiroRequests.$inferSelect;
