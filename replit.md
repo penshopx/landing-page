@@ -142,3 +142,19 @@ Semua pakai `PremiumPageGuard` feature="advanced_ai_tools" requiredPlan="profesi
 - **Secrets currently set**: `SESSION_SECRET`, `BREVO_API_KEY`, `SCALEV_API_KEY`. Env vars (shared): `ADMIN_EMAILS`, `ADMIN_USER_IDS`, `BREVO_SENDER_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SUPERADMIN_EMAILS`.
 - **Not yet set**: `OPENAI_API_KEY` (AI chat/embeddings won't work), `GEMINI_API_KEY`, `DEEPSEEK_API_KEY`, `MIDTRANS_SERVER_KEY`/`MIDTRANS_CLIENT_KEY`, `TENDER_INGEST_KEY`.
 - After any re-import: run `npm install`, then `npx drizzle-kit push`, then restart the "Start application" workflow.
+
+## ⚠️ Secrets checklist — WAJIB setelah setiap re-import
+**JANGAN pernah tempel API key ke `.replit` atau file apapun yang masuk git.**
+Setelah re-import dari GitHub, atur ulang secrets berikut via **Replit Secrets** (bukan `[userenv.shared]`):
+
+| Secret | Keterangan |
+|--------|-----------|
+| `BREVO_API_KEY` | Email OTP & notifikasi (Brevo dashboard) |
+| `SCALEV_API_KEY` | Payment gateway (Scalev dashboard) |
+| `SESSION_SECRET` | Cookie signing — buat string acak baru |
+| `OPENAI_API_KEY` | AI chat & embeddings |
+| `GEMINI_API_KEY` | Gemini model fallback |
+| `DEEPSEEK_API_KEY` | DeepSeek model fallback |
+| `TENDER_INGEST_KEY` | Relay SIRUP tender data |
+
+**Jika key pernah masuk git history** (pernah ada di `.replit [userenv.shared]`): rotate key tersebut di dashboard masing-masing — BREVO (`xkeysib-...`) dan Scalev (`sk_...`) — agar nilai lama di history git tidak bisa dipakai lagi.
