@@ -18,6 +18,15 @@ Peta siklus 9 tahap jangka panjang (tidak semua tahap sudah diimplementasi): Mas
 - **Codegen (Drizzle)**: `npx drizzle-kit generate` · **DB Push**: `npx drizzle-kit push`
 - **Environment Variables**: `MIDTRANS_SERVER_KEY`, `MIDTRANS_CLIENT_KEY` (Midtrans, legacy)
 
+## Git hooks (wajib setelah setiap fresh clone)
+Setelah `git clone` atau re-import, jalankan sekali:
+```bash
+bash scripts/install-hooks.sh
+```
+Hook `pre-commit` di `scripts/hooks/pre-commit` akan di-copy ke `.git/hooks/pre-commit` dan memblokir commit yang mengandung pola secret (Brevo `xkeysib-*`, OpenAI `sk-*`, Scalev `sk_*`, bearer token, blok `[userenv.shared]` di `.replit`, dll.).
+
+Jika commit diblokir: hapus nilai secret dari file, simpan ke **Replit Secrets** (bukan `.replit` atau `.env`), lalu commit ulang. Jika key sudah masuk git history → rotate di dashboard provider.
+
 ## Stack
 - **Frontend**: React 18 + TypeScript, Tailwind CSS, shadcn/ui, TanStack React Query, Vite, wouter
 - **Backend**: Express 5 + TypeScript, Node.js (`tsx`), Drizzle ORM + Zod, PostgreSQL
