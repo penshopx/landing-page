@@ -99,8 +99,23 @@ export function ChaesaWidget() {
             if (parsed.sessionId && !sessionId) {
               setSessionId(String(parsed.sessionId));
             }
+            // Handle server-sent error events (all providers failed, rate-limit, etc.)
+            if (parsed.type === "error" || parsed.error) {
+              const errMsg = parsed.error || "Maaf, asisten sedang tidak tersedia. Coba lagi dalam beberapa saat.";
+              setMessages(prev => prev.map(m =>
+                m.id === assistantId ? { ...m, content: errMsg } : m
+              ));
+            }
           } catch {}
         }
+      }
+      // If stream ended with no content at all, show a friendly fallback
+      if (!assistantContent) {
+        setMessages(prev => prev.map(m =>
+          m.id === assistantId
+            ? { ...m, content: "Maaf, asisten sedang sibuk. Coba kirim pesan lagi dalam beberapa saat." }
+            : m
+        ));
       }
     } catch (err: any) {
       if (err?.name === "AbortError") return;

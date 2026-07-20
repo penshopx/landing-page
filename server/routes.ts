@@ -4477,7 +4477,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           model: agentModel,
           contents: geminiMsgs as any,
           config: {
-            ...(geminiSysParts.length ? { systemInstruction: geminiSysParts.join("\n\n") } : {}),
+            ...(geminiSysParts.length ? { systemInstruction: { parts: [{ text: geminiSysParts.join("\n\n") }] } } : {}),
             temperature,
             maxOutputTokens: maxTokens,
           },
@@ -5525,7 +5525,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
                 model: agentModel,
                 contents: geminiC as any,
                 config: {
-                  ...(geminiSysP.length ? { systemInstruction: geminiSysP.join("\n\n") } : {}),
+                  ...(geminiSysP.length ? { systemInstruction: { parts: [{ text: geminiSysP.join("\n\n") }] } } : {}),
                   temperature,
                   maxOutputTokens: maxTokens,
                 },
@@ -5685,7 +5685,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
                 model: "gemini-2.5-pro",
                 contents: geminiContents as any,
                 config: {
-                  ...(sysParts.length ? { systemInstruction: sysParts.join("\n\n") } : {}),
+                  ...(sysParts.length ? { systemInstruction: { parts: [{ text: sysParts.join("\n\n") }] } } : {}),
                   temperature,
                   maxOutputTokens: maxTokens,
                 },
@@ -7375,7 +7375,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           const gResp = await genai.models.generateContent({
             model: agentModel,
             contents: geminiC as any,
-            config: { ...(geminiSysP.length ? { systemInstruction: geminiSysP.join("\n\n") } : {}), temperature, maxOutputTokens: maxTokens },
+            config: { ...(geminiSysP.length ? { systemInstruction: { parts: [{ text: geminiSysP.join("\n\n") }] } } : {}), temperature, maxOutputTokens: maxTokens },
           });
           clearTimeout(timer2);
           return (gResp as any).text || "[Tidak ada respons dari Gemini sub-agen]";
@@ -7794,7 +7794,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           model: agentModel,
           contents: geminiC as any,
           config: {
-            ...(geminiSysP.length ? { systemInstruction: geminiSysP.join("\n\n") } : {}),
+            ...(geminiSysP.length ? { systemInstruction: { parts: [{ text: geminiSysP.join("\n\n") }] } } : {}),
             temperature,
             maxOutputTokens: maxTokens,
           },

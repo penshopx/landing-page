@@ -315,7 +315,7 @@ async function* streamOneProvider(
       model: choice.model,
       contents: geminiContents as any,
       config: {
-        ...(systemMsg ? { systemInstruction: systemMsg } : {}),
+        ...(systemMsg ? { systemInstruction: { parts: [{ text: systemMsg }] } } : {}),
         temperature,
         maxOutputTokens: maxTokens,
       },
