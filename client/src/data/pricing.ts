@@ -431,8 +431,8 @@ export const RUANG_SIMPAN_PLANS = [
       "Dedicated support WhatsApp",
     ],
     limits: [],
-    cta: "Hubungi Kami",
-    ctaHref: "https://wa.me/6282299417818?text=Halo%2C%20saya%20tertarik%20Ruang%20Simpan%20Perusahaan",
+    cta: "Pilih Perusahaan",
+    ctaHref: "https://app.scalev.com/checkout/ruang-simpan-perusahaan",
   },
 ] as const;
 
