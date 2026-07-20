@@ -39,6 +39,9 @@ const hasQwen     = () => !!process.env.QWEN_API_KEY;
 const hasDeepSeek = () => !!process.env.DEEPSEEK_API_KEY;
 const hasGemini   = () => !!(process.env.GEMINI_API_KEY || process.env.AI_INTEGRATIONS_GEMINI_API_KEY);
 
+/** Qwen model name — overrideable via QWEN_MODEL env var, defaults to "qwen-plus". */
+export const getQwenModel = () => process.env.QWEN_MODEL?.trim() || "qwen-plus";
+
 /** Returns the ordered fallback chain for a task. First entry = preferred provider. */
 export function buildFallbackChain(task: TaskType): RouterChoice[] {
   switch (task) {
@@ -52,7 +55,7 @@ export function buildFallbackChain(task: TaskType): RouterChoice[] {
     case "orchestration": {
       const chain: RouterChoice[] = [];
       if (hasDeepSeek()) chain.push({ provider: "deepseek", model: "deepseek-chat", reason: "DeepSeek Chat — reasoning kuat untuk orkestrasi" });
-      if (hasQwen())     chain.push({ provider: "qwen",     model: "qwen-plus",     reason: "Qwen Plus — orkestrasi multi-step yang solid" });
+      if (hasQwen())     chain.push({ provider: "qwen",     model: getQwenModel(), reason: "Qwen Plus — orkestrasi multi-step yang solid" });
       chain.push(          { provider: "openai",   model: "gpt-4o",         reason: "GPT-4o — orkestrasi cerdas" });
       return chain;
     }
@@ -60,7 +63,7 @@ export function buildFallbackChain(task: TaskType): RouterChoice[] {
     case "math_rab": {
       const chain: RouterChoice[] = [];
       if (hasDeepSeek()) chain.push({ provider: "deepseek", model: "deepseek-chat", reason: "DeepSeek — chain-of-thought terbaik untuk perhitungan RAB & numerik" });
-      if (hasQwen())     chain.push({ provider: "qwen",     model: "qwen-plus",     reason: "Qwen Plus — perhitungan solid" });
+      if (hasQwen())     chain.push({ provider: "qwen",     model: getQwenModel(), reason: "Qwen Plus — perhitungan solid" });
       chain.push(          { provider: "openai",   model: "gpt-4o",         reason: "GPT-4o — perhitungan cerdas" });
       return chain;
     }
@@ -68,7 +71,7 @@ export function buildFallbackChain(task: TaskType): RouterChoice[] {
     case "data_extraction": {
       const chain: RouterChoice[] = [];
       if (hasDeepSeek()) chain.push({ provider: "deepseek", model: "deepseek-chat", reason: "DeepSeek Chat — ekstraksi terstruktur akurat" });
-      if (hasQwen())     chain.push({ provider: "qwen",     model: "qwen-plus",     reason: "Qwen Plus — ekstraksi solid" });
+      if (hasQwen())     chain.push({ provider: "qwen",     model: getQwenModel(), reason: "Qwen Plus — ekstraksi solid" });
       chain.push(          { provider: "openai",   model: "gpt-4o",         reason: "GPT-4o — ekstraksi cerdas" });
       return chain;
     }
@@ -76,7 +79,7 @@ export function buildFallbackChain(task: TaskType): RouterChoice[] {
     case "large_doc": {
       const chain: RouterChoice[] = [];
       if (hasGemini())   chain.push({ provider: "gemini",   model: "gemini-2.5-pro", reason: "Gemini 2.5 Pro — context besar & cerdas untuk dokumen panjang" });
-      if (hasQwen())     chain.push({ provider: "qwen",     model: "qwen-plus",       reason: "Qwen Plus — dokumen panjang" });
+      if (hasQwen())     chain.push({ provider: "qwen",     model: getQwenModel(), reason: "Qwen Plus — dokumen panjang" });
       chain.push(          { provider: "openai",   model: "gpt-4o",           reason: "GPT-4o — dokumen panjang cerdas" });
       return chain;
     }
@@ -86,7 +89,7 @@ export function buildFallbackChain(task: TaskType): RouterChoice[] {
       const chain: RouterChoice[] = [];
       if (hasOpenAI())   chain.push({ provider: "openai",   model: "gpt-4o",         reason: "GPT-4o — general cerdas" });
       if (hasDeepSeek()) chain.push({ provider: "deepseek", model: "deepseek-chat",   reason: "DeepSeek Chat — general cerdas" });
-      if (hasQwen())     chain.push({ provider: "qwen",     model: "qwen-plus",       reason: "Qwen Plus — general cerdas" });
+      if (hasQwen())     chain.push({ provider: "qwen",     model: getQwenModel(), reason: "Qwen Plus — general cerdas" });
       // Always have at least one entry even if no keys are set (will fail at runtime with a clear error)
       if (chain.length === 0) chain.push({ provider: "openai", model: "gpt-4o", reason: "GPT-4o — general cerdas (no key configured)" });
       return chain;
