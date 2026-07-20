@@ -76,10 +76,19 @@ const folderSchema = z.object({
 });
 
 const fileMetaSchema = z.object({
-  description: z.string().max(500).trim().optional().nullable(),
-  tags:        z.array(z.string().max(50)).max(10).optional(),
-  folder_id:   z.string().uuid().optional().nullable(),
-  kelola_doc_id: z.string().uuid().optional().nullable(),
+  description:  z.string().max(500).trim().optional().nullable(),
+  tags:         z.array(z.string().max(50)).max(10).optional(),
+  folder_id:    z.string().uuid().optional().nullable(),
+  kelola_doc_id:z.string().uuid().optional().nullable(),
+  doc_status:   z.enum(["draft","aktif","kadaluarsa","arsip"]).optional(),
+});
+
+const grantSchema = z.object({
+  grantee_name:  z.string().min(1).max(200).trim(),
+  grantee_email: z.string().email().max(100).optional().nullable(),
+  permissions:   z.array(z.enum(["view","download"])).min(1).default(["view"]),
+  purpose:       z.string().min(1).max(500).trim(),
+  expires_days:  z.number().int().min(1).max(365).optional().nullable(), // null = no expiry
 });
 
 // ── Multer ──────────────────────────────────────────────────────────────────
@@ -224,7 +233,54 @@ async function getUsedBytes(userId: string): Promise<number> {
 
 // ── Route registration ───────────────────────────────────────────────────────
 
-export function registerRuangSimpanRoutes(app: Express): void {
+export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
+
+  // ── Governance DDL (idempotent — runs safely on every server start) ────────
+  try {
+    await pool.query(`
+      ALTER TABLE ruang_simpan_files
+        ADD COLUMN IF NOT EXISTS doc_status TEXT NOT NULL DEFAULT 'aktif'
+        CHECK (doc_status IN ('draft','aktif','kadaluarsa','arsip'))
+    `);
+  } catch { /* table may not exist yet in dev */ }
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ruang_simpan_access_grants (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      file_id         UUID NOT NULL,
+      owner_user_id   TEXT NOT NULL,
+      grantee_name    TEXT NOT NULL,
+      grantee_email   TEXT,
+      permissions     TEXT[] NOT NULL DEFAULT '{view}',
+      purpose         TEXT NOT NULL,
+      expires_at      TIMESTAMPTZ,
+      is_active       BOOLEAN NOT NULL DEFAULT TRUE,
+      revoked_at      TIMESTAMPTZ,
+      revoked_reason  TEXT,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ruang_simpan_access_log (
+      id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      file_id             UUID NOT NULL,
+      file_owner_user_id  TEXT NOT NULL,
+      actor_user_id       TEXT,
+      actor_name          TEXT NOT NULL DEFAULT 'Sistem',
+      action              TEXT NOT NULL,
+      purpose             TEXT,
+      grant_id            UUID,
+      meta                JSONB NOT NULL DEFAULT '{}',
+      created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await Promise.all([
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsa_grants_file  ON ruang_simpan_access_grants(file_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsa_grants_owner ON ruang_simpan_access_grants(owner_user_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsal_file        ON ruang_simpan_access_log(file_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsal_owner       ON ruang_simpan_access_log(file_owner_user_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsal_created     ON ruang_simpan_access_log(created_at DESC)`),
+  ]);
 
   // ── GET /api/ruang-simpan/overview ────────────────────────────────────────
   app.get("/api/ruang-simpan/overview", isAuthenticated, async (req: any, res) => {
@@ -361,11 +417,11 @@ export function registerRuangSimpanRoutes(app: Express): void {
     const parsed = fileMetaSchema.safeParse(req.body);
     if (!parsed.success) return res.status(422).json({ error: "Data tidak valid", issues: parsed.error.flatten().fieldErrors });
 
-    const { description, tags, folder_id, kelola_doc_id } = parsed.data;
+    const { description, tags, folder_id, kelola_doc_id, doc_status } = parsed.data;
     try {
       // Ownership + optional folder ownership
       const { rows: own } = await pool.query(
-        `SELECT id FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`, [req.params.id, userId]
+        `SELECT id, doc_status AS old_status FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`, [req.params.id, userId]
       );
       if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
       if (folder_id) {
@@ -381,13 +437,26 @@ export function registerRuangSimpanRoutes(app: Express): void {
            tags           = COALESCE($4, tags),
            folder_id      = $5,
            kelola_doc_id  = $6,
+           doc_status     = COALESCE($7, doc_status),
            updated_at     = now()
          WHERE id = $1 AND user_id = $2
          RETURNING id, original_name, mime_type, size_bytes, description, tags,
-                   kb_status, kb_chunk_count, folder_id, kelola_doc_id, updated_at`,
-        [req.params.id, userId, description ?? null, tags ? `{${tags.map(t => `"${t.replace(/"/g, '')}"`).join(",")}}` : null,
-         folder_id ?? null, kelola_doc_id ?? null]
+                   kb_status, kb_chunk_count, folder_id, kelola_doc_id, doc_status, updated_at`,
+        [req.params.id, userId, description ?? null,
+         tags ? `{${tags.map(t => `"${t.replace(/"/g, '')}"`).join(",")}}` : null,
+         folder_id ?? null, kelola_doc_id ?? null, doc_status ?? null]
       );
+      // Log status change to access log
+      if (doc_status && doc_status !== own[0].old_status) {
+        const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
+        pool.query(
+          `INSERT INTO ruang_simpan_access_log
+             (file_id, file_owner_user_id, actor_user_id, actor_name, action, meta)
+           VALUES ($1,$2,$3,$4,'status_change',$5)`,
+          [req.params.id, userId, userId, actorName,
+           JSON.stringify({ from: own[0].old_status, to: doc_status })]
+        ).catch(() => {});
+      }
       res.json(rows[0]);
     } catch (e) { safeErr(res, e, "PATCH files/:id"); }
   });
@@ -427,6 +496,14 @@ export function registerRuangSimpanRoutes(app: Express): void {
       const { original_name, mime_type, storage_key } = rows[0];
       if (!storage_key) return res.status(410).json({ error: "File tidak tersedia (storage_key kosong)" });
       const buffer = await downloadFile(storage_key);
+      // Log access (fire-and-forget)
+      const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
+      pool.query(
+        `INSERT INTO ruang_simpan_access_log
+           (file_id, file_owner_user_id, actor_user_id, actor_name, action, meta)
+         VALUES ($1,$2,$3,$4,'download',$5)`,
+        [req.params.id, userId, userId, actorName, JSON.stringify({ filename: original_name })]
+      ).catch(() => {});
       res.setHeader("Content-Type", mime_type);
       res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(original_name)}"`);
       res.setHeader("Cache-Control", "private, no-store");
@@ -575,6 +652,153 @@ export function registerRuangSimpanRoutes(app: Express): void {
                  quota_mb: (quotaBytes / 1024 / 1024).toFixed(0),
                  pct: Math.min(100, Math.round((used / quotaBytes) * 100)) });
     } catch (e) { safeErr(res, e, "GET usage"); }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // GOVERNANCE LAYER — Document Lifecycle · Kuasa Digital · Audit Trail
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── GET /api/ruang-simpan/files/:id/passport ─────────────────────────────
+  // Document Passport: status, access log, active grants summary
+  app.get("/api/ruang-simpan/files/:id/passport", isAuthenticated, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res)) return;
+    try {
+      // Verify ownership
+      const { rows: own } = await pool.query(
+        `SELECT id, original_name, doc_status, created_at FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`,
+        [req.params.id, userId]
+      );
+      if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
+
+      const [logRes, grantRes] = await Promise.all([
+        pool.query(
+          `SELECT id, actor_name, action, purpose, meta, created_at
+           FROM ruang_simpan_access_log
+           WHERE file_id = $1
+           ORDER BY created_at DESC LIMIT 50`,
+          [req.params.id]
+        ),
+        pool.query(
+          `SELECT id, grantee_name, grantee_email, permissions, purpose,
+                  expires_at, is_active, revoked_at, created_at
+           FROM ruang_simpan_access_grants
+           WHERE file_id = $1 AND owner_user_id = $2
+           ORDER BY created_at DESC LIMIT 20`,
+          [req.params.id, userId]
+        ),
+      ]);
+
+      res.json({
+        file: own[0],
+        access_log: logRes.rows,
+        grants: grantRes.rows,
+        stats: {
+          total_downloads: logRes.rows.filter(r => r.action === "download").length,
+          active_grants: grantRes.rows.filter(r => r.is_active).length,
+        },
+      });
+    } catch (e) { safeErr(res, e, "GET files/:id/passport"); }
+  });
+
+  // ── POST /api/ruang-simpan/files/:id/grants ──────────────────────────────
+  // Beri Kuasa Digital — grant access to a grantee
+  app.post("/api/ruang-simpan/files/:id/grants", isAuthenticated, rsWriteLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res)) return;
+
+    const parsed = grantSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(422).json({ error: "Data tidak valid", issues: parsed.error.flatten().fieldErrors });
+
+    try {
+      // Ownership check
+      const { rows: own } = await pool.query(
+        `SELECT id, original_name FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`,
+        [req.params.id, userId]
+      );
+      if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
+
+      const { grantee_name, grantee_email, permissions, purpose, expires_days } = parsed.data;
+      const expiresAt = expires_days ? new Date(Date.now() + expires_days * 86_400_000) : null;
+
+      const { rows: [grant] } = await pool.query(
+        `INSERT INTO ruang_simpan_access_grants
+           (file_id, owner_user_id, grantee_name, grantee_email, permissions, purpose, expires_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
+         RETURNING id, grantee_name, grantee_email, permissions, purpose, expires_at, is_active, created_at`,
+        [req.params.id, userId, grantee_name, grantee_email || null,
+         `{${permissions.join(",")}}`, purpose, expiresAt]
+      );
+
+      // Log grant creation
+      const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
+      pool.query(
+        `INSERT INTO ruang_simpan_access_log
+           (file_id, file_owner_user_id, actor_user_id, actor_name, action, purpose, grant_id, meta)
+         VALUES ($1,$2,$3,$4,'grant_access',$5,$6,$7)`,
+        [req.params.id, userId, userId, actorName, purpose, grant.id,
+         JSON.stringify({ grantee: grantee_name, permissions })]
+      ).catch(() => {});
+
+      res.status(201).json(grant);
+    } catch (e) { safeErr(res, e, "POST files/:id/grants"); }
+  });
+
+  // ── GET /api/ruang-simpan/files/:id/grants ───────────────────────────────
+  app.get("/api/ruang-simpan/files/:id/grants", isAuthenticated, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res)) return;
+    try {
+      const { rows: own } = await pool.query(
+        `SELECT id FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`, [req.params.id, userId]
+      );
+      if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
+
+      const { rows } = await pool.query(
+        `SELECT id, grantee_name, grantee_email, permissions, purpose,
+                expires_at, is_active, revoked_at, revoked_reason, created_at
+         FROM ruang_simpan_access_grants
+         WHERE file_id = $1 AND owner_user_id = $2
+         ORDER BY is_active DESC, created_at DESC`,
+        [req.params.id, userId]
+      );
+      res.json(rows);
+    } catch (e) { safeErr(res, e, "GET files/:id/grants"); }
+  });
+
+  // ── DELETE /api/ruang-simpan/files/:id/grants/:grantId ───────────────────
+  // Cabut kuasa digital
+  app.delete("/api/ruang-simpan/files/:id/grants/:grantId", isAuthenticated, rsWriteLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res) || !guardUUID(req.params.grantId, res)) return;
+
+    const reason = (req.body?.reason as string || "").slice(0, 200).trim() || "Dicabut oleh pemilik";
+    try {
+      const { rows } = await pool.query(
+        `UPDATE ruang_simpan_access_grants SET
+           is_active = false, revoked_at = now(), revoked_reason = $3
+         WHERE id = $1 AND file_id = $2 AND owner_user_id = $4 AND is_active = true
+         RETURNING id, grantee_name`,
+        [req.params.grantId, req.params.id, reason, userId]
+      );
+      if (!rows.length) return res.status(404).json({ error: "Kuasa tidak ditemukan atau sudah dicabut" });
+
+      // Log revocation
+      const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
+      pool.query(
+        `INSERT INTO ruang_simpan_access_log
+           (file_id, file_owner_user_id, actor_user_id, actor_name, action, grant_id, meta)
+         VALUES ($1,$2,$3,$4,'revoke_access',$5,$6)`,
+        [req.params.id, userId, userId, actorName, req.params.grantId,
+         JSON.stringify({ grantee: rows[0].grantee_name, reason })]
+      ).catch(() => {});
+
+      res.json({ ok: true });
+    } catch (e) { safeErr(res, e, "DELETE grants/:grantId"); }
   });
 }
 

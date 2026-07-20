@@ -1,0 +1,366 @@
+Pertanyaan ini sangat penting. Dan menurut saya, **kalau tidak dirancang dengan benar, justru bisa berisiko secara hukum**.
+
+Namun kalau dirancang dengan konsep yang tepat, **fitur ini justru membantu kepatuhan (compliance)**.
+
+Mari kita bedakan beberapa hal.
+
+---
+
+# 1. Yang tidak boleh dilakukan
+
+Misalnya Gustafta menjadi tempat orang bebas mengambil dokumen perusahaan lain.
+
+Contoh:
+
+* Mengunduh SBU perusahaan lain.
+* Mengambil SKK tenaga ahli tanpa izin.
+* Menggunakan Company Profile perusahaan lain.
+
+Ini jelas bermasalah.
+
+Karena menyangkut:
+
+* Hak cipta dokumen.
+* Kerahasiaan bisnis.
+* Perlindungan data.
+* Potensi penyalahgunaan identitas perusahaan.
+
+Model seperti ini tidak boleh.
+
+---
+
+# 2. Yang boleh dilakukan
+
+Misalnya.
+
+PT ABC adalah klien biro jasa.
+
+PT ABC memberikan kuasa kepada biro jasa untuk mengelola dokumennya.
+
+Di Gustafta.
+
+Pemilik dokumen tetap PT ABC.
+
+Biro jasa hanya mempunyai hak akses.
+
+Ini sama seperti:
+
+* Akuntan mengelola laporan keuangan klien.
+* Notaris menyimpan dokumen klien.
+* Konsultan pajak mengelola dokumen perpajakan.
+
+Selama ada hubungan hukum dan persetujuan, ini merupakan praktik yang umum.
+
+---
+
+# 3. Saya justru menyarankan konsep "Hak Akses", bukan "Pinjam"
+
+Contohnya.
+
+PT ABC memiliki:
+
+```
+Company Profile
+
+Pemilik:
+PT ABC
+
+Hak akses:
+
+✓ Direktur
+
+✓ Admin
+
+✓ Konsultan ISO
+
+✓ Konsultan Tender
+
+✓ Biro Jasa ABC
+```
+
+Jadi yang diberikan bukan dokumennya.
+
+Yang diberikan adalah **izin mengakses**.
+
+---
+
+# 4. Harus ada Audit Trail
+
+Ini menurut saya wajib.
+
+Misalnya.
+
+```
+21 Juli 2026
+
+Marketing
+
+Melihat Company Profile
+
+Tujuan:
+Tender PLN
+```
+
+---
+
+```
+22 Juli
+
+Konsultan ISO
+
+Mengunduh SOP
+
+Tujuan:
+Audit Stage 2
+```
+
+---
+
+Kalau suatu saat terjadi masalah.
+
+Perusahaan tahu.
+
+Siapa.
+
+Mengakses apa.
+
+Kapan.
+
+Untuk apa.
+
+---
+
+# 5. Approval Workflow
+
+Misalnya.
+
+Marketing meminta.
+
+```
+SKK
+
+Company Profile
+
+ISO
+```
+
+---
+
+Direktur.
+
+Approve.
+
+---
+
+Baru bisa digunakan.
+
+Ini jauh lebih aman.
+
+---
+
+# 6. Watermark Dinamis
+
+Ini fitur yang menurut saya sangat penting.
+
+Misalnya.
+
+Saat dokumen diunduh.
+
+Otomatis.
+
+```
+Digunakan untuk:
+
+Tender PT PLN
+
+Diunduh oleh:
+
+Marketing
+
+Tanggal
+
+21 Juli 2026
+```
+
+Kalau bocor.
+
+Ketahuan.
+
+---
+
+# 7. Masa Berlaku Hak Akses
+
+Misalnya.
+
+Konsultan ISO.
+
+Hanya boleh mengakses.
+
+30 hari.
+
+Setelah proyek selesai.
+
+Hak akses otomatis dicabut.
+
+---
+
+# 8. Secara hukum
+
+Saya bukan pengacara, tetapi dari perspektif tata kelola sistem informasi, prinsip-prinsip yang umum digunakan adalah:
+
+* **Pemilik dokumen tetap pemiliknya.**
+* **Hak akses diberikan berdasarkan izin.**
+* **Semua aktivitas dicatat (audit log).**
+* **Akses dapat dicabut kapan saja.**
+* **Dokumen tidak boleh dipakai di luar tujuan yang disetujui.**
+
+Kalau lima prinsip ini diterapkan, desainnya jauh lebih kuat dibanding sekadar mengirim file lewat WhatsApp.
+
+---
+
+# Menurut saya justru ada peluang bisnis baru.
+
+Saya menyebutnya.
+
+## Document Governance
+
+Bukan Document Storage.
+
+Karena perusahaan besar tidak membeli storage.
+
+Mereka membeli.
+
+Governance.
+
+Misalnya.
+
+```
+Siapa yang boleh melihat?
+
+Siapa yang boleh download?
+
+Siapa yang boleh edit?
+
+Siapa yang boleh share?
+
+Siapa yang approve?
+```
+
+Itu governance.
+
+---
+
+# Saya bahkan berpikir lebih jauh.
+
+Business Memory nanti mempunyai.
+
+## Role
+
+Misalnya.
+
+```
+Owner
+
+↓
+
+Direktur
+
+↓
+
+Admin
+
+↓
+
+HR
+
+↓
+
+Legal
+
+↓
+
+Marketing
+
+↓
+
+Tender
+
+↓
+
+Finance
+
+↓
+
+Konsultan
+```
+
+Masing-masing.
+
+Hak akses berbeda.
+
+---
+
+# Insight yang menurut saya paling besar
+
+Saya justru **tidak akan membuat fitur "Pinjam Dokumen".**
+
+Saya akan membuat.
+
+## Workspace Collaboration
+
+Misalnya.
+
+```
+Tender PLN
+
+↓
+
+Tambah Anggota
+
+↓
+
+Tambah Dokumen
+
+↓
+
+Tambah AI
+
+↓
+
+Tambah Konsultan
+```
+
+Semua bekerja.
+
+Di satu ruang.
+
+Dokumen tidak pernah keluar.
+
+Yang keluar.
+
+Hanya.
+
+Hasil pekerjaannya.
+
+---
+
+## Ini jauh lebih aman secara hukum.
+
+Karena:
+
+* Dokumen tetap berada di Business Memory.
+* Pengguna bekerja melalui hak akses.
+* Semua aktivitas tercatat.
+* Tidak perlu saling kirim file lewat WhatsApp atau email.
+* Hak akses dapat dibatasi sesuai peran dan durasi.
+
+---
+
+## Kalau saya boleh memberikan satu rekomendasi arsitektur, saya akan menerapkan empat prinsip utama sejak awal:
+
+1. **Ownership** → setiap dokumen memiliki pemilik yang jelas (perusahaan).
+2. **Consent** → setiap akses oleh pihak luar (misalnya konsultan) didasarkan pada persetujuan pemilik.
+3. **Auditability** → setiap lihat, unduh, ubah, atau bagikan tercatat dalam audit log.
+4. **Least Privilege** → setiap orang hanya mendapat akses yang benar-benar diperlukan untuk tugasnya.
+
+Dengan empat prinsip ini, Gustafta tidak hanya menjadi platform yang nyaman digunakan, tetapi juga memiliki fondasi tata kelola yang kuat. Itu akan menjadi nilai tambah besar ketika nanti Anda berbicara dengan perusahaan yang semakin peduli pada kepatuhan, keamanan informasi, dan tata kelola dokumen.

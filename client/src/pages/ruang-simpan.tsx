@@ -19,6 +19,8 @@ import {
   Calculator, Award, BarChart3, Folder, ChevronRight, RefreshCw,
   Brain, Eye, Link2, Info, Check, ArrowRight, Zap, Lock,
   DatabaseZap, ScanSearch, BrainCircuit, ClipboardList, Star,
+  KeyRound, History, UserCheck, CalendarClock, UserX, ChevronDown, ChevronUp,
+  Activity,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { RUANG_SIMPAN_PLANS } from "@/data/pricing";
@@ -31,12 +33,29 @@ interface RSFile {
   description?: string; tags?: string[]; kb_status: string; kb_chunk_count?: number;
   folder_id?: string; folder_name?: string; folder_color?: string;
   kelola_doc_id?: string; created_at: string; snippet?: string;
+  doc_status?: "draft" | "aktif" | "kadaluarsa" | "arsip";
 }
 interface RSOverview {
   folders: RSFolder[];
   usage: { used: number; quota: number; total_files: number; ai_ready: number };
   recent_files: RSFile[];
   stats: { pending: number; failed: number };
+}
+interface RSGrant {
+  id: string; grantee_name: string; grantee_email?: string;
+  permissions: string[]; purpose: string;
+  expires_at?: string; is_active: boolean; revoked_at?: string;
+  revoked_reason?: string; created_at: string;
+}
+interface RSAccessLogEntry {
+  id: string; actor_name: string; action: string;
+  purpose?: string; meta: any; created_at: string;
+}
+interface RSPassport {
+  file: { id: string; original_name: string; doc_status: string; created_at: string };
+  access_log: RSAccessLogEntry[];
+  grants: RSGrant[];
+  stats: { total_downloads: number; active_grants: number };
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -89,6 +108,35 @@ function kbBadge(status: string, count?: number) {
     case "skipped":    return <Badge className="bg-gray-100 text-gray-400 text-[10px]">Tidak Teks</Badge>;
     default:           return null;
   }
+}
+
+const DOC_STATUS_CFG = {
+  draft:      { label: "Draft",      cls: "bg-amber-100 text-amber-700 border-amber-200", icon: Pencil },
+  aktif:      { label: "Aktif",      cls: "bg-emerald-100 text-emerald-700 border-emerald-200", icon: CheckCircle2 },
+  kadaluarsa: { label: "Kadaluarsa", cls: "bg-red-100 text-red-700 border-red-200", icon: AlertCircle },
+  arsip:      { label: "Arsip",      cls: "bg-gray-100 text-gray-500 border-gray-200", icon: FolderOpen },
+} as const;
+
+function docStatusBadge(status?: string) {
+  const cfg = DOC_STATUS_CFG[(status || "aktif") as keyof typeof DOC_STATUS_CFG] || DOC_STATUS_CFG.aktif;
+  const Icon = cfg.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border ${cfg.cls}`}>
+      <Icon className="h-2.5 w-2.5" />{cfg.label}
+    </span>
+  );
+}
+
+function actionLabel(action: string): string {
+  const map: Record<string, string> = {
+    download: "Download",
+    view: "Lihat",
+    grant_access: "Beri Kuasa",
+    revoke_access: "Cabut Kuasa",
+    status_change: "Ubah Status",
+    upload: "Upload",
+  };
+  return map[action] || action;
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
@@ -425,6 +473,7 @@ function FileCard({ file, onClick, onDelete }: { file: RSFile; onClick: () => vo
       <div className="flex items-center justify-between">
         <div className="flex gap-1 flex-wrap">
           {kbBadge(file.kb_status, file.kb_chunk_count)}
+          {docStatusBadge(file.doc_status)}
           {file.folder_name && (
             <Badge variant="outline" className="text-[10px]">{file.folder_name}</Badge>
           )}
@@ -475,11 +524,29 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
   file: RSFile; folders: RSFolder[]; onClose: () => void; onDelete: () => void; onUpdated: () => void;
 }) {
   const { toast } = useToast();
+  const qc = useQueryClient();
+  const [tab, setTab] = useState<"info" | "paspor">("info");
   const [editing, setEditing] = useState(false);
   const [desc, setDesc] = useState(file.description || "");
   const [folderId, setFolderId] = useState(file.folder_id || "");
+  const [docStatus, setDocStatus] = useState<string>(file.doc_status || "aktif");
   const [saving, setSaving] = useState(false);
+  const [showGrant, setShowGrant] = useState(false);
+  const [showPassportLog, setShowPassportLog] = useState(false);
   const isImage = file.mime_type.startsWith("image/");
+
+  // Passport (access log + grants)
+  const { data: passport, isLoading: passportLoading, refetch: refetchPassport } = useQuery<RSPassport>({
+    queryKey: [`/api/ruang-simpan/files/${file.id}/passport`],
+    queryFn: () => apiRequest("GET", `/api/ruang-simpan/files/${file.id}/passport`).then(r => r.json()),
+    enabled: tab === "paspor",
+  });
+
+  const revokeGrant = useMutation({
+    mutationFn: (grantId: string) => apiRequest("DELETE", `/api/ruang-simpan/files/${file.id}/grants/${grantId}`).then(r => r.json()),
+    onSuccess: () => { toast({ title: "Kuasa berhasil dicabut" }); refetchPassport(); },
+    onError: () => toast({ title: "Gagal mencabut kuasa", variant: "destructive" }),
+  });
 
   const save = async () => {
     setSaving(true);
@@ -487,6 +554,7 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
       const res = await apiRequest("PATCH", `/api/ruang-simpan/files/${file.id}`, {
         description: desc || null,
         folder_id: folderId || null,
+        doc_status: docStatus,
       });
       if (!res.ok) throw new Error("Gagal menyimpan");
       toast({ title: "File diperbarui" });
@@ -497,102 +565,375 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
   };
 
   return (
-    <Dialog open onOpenChange={v => !v && onClose()}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base">
-            {mimeIcon(file.mime_type)}
-            <span className="truncate">{file.original_name}</span>
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          {/* Image preview */}
-          {isImage && (
-            <div className="rounded-xl overflow-hidden bg-muted">
-              <img
-                src={`/api/ruang-simpan/files/${file.id}/preview`}
-                alt={file.original_name}
-                className="w-full max-h-64 object-contain"
-              />
-            </div>
-          )}
-          {/* Meta */}
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="bg-muted/40 rounded-lg p-3">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Ukuran</p>
-              <p className="font-semibold">{formatBytes(file.size_bytes)}</p>
-            </div>
-            <div className="bg-muted/40 rounded-lg p-3">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Diunggah</p>
-              <p className="font-semibold">{formatDate(file.created_at)}</p>
-            </div>
-            <div className="bg-muted/40 rounded-lg p-3 col-span-2">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Status AI</p>
-              <div className="flex items-center gap-2">
-                {kbBadge(file.kb_status, file.kb_chunk_count)}
-                {file.kb_status === "ready" && (
-                  <span className="text-xs text-muted-foreground">{file.kb_chunk_count} potongan teks siap untuk RAG</span>
-                )}
-                {file.kb_status === "skipped" && (
-                  <span className="text-xs text-muted-foreground">File tidak mengandung teks yang bisa diekstrak</span>
-                )}
-              </div>
-            </div>
+    <>
+      <Dialog open onOpenChange={v => !v && onClose()}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base">
+              {mimeIcon(file.mime_type)}
+              <span className="truncate">{file.original_name}</span>
+            </DialogTitle>
+          </DialogHeader>
+
+          {/* Tabs */}
+          <div className="flex gap-1 border-b border-border pb-2">
+            {(["info", "paspor"] as const).map(t => (
+              <button key={t} onClick={() => setTab(t)}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                  tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
+                }`}>
+                {t === "info" ? "📄 Info" : "🛡️ Paspor Dokumen"}
+              </button>
+            ))}
           </div>
 
-          {/* Edit fields */}
-          {editing ? (
-            <div className="space-y-3">
-              <div className="grid gap-1.5">
-                <Label>Folder</Label>
-                <Select value={folderId} onValueChange={setFolderId}>
-                  <SelectTrigger><SelectValue placeholder="Tanpa folder" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Tanpa folder</SelectItem>
-                    {folders.map(f => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+          {tab === "info" && (
+            <div className="space-y-4">
+              {/* Image preview */}
+              {isImage && (
+                <div className="rounded-xl overflow-hidden bg-muted">
+                  <img src={`/api/ruang-simpan/files/${file.id}/preview`} alt={file.original_name}
+                    className="w-full max-h-64 object-contain" />
+                </div>
+              )}
+
+              {/* Meta */}
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="bg-muted/40 rounded-lg p-3">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Ukuran</p>
+                  <p className="font-semibold">{formatBytes(file.size_bytes)}</p>
+                </div>
+                <div className="bg-muted/40 rounded-lg p-3">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-0.5">Diunggah</p>
+                  <p className="font-semibold">{formatDate(file.created_at)}</p>
+                </div>
+                <div className="bg-muted/40 rounded-lg p-3">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Status AI</p>
+                  <div className="flex items-center gap-2">
+                    {kbBadge(file.kb_status, file.kb_chunk_count)}
+                  </div>
+                </div>
+                <div className="bg-muted/40 rounded-lg p-3">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Status Dokumen</p>
+                  {editing ? (
+                    <Select value={docStatus} onValueChange={setDocStatus}>
+                      <SelectTrigger className="h-6 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="aktif">Aktif</SelectItem>
+                        <SelectItem value="kadaluarsa">Kadaluarsa</SelectItem>
+                        <SelectItem value="arsip">Arsip</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    docStatusBadge(file.doc_status)
+                  )}
+                </div>
               </div>
-              <div className="grid gap-1.5">
-                <Label>Deskripsi</Label>
-                <Textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Keterangan singkat…" />
-              </div>
+
+              {/* Edit fields */}
+              {editing ? (
+                <div className="space-y-3">
+                  <div className="grid gap-1.5">
+                    <Label>Folder</Label>
+                    <Select value={folderId} onValueChange={setFolderId}>
+                      <SelectTrigger><SelectValue placeholder="Tanpa folder" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Tanpa folder</SelectItem>
+                        {folders.map(f => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label>Deskripsi</Label>
+                    <Textarea value={desc} onChange={e => setDesc(e.target.value)} rows={2} placeholder="Keterangan singkat…" />
+                  </div>
+                </div>
+              ) : (
+                file.description && (
+                  <div className="bg-muted/30 rounded-lg p-3 text-sm text-muted-foreground">
+                    <p className="text-[10px] uppercase tracking-wide mb-1 font-semibold text-foreground">Deskripsi</p>
+                    {file.description}
+                  </div>
+                )
+              )}
+
+              {/* AI context info */}
+              {file.kb_status === "ready" && (
+                <div className="bg-violet-50 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30 rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Brain className="h-3.5 w-3.5 text-violet-600" />
+                    <span className="text-xs font-bold text-violet-700 dark:text-violet-400">Cara Gunakan di AI</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Pergi ke <strong>Bedah Dokumen</strong> → pilih "Dari Ruang Simpan". Atau buka <strong>Klinik Konsultasi</strong> → tanya pertanyaan — AI otomatis mencari konteks dari dokumen ini.
+                  </p>
+                </div>
+              )}
             </div>
-          ) : (
-            file.description && (
-              <div className="bg-muted/30 rounded-lg p-3 text-sm text-muted-foreground">
-                <p className="text-[10px] uppercase tracking-wide mb-1 font-semibold text-foreground">Deskripsi</p>
-                {file.description}
-              </div>
-            )
           )}
 
-          {/* AI context info */}
-          {file.kb_status === "ready" && (
-            <div className="bg-violet-50 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30 rounded-xl p-3">
-              <div className="flex items-center gap-1.5 mb-1">
-                <Brain className="h-3.5 w-3.5 text-violet-600" />
-                <span className="text-xs font-bold text-violet-700 dark:text-violet-400">Cara Gunakan di AI</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Pergi ke <strong>Bedah Dokumen</strong> → pilih "Dari Ruang Simpan". Atau buka <strong>Klinik Konsultasi</strong> → tanya pertanyaan — AI otomatis mencari konteks dari dokumen ini.
-              </p>
+          {tab === "paspor" && (
+            <div className="space-y-4">
+              {passportLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : passport ? (
+                <>
+                  {/* Stats */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-indigo-50 dark:bg-indigo-950/20 rounded-xl p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
+                      <Download className="h-4 w-4 text-indigo-500 mx-auto mb-1" />
+                      <p className="text-lg font-black text-indigo-700 dark:text-indigo-400">{passport.stats.total_downloads}</p>
+                      <p className="text-[10px] text-muted-foreground">Download</p>
+                    </div>
+                    <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-3 text-center border border-emerald-100 dark:border-emerald-900/30">
+                      <KeyRound className="h-4 w-4 text-emerald-500 mx-auto mb-1" />
+                      <p className="text-lg font-black text-emerald-700 dark:text-emerald-400">{passport.stats.active_grants}</p>
+                      <p className="text-[10px] text-muted-foreground">Kuasa Aktif</p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-900/20 rounded-xl p-3 text-center border border-gray-100 dark:border-gray-800/30">
+                      <Activity className="h-4 w-4 text-gray-500 mx-auto mb-1" />
+                      <p className="text-lg font-black text-foreground">{passport.access_log.length}</p>
+                      <p className="text-[10px] text-muted-foreground">Log Aktivitas</p>
+                    </div>
+                  </div>
+
+                  {/* Active Grants */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                        <KeyRound className="h-3.5 w-3.5 text-indigo-500" /> Kuasa Digital Aktif
+                      </p>
+                      <Button size="sm" variant="outline" className="h-6 text-[11px] gap-1 px-2"
+                        onClick={() => setShowGrant(true)}>
+                        <Plus className="h-3 w-3" /> Beri Kuasa
+                      </Button>
+                    </div>
+                    {passport.grants.filter(g => g.is_active).length === 0 ? (
+                      <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+                        Belum ada kuasa aktif. Klik "Beri Kuasa" untuk memberi akses ke konsultan atau biro jasa.
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {passport.grants.filter(g => g.is_active).map(g => (
+                          <div key={g.id} className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30 rounded-xl p-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                  <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
+                                  <span className="text-sm font-semibold">{g.grantee_name}</span>
+                                  {g.grantee_email && <span className="text-[10px] text-muted-foreground">({g.grantee_email})</span>}
+                                </div>
+                                <p className="text-xs text-muted-foreground truncate">Tujuan: {g.purpose}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <div className="flex gap-1">
+                                    {g.permissions.map(p => (
+                                      <span key={p} className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">{p === "view" ? "Lihat" : "Download"}</span>
+                                    ))}
+                                  </div>
+                                  {g.expires_at && (
+                                    <span className="text-[10px] text-amber-600 flex items-center gap-0.5">
+                                      <CalendarClock className="h-2.5 w-2.5" />
+                                      Sampai {formatDate(g.expires_at)}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <button onClick={() => {
+                                if (confirm(`Cabut kuasa untuk ${g.grantee_name}?`)) revokeGrant.mutate(g.id);
+                              }} className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors" title="Cabut kuasa">
+                                <UserX className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Revoked grants (collapsed) */}
+                  {passport.grants.filter(g => !g.is_active).length > 0 && (
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
+                        <UserX className="h-3 w-3" /> {passport.grants.filter(g => !g.is_active).length} kuasa sudah dicabut
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Access Log */}
+                  <div>
+                    <button className="flex items-center gap-1.5 text-xs font-bold text-foreground mb-2 w-full"
+                      onClick={() => setShowPassportLog(v => !v)}>
+                      <History className="h-3.5 w-3.5 text-indigo-500" /> Riwayat Aktivitas ({passport.access_log.length})
+                      {showPassportLog ? <ChevronUp className="h-3 w-3 ml-auto" /> : <ChevronDown className="h-3 w-3 ml-auto" />}
+                    </button>
+                    {showPassportLog && (
+                      <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                        {passport.access_log.length === 0 ? (
+                          <p className="text-xs text-muted-foreground px-3 py-2 bg-muted/30 rounded-lg">Belum ada aktivitas tercatat.</p>
+                        ) : passport.access_log.map(log => (
+                          <div key={log.id} className="flex items-center gap-2 text-[11px] text-foreground bg-muted/30 rounded-lg px-3 py-2">
+                            <Activity className="h-3 w-3 text-muted-foreground shrink-0" />
+                            <span className="font-semibold">{actionLabel(log.action)}</span>
+                            <span className="text-muted-foreground">oleh {log.actor_name}</span>
+                            {log.purpose && <span className="text-muted-foreground">— {log.purpose}</span>}
+                            <span className="ml-auto text-muted-foreground shrink-0">{formatDate(log.created_at)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : null}
             </div>
           )}
+
+          <DialogFooter className="flex-row flex-wrap gap-2">
+            <a href={`/api/ruang-simpan/files/${file.id}/download`} download={file.original_name}>
+              <Button variant="outline" size="sm" className="gap-1.5"><Download className="h-3.5 w-3.5" /> Download</Button>
+            </a>
+            {tab === "info" && (
+              editing ? (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => setEditing(false)}>Batal</Button>
+                  <Button size="sm" onClick={save} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Simpan</Button>
+                </>
+              ) : (
+                <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setEditing(true)}><Pencil className="h-3.5 w-3.5" /> Edit</Button>
+              )
+            )}
+            {tab === "paspor" && (
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setShowGrant(true)}>
+                <KeyRound className="h-3.5 w-3.5" /> Beri Kuasa Digital
+              </Button>
+            )}
+            <Button variant="destructive" size="sm" className="gap-1.5 ml-auto" onClick={onDelete}><Trash2 className="h-3.5 w-3.5" /> Hapus</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Grant Modal */}
+      {showGrant && (
+        <GrantModal
+          fileId={file.id}
+          fileName={file.original_name}
+          onClose={() => setShowGrant(false)}
+          onGranted={() => { setShowGrant(false); refetchPassport(); }}
+        />
+      )}
+    </>
+  );
+}
+
+// ── Grant Access Modal ─────────────────────────────────────────────────────────
+
+function GrantModal({ fileId, fileName, onClose, onGranted }: {
+  fileId: string; fileName: string; onClose: () => void; onGranted: () => void;
+}) {
+  const { toast } = useToast();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [purpose, setPurpose] = useState("");
+  const [permissions, setPermissions] = useState<string[]>(["view"]);
+  const [expiresDays, setExpiresDays] = useState<string>("");
+  const [saving, setSaving] = useState(false);
+
+  const togglePerm = (p: string) => {
+    setPermissions(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+  };
+
+  const submit = async () => {
+    if (!name.trim() || !purpose.trim() || permissions.length === 0) {
+      toast({ title: "Isi nama, tujuan, dan minimal 1 izin akses", variant: "destructive" }); return;
+    }
+    setSaving(true);
+    try {
+      const res = await apiRequest("POST", `/api/ruang-simpan/files/${fileId}/grants`, {
+        grantee_name: name.trim(),
+        grantee_email: email.trim() || undefined,
+        permissions,
+        purpose: purpose.trim(),
+        expires_days: expiresDays ? parseInt(expiresDays) : null,
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Gagal");
+      toast({ title: `Kuasa digital diberikan ke ${name}` });
+      onGranted();
+    } catch (e: any) {
+      toast({ title: e.message || "Gagal memberi kuasa", variant: "destructive" });
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open onOpenChange={v => !v && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <KeyRound className="h-4 w-4 text-indigo-500" /> Beri Kuasa Digital
+          </DialogTitle>
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">Untuk: {fileName}</p>
+        </DialogHeader>
+        <div className="space-y-3 py-1">
+          <div className="bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/30 rounded-xl p-3">
+            <p className="text-[11px] text-indigo-700 dark:text-indigo-400 leading-relaxed">
+              <strong>Kuasa Digital</strong> memberi seseorang hak akses terbatas ke dokumen ini. Anda bisa mencabutnya kapan saja. Semua aktivitas tercatat otomatis.
+            </p>
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs">Nama Penerima Kuasa *</Label>
+            <Input value={name} onChange={e => setName(e.target.value)} placeholder="cth: Biro Jasa XYZ / Pak Ahmad" />
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs">Email (opsional)</Label>
+            <Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@perusahaan.com" />
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs">Tujuan Pemberian Kuasa *</Label>
+            <Input value={purpose} onChange={e => setPurpose(e.target.value)} placeholder="cth: Tender PLN 2026, Audit ISO, Due Diligence" />
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs">Izin Akses *</Label>
+            <div className="flex gap-2">
+              {[
+                { val: "view", label: "Lihat", desc: "Baca dokumen" },
+                { val: "download", label: "Download", desc: "Unduh file" },
+              ].map(p => (
+                <button key={p.val} onClick={() => togglePerm(p.val)}
+                  className={`flex-1 border-2 rounded-xl p-2.5 text-left transition-colors ${
+                    permissions.includes(p.val)
+                      ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30"
+                      : "border-border hover:border-indigo-200"
+                  }`}>
+                  <p className={`text-xs font-bold ${permissions.includes(p.val) ? "text-indigo-700 dark:text-indigo-400" : "text-foreground"}`}>{p.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{p.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-1.5">
+            <Label className="text-xs">Masa Berlaku (opsional)</Label>
+            <Select value={expiresDays} onValueChange={setExpiresDays}>
+              <SelectTrigger><SelectValue placeholder="Tidak terbatas" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Tidak terbatas</SelectItem>
+                <SelectItem value="7">7 hari</SelectItem>
+                <SelectItem value="30">30 hari</SelectItem>
+                <SelectItem value="90">90 hari</SelectItem>
+                <SelectItem value="180">6 bulan</SelectItem>
+                <SelectItem value="365">1 tahun</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <DialogFooter className="flex-row flex-wrap gap-2">
-          <a href={`/api/ruang-simpan/files/${file.id}/download`} download={file.original_name}>
-            <Button variant="outline" size="sm" className="gap-1.5"><Download className="h-3.5 w-3.5" /> Download</Button>
-          </a>
-          {editing ? (
-            <>
-              <Button variant="outline" size="sm" onClick={() => setEditing(false)}>Batal</Button>
-              <Button size="sm" onClick={save} disabled={saving}>{saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}Simpan</Button>
-            </>
-          ) : (
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setEditing(true)}><Pencil className="h-3.5 w-3.5" /> Edit</Button>
-          )}
-          <Button variant="destructive" size="sm" className="gap-1.5 ml-auto" onClick={onDelete}><Trash2 className="h-3.5 w-3.5" /> Hapus</Button>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Batal</Button>
+          <Button onClick={submit} disabled={saving || !name.trim() || !purpose.trim() || permissions.length === 0}
+            className="gap-1.5">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <KeyRound className="h-4 w-4" />}
+            Beri Kuasa
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -819,7 +1160,7 @@ function RuangSimpanLandingPage() {
               { icon: BrainCircuit,  color:"text-violet-600 bg-violet-50 dark:bg-violet-900/20", title:"Konteks AI Otomatis",    desc:"Semua fitur AI Gustafta otomatis membaca dokumen Anda saat Anda menggunakannya." },
               { icon: ClipboardList, color:"text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20", title:"Link ke Ruang Kelola", desc:"Hubungkan file scan dengan catatan SBU, NIB, SKK — satu klik dari dashboard." },
               { icon: FolderOpen,    color:"text-orange-600 bg-orange-50 dark:bg-orange-900/20", title:"Folder Terstruktur",    desc:"7 kategori default: Legalitas, Teknis, Tender, SDM, dan lainnya. Buat folder sendiri." },
-              { icon: Shield,        color:"text-red-600 bg-red-50 dark:bg-red-900/20",     title:"Aman & Privat",           desc:"Dokumen hanya bisa diakses pemilik akun. Terenkripsi, audit log lengkap." },
+              { icon: Shield,        color:"text-red-600 bg-red-50 dark:bg-red-900/20",     title:"Kuasa Digital & Audit",   desc:"Beri akses terbatas ke konsultan/biro jasa. Riwayat download & setiap perubahan tercatat otomatis." },
               { icon: DatabaseZap,   color:"text-teal-600 bg-teal-50 dark:bg-teal-900/20",  title:"Preview & Download",      desc:"Lihat gambar langsung di browser. Download kapan saja, tanpa batas." },
             ].map(({ icon: Icon, color, title, desc }) => (
               <div key={title} className="bg-white dark:bg-card border border-border rounded-xl p-5">

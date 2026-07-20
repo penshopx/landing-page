@@ -783,7 +783,7 @@ export async function registerRoutes(
   await registerRuangKelolaRoutes(app);
 
   // Ruang Simpan — gudang dokumen perusahaan dengan AI context.
-  registerRuangSimpanRoutes(app);
+  await registerRuangSimpanRoutes(app);
 
   // MIME type lookup for proper Content-Type headers
   const mimeTypes: Record<string, string> = {

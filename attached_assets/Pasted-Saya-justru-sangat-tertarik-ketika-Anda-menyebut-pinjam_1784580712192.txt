@@ -1,0 +1,536 @@
+Saya justru sangat tertarik ketika Anda menyebut **pinjam-meminjam dokumen**.
+
+Karena menurut saya, ini bukan sekadar fitur.
+
+**Ini adalah proses bisnis yang selama ini belum terdigitalisasi dengan baik.**
+
+Dan saya yakin hampir semua biro jasa maupun perusahaan pernah mengalaminya.
+
+---
+
+# Realita di lapangan
+
+Misalnya.
+
+Seorang marketing berkata.
+
+> "Pak Admin, kirim Company Profile ya."
+
+Admin mengirim melalui WhatsApp.
+
+Kemudian.
+
+> "Pak, sekalian kirim SBU."
+
+Kemudian.
+
+> "SKK Pak Budi juga ya."
+
+Kemudian.
+
+> "Kontrak pengalaman."
+
+Kemudian.
+
+> "Foto proyek."
+
+Lalu.
+
+> "Pak, yang terbaru ya..."
+
+Semua dikirim.
+
+Tidak ada pencatatan.
+
+Tidak ada histori.
+
+Tidak tahu siapa yang meminta.
+
+Tidak tahu untuk apa.
+
+Tidak tahu apakah dokumen terakhir atau lama.
+
+---
+
+# Padahal sebenarnya yang terjadi adalah
+
+## Peminjaman Dokumen
+
+Walaupun secara fisik tidak dipinjam.
+
+Tetapi secara proses bisnis.
+
+Dokumen sedang digunakan oleh orang lain.
+
+---
+
+# Saya melihat peluang baru.
+
+Bukan.
+
+## Download
+
+Tetapi.
+
+## Request Document
+
+Misalnya.
+
+Marketing.
+
+Klik.
+
+```text
+Minta Dokumen
+```
+
+Kemudian.
+
+Memilih.
+
+```
+Company Profile
+
++
+
+SBU
+
++
+
+SKK
+
++
+
+ISO
+```
+
+Klik.
+
+Kirim.
+
+---
+
+Admin menerima.
+
+```
+Marketing
+
+meminta
+
+5 dokumen
+
+untuk
+
+Tender PT XYZ
+```
+
+Approve.
+
+---
+
+Semua tercatat.
+
+---
+
+# Maka history muncul.
+
+```
+14 Juli
+
+Marketing
+
+↓
+
+Meminjam
+
+Company Profile
+
+untuk
+
+Tender PLN
+```
+
+---
+
+```
+20 Juli
+
+Legal
+
+↓
+
+Meminjam
+
+Akta
+
+untuk
+
+Perubahan Direksi
+```
+
+---
+
+```
+22 Juli
+
+HR
+
+↓
+
+Meminjam
+
+SKK
+
+untuk
+
+Tender ABC
+```
+
+---
+
+Ini luar biasa.
+
+---
+
+# Saya malah melihat.
+
+Harus ada
+
+## Tujuan Penggunaan
+
+Misalnya.
+
+□ Tender
+
+□ Audit
+
+□ Sertifikasi
+
+□ Marketing
+
+□ Pajak
+
+□ Legal
+
+□ Internal
+
+---
+
+Karena nanti.
+
+AI mengetahui.
+
+Dokumen ini paling sering dipakai untuk apa.
+
+---
+
+# Bahkan.
+
+AI berkata.
+
+```
+Company Profile
+
+digunakan
+
+85 kali
+
+tahun ini
+```
+
+---
+
+```
+SBU
+
+52 kali
+```
+
+---
+
+```
+ISO
+
+20 kali
+```
+
+---
+
+Ini menjadi insight.
+
+---
+
+# Yang lebih menarik lagi.
+
+Versi.
+
+Misalnya.
+
+Marketing.
+
+Masih memakai.
+
+```
+Company Profile
+
+2024
+```
+
+Padahal.
+
+Sudah ada.
+
+```
+Versi 2026
+```
+
+AI memberi peringatan.
+
+```
+Gunakan versi terbaru?
+```
+
+---
+
+# Saya semakin melihat.
+
+Business Memory mempunyai
+
+## Lifecycle
+
+Misalnya.
+
+```
+Dokumen Dibuat
+
+↓
+
+Diverifikasi
+
+↓
+
+Disetujui
+
+↓
+
+Dipakai
+
+↓
+
+Dipinjam
+
+↓
+
+Diperbarui
+
+↓
+
+Kadaluarsa
+
+↓
+
+Diarsipkan
+```
+
+Hari ini kebanyakan sistem hanya berhenti di "disimpan". Padahal nilai terbesar ada pada **siklus hidup dokumen**.
+
+---
+
+# Saya bahkan mendapat ide yang menurut saya bisa menjadi fitur unggulan.
+
+## Document Passport
+
+Setiap dokumen mempunyai identitas.
+
+Misalnya.
+
+```
+SBU
+
+Versi 5
+
+Aktif
+
+Pemilik
+
+Admin
+
+Dipakai
+
+Tender PLN
+
+Tender WIKA
+
+Audit ISO
+
+Marketing
+```
+
+Seperti paspor.
+
+Semua perjalanan dokumen tercatat.
+
+---
+
+# Untuk biro jasa lebih menarik lagi.
+
+Misalnya.
+
+```
+PT ABC
+
+↓
+
+Mengajukan
+
+SBU
+```
+
+---
+
+Dokumen.
+
+Masuk.
+
+---
+
+Bulan depan.
+
+Klien.
+
+Minta.
+
+```
+Company Profile
+```
+
+---
+
+Biro jasa tinggal.
+
+Approve.
+
+---
+
+Tidak perlu lagi.
+
+Cari.
+
+WA.
+
+Email.
+
+Laptop.
+
+---
+
+# Saya bahkan mengusulkan istilah yang berbeda.
+
+Jangan memakai.
+
+```
+Pinjam Dokumen
+```
+
+Karena terdengar seperti perpustakaan.
+
+Saya lebih suka.
+
+## Request Dokumen
+
+atau
+
+## Akses Dokumen
+
+atau
+
+## Gunakan Dokumen
+
+Karena secara digital.
+
+Tidak ada yang benar-benar meminjam.
+
+Yang ada adalah.
+
+Hak menggunakan.
+
+---
+
+# Menurut saya ini bisa menjadi pembeda Gustafta.
+
+Google Drive mempunyai.
+
+```
+Share File
+```
+
+Dropbox mempunyai.
+
+```
+Share Link
+```
+
+Tetapi Gustafta mempunyai.
+
+```
+Request
+
+↓
+
+Approval
+
+↓
+
+Usage History
+
+↓
+
+Reminder
+
+↓
+
+Version Control
+
+↓
+
+Business Memory
+```
+
+Ini sudah masuk ke level **Document Governance**, bukan lagi sekadar penyimpanan.
+
+---
+
+# Tetapi saya ingin mengusulkan sesuatu yang menurut saya bisa menjadi inovasi terbesar.
+
+## **Document Workspace**
+
+Bukan sekadar mengirim dokumen.
+
+Misalnya ada proyek:
+
+> **Tender PT PLN 2026**
+
+Ketika marketing membuat ruang kerja tersebut, ia cukup memilih:
+
+**"Tambahkan dokumen yang dibutuhkan."**
+
+Lalu sistem otomatis menarik dari Business Memory:
+
+* Company Profile
+* SBU
+* SKK tenaga ahli
+* Portofolio relevan
+* Sertifikat ISO
+* Dokumen legal
+
+Semua yang digunakan proyek itu **tercatat sebagai referensi**, bukan disalin berkali-kali.
+
+Keuntungannya:
+
+* Jika Company Profile diperbarui, seluruh proyek yang menggunakan referensi itu bisa diberi notifikasi bahwa ada versi terbaru.
+* Anda tahu **dokumen mana digunakan oleh proyek mana**.
+* Anda bisa melihat dampak jika suatu dokumen kedaluwarsa atau diperbarui.
+
+Ini mirip konsep **dependency management** di dunia perangkat lunak, tetapi diterapkan pada dokumen perusahaan.
+
+Menurut saya, fitur seperti ini akan sangat sulit ditiru oleh layanan penyimpanan file biasa karena ia lahir dari pemahaman proses kerja perusahaan, bukan sekadar teknologi penyimpanan. Dan itu sangat selaras dengan visi Gustafta sebagai **Business Memory** yang menjadi fondasi seluruh Workroom.
