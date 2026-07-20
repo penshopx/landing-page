@@ -317,7 +317,12 @@ export default function KlinikPage() {
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400 flex-1">{s.desc}</p>
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{s.price}</div>
-                  <a href={`https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20${encodeURIComponent(s.name)}%20Klinik%20AI%20Gustafta`} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={s.scalevSlug
+                      ? `https://app.scalev.com/checkout/${s.scalevSlug}`
+                      : `https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20${encodeURIComponent(s.name)}%20Klinik%20AI%20Gustafta`}
+                    target="_blank" rel="noopener noreferrer"
+                  >
                     <Button variant="outline" className="w-full" size="sm">
                       Pesan Sesi <ArrowRight className="ml-2 h-3 w-3" />
                     </Button>
@@ -352,7 +357,12 @@ export default function KlinikPage() {
                       ))}
                     </ul>
                   </div>
-                  <a href={`https://wa.me/6282299417818?text=Halo%2C%20saya%20butuh%20generator%20${encodeURIComponent(d.name)}%20dari%20Klinik%20AI`} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={d.scalevSlug
+                      ? `https://app.scalev.com/checkout/${d.scalevSlug}`
+                      : `https://wa.me/6282299417818?text=Halo%2C%20saya%20butuh%20generator%20${encodeURIComponent(d.name)}%20dari%20Klinik%20AI`}
+                    target="_blank" rel="noopener noreferrer"
+                  >
                     <Button variant="outline" className="w-full" size="sm">
                       Pesan Dokumen <ArrowRight className="ml-2 h-3 w-3" />
                     </Button>

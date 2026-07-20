@@ -284,19 +284,18 @@ export const CREDIT_PACKS: CreditPack[] = [
 
 // ─── Klinik Konsultasi AI ────────────────────────────────────────────────────
 // Model harga untuk layanan Klinik: Per Sesi, Per Dokumen, Paket Tuntas.
-// Ini BELUM memiliki payment flow otomatis — transaksi via WhatsApp / Jasa Order.
-// Saat payment flow dibangun, angka di sini menjadi source-of-truth.
+// Checkout via Scalev (scalevSlug). Jika scalevSlug kosong → fallback WA.
 
 export const KLINIK_SESI = [
-  { name: "Sesi Standar",           price: "Rp 150.000", amount: 150000, duration: "60 menit", desc: "Konsultasi 1 domain, 1 spesialis AI, ringkasan hasil", tag: "" },
-  { name: "Sesi Lanjutan",          price: "Rp 300.000", amount: 300000, duration: "90 menit", desc: "Multi-domain, action plan tertulis + ringkasan eksekutif", tag: "Populer" },
-  { name: "Sesi Expert + Dokumen",  price: "Rp 500.000", amount: 500000, duration: "90 menit", desc: "Sesi penuh + 1 dokumen output siap pakai", tag: "" },
+  { name: "Sesi Standar",           price: "Rp 150.000", amount: 150000, duration: "60 menit", desc: "Konsultasi 1 domain, 1 spesialis AI, ringkasan hasil",         tag: "",       scalevSlug: "klinik-sesi-standar" },
+  { name: "Sesi Lanjutan",          price: "Rp 300.000", amount: 300000, duration: "90 menit", desc: "Multi-domain, action plan tertulis + ringkasan eksekutif",      tag: "Populer", scalevSlug: "" },
+  { name: "Sesi Expert + Dokumen",  price: "Rp 500.000", amount: 500000, duration: "90 menit", desc: "Sesi penuh + 1 dokumen output siap pakai",                      tag: "",       scalevSlug: "klinik-sesi-expert" },
 ] as const;
 
 export const KLINIK_DOKUMEN = [
-  { name: "Dokumen Dasar",    price: "Rp 99.000",  amount: 99000,  desc: "Surat, checklist, laporan ringkas, RAB sederhana",           examples: ["Surat Permohonan", "Checklist K3", "RAB Pekerjaan Kecil"] },
-  { name: "Dokumen Teknis",   price: "Rp 249.000", amount: 249000, desc: "Metode pelaksanaan, spesifikasi teknis, RKK, RMPK, RMK",      examples: ["Metode Pelaksanaan", "Rencana Mutu Kontrak", "SMKK Singkat"] },
-  { name: "Dokumen Kompleks", price: "Rp 499.000", amount: 499000, desc: "AMDAL ringkas, kontrak, HSE Plan, studi kelayakan mini",      examples: ["UKL-UPL Ringkas", "Draft Kontrak Kerja", "HSE Plan Proyek"] },
+  { name: "Dokumen Dasar",    price: "Rp 99.000",  amount: 99000,  scalevSlug: "klinik-dokumen-dasar",    desc: "Surat, checklist, laporan ringkas, RAB sederhana",           examples: ["Surat Permohonan", "Checklist K3", "RAB Pekerjaan Kecil"] },
+  { name: "Dokumen Teknis",   price: "Rp 249.000", amount: 249000, scalevSlug: "klinik-dokumen-teknis",   desc: "Metode pelaksanaan, spesifikasi teknis, RKK, RMPK, RMK",      examples: ["Metode Pelaksanaan", "Rencana Mutu Kontrak", "SMKK Singkat"] },
+  { name: "Dokumen Kompleks", price: "Rp 499.000", amount: 499000, scalevSlug: "klinik-dokumen-kompleks", desc: "AMDAL ringkas, kontrak, HSE Plan, studi kelayakan mini",      examples: ["UKL-UPL Ringkas", "Draft Kontrak Kerja", "HSE Plan Proyek"] },
 ] as const;
 
 export const KLINIK_PAKET = [
@@ -432,8 +431,8 @@ export const RUANG_SIMPAN_PLANS = [
       "Dedicated support WhatsApp",
     ],
     limits: [],
-    cta: "Hubungi Kami",
-    ctaHref: "https://wa.me/6282299417818?text=Halo%2C%20saya%20tertarik%20Ruang%20Simpan%20Perusahaan",
+    cta: "Pilih Perusahaan",
+    ctaHref: "https://app.scalev.com/checkout/ruang-simpan-perusahaan",
   },
 ] as const;
 
