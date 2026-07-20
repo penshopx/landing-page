@@ -27,6 +27,17 @@ Hook `pre-commit` di `scripts/hooks/pre-commit` akan di-copy ke `.git/hooks/pre-
 
 Jika commit diblokir: hapus nilai secret dari file, simpan ke **Replit Secrets** (bukan `.replit` atau `.env`), lalu commit ulang. Jika key sudah masuk git history → rotate di dashboard provider.
 
+### CI guard — menutup celah `--no-verify`
+`git commit --no-verify` melewati hook lokal. Untuk menutup celah ini di GitHub:
+
+- **`.github/workflows/secret-scan.yml`** — berjalan pada setiap `push` dan `pull_request` ke `main`. Dua lapis:
+  1. **[Gitleaks Action](https://github.com/gitleaks/gitleaks-action)** — deteksi secret generik (token AWS, GCP, dll.) dengan aturan bawaan Gitleaks.
+  2. **Pola khusus Gustafta** — grep step menggunakan pola yang sama dengan `scripts/hooks/pre-commit` (Brevo `xkeysib-*`, OpenAI `sk-*`, `[userenv.shared]`, variabel env Gustafta, dll.), melewati `node_modules/`, `dist/`, `.agents/memory/`, dan file hook itu sendiri.
+- Jika salah satu pola terdeteksi, check GitHub Actions **gagal** dan PR tidak bisa di-merge (branch protection).
+- Untuk repo **privat** berbayar: tambahkan `GITLEAKS_LICENSE` ke GitHub Secrets (lihat komentar di workflow).
+
+Alur perlindungan berlapis: `pre-commit` lokal → CI GitHub Actions → (opsional) GitHub native secret scanning di Settings repo.
+
 ## Stack
 - **Frontend**: React 18 + TypeScript, Tailwind CSS, shadcn/ui, TanStack React Query, Vite, wouter
 - **Backend**: Express 5 + TypeScript, Node.js (`tsx`), Drizzle ORM + Zod, PostgreSQL
