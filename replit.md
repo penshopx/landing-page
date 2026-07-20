@@ -10,6 +10,12 @@ Penting: **"Workroom" (istilah teknis engine) ≠ "Ruang X" (nama produk/domain)
 
 Peta siklus 9 tahap jangka panjang (tidak semua tahap sudah diimplementasi): Masalah → Kesadaran → Dialog → Blueprint → Kolaborasi → Workroom → Produksi → Refleksi → Knowledge Baru.
 
+## Replit Setup Notes
+- **Database**: Uses external PostgreSQL via `DATABASE_URL` secret (no local `postgresql-16` module needed).
+- **Workflow command**: The Replit workflow runs `NODE_ENV=development npx tsx server/index.ts` (equivalent to `npm run dev`) because `tsx` is a local devDependency and must be invoked via `npx` in the Replit shell environment.
+- **After fresh clone/import**: Run `bash scripts/install-hooks.sh` once to install git pre-commit hooks, then set required secrets (see `.env.example`).
+- **Required secrets**: `DATABASE_URL`, `SESSION_SECRET`. AI features need at least one of: `OPENAI_API_KEY`, `GEMINI_API_KEY`, `DEEPSEEK_API_KEY`, `QWEN_API_KEY`.
+
 ## Run & Operate
 - **Run Development Server**: `npm run dev`
 - **Build**: `npm run build`
