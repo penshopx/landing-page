@@ -156,6 +156,8 @@ Semua pakai `PremiumPageGuard` feature="advanced_ai_tools" requiredPlan="profesi
 **JANGAN pernah tempel API key ke `.replit` atau file apapun yang masuk git.**
 Setelah re-import dari GitHub, atur ulang secrets berikut via **Replit Secrets** (bukan `[userenv.shared]`):
 
+**CI guard aktif**: `.github/workflows/secret-scan.yml` menjalankan [Gitleaks](https://github.com/gitleaks/gitleaks-action) + pola khusus Gustafta di setiap `push`/`pull_request` ke `main`. Jika ada pola secret terdeteksi, check gagal dan merge diblokir secara otomatis. Guard ini melengkapi hook `pre-commit` lokal — keduanya harus lolos.
+
 | Secret | Keterangan |
 |--------|-----------|
 | `BREVO_API_KEY` | Email OTP & notifikasi (Brevo dashboard) |
