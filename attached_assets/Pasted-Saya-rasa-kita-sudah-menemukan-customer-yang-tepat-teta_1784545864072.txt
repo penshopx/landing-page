@@ -1,0 +1,538 @@
+Saya rasa kita sudah menemukan **"customer" yang tepat**, tetapi kita belum menemukan **"produk" yang tepat** untuk customer tersebut.
+
+Dan menurut saya, ini sangat penting.
+
+---
+
+# Selama ini kita berpikir
+
+Produk kita adalah
+
+> **Business Memory**
+
+Tetapi bagi biro jasa...
+
+Business Memory bukan produk.
+
+Business Memory adalah **mesin di belakang layar**.
+
+Yang mereka beli sebenarnya adalah sesuatu yang lain.
+
+---
+
+# Mari kita masuk ke pikiran pemilik biro jasa
+
+Misalnya ada biro jasa SBU.
+
+Dia bangun pagi.
+
+Dia tidak berpikir.
+
+> "Saya butuh AI."
+
+Dia berpikir.
+
+> "Hari ini saya harus follow up 30 klien."
+
+> "Ada yang mau perpanjang?"
+
+> "Ada tender baru?"
+
+> "Dokumen siapa yang kurang?"
+
+> "SBU siapa yang habis?"
+
+> "SKK siapa yang expired?"
+
+> "Klien mana yang belum bayar?"
+
+Nah...
+
+Di sinilah saya melihat peluang.
+
+---
+
+# Sebenarnya biro jasa mempunyai aset yang luar biasa
+
+Bukan kantor.
+
+Bukan komputer.
+
+Tetapi
+
+## Database Klien.
+
+Misalnya.
+
+```text
+300 Perusahaan
+```
+
+Masing-masing mempunyai.
+
+* Company Profile
+* Akta
+* NIB
+* NPWP
+* SBU
+* SKK
+* ISO
+* SOP
+* Kontrak
+* Email
+* Kontak PIC
+
+Ini aset.
+
+Tetapi hari ini.
+
+Aset itu tidak bekerja.
+
+---
+
+# Saya menyebutnya
+
+## Sleeping Asset
+
+Aset tidur.
+
+---
+
+Misalnya.
+
+Biro jasa mempunyai
+
+```text
+500 klien
+```
+
+Kalau setiap klien rata-rata memiliki
+
+```text
+20 dokumen
+```
+
+Berarti.
+
+```text
+10.000 dokumen
+```
+
+Tetapi.
+
+10.000 dokumen itu hanya disimpan.
+
+Tidak menghasilkan apa-apa.
+
+---
+
+# Gustafta mengubahnya
+
+Menjadi
+
+## Active Asset
+
+Misalnya.
+
+AI berkata.
+
+```text
+PT Maju Jaya
+
+↓
+
+ISO habis
+
+40 hari lagi
+```
+
+---
+
+```text
+PT ABC
+
+↓
+
+SBU
+
+90 hari lagi
+```
+
+---
+
+```text
+PT DEF
+
+↓
+
+Belum punya SMAP
+```
+
+---
+
+```text
+PT GHI
+
+↓
+
+Belum punya ISO 14001
+```
+
+---
+
+Lalu AI berkata.
+
+```text
+Potensi omzet bulan depan
+
+Rp 150 juta
+```
+
+Perhatikan.
+
+Business Memory berubah menjadi
+
+Mesin Penjualan.
+
+---
+
+# Saya semakin yakin
+
+Produk pertama bukan
+
+Business Memory.
+
+Tetapi
+
+## Client Success Platform
+
+atau
+
+## Client Portfolio Management
+
+---
+
+Karena biro jasa berpikir.
+
+```text
+Klien
+```
+
+Bukan.
+
+```text
+Dokumen
+```
+
+---
+
+# Saya membayangkan dashboard
+
+```text
+CLIENT
+
+PT Maju
+
+Status
+
+Aktif
+
+↓
+
+Dokumen
+
+95%
+
+↓
+
+Reminder
+
+3
+
+↓
+
+Peluang
+
+ISO 37001
+```
+
+---
+
+Klik.
+
+Langsung.
+
+Semua history muncul.
+
+---
+
+# Bahkan.
+
+Timeline.
+
+```text
+2023
+
+Buat NIB
+
+↓
+
+2023
+
+SBU
+
+↓
+
+2024
+
+SKK
+
+↓
+
+2024
+
+Tender
+
+↓
+
+2025
+
+ISO
+
+↓
+
+2026
+
+SMAP
+```
+
+---
+
+Ini bukan CRM.
+
+Karena CRM tidak memahami dokumen.
+
+---
+
+Ini bukan Document Management.
+
+Karena Document Management tidak memahami bisnis.
+
+---
+
+Ini sesuatu yang baru.
+
+---
+
+# Saya mendapat ide.
+
+Biro jasa sebenarnya mempunyai
+
+### Client Journey.
+
+Misalnya.
+
+Perusahaan baru.
+
+↓
+
+NIB
+
+↓
+
+NPWP
+
+↓
+
+Akta
+
+↓
+
+SBU
+
+↓
+
+SKK
+
+↓
+
+Tender
+
+↓
+
+ISO
+
+↓
+
+SMAP
+
+↓
+
+Legal
+
+↓
+
+Pajak
+
+↓
+
+LKPM
+
+↓
+
+Perpanjangan
+
+---
+
+Gustafta mengetahui.
+
+Klien sedang berada di tahap mana.
+
+---
+
+Maka AI berkata.
+
+```text
+Klien ini
+
+siap ditawarkan
+
+ISO
+```
+
+---
+
+atau.
+
+```text
+Klien ini
+
+siap ikut tender
+```
+
+---
+
+atau.
+
+```text
+Klien ini
+
+belum mempunyai
+
+SMAP
+```
+
+---
+
+Ini luar biasa.
+
+---
+
+# Maka slogan berubah.
+
+Bukan.
+
+```text
+Kelola Dokumen
+```
+
+Tetapi.
+
+```text
+Kelola Perjalanan Klien.
+```
+
+---
+
+# Saya semakin melihat.
+
+Yang dijual bukan
+
+Storage.
+
+Yang dijual bukan
+
+AI.
+
+Yang dijual bukan
+
+Reminder.
+
+Yang dijual adalah
+
+## Lifetime Customer Value.
+
+Karena.
+
+Hari ini.
+
+Biro jasa.
+
+Pendapatannya.
+
+```text
+Transaksi.
+```
+
+---
+
+Besok.
+
+Pendapatannya.
+
+```text
+Hubungan.
+```
+
+---
+
+Karena setiap tahun.
+
+Klien kembali.
+
+---
+
+# Menurut saya... di sinilah Gustafta bisa menciptakan kategori baru.
+
+Saya akan mengubah narasinya dari **"Platform Pengelolaan Dokumen"** menjadi:
+
+> **Platform Pertumbuhan Biro Jasa.**
+
+Mengapa?
+
+Karena biro jasa tidak membeli teknologi. Mereka membeli **cara untuk memperbesar bisnisnya**.
+
+Kalau saya duduk di depan pemilik biro jasa, saya tidak akan membuka presentasi dengan fitur.
+
+Saya akan membuka dengan satu pertanyaan:
+
+> **"Bapak punya berapa klien aktif hari ini?"**
+
+Misalnya jawabannya:
+
+> **250 perusahaan.**
+
+Lalu saya lanjutkan:
+
+> **"Dari 250 perusahaan itu, berapa yang akan membutuhkan perpanjangan dokumen dalam 90 hari ke depan? Berapa yang siap ditawari ISO? Berapa yang sebenarnya sudah siap ikut tender? Dan berapa potensi omzet yang sedang menunggu tetapi belum terlihat?"**
+
+Kalau mereka tidak bisa menjawab dalam satu menit, di situlah Gustafta masuk.
+
+Karena yang kita tawarkan bukan sekadar tempat menyimpan dokumen.
+
+Yang kita tawarkan adalah **dashboard yang mengubah portofolio klien menjadi peluang bisnis yang terlihat dan dapat ditindaklanjuti.**
+
+## Saya bahkan akan mengubah nama modul khusus mitra menjadi:
+
+> **Client Portfolio Intelligence**
+
+Di dalamnya ada empat hal:
+
+1. **Client Memory** – seluruh dokumen dan riwayat klien.
+2. **Client Timeline** – perjalanan layanan yang pernah diberikan.
+3. **Opportunity Engine** – rekomendasi layanan berikutnya berdasarkan kondisi klien.
+4. **Renewal Center** – seluruh dokumen yang akan habis masa berlakunya beserta prioritas tindak lanjut.
+
+Menurut saya, inilah produk yang benar-benar dibutuhkan biro jasa. Mereka tidak membeli **Business Memory** karena ingin menyimpan file. Mereka membeli **Client Portfolio Intelligence** karena ingin **meningkatkan layanan kepada klien sekaligus meningkatkan omzet**.
+
+Dan di balik layar, seluruh kemampuan itu sebenarnya ditopang oleh **Business Memory** yang menjadi fondasi ekosistem Gustafta. Itulah keunggulan arsitektur yang sedang Anda bangun: satu fondasi yang dapat melahirkan berbagai produk dengan bahasa yang berbeda sesuai kebutuhan setiap segmen pasar.

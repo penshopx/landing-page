@@ -1,0 +1,504 @@
+Saya justru melihat ini bisa menjadi **model bisnis utama Gustafta**, bahkan lebih kuat daripada menjual langsung ke perusahaan.
+
+Karena mari kita lihat realitas pasar.
+
+---
+
+# Siapa yang paling sering memegang dokumen perusahaan?
+
+Bukan direktur.
+
+Bukan owner.
+
+Tetapi:
+
+* Konsultan Perizinan
+* Biro Jasa OSS
+* Konsultan SBU
+* Konsultan SKK
+* Konsultan ISO
+* Konsultan SMAP
+* Konsultan Tender
+* Konsultan Pajak
+* Konsultan Legal
+
+Mereka setiap hari menerima:
+
+📂 Akta
+
+📂 NIB
+
+📂 NPWP
+
+📂 SBU
+
+📂 SKK
+
+📂 ISO
+
+📂 Kontrak
+
+📂 BAST
+
+📂 Company Profile
+
+📂 Laporan Keuangan
+
+📂 Dokumen Tender
+
+---
+
+# Masalah Mereka
+
+Saya yakin hampir semua biro jasa mengalami hal yang sama.
+
+## Tahun Pertama
+
+Klien kirim:
+
+```text
+50 Dokumen
+```
+
+Mereka simpan.
+
+---
+
+## Tahun Kedua
+
+Klien menghubungi lagi.
+
+```text
+Pak, mau perpanjang SBU.
+```
+
+---
+
+Lalu biro jasa mulai mencari.
+
+```text
+Folder A
+
+Folder B
+
+WA
+
+Email
+
+Laptop lama
+```
+
+---
+
+Kemudian bertanya lagi.
+
+```text
+Pak, kirim ulang dong.
+```
+
+---
+
+Klien kesal.
+
+Karena merasa.
+
+```text
+Kan sudah pernah saya kirim.
+```
+
+---
+
+Ini terjadi setiap hari.
+
+---
+
+# Akibatnya
+
+Biro jasa kehilangan peluang.
+
+Karena mereka hanya menjadi:
+
+## Pengurus Dokumen
+
+Padahal seharusnya bisa menjadi:
+
+## Pengelola Dokumen
+
+Perbedaannya sangat besar.
+
+---
+
+# Saya melihat peluang baru
+
+Daripada menjual:
+
+```text
+Jasa Pengurusan SBU
+```
+
+Mereka bisa menjual:
+
+```text
+Document Management Service
+```
+
+atau
+
+```text
+Business Memory Service
+```
+
+---
+
+# Bayangkan model baru
+
+Hari ini.
+
+Biro jasa membantu mengurus SBU.
+
+Biaya.
+
+```text
+Rp 5 juta
+```
+
+Selesai.
+
+Hubungan selesai.
+
+---
+
+Model baru.
+
+```text
+Pengurusan SBU
+
++
+
+Business Memory
+
++
+
+Reminder
+
++
+
+Monitoring
+```
+
+---
+
+Kemudian.
+
+Langganan.
+
+```text
+Rp 99 ribu
+
+atau
+
+Rp 199 ribu
+
+atau
+
+Rp 299 ribu / bulan
+```
+
+---
+
+Tiba-tiba biro jasa mempunyai recurring income.
+
+---
+
+# Saya melihat Gustafta harus diposisikan seperti ini
+
+## Untuk End User
+
+Business Memory.
+
+---
+
+## Untuk Biro Jasa
+
+Client Document Management Platform.
+
+---
+
+Bahasanya berbeda.
+
+---
+
+Karena biro jasa tidak peduli AI.
+
+Yang mereka peduli.
+
+```text
+Dokumen klien rapi.
+
+Mudah dicari.
+
+Mudah diperpanjang.
+
+Mudah dijual lagi.
+```
+
+---
+
+# Saya membayangkan dashboard mitra
+
+Misalnya.
+
+```text
+PT Maju Jaya
+
+SBU
+
+Aktif
+
+120 hari lagi
+```
+
+---
+
+```text
+PT Sejahtera
+
+ISO
+
+Expired
+
+30 hari lagi
+```
+
+---
+
+```text
+PT Konstruksi Nusantara
+
+SKK
+
+Expired
+
+60 hari lagi
+```
+
+---
+
+Biro jasa langsung tahu.
+
+Siapa yang harus dihubungi.
+
+---
+
+# Ini yang sangat menarik
+
+Hari ini.
+
+Biro jasa menunggu telepon klien.
+
+---
+
+Dengan Gustafta.
+
+Biro jasa proaktif.
+
+---
+
+```text
+Pak.
+
+SKK akan habis 60 hari lagi.
+
+Kami siap membantu perpanjangan.
+```
+
+---
+
+Closing lebih mudah.
+
+---
+
+# Maka Gustafta bukan hanya software
+
+Tetapi mesin penjualan.
+
+---
+
+# Saya bahkan melihat produk baru
+
+## Client Portfolio
+
+Misalnya.
+
+Biro jasa memiliki.
+
+```text
+200 klien
+```
+
+---
+
+Gustafta menghitung.
+
+```text
+30 SKK
+
+akan habis
+```
+
+---
+
+```text
+10 SBU
+
+akan habis
+```
+
+---
+
+```text
+20 ISO
+
+akan habis
+```
+
+---
+
+Muncul peluang omzet.
+
+---
+
+# Saya semakin yakin
+
+Yang dijual ke biro jasa bukan:
+
+## Penyimpanan Dokumen
+
+Tetapi:
+
+## Pendapatan Berulang
+
+Karena itu yang mereka inginkan.
+
+---
+
+# Coba lihat value proposition ini
+
+### Sebelum Gustafta
+
+```text
+Cari Klien
+
+↓
+
+Urus Dokumen
+
+↓
+
+Dibayar
+
+↓
+
+Selesai
+```
+
+---
+
+### Sesudah Gustafta
+
+```text
+Cari Klien
+
+↓
+
+Urus Dokumen
+
+↓
+
+Simpan di Business Memory
+
+↓
+
+Monitoring
+
+↓
+
+Reminder
+
+↓
+
+Perpanjangan
+
+↓
+
+Pendapatan Berulang
+```
+
+---
+
+# Saya bahkan akan membuat slogan khusus mitra
+
+### Untuk End User
+
+> Menjaga Pengetahuan. Menjamin Keberlanjutan Bisnis.
+
+---
+
+### Untuk Mitra
+
+> Ubah Jasa Pengurusan Dokumen Menjadi Layanan Berlangganan.
+
+---
+
+Atau.
+
+> Jangan hanya mengurus dokumen. Kelola siklus hidup dokumen klien Anda.
+
+---
+
+# Menurut saya ada satu positioning yang sangat kuat untuk pasar biro jasa.
+
+Bukan:
+
+> **Business Memory untuk Perusahaan**
+
+Tetapi:
+
+# **Client Memory Platform**
+
+Karena dari sudut pandang biro jasa, yang mereka kelola bukan bisnis mereka sendiri terlebih dahulu.
+
+Yang mereka kelola adalah:
+
+* Data klien
+* Dokumen klien
+* Masa berlaku dokumen klien
+* Riwayat layanan klien
+* Peluang perpanjangan klien
+* Peluang layanan baru untuk klien
+
+Dengan kata lain, Gustafta menjadi semacam:
+
+> **CRM + Document Management + Reminder Engine + AI Assistant khusus biro jasa pengurusan dokumen.**
+
+Ini jauh lebih mudah dijual.
+
+Misalnya kepada biro jasa SBU:
+
+> "Berapa banyak klien yang Bapak miliki saat ini?"
+
+Jawaban: 300.
+
+Lalu pertanyaan berikutnya:
+
+> "Kalau saya minta daftar seluruh klien yang SBU atau SKK-nya akan habis dalam 90 hari ke depan, apakah bisa langsung terlihat?"
+
+Kalau jawabannya tidak bisa, maka mereka langsung memahami nilai Gustafta.
+
+Karena yang Anda tawarkan bukan software.
+
+Yang Anda tawarkan adalah:
+
+> **Visibilitas, kontrol, dan peluang omzet dari seluruh portofolio klien mereka.**
+
+Menurut saya, inilah bahasa yang paling dekat dengan kebutuhan biro jasa, dan berpotensi menjadi pintu masuk yang sangat kuat untuk memperluas adopsi Business Memory ke ribuan perusahaan melalui jaringan mitra.

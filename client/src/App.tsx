@@ -62,6 +62,7 @@ import TrilogiLanding from "@/pages/trilogi-landing";
 import EbookDialog from "@/pages/ebook-dialog";
 import EbookTerimaKasih from "@/pages/ebook-terima-kasih";
 import MitraPage from "@/pages/mitra";
+import MitraBiroJasaPage from "@/pages/mitra-biro-jasa";
 import LegacyPage from "@/pages/legacy";
 import BlueprintPage from "@/pages/blueprint";
 import BlueprintBuilderPage from "@/pages/blueprint-builder";
@@ -526,6 +527,7 @@ function Router() {
       <Route path="/ebook-dialog" component={EbookDialog} />
       <Route path="/ebook-terima-kasih" component={EbookTerimaKasih} />
       <Route path="/mitra" component={MitraPage} />
+      <Route path="/mitra-biro-jasa" component={MitraBiroJasaPage} />
       <Route path="/legacy" component={LegacyPage} />
       <Route path="/blueprint" component={BlueprintPage} />
       <Route path="/blueprint-builder" component={BlueprintBuilderPage} />

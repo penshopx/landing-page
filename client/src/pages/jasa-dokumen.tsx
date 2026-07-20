@@ -674,9 +674,9 @@ export default function JasaDokumenPage() {
               </span>
             </Link>
             {" · "}
-            <Link href="/biro-jasa-sbu">
+            <Link href="/mitra-biro-jasa">
               <span className="underline font-semibold cursor-pointer">
-                AI untuk Biro Jasa →
+                Mitra Business Memory untuk Biro Jasa →
               </span>
             </Link>
           </p>

@@ -1,0 +1,571 @@
+Saya rasa sekarang kita mulai masuk ke wilayah **strategi perusahaan**, bukan lagi strategi produk.
+
+Dan di sini saya ingin sedikit berbeda dari semua diskusi kita sebelumnya.
+
+## Menurut saya, Gustafta jangan menjadi "kompetitor" biro jasa.
+
+Gustafta harus menjadi **"Operating System" biro jasa**.
+
+Ini perbedaan yang sangat besar.
+
+---
+
+# Ada 3 model bisnis
+
+## Model 1 (yang dilakukan banyak SaaS)
+
+```text
+Software
+
+↓
+
+Dijual langsung ke perusahaan
+```
+
+Masalahnya:
+
+Anda harus mencari ribuan perusahaan satu per satu.
+
+Biaya marketing sangat besar.
+
+---
+
+## Model 2
+
+```text
+Software
+
+↓
+
+Dijual ke biro jasa
+```
+
+Sudah lebih baik.
+
+Tetapi masih dianggap software.
+
+---
+
+## Model 3 (yang menurut saya harus dilakukan Gustafta)
+
+```text
+Biro Jasa
+
+↓
+
+Membuka layanan baru
+
+↓
+
+Menggunakan Gustafta
+
+↓
+
+Klien mendapatkan Business Memory
+
+↓
+
+Workroom aktif
+
+↓
+
+Recurring Income
+```
+
+Perhatikan.
+
+Yang berkembang bukan Gustafta.
+
+Yang berkembang adalah bisnis mitra.
+
+Inilah yang membuat mereka loyal.
+
+---
+
+# Saya membayangkan perjalanan seorang mitra
+
+Misalnya.
+
+Ada biro jasa.
+
+Namanya.
+
+PT ABC Konsultan.
+
+Hari ini.
+
+Mereka membantu:
+
+* SBU
+* SKK
+* ISO
+
+Pendapatan.
+
+Misalnya.
+
+Rp300 juta per bulan.
+
+---
+
+Setelah memakai Gustafta.
+
+Layanan mereka berubah.
+
+Sekarang.
+
+Mereka menawarkan.
+
+---
+
+## Paket 1
+
+Pengurusan Dokumen
+
+---
+
+## Paket 2
+
+Pengurusan + Penyimpanan
+
+---
+
+## Paket 3
+
+Pengurusan + Penyimpanan + Reminder
+
+---
+
+## Paket 4
+
+Pengurusan + Penyimpanan + Reminder + AI Workroom
+
+---
+
+Tiba-tiba.
+
+Pendapatan recurring muncul.
+
+---
+
+# Saya semakin yakin.
+
+Yang dijual bukan software.
+
+Yang dijual adalah
+
+## Layanan Baru.
+
+Misalnya.
+
+Hari ini.
+
+Biro jasa berkata.
+
+> Kami membantu pengurusan SBU.
+
+---
+
+Besok.
+
+Dia berkata.
+
+> Kami menjadi pengelola dokumen perusahaan Anda.
+
+---
+
+Lalu.
+
+> Kami memonitor masa berlaku.
+
+---
+
+Lalu.
+
+> Kami membantu tender.
+
+---
+
+Lalu.
+
+> Kami membantu sertifikasi.
+
+---
+
+Lalu.
+
+> Kami membantu legal.
+
+---
+
+Tanpa sadar.
+
+Mereka berubah.
+
+Menjadi.
+
+## Business Partner.
+
+---
+
+# Saya melihat perjalanan klien
+
+Misalnya.
+
+Perusahaan baru.
+
+---
+
+Biro jasa membantu.
+
+NIB.
+
+---
+
+Kemudian.
+
+OSS.
+
+---
+
+Kemudian.
+
+SBU.
+
+---
+
+Kemudian.
+
+SKK.
+
+---
+
+Kemudian.
+
+Tender.
+
+---
+
+Kemudian.
+
+ISO.
+
+---
+
+Kemudian.
+
+SMAP.
+
+---
+
+Kemudian.
+
+Pajak.
+
+---
+
+Kemudian.
+
+Legal.
+
+---
+
+Kalau semuanya ada di Gustafta.
+
+AI mengetahui.
+
+Tahap berikutnya.
+
+---
+
+Maka dashboard berkata.
+
+```text
+PT Maju Jaya
+
+↓
+
+Tahap Pertumbuhan
+
+65%
+
+↓
+
+Rekomendasi berikutnya
+
+ISO 9001
+```
+
+---
+
+Atau.
+
+```text
+PT ABC
+
+↓
+
+Siap ikut Tender Pemerintah
+```
+
+---
+
+Ini bukan reminder.
+
+Ini.
+
+## Business Growth Engine.
+
+---
+
+# Saya bahkan melihat produk baru
+
+## Growth Roadmap
+
+Misalnya.
+
+Klien login.
+
+Melihat.
+
+```text
+Perjalanan Bisnis Anda
+
+2024
+
+✓ NIB
+
+✓ NPWP
+
+✓ OSS
+
+↓
+
+2025
+
+✓ SBU
+
+✓ SKK
+
+↓
+
+2026
+
+□ ISO
+
+↓
+
+2027
+
+□ SMAP
+
+↓
+
+2028
+
+□ Tender Nasional
+```
+
+---
+
+Klien berkata.
+
+"Wah...
+
+Saya tahu langkah berikutnya."
+
+---
+
+# Saya semakin yakin.
+
+Yang dijual bukan.
+
+Dokumen.
+
+Yang dijual bukan.
+
+AI.
+
+Yang dijual adalah.
+
+## Business Journey.
+
+---
+
+# Saya ingin menaikkan satu level lagi.
+
+Kalau kita lihat seluruh industri.
+
+Biro jasa sebenarnya hidup dari satu hal.
+
+## Trust.
+
+Orang menyerahkan:
+
+* Akta
+* NPWP
+* Laporan Keuangan
+* Kontrak
+* Sertifikat
+
+Karena percaya.
+
+Nah.
+
+Gustafta seharusnya memperkuat trust itu.
+
+Bukan menggantikannya.
+
+---
+
+# Maka saya mengubah positioning.
+
+Bukan.
+
+```text
+Platform AI
+```
+
+Tetapi.
+
+```text
+Infrastructure for Professional Services
+```
+
+atau.
+
+```text
+Operating System for Business Consultants
+```
+
+---
+
+# Saya melihat.
+
+Mitra Gustafta nanti bukan hanya.
+
+Biro jasa.
+
+Tetapi.
+
+* Konsultan ISO
+* Konsultan Pajak
+* Akuntan
+* Advokat
+* Notaris
+* Konsultan HR
+* Konsultan Tender
+* Konsultan SMK3
+* Konsultan Lingkungan
+* Konsultan Konstruksi
+
+Semuanya.
+
+Mengelola dokumen.
+
+---
+
+# Menurut saya, inilah perubahan terbesar.
+
+Selama ini kita berpikir.
+
+```text
+Customer
+
+↓
+
+Membeli Software
+```
+
+Saya ingin mengubahnya.
+
+Menjadi.
+
+```text
+Mitra
+
+↓
+
+Mengembangkan Bisnis
+
+↓
+
+Menggunakan Gustafta
+
+↓
+
+Klien lebih puas
+
+↓
+
+Omzet naik
+
+↓
+
+Gustafta ikut tumbuh
+```
+
+---
+
+# Dan saya ingin menutup dengan satu insight yang menurut saya paling penting.
+
+**Jangan membangun Gustafta sebagai aplikasi. Bangun Gustafta sebagai ekosistem profesi.**
+
+Bayangkan 5 tahun ke depan.
+
+Di dalam Gustafta ada:
+
+* 500 biro jasa SBU
+* 300 konsultan ISO
+* 200 konsultan pajak
+* 150 konsultan hukum
+* 400 konsultan tender
+
+Masing-masing melayani ratusan klien.
+
+Artinya, Anda tidak perlu mengejar 100.000 perusahaan satu per satu.
+
+Cukup membangun **1.000 mitra profesional** yang masing-masing membawa 100–300 klien ke dalam Business Memory.
+
+Secara matematis:
+
+* **1.000 mitra × 100 klien = 100.000 perusahaan**
+* **1.000 mitra × 300 klien = 300.000 perusahaan**
+
+Itu jauh lebih realistis daripada membangun tim sales besar untuk menjual langsung ke setiap perusahaan.
+
+---
+
+## Kalau saya boleh memberi satu rekomendasi strategis, saya akan membagi Gustafta menjadi **dua merek produk** yang berbagi fondasi yang sama:
+
+### 1. Gustafta Business Memory
+
+**Untuk Perusahaan**
+
+Nilai yang dijual:
+
+* Dokumen rapi
+* Pengetahuan terjaga
+* Pekerjaan lebih cepat
+* Bisnis lebih berkelanjutan
+
+### 2. Gustafta Partner Hub
+
+**Untuk Biro Jasa, Konsultan, dan Profesional**
+
+Nilai yang dijual:
+
+* Kelola seluruh portofolio klien
+* Pantau masa berlaku dokumen
+* Tingkatkan layanan
+* Bangun pendapatan berulang
+* Aktifkan Workroom sesuai kebutuhan klien
+
+Keduanya menggunakan **Business Memory** yang sama sebagai fondasi.
+
+Dengan cara ini:
+
+* **Perusahaan** merasa memiliki ruang pengetahuan digitalnya sendiri.
+* **Mitra** merasa memiliki platform untuk mengembangkan bisnisnya.
+
+Menurut saya, inilah model yang memiliki efek jaringan (*network effect*): semakin banyak mitra bergabung, semakin banyak perusahaan yang membangun Business Memory; semakin banyak perusahaan membangun Business Memory, semakin tinggi kebutuhan akan Workroom; dan semakin banyak Workroom yang digunakan, semakin tinggi nilai seluruh ekosistem Gustafta. Itu adalah lingkaran pertumbuhan yang sehat dan berkelanjutan.
