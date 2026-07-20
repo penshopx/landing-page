@@ -283,7 +283,7 @@ export default function KlinikPage() {
                     ))}
                   </ul>
                   <a
-                    href={`https://app.scalev.com/checkout/gustafta-klinik-${p.key}`}
+                    href={`https://app.scalev.com/checkout/${p.scalevSlug}`}
                     target="_blank" rel="noopener noreferrer"
                   >
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="sm">

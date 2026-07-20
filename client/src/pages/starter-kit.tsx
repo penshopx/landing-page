@@ -11,7 +11,7 @@ import {
 
 import { trackLead } from "@/lib/meta-pixel";
 const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Starter%20Kit";
-const SCALEV_STARTER_KIT = "https://app.scalev.com/checkout/gustafta-starter-kit";
+const SCALEV_STARTER_KIT = "https://app.scalev.com/checkout/starter-kit-gustafta";
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }

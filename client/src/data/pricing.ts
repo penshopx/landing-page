@@ -301,37 +301,37 @@ export const KLINIK_DOKUMEN = [
 
 export const KLINIK_PAKET = [
   {
-    key: "tender",       name: "Klinik Tender",       price: "Rp 999.000",   amount: 999000,
+    key: "tender",       scalevSlug: "klinik-tender",       name: "Klinik Tender",       price: "Rp 999.000",   amount: 999000,
     desc: "Analisis dokumen + strategi menang + 2 dokumen output",
     includes: ["Analisis RKS / SDP / SSKK / SSUK", "Strategi penawaran & kalkulasi HPS", "2 dokumen output (metode / RAB)", "30 hari akses TenderBot + TENDERA"],
     tag: "Terlaris",
   },
   {
-    key: "sertifikasi",  name: "Klinik SBU & SKK",    price: "Rp 749.000",   amount: 749000,
+    key: "sertifikasi",  scalevSlug: "klinik-sbu-skk",      name: "Klinik SBU & SKK",    price: "Rp 749.000",   amount: 749000,
     desc: "Peta SBU/SKK + checklist + template portofolio uji kompetensi",
     includes: ["Peta SBU & SKK yang tepat untuk usaha Anda", "Checklist dokumen pendaftaran lengkap", "Template portofolio SKK siap diisi", "30 hari akses SertifikasiBot + SKK Coach"],
     tag: "",
   },
   {
-    key: "hukum",        name: "Klinik Legal",         price: "Rp 799.000",   amount: 799000,
+    key: "hukum",        scalevSlug: "klinik-legal",         name: "Klinik Legal",         price: "Rp 799.000",   amount: 799000,
     desc: "2 sesi konsultasi hukum + 1 dokumen hukum siap pakai",
     includes: ["2 sesi konsultasi dengan LexCom AI (17 spesialis)", "1 dokumen hukum (surat / kontrak / klausul review)", "Panduan langkah hukum selanjutnya", "30 hari akses LexCom"],
     tag: "",
   },
   {
-    key: "proyek",       name: "Klinik Proyek",        price: "Rp 1.499.000", amount: 1499000,
+    key: "proyek",       scalevSlug: "klinik-proyek",        name: "Klinik Proyek",        price: "Rp 1.499.000", amount: 1499000,
     desc: "Diagnosa proyek + action plan + set dokumen manajemen proyek",
     includes: ["Diagnosa progres, biaya & risiko proyek", "Action plan & rencana tindak korektif", "3 dokumen manpro (jadwal / RMK / laporan)", "30 hari akses ProyekBot + BRAIN Project"],
     tag: "Paling Lengkap",
   },
   {
-    key: "perijinan",    name: "Klinik Perizinan",     price: "Rp 499.000",   amount: 499000,
+    key: "perijinan",    scalevSlug: "klinik-perizinan",     name: "Klinik Perizinan",     price: "Rp 499.000",   amount: 499000,
     desc: "Analisis KBLI + roadmap izin OSS-RBA + checklist per izin",
     includes: ["Peta KBLI & tingkat risiko usaha", "Roadmap perizinan OSS-RBA langkah demi langkah", "Checklist dokumen per jenis izin", "30 hari akses PerijinanBot + OSSClaw"],
     tag: "",
   },
   {
-    key: "iso",          name: "Klinik ISO",           price: "Rp 1.299.000", amount: 1299000,
+    key: "iso",          scalevSlug: "klinik-iso",           name: "Klinik ISO",           price: "Rp 1.299.000", amount: 1299000,
     desc: "Gap analysis + template dokumen sistem manajemen + persiapan audit",
     includes: ["Gap analysis ISO 9001 atau ISO 14001", "Template dokumen QMS / EMS siap adaptasi", "Panduan persiapan audit internal & eksternal", "30 hari akses ISO 9001 AI atau ISO 14001 AI"],
     tag: "",
@@ -385,7 +385,7 @@ export const RUANG_SIMPAN_PLANS = [
     ],
     limits: [],
     cta: "Pilih Esensial",
-    ctaHref: "https://app.scalev.com/checkout/gustafta-ruang-simpan-esensial",
+    ctaHref: "https://app.scalev.com/checkout/ruang-simpan-esensial",
   },
   {
     key:        "profesional",
@@ -409,7 +409,7 @@ export const RUANG_SIMPAN_PLANS = [
     ],
     limits: [],
     cta: "Pilih Profesional",
-    ctaHref: "https://app.scalev.com/checkout/gustafta-ruang-simpan-profesional",
+    ctaHref: "https://app.scalev.com/checkout/ruang-simpan-profesional",
   },
   {
     key:        "perusahaan",
