@@ -194,11 +194,21 @@ async function callOneProvider(
   if (choice.provider === "gemini") {
     const apiKey = process.env.GEMINI_API_KEY || process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
     const genai  = new GoogleGenAI({ apiKey: apiKey! });
-    const systemMsg = messages.find(m => m.role === "system")?.content ?? "";
-    const userMsg   = messages.filter(m => m.role !== "system").map(m => m.content).join("\n");
+    const systemMsg  = messages.find(m => m.role === "system")?.content ?? "";
+    const otherMsgs  = messages.filter(m => m.role !== "system");
+    const geminiContents = otherMsgs.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
     const result = await genai.models.generateContent({
       model: choice.model,
-      contents: `${systemMsg}\n\n${userMsg}`,
+      contents: geminiContents as any,
+      config: {
+        ...(systemMsg ? { systemInstruction: { parts: [{ text: systemMsg }] } } : {}),
+        temperature: options?.temperature ?? 0.3,
+        maxOutputTokens: options?.maxTokens ?? 2000,
+        ...(options?.jsonMode ? { responseMimeType: "application/json" } : {}),
+      },
     });
     return result.text ?? "";
   }

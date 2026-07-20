@@ -723,18 +723,19 @@ Orchestrator (DeepSeek Classifier) → ~$0.0001/call
 
 ---
 
-### 5.19 RUANG SIMPAN — MEMORI BISNIS
+### 5.19 RUANG SIMPAN — TATA KELOLA DOKUMEN BISNIS
 
 **URL Akses:** /ruang-simpan
-**Tagline:** Arsip cerdas yang jadi memori bisnis perusahaan Anda
+**Tagline:** Platform tata kelola dokumen — Simpan, Lindungi, Kendalikan Akses
 
 **Konsep Inti:**
-Ruang Simpan bukan sekadar cloud storage. Ini adalah lapisan memori yang membuat AI Gustafta "mengenal" perusahaan Anda. Setiap dokumen yang diunggah menjadi pengetahuan yang bisa digunakan agen AI dalam menjawab dan berkolaborasi.
+Ruang Simpan bukan sekadar cloud storage, dan bukan sekadar memori bisnis. Ini adalah **platform tata kelola dokumen** (Document Governance Platform). Gustafta tidak memiliki dokumen klien — klien yang memiliki, Gustafta yang mengatur akses dan menjaga jejak audit. Setiap dokumen punya siklus hidup, setiap akses tercatat, dan setiap kepercayaan bisa diberi batas waktu.
 
-**Cara Kerja ("Rapikan → Hubungkan → Gunakan Kembali"):**
-1. **Tambahkan Pengetahuan** — Upload dokumen, gambar, PDF; organisasikan ke dalam folder tematik (SBU, Kontrak, Proyek, Tim, dll)
-2. **AI Mengindeks Otomatis** — Konten teks diekstrak dan dibuat chunk; gambar teknis dianalisis via Vision AI; PDF dokumen/scan dikenali secara cerdas
-3. **Gunakan di Mana Saja** — Konteks dari Ruang Simpan tersedia untuk Klinik, Bedah Dokumen, Brain Project, dan agen AI Anda
+**Cara Kerja ("Simpan → Tata → Kendalikan"):**
+1. **Simpan & Indeks** — Upload dokumen/gambar; AI mengekstrak teks otomatis; Vision AI membaca gambar teknis; semua bisa dicari full-text
+2. **Tata Siklus Hidup** — Tetapkan status dokumen (Draft/Aktif/Kadaluarsa/Arsip) sesuai tahap aktualnya
+3. **Kendalikan Akses** — Beri Kuasa Digital terbatas ke biro jasa/konsultan; tentukan izin (lihat/unduh), tujuan, dan masa berlaku; cabut kapan saja
+4. **Audit Otomatis** — Setiap aksi (unduh, ubah status, beri kuasa, cabut) tercatat di Paspor Dokumen — siapa, kapan, untuk apa
 
 **File yang Didukung:**
 | Tipe | Format | Pemrosesan AI |
@@ -744,14 +745,37 @@ Ruang Simpan bukan sekadar cloud storage. Ini adalah lapisan memori yang membuat
 | Arsip | ZIP (coming soon) | — |
 
 **Fitur Utama:**
-- **Folder Pintar**: Organisasikan file ke folder tematik (berwarna, berikon)
-- **Pencarian Full-Text**: Cari di seluruh konten dokumen, bukan hanya nama file
-- **Kuota Storage**: Sesuai paket (Gratis: 500MB; Starter: 5GB; Profesional: 20GB)
-- **Download & Preview**: Akses file kapan saja langsung dari browser
-- **AI Context API**: Endpoint "/api/ruang-simpan/context" untuk mengambil chunk konten paling relevan ke agen AI
 
-**Filosofi — "Karena bisnis yang baik tidak bergantung pada ingatan seseorang."**
-Dokumen SBU yang disimpan di laptop satu orang, kontrak lama yang tidak bisa dicari, gambar teknis yang hilang saat karyawan resign — semua masalah ini diselesaikan Ruang Simpan dengan menjadikan pengetahuan bisnis sebagai aset perusahaan yang terkelola.
+🗂️ **Manajemen File & Folder**
+- Folder pintar berwarna dengan ikon tematik (SBU, Kontrak, Proyek, Tim, dll)
+- Pencarian full-text di seluruh konten dokumen, bukan hanya nama file
+- Download & preview langsung dari browser
+- Kuota storage sesuai paket (Gratis: 500MB; Starter: 5GB; Profesional: 20GB)
+
+📊 **Status Siklus Hidup Dokumen (doc_status)**
+Setiap dokumen memiliki status yang bisa dikelola:
+- **Draft** — Dokumen masih dalam tahap penyusunan, belum final
+- **Aktif** — Dokumen berlaku dan sedang digunakan (status default)
+- **Kadaluarsa** — Masa berlaku habis, perlu diperbarui
+- **Arsip** — Disimpan untuk referensi historis, tidak aktif digunakan
+Status ditampilkan sebagai badge warna di kartu file dan bisa diubah kapan saja oleh pemilik.
+
+🔑 **Kuasa Digital (Access Grants)**
+Fitur untuk memberi akses terbatas ke pihak eksternal (biro jasa, konsultan, mitra):
+- Tentukan nama penerima kuasa dan tujuan akses (wajib)
+- Pilih jenis izin: **Lihat** (bisa baca/preview) dan/atau **Unduh** (bisa download)
+- Pilih masa berlaku: 7 hari / 30 hari / 90 hari / 6 bulan / 1 tahun / tidak terbatas
+- Lihat semua kuasa aktif di tab Paspor Dokumen → cabut kapan saja dengan 1 klik
+- Email opsional untuk notifikasi ke penerima kuasa
+
+📜 **Paspor Dokumen (Document Passport)**
+Setiap file memiliki Paspor Dokumen — tab khusus yang berisi:
+- **Statistik**: total unduhan, jumlah kuasa aktif, total entri log
+- **Kuasa Aktif**: siapa yang sedang punya akses, izin apa, berakhir kapan — dengan tombol "Cabut Kuasa"
+- **Riwayat Aktivitas**: log lengkap setiap aksi — unduh, perubahan status, pemberian/pencabutan kuasa — dengan nama aktor dan waktu
+
+**Filosofi — "Gustafta tidak memiliki dokumen Anda. Anda yang memiliki, kami yang menjaga."**
+Dokumen SBU yang disimpan di laptop satu orang, kontrak yang dikasih ke biro jasa tanpa batas, gambar teknis yang hilang saat karyawan resign — semua diselesaikan Ruang Simpan dengan menjadikan dokumen bisnis sebagai aset perusahaan yang terkelola, terlindungi, dan bisa dipertanggungjawabkan.
 
 ---
 
@@ -935,10 +959,19 @@ A: Fitur yang mengubah chatbot menjadi mesin lead generation — lead capture fo
 A: Ya! Upload file .mp4/.webm/.mov → sistem ekstrak audio → transkripsi otomatis → jadi KB. Berlaku juga untuk audio (.mp3/.wav/.m4a/.aac).
 
 **Q: Apa itu Ruang Simpan? Bedanya dengan Knowledge Base?**
-A: Ruang Simpan adalah "Memori Bisnis" perusahaan Anda — tempat menyimpan semua dokumen dan file perusahaan yang terorganisir (SBU, kontrak, gambar proyek, dll) dan otomatis terindeks oleh AI. Knowledge Base (KB) di agen adalah untuk melatih satu chatbot spesifik. Ruang Simpan adalah repositori terpusat yang bisa diakses oleh SEMUA agen Anda — "otak perusahaan" yang jadi referensi bersama.
+A: Ruang Simpan adalah platform tata kelola dokumen bisnis — menyimpan semua file perusahaan (SBU, kontrak, gambar proyek, dll), mengelola siklus hidup dokumen, dan mengontrol akses pihak eksternal dengan audit trail lengkap. Knowledge Base (KB) di agen adalah untuk melatih satu chatbot spesifik. Ruang Simpan adalah repositori terpusat yang bisa diakses SEMUA agen — "otak perusahaan" yang terlindungi dan bisa dipertanggungjawabkan.
 
 **Q: File apa saja yang bisa disimpan di Ruang Simpan?**
 A: PDF, TXT, dan gambar (JPG/PNG/WEBP). Untuk PDF dan teks — isi diekstrak otomatis untuk pencarian full-text. Untuk gambar — GPT-4o Vision menganalisis dan mengekstrak informasi visual (dimensi, label, notasi teknis, dll).
+
+**Q: Apa itu Kuasa Digital di Ruang Simpan?**
+A: Kuasa Digital adalah fitur berbagi file terbatas dan aman ke pihak eksternal (biro jasa, konsultan, mitra). Kamu tentukan: siapa penerimanya, tujuan akses, jenis izin (lihat dan/atau unduh), serta masa berlaku (7 hari hingga tidak terbatas). Penerima kuasa bisa mengakses file sampai batas waktu habis — dan kamu bisa mencabut kapan saja. Semua aksi tercatat otomatis di Paspor Dokumen.
+
+**Q: Apa itu Paspor Dokumen?**
+A: Paspor Dokumen adalah tab khusus di setiap file yang menampilkan riwayat lengkap: total unduhan, daftar kuasa aktif beserta izin dan batas waktu, dan log setiap aktivitas (unduhan, perubahan status, pemberian/pencabutan kuasa) dengan nama aktor dan waktu. Ini adalah fitur audit trail yang memungkinkan kamu membuktikan siapa yang pernah mengakses dokumenmu, kapan, dan untuk apa.
+
+**Q: Apa itu status dokumen di Ruang Simpan?**
+A: Setiap file punya status siklus hidup: **Draft** (sedang disusun), **Aktif** (berlaku, default), **Kadaluarsa** (habis masa berlaku), atau **Arsip** (disimpan untuk referensi historis). Status ini membantu tim mengetahui versi mana yang masih berlaku tanpa harus membuka setiap file satu per satu. Badge berwarna tampil di kartu file dan bisa diubah kapan saja.
 
 **Q: Apakah Bedah Dokumen bisa membaca gambar teknis seperti denah atau gambar kapal?**
 A: Ya! Upload JPG/PNG/WEBP gambar teknis → GPT-4o Vision membaca gambar dengan resolusi tinggi → mengekstrak semua informasi: jenis gambar, dimensi, label ruang, notasi struktural, spesifikasi material, catatan teknis, title block. Untuk PDF gambar/scan — sistem otomatis mendeteksi bahwa PDF ini adalah gambar (bukan teks) dan menggunakan Vision AI. Setelah analisis, Anda bisa **berdialog** tentang isi gambar tersebut.
