@@ -159,8 +159,10 @@ async function callOneProvider(
  * Determines whether an error from a provider should trigger a fallback attempt.
  * Rate-limits (429), server errors (5xx), timeouts, and network failures all qualify.
  * Auth errors (401/403) also qualify because the key may be invalid/exhausted.
+ *
+ * Exported so it can be unit-tested without hitting a real API.
  */
-function isRetryableError(err: unknown): boolean {
+export function isRetryableError(err: unknown): boolean {
   if (!err || typeof err !== "object") return true;
   const e = err as any;
 
@@ -176,6 +178,23 @@ function isRetryableError(err: unknown): boolean {
   return true;
 }
 
+/**
+ * Test-only seam: assign `.fn` to intercept `callOneProvider` without hitting
+ * a real API.  Must be a mutable-property object (not `export let`) so ESM
+ * live-binding read-only restrictions don't prevent reassignment from tests.
+ *
+ * @internal — do not use outside of tests.
+ */
+export const _testHooks: {
+  callOneProviderFn:
+    | ((
+        choice: RouterChoice,
+        messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+        options?: { temperature?: number; maxTokens?: number; jsonMode?: boolean }
+      ) => Promise<string>)
+    | undefined;
+} = { callOneProviderFn: undefined };
+
 export async function callWithRouter(
   task: TaskType,
   messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
@@ -183,6 +202,7 @@ export async function callWithRouter(
 ): Promise<{ text: string; choice: RouterChoice }> {
   const chain = buildFallbackChain(task);
   const errors: Array<{ provider: string; model: string; error: string }> = [];
+  const invoke = _testHooks.callOneProviderFn ?? callOneProvider;
 
   for (let i = 0; i < chain.length; i++) {
     const choice = chain[i];
@@ -196,7 +216,7 @@ export async function callWithRouter(
     }
 
     try {
-      const text = await callOneProvider(choice, messages, options);
+      const text = await invoke(choice, messages, options);
       if (!isFirst) {
         console.info(
           `[ModelRouter] Fallback succeeded: task="${task}" provider=${choice.provider} model=${choice.model}`
