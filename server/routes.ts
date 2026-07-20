@@ -63,6 +63,7 @@ import { importDocumentToProposal, mergeProposalIntoAgent, type ApplyMode } from
 import { buildEbookMarkdown, buildEbookHtml, stripMarkdownToPlainText, buildEbookTables } from "./lib/ebook-generator";
 import { chatIpRateLimiter, chatAgentIdRateLimiter } from "./lib/rate-limiter";
 import { runGuardedDialog, dialogChatCompletion, DialogBusyError, DIALOG_MODEL, dialogLoadStats } from "./lib/dialog-load-guard";
+import { callWithRouter } from "./lib/model-router";
 import { isSchedulerLeader, schedulerInstanceId } from "./lib/scheduler-leader";
 import * as XLSX from "xlsx";
 import { buildChaesaExport } from "./lib/chaesa-exporter";
@@ -4517,16 +4518,17 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         }
         
       } else {
-        if (!openaiApiKey) {
-          return res.status(503).json({ error: "AI service is not configured. Please check API key settings." });
-        }
-        const completion = await openai.chat.completions.create({
-          model: agentModel,
-          messages: chatMessages,
-          max_tokens: maxTokens,
-          temperature: temperature,
-        });
-        aiResponseContent = completion.choices[0]?.message?.content || "Maaf, saya tidak dapat merespons saat ini.";
+        // Default path: use the model router with automatic provider fallback.
+        // If the primary provider (OpenAI/DeepSeek/Qwen depending on available keys)
+        // returns a rate-limit, 5xx, or timeout error, callWithRouter retries the next
+        // provider in the chain transparently. The chosen provider is logged.
+        const routerResult = await callWithRouter(
+          "general",
+          chatMessages as Array<{ role: "system" | "user" | "assistant"; content: string }>,
+          { temperature, maxTokens },
+        );
+        aiResponseContent = routerResult.text || "Maaf, saya tidak dapat merespons saat ini.";
+        console.info(`[Chat] non-stream provider=${routerResult.choice.provider} model=${routerResult.choice.model}`);
       }
       
       // Process memory tags from AI response — whitespace-tolerant, case-insensitive patterns
@@ -5697,6 +5699,25 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
             },
           });
         }
+
+        // Ultimate fallback: callWithRouter (non-streaming) emits full response as one chunk.
+        // This fires only when every streaming attempt above has failed, ensuring the user
+        // always receives a response instead of a silent error. The chosen provider is logged.
+        fallbackAttempts.push({
+          name: "fallback(model-router)",
+          createStream: async () => {
+            const routerResult = await callWithRouter(
+              "general",
+              chatMessages as Array<{ role: "system" | "user" | "assistant"; content: string }>,
+              { temperature, maxTokens },
+            );
+            console.info(`[Chat stream] model-router fallback succeeded: provider=${routerResult.choice.provider} model=${routerResult.choice.model}`);
+            const text = routerResult.text;
+            return (async function* () {
+              if (text) yield { content: text };
+            })();
+          },
+        });
 
         let aiStream: AsyncIterable<{ content: string }> | null = null;
         let chosenProvider = "";
