@@ -92,6 +92,8 @@ import KonsultanKeuanganPage from "@/pages/konsultan-keuangan";
 import ExecutiveSummaryPage from "@/pages/executive-summary";
 import ToolkitPage from "@/pages/toolkit";
 import BiroJasaSbuPage from "@/pages/biro-jasa-sbu";
+import JasaDokumenPage from "@/pages/jasa-dokumen";
+import JasaKeuanganPage from "@/pages/jasa-keuangan";
 import BrainProjectPage from "@/pages/brain-project";
 import KonsultanKontrakPage from "@/pages/konsultan-kontrak";
 import LisensiLspBnspPage from "@/pages/lisensi-lsp-bnsp";
@@ -553,6 +555,8 @@ function Router() {
       <Route path="/executive-summary" component={ExecutiveSummaryPage} />
       <Route path="/toolkit" component={ToolkitPage} />
       <Route path="/biro-jasa-sbu" component={BiroJasaSbuPage} />
+      <Route path="/jasa-dokumen" component={JasaDokumenPage} />
+      <Route path="/jasa-keuangan" component={JasaKeuanganPage} />
       <Route path="/brain-project" component={BrainProjectPage} />
       <Route path="/konsultan-kontrak" component={KonsultanKontrakPage} />
       <Route path="/konsultan-dokumen-proyek" component={KonsultanDokumenProyekPage} />
