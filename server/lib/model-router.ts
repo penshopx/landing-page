@@ -193,7 +193,200 @@ export const _testHooks: {
         options?: { temperature?: number; maxTokens?: number; jsonMode?: boolean }
       ) => Promise<string>)
     | undefined;
-} = { callOneProviderFn: undefined };
+  /** Streaming seam: override the per-provider async generator used by callWithRouterStream. */
+  streamOneProviderFn:
+    | ((
+        choice: RouterChoice,
+        messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+        options?: { temperature?: number; maxTokens?: number; signal?: AbortSignal }
+      ) => AsyncGenerator<string>)
+    | undefined;
+} = { callOneProviderFn: undefined, streamOneProviderFn: undefined };
+
+/**
+ * Opens a streaming completion for one provider and yields text chunks.
+ * Throws synchronously (before the first yield) if the stream cannot be opened,
+ * which lets the caller fall back to the next provider with zero chunks emitted.
+ * Throws during iteration for mid-stream drops.
+ */
+async function* streamOneProvider(
+  choice: RouterChoice,
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  options?: { temperature?: number; maxTokens?: number; signal?: AbortSignal }
+): AsyncGenerator<string> {
+  const temperature = options?.temperature ?? 0.3;
+  const maxTokens   = options?.maxTokens   ?? 2000;
+
+  if (choice.provider === "openai" || choice.provider === "deepseek" || choice.provider === "qwen") {
+    let client: OpenAI;
+    if (choice.provider === "deepseek") {
+      client = new OpenAI({
+        apiKey: process.env.DEEPSEEK_API_KEY!,
+        baseURL: "https://api.deepseek.com",
+      });
+    } else if (choice.provider === "qwen") {
+      client = new OpenAI({
+        apiKey: process.env.QWEN_API_KEY!,
+        baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      });
+    } else {
+      client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+    }
+
+    // stream creation can throw here (pre-stream error) — caller catches this
+    const stream = await client.chat.completions.create({
+      model: choice.model,
+      messages: messages as any,
+      temperature,
+      max_tokens: maxTokens,
+      stream: true,
+    });
+
+    for await (const chunk of stream) {
+      if (options?.signal?.aborted) return;
+      const content = chunk.choices[0]?.delta?.content || "";
+      if (content) yield content;
+    }
+    return;
+  }
+
+  if (choice.provider === "gemini") {
+    const apiKey = process.env.GEMINI_API_KEY || process.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+    const genai  = new GoogleGenAI({ apiKey: apiKey! });
+    const systemMsg  = messages.find(m => m.role === "system")?.content ?? "";
+    const otherMsgs  = messages.filter(m => m.role !== "system");
+    const geminiContents = otherMsgs.map(m => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
+
+    const stream = await genai.models.generateContentStream({
+      model: choice.model,
+      contents: geminiContents as any,
+      config: {
+        ...(systemMsg ? { systemInstruction: systemMsg } : {}),
+        temperature,
+        maxOutputTokens: maxTokens,
+      },
+    });
+
+    for await (const chunk of stream) {
+      if (options?.signal?.aborted) return;
+      const content = (chunk as any).text || "";
+      if (content) yield content;
+    }
+    return;
+  }
+
+  throw new Error(`Unknown provider: ${choice.provider}`);
+}
+
+/**
+ * Streaming variant of callWithRouter.
+ *
+ * Walks the fallback chain and streams from each provider in order:
+ *
+ * - Pre-stream errors (thrown before the first chunk): caught silently,
+ *   next provider tried immediately.
+ * - Mid-stream errors (thrown after ≥1 chunks already emitted): logged with
+ *   the number of chunks already delivered, then the next provider is tried
+ *   so the client receives a complete response rather than a truncated one.
+ *   The partial output from the failed provider has already been delivered
+ *   via `onChunk`; the next provider's output is appended to it.
+ * - Non-retryable errors (HTTP 400): stop immediately, no further fallback.
+ * - The chosen provider is logged on every pre/mid-stream fallback.
+ *
+ * @param task       Task type — selects the fallback chain.
+ * @param messages   Chat messages to send.
+ * @param options    Streaming options including the per-chunk callback.
+ * @returns          The RouterChoice of the provider that completed the stream.
+ */
+export async function callWithRouterStream(
+  task: TaskType,
+  messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
+  options: {
+    temperature?: number;
+    maxTokens?: number;
+    signal?: AbortSignal;
+    /** Called for each text chunk as it arrives from the provider. */
+    onChunk: (content: string, choice: RouterChoice) => void;
+  }
+): Promise<RouterChoice> {
+  const chain   = buildFallbackChain(task);
+  const errors: Array<{ provider: string; model: string; error: string }> = [];
+  const streamFn = _testHooks.streamOneProviderFn ?? streamOneProvider;
+
+  for (let i = 0; i < chain.length; i++) {
+    const choice  = chain[i];
+    const isFirst = i === 0;
+
+    if (!isFirst) {
+      console.warn(
+        `[ModelRouter] Stream falling back to ${choice.provider}/${choice.model} for task="${task}" ` +
+        `after ${errors.map(e => `${e.provider}/${e.model}: ${e.error}`).join("; ")}`
+      );
+    }
+
+    let chunksEmitted = 0;
+    try {
+      const gen = streamFn(choice, messages, options);
+      for await (const content of gen) {
+        if (options.signal?.aborted) {
+          return choice; // client disconnected — stop cleanly
+        }
+        chunksEmitted++;
+        options.onChunk(content, choice);
+      }
+
+      if (!isFirst) {
+        console.info(
+          `[ModelRouter] Stream fallback succeeded: task="${task}" provider=${choice.provider} model=${choice.model}`
+        );
+      } else {
+        console.info(
+          `[ModelRouter] Stream succeeded: task="${task}" provider=${choice.provider} model=${choice.model}`
+        );
+      }
+      return choice;
+
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+
+      if (chunksEmitted > 0) {
+        // Mid-stream drop: partial content was already delivered. Log the drop
+        // with a chunk count and fall through to the next provider so the client
+        // receives a complete response rather than being truncated.
+        console.warn(
+          `[ModelRouter] Stream dropped mid-response from ${choice.provider}/${choice.model} ` +
+          `after ${chunksEmitted} chunk(s) — trying next provider: ${errMsg}`
+        );
+      }
+
+      errors.push({
+        provider: choice.provider,
+        model: choice.model,
+        error: chunksEmitted > 0 ? `mid-stream drop after ${chunksEmitted} chunk(s): ${errMsg}` : errMsg,
+      });
+
+      if (!isRetryableError(err)) {
+        console.error(
+          `[ModelRouter] Non-retryable stream error from ${choice.provider}/${choice.model}: ${errMsg}`
+        );
+        break;
+      }
+
+      if (chunksEmitted === 0) {
+        console.warn(
+          `[ModelRouter] Stream provider ${choice.provider}/${choice.model} failed pre-stream (retryable): ${errMsg}`
+        );
+      }
+      // continue to next provider
+    }
+  }
+
+  const summary = errors.map(e => `${e.provider}/${e.model}: ${e.error}`).join("; ");
+  throw new Error(`[ModelRouter] All stream providers failed for task="${task}". Errors: ${summary}`);
+}
 
 export async function callWithRouter(
   task: TaskType,

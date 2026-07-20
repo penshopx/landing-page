@@ -63,7 +63,7 @@ import { importDocumentToProposal, mergeProposalIntoAgent, type ApplyMode } from
 import { buildEbookMarkdown, buildEbookHtml, stripMarkdownToPlainText, buildEbookTables } from "./lib/ebook-generator";
 import { chatIpRateLimiter, chatAgentIdRateLimiter } from "./lib/rate-limiter";
 import { runGuardedDialog, dialogChatCompletion, DialogBusyError, DIALOG_MODEL, dialogLoadStats } from "./lib/dialog-load-guard";
-import { callWithRouter } from "./lib/model-router";
+import { callWithRouter, callWithRouterStream } from "./lib/model-router";
 import { isSchedulerLeader, schedulerInstanceId } from "./lib/scheduler-leader";
 import * as XLSX from "xlsx";
 import { buildChaesaExport } from "./lib/chaesa-exporter";
@@ -5700,48 +5700,73 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           });
         }
 
-        // Ultimate fallback: callWithRouter (non-streaming) emits full response as one chunk.
-        // This fires only when every streaming attempt above has failed, ensuring the user
-        // always receives a response instead of a silent error. The chosen provider is logged.
+        // Ultimate fallback: callWithRouterStream walks the full model-router fallback chain
+        // with real streaming and per-provider fallback. Pre-stream errors automatically
+        // advance to the next provider in the chain; mid-stream drops surface as a clear
+        // error so the client is never silently truncated. Fires only when every
+        // hand-rolled streaming attempt above has already failed.
         fallbackAttempts.push({
-          name: "fallback(model-router)",
+          name: "fallback(model-router-stream)",
           createStream: async () => {
-            const routerResult = await callWithRouter(
+            // Buffer chunks here so the existing `for await` consumer gets a standard
+            // async iterable; callWithRouterStream's onChunk writes into this buffer.
+            const buf: string[] = [];
+            let resolve: (() => void) | null = null;
+            let done = false;
+            let streamError: unknown = null;
+
+            function notify() { if (resolve) { const r = resolve; resolve = null; r(); } }
+
+            // Run callWithRouterStream in the background; wake the consumer on each chunk.
+            const routerDone = callWithRouterStream(
               "general",
               chatMessages as Array<{ role: "system" | "user" | "assistant"; content: string }>,
-              { temperature, maxTokens },
-            );
-            console.info(`[Chat stream] model-router fallback succeeded: provider=${routerResult.choice.provider} model=${routerResult.choice.model}`);
-            const text = routerResult.text;
+              {
+                temperature,
+                maxTokens,
+                onChunk: (content, choice) => {
+                  buf.push(content);
+                  notify();
+                  if (buf.length === 1) {
+                    // Log chosen provider on first chunk
+                    console.info(
+                      `[Chat stream] model-router-stream in use: provider=${choice.provider} model=${choice.model}`
+                    );
+                  }
+                },
+              }
+            ).then((choice) => {
+              console.info(
+                `[Chat stream] model-router-stream completed: provider=${choice.provider} model=${choice.model}`
+              );
+            }).catch((err) => {
+              streamError = err;
+            }).finally(() => {
+              done = true;
+              notify();
+            });
+
             return (async function* () {
-              if (text) yield { content: text };
+              while (true) {
+                if (buf.length > 0) {
+                  yield { content: buf.splice(0).join("") };
+                  continue;
+                }
+                if (done) {
+                  if (streamError) throw streamError;
+                  break;
+                }
+                // Wait for next chunk or completion
+                await new Promise<void>((r) => { resolve = r; });
+              }
+              void routerDone; // ensure the promise is referenced
             })();
           },
         });
 
-        let aiStream: AsyncIterable<{ content: string }> | null = null;
-        let chosenProvider = "";
-        let lastAttemptError: any;
-        for (const attempt of fallbackAttempts) {
-          try {
-            aiStream = await attempt.createStream();
-            chosenProvider = attempt.name;
-            if (attempt !== fallbackAttempts[0]) {
-              console.warn(`[Chat fallback] using ${attempt.name} after primary failure:`, lastAttemptError?.message || lastAttemptError);
-            }
-            break;
-          } catch (err: any) {
-            lastAttemptError = err;
-            console.error(`[Chat fallback] ${attempt.name} stream creation failed:`, err?.message || err);
-          }
-        }
-        if (!aiStream) {
-          throw lastAttemptError || new Error("All AI providers failed to create stream");
-        }
-
-        // Streaming tag filter — strips ALL internal control tags from live SSE chunks
-        // before reaching the client. Uses regex for case-insensitive + whitespace-tolerant
-        // matching (handles variants like "[ SAVE_MEMORY : note ]" or "[ Update_Brain:key ]").
+        // Streaming tag filter — defined before the provider loop so state persists
+        // across mid-stream provider switches (partial tag buffered from provider A
+        // continues being filtered correctly when provider B picks up).
         //
         // Block tags: [TAG...]...[/TAG] — strip from opener to closer (multi-token).
         // Inline tags: [TAG:...]        — strip opener to next "]" (single bracket).
@@ -5822,18 +5847,65 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           return out;
         }
 
-        for await (const chunk of aiStream) {
-          if (!isClientConnected) {
-            cleanup();
-            return;
-          }
-          if (chunk.content) {
-            fullContent += chunk.content;
-            _sBuf += chunk.content;
-            const toWrite = _flushStreamBuf(false);
-            if (toWrite) res.write(`data: ${JSON.stringify({ type: "chunk", content: toWrite })}\n\n`);
+        // ── Provider iteration loop: handles both pre-stream AND mid-stream fallback ──
+        //
+        // Each attempt tries to open a stream AND iterate all its chunks inside one
+        // try block. Errors during stream creation (pre-stream) OR during async
+        // iteration (mid-stream) both fall through to the next provider in the chain,
+        // so the client always receives a complete response rather than being silently
+        // truncated. The streaming tag filter state (_sBuf) is preserved across
+        // provider switches so cross-chunk boundary tags remain correctly buffered.
+        let lastAttemptError: any;
+        let streamCompleted = false;
+        let chunksTotal = 0;
+
+        for (const attempt of fallbackAttempts) {
+          let chunksThisAttempt = 0;
+          try {
+            const aiStream = await attempt.createStream();
+
+            if (attempt !== fallbackAttempts[0]) {
+              const context = chunksTotal > 0 ? `after mid-stream drop (${chunksTotal} chunks already delivered)` : `after pre-stream failure`;
+              console.warn(`[Chat fallback] switching to ${attempt.name} ${context}:`, lastAttemptError?.message || lastAttemptError);
+            }
+
+            for await (const chunk of aiStream) {
+              if (!isClientConnected) {
+                cleanup();
+                return;
+              }
+              if (chunk.content) {
+                fullContent += chunk.content;
+                chunksThisAttempt++;
+                chunksTotal++;
+                _sBuf += chunk.content;
+                const toWrite = _flushStreamBuf(false);
+                if (toWrite) res.write(`data: ${JSON.stringify({ type: "chunk", content: toWrite })}\n\n`);
+              }
+            }
+
+            // This attempt completed successfully — stop trying further providers.
+            streamCompleted = true;
+            break;
+
+          } catch (err: any) {
+            lastAttemptError = err;
+            if (chunksThisAttempt > 0) {
+              console.warn(
+                `[Chat fallback] ${attempt.name} dropped mid-stream after ${chunksThisAttempt} chunk(s) — trying next provider:`,
+                err?.message || err
+              );
+            } else {
+              console.error(`[Chat fallback] ${attempt.name} stream creation failed:`, err?.message || err);
+            }
+            // Continue to next provider in fallbackAttempts
           }
         }
+
+        if (!streamCompleted) {
+          throw lastAttemptError || new Error("All AI providers failed to generate a response");
+        }
+
         // Flush any held buffer when the stream ends
         const finalFlush = _flushStreamBuf(true);
         if (finalFlush) res.write(`data: ${JSON.stringify({ type: "chunk", content: finalFlush })}\n\n`);
@@ -5993,10 +6065,21 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         // ───────────────────────────────────────────────────────────────────────
         
       } catch (streamError) {
-        console.error("Streaming error:", streamError);
+        // All providers (including mid-stream fallbacks) have failed.
+        // Distinguish whether any partial content was already sent to the client.
+        const isStreamDrop = fullContent.length > 0;
+        const errMsg = streamError instanceof Error ? streamError.message : String(streamError);
+        if (isStreamDrop) {
+          console.error(`[Chat stream] All providers exhausted after mid-stream drop (${fullContent.length} chars delivered): ${errMsg}`);
+        } else {
+          console.error("Streaming error (all providers failed pre-stream):", streamError);
+        }
         cleanup();
         if (isClientConnected && !res.writableEnded) {
-          res.write(`data: ${JSON.stringify({ type: "error", error: "Failed to generate response" })}\n\n`);
+          const clientMsg = isStreamDrop
+            ? "Response interrupted — all AI providers were exhausted mid-reply. Please try again."
+            : "Failed to generate response";
+          res.write(`data: ${JSON.stringify({ type: "error", error: clientMsg, midStream: isStreamDrop })}\n\n`);
           res.end();
         }
       }
