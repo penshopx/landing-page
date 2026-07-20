@@ -460,3 +460,76 @@ export function getActiveProviders(): Record<string, boolean> {
     gemini:   hasGemini(),
   };
 }
+
+/**
+ * Checks each provider for misconfiguration and logs a WARN for each issue found.
+ * Two cases are flagged:
+ *   1. MODEL var is set but the matching API_KEY is absent → provider will be silently excluded.
+ *   2. API_KEY is set but the resolved model name is blank/whitespace → calls will fail at runtime.
+ *
+ * Does NOT throw — warn only, so the fallback chain continues to work normally.
+ * Call once at server startup.
+ */
+export function warnMisconfiguredProviders(): void {
+  const providers: Array<{
+    name: string;
+    modelVar: string;
+    modelValue: string | undefined;
+    resolvedModel: string;
+    keyPresent: boolean;
+  }> = [
+    {
+      name: "OpenAI",
+      modelVar: "OPENAI_MODEL",
+      modelValue: process.env.OPENAI_MODEL,
+      resolvedModel: getOpenAIModel(),
+      keyPresent: hasOpenAI(),
+    },
+    {
+      name: "DeepSeek",
+      modelVar: "DEEPSEEK_MODEL",
+      modelValue: process.env.DEEPSEEK_MODEL,
+      resolvedModel: getDeepSeekModel(),
+      keyPresent: hasDeepSeek(),
+    },
+    {
+      name: "Qwen",
+      modelVar: "QWEN_MODEL",
+      modelValue: process.env.QWEN_MODEL,
+      resolvedModel: getQwenModel(),
+      keyPresent: hasQwen(),
+    },
+    {
+      name: "Gemini",
+      modelVar: "GEMINI_MODEL",
+      modelValue: process.env.GEMINI_MODEL,
+      resolvedModel: getGeminiModel(),
+      keyPresent: hasGemini(),
+    },
+  ];
+
+  const apiKeyVars: Record<string, string> = {
+    OpenAI:   "OPENAI_API_KEY",
+    DeepSeek: "DEEPSEEK_API_KEY",
+    Qwen:     "QWEN_API_KEY",
+    Gemini:   "GEMINI_API_KEY",
+  };
+
+  for (const p of providers) {
+    // Case 1: MODEL var explicitly set but API key is missing
+    if (p.modelValue !== undefined && p.modelValue.trim() !== "" && !p.keyPresent) {
+      console.warn(
+        `[ModelRouter] WARN: ${p.modelVar} is set ("${p.modelValue.trim()}") ` +
+        `but ${apiKeyVars[p.name]} is missing — ${p.name} will not be used.`
+      );
+    }
+
+    // Case 2: API key is present but resolved model name is blank/whitespace
+    if (p.keyPresent && !p.resolvedModel.trim()) {
+      console.warn(
+        `[ModelRouter] WARN: ${apiKeyVars[p.name]} is set but ${p.modelVar} ` +
+        `resolves to an empty string — ${p.name} calls will fail at runtime.`
+      );
+    }
+  }
+}

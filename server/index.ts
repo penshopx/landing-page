@@ -422,12 +422,13 @@ for (const envVar of requiredEnvVars) {
 
       // ── AI PROVIDER STATUS ────────────────────────────────────────────────
       try {
-        const { getActiveProviders } = await import("./lib/model-router");
+        const { getActiveProviders, warnMisconfiguredProviders } = await import("./lib/model-router");
         const providers = getActiveProviders();
         const active = Object.entries(providers)
           .map(([k, v]) => `${k}:${v ? "✓" : "✗"}`)
           .join("  ");
         log(`AI providers — ${active}`);
+        warnMisconfiguredProviders();
       } catch (_) {}
 
       // ── ORPHAN CLEANUP — hapus toolboxes/agents yang induknya sudah hilang ──
