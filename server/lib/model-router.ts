@@ -28,6 +28,48 @@ export type TaskType =
   | "large_doc"
   | "general";
 
+// ─── Per-provider health tracking ────────────────────────────────────────────
+
+export type ProviderHealthEntry = {
+  /** ISO timestamp of last successful call, or null if none yet. */
+  lastSuccess: string | null;
+  /** ISO timestamp of last error, or null if none yet. */
+  lastError: string | null;
+  /** Last error message string. */
+  lastErrorMsg: string | null;
+  /** Total successful calls since server start. */
+  successCount: number;
+  /** Total failed calls since server start. */
+  errorCount: number;
+};
+
+const _providerHealth: Record<string, ProviderHealthEntry> = {
+  openai:   { lastSuccess: null, lastError: null, lastErrorMsg: null, successCount: 0, errorCount: 0 },
+  deepseek: { lastSuccess: null, lastError: null, lastErrorMsg: null, successCount: 0, errorCount: 0 },
+  qwen:     { lastSuccess: null, lastError: null, lastErrorMsg: null, successCount: 0, errorCount: 0 },
+  gemini:   { lastSuccess: null, lastError: null, lastErrorMsg: null, successCount: 0, errorCount: 0 },
+};
+
+/** Returns a snapshot of per-provider health state. Safe to call from any route. */
+export function getProviderHealth(): Record<string, ProviderHealthEntry> {
+  return JSON.parse(JSON.stringify(_providerHealth));
+}
+
+function _recordSuccess(provider: string): void {
+  const h = _providerHealth[provider];
+  if (!h) return;
+  h.lastSuccess = new Date().toISOString();
+  h.successCount += 1;
+}
+
+function _recordError(provider: string, errMsg: string): void {
+  const h = _providerHealth[provider];
+  if (!h) return;
+  h.lastError = new Date().toISOString();
+  h.lastErrorMsg = errMsg;
+  h.errorCount += 1;
+}
+
 export interface RouterChoice {
   provider: "openai" | "gemini" | "deepseek" | "qwen";
   model: string;
@@ -347,6 +389,7 @@ export async function callWithRouterStream(
         options.onChunk(content, choice);
       }
 
+      _recordSuccess(choice.provider);
       if (!isFirst) {
         console.info(
           `[ModelRouter] Stream fallback succeeded: task="${task}" provider=${choice.provider} model=${choice.model}`
@@ -360,6 +403,7 @@ export async function callWithRouterStream(
 
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
+      _recordError(choice.provider, errMsg);
 
       if (chunksEmitted > 0) {
         // Mid-stream drop: partial content was already delivered. Log the drop
@@ -419,6 +463,7 @@ export async function callWithRouter(
 
     try {
       const text = await invoke(choice, messages, options);
+      _recordSuccess(choice.provider);
       if (!isFirst) {
         console.info(
           `[ModelRouter] Fallback succeeded: task="${task}" provider=${choice.provider} model=${choice.model}`
@@ -427,6 +472,7 @@ export async function callWithRouter(
       return { text, choice };
     } catch (err: unknown) {
       const errMsg = err instanceof Error ? err.message : String(err);
+      _recordError(choice.provider, errMsg);
       errors.push({ provider: choice.provider, model: choice.model, error: errMsg });
 
       if (!isRetryableError(err)) {

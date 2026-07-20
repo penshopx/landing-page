@@ -6077,8 +6077,8 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         cleanup();
         if (isClientConnected && !res.writableEnded) {
           const clientMsg = isStreamDrop
-            ? "Response interrupted — all AI providers were exhausted mid-reply. Please try again."
-            : "Failed to generate response";
+            ? "Respons terputus — semua AI provider kehabisan kapasitas di tengah jawaban. Silakan coba lagi."
+            : "AI sementara tidak tersedia. Semua provider gagal merespons — silakan coba beberapa saat lagi.";
           res.write(`data: ${JSON.stringify({ type: "error", error: clientMsg, midStream: isStreamDrop })}\n\n`);
           res.end();
         }
@@ -17859,6 +17859,18 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       });
     } catch (err: any) {
       res.status(500).json({ error: err?.message || "Gagal membaca beban sistem." });
+    }
+  });
+
+  // ==================== ADMIN: AI PROVIDER HEALTH ====================
+  app.get("/api/admin/ai-health", requireAdmin, async (_req: any, res: any) => {
+    try {
+      const { getActiveProviders, getProviderHealth } = await import("./lib/model-router");
+      const active = getActiveProviders();
+      const health = getProviderHealth();
+      res.json({ timestamp: new Date().toISOString(), active, health });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || "Gagal membaca status AI provider." });
     }
   });
 
