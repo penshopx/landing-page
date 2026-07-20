@@ -229,57 +229,15 @@ export default function Store() {
       {/* Hero */}
       <section className="py-10 px-4 text-center border-b border-gray-200 bg-white">
         <Badge className="mb-3 bg-violet-100 text-violet-700 border-violet-200 hover:bg-violet-100">
-          🏪 Store Creator — Marketplace Chatbot Gustafta
+          🏗️ Produk AI Konstruksi — Solusi Siap Pakai
         </Badge>
         <h1 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">
-          Chatbot dari Mitra Creator Gustafta
+          Solusi AI untuk Industri Konstruksi
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto mb-4">
-          Chatbot di Store ini dibuat oleh <strong className="text-gray-900">kreator independen</strong> — bukan produk Gustafta sendiri. Program workshop &amp; sertifikasi kreator <strong className="text-gray-900">sedang kami siapkan</strong>. Untuk saat ini, sebagian kreator masih dalam tahap <strong className="text-gray-900">pra-sertifikasi</strong>, dan kualitasnya akan terus kami tingkatkan seiring program berjalan.
+        <p className="text-gray-600 max-w-2xl mx-auto mb-6">
+          Kumpulan solusi AI yang dikurasi khusus untuk industri konstruksi Indonesia —
+          SBU, SKK, Tender, K3, Keuangan, dan Perizinan. Pilih, aktifkan, langsung pakai.
         </p>
-        <div className="max-w-2xl mx-auto mb-5 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left" data-testid="notice-pra-sertifikasi">
-          <span className="text-base leading-none mt-0.5">🔎</span>
-          <p className="text-xs text-amber-800 leading-relaxed">
-            <strong>Catatan transparansi:</strong> Store dibuka lebih awal agar kreator yang sudah diminati bisa mulai menawarkan karyanya. Periksa dulu setiap chatbot sebelum membeli — status <strong>Bersertifikat</strong> akan diberikan bertahap setelah kreator mengikuti workshop &amp; lulus sertifikasi Gustafta.
-          </p>
-        </div>
-
-        {/* Alur Sertifikasi Creator */}
-        <div className="max-w-3xl mx-auto mb-7">
-          <p className="text-xs text-gray-500 font-semibold uppercase tracking-widest mb-3">Alur Sertifikasi Creator — Segera Hadir</p>
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {[
-              { step: "1", label: "Ikuti Workshop Gustafta Builder", icon: "🎓", color: "bg-blue-50 border-blue-200 text-blue-800" },
-              { step: "→", label: "", icon: "", color: "" },
-              { step: "2", label: "Lulus & Dapat Sertifikat", icon: "📜", color: "bg-green-50 border-green-200 text-green-800" },
-              { step: "→", label: "", icon: "", color: "" },
-              { step: "3", label: "Submit chatbot untuk review tim", icon: "🔍", color: "bg-amber-50 border-amber-200 text-amber-800" },
-              { step: "→", label: "", icon: "", color: "" },
-              { step: "4", label: "Disetujui → Tayang di Store", icon: "✅", color: "bg-violet-50 border-violet-200 text-violet-800" },
-            ].map((s, i) =>
-              s.label ? (
-                <div key={i} className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-medium ${s.color}`}>
-                  <span>{s.icon}</span>
-                  <span>{s.label}</span>
-                </div>
-              ) : (
-                <span key={i} className="text-gray-400 font-bold text-lg">→</span>
-              )
-            )}
-          </div>
-          <div className="mt-4 flex flex-wrap justify-center gap-4 text-xs text-gray-500">
-            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span>Kurasi kerapian konfigurasi — bagian dari program sertifikasi</div>
-            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>Pendampingan creator — hadir bersama workshop</div>
-            <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-violet-400 inline-block"></span>Quality check untuk naik status Bersertifikat</div>
-          </div>
-          <div className="mt-4">
-            <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20info%20Workshop%20Gustafta%20Builder%20untuk%20jadi%20Creator" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-green-300 bg-green-50 text-green-800 text-xs font-semibold hover:bg-green-100 transition-colors">
-              <MessageCircle className="h-3.5 w-3.5" />
-              Tanya info Workshop Gustafta Builder →
-            </a>
-          </div>
-        </div>
 
         <p className="text-gray-600 max-w-xl mx-auto mb-5">
           Seperti domain dan hosting — chatbot dari Store dan Paket Berlangganan adalah dua hal yang <strong className="text-gray-900">saling melengkapi dan keduanya wajib</strong>.

@@ -1053,7 +1053,7 @@ export default function Landing() {
               Dari Pengetahuan Menjadi Aset AI
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-              Setiap orang memiliki sesuatu yang sangat berharga. Selama ini semua itu hanya tersimpan di kepala atau di folder komputer. Dengan GUSTAFTA, semuanya dapat dirakit menjadi AI.
+              Setiap profesional konstruksi menyimpan pengetahuan berharga — regulasi yang dikuasai, prosedur yang teruji, pengalaman lapangan selama bertahun-tahun. Dengan GUSTAFTA, semua itu menjadi fondasi AI yang benar-benar relevan untuk industri Anda.
             </p>
           </div>
 
@@ -1424,7 +1424,7 @@ export default function Landing() {
               Seminar Nasional Indobuildtech 2026
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4 max-w-2xl">
-              Tema "Perkuatan Bangunan Miring". Kunjungi booth kami dan lihat langsung cara merakit chatbot AI konstruksi — plus bonus eksklusif untuk peserta seminar.
+              Tema "Perkuatan Bangunan Miring". Kunjungi booth kami dan lihat langsung solusi AI Gustafta untuk industri konstruksi — plus bonus eksklusif untuk peserta seminar.
             </p>
             <p className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-6">
               <Clock className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" /> Kamis, 9 Juli 2026 · 13.00–17.30 WIB
@@ -1446,25 +1446,25 @@ export default function Landing() {
           <div className="text-center mb-10">
             <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">AI untuk Bidang Anda</p>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              Pengetahuan Anda, Dikuatkan oleh AI.<br />
-              Solusi Nyata untuk Setiap Bidang.
+              AI Konstruksi untuk Setiap Domain.<br />
+              Spesifik, Mendalam, Siap Pakai.
             </h2>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-10">
             {[
-              { icon: "👤", label: "Mentor AI" },
-              { icon: "📚", label: "Tutor AI" },
-              { icon: "🏢", label: "AI Perusahaan" },
-              { icon: "⚖", label: "AI Regulasi" },
-              { icon: "🏗", label: "AI Konstruksi" },
-              { icon: "⚡", label: "AI Energi" },
-              { icon: "⛏", label: "AI Pertambangan" },
-              { icon: "🌱", label: "AI Lingkungan" },
-              { icon: "📄", label: "AI Dokumen" },
-              { icon: "🎓", label: "AI Sertifikasi" },
-              { icon: "💼", label: "AI Konsultan" },
-              { icon: "📊", label: "AI Bisnis" },
+              { icon: "🏗️", label: "SBU & Perizinan" },
+              { icon: "🎓", label: "SKK & Kompetensi" },
+              { icon: "📋", label: "Tender & LKPP" },
+              { icon: "⚠️", label: "K3 Konstruksi" },
+              { icon: "📐", label: "Teknik Sipil" },
+              { icon: "🏛️", label: "Arsitektur" },
+              { icon: "⚡", label: "MEP & Mekanikal" },
+              { icon: "🌱", label: "Lingkungan & AMDAL" },
+              { icon: "📄", label: "Bedah Dokumen" },
+              { icon: "💰", label: "Keuangan Proyek" },
+              { icon: "⚖️", label: "Legal & Kontrak" },
+              { icon: "📊", label: "Manajemen Proyek" },
             ].map((item) => (
               <div key={item.label} className="bg-white dark:bg-card border border-gray-200 dark:border-gray-700 rounded-xl p-3.5 flex items-center gap-2.5 hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
                 <span className="text-xl">{item.icon}</span>
@@ -1561,10 +1561,10 @@ export default function Landing() {
           <div className="text-center mb-8">
             <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Platform Bekerja</p>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              Dari Pengetahuan Menjadi AI — Tanpa Coding
+              Dari Keahlian Konstruksi Menjadi AI — Tanpa Coding
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-              Lihat bagaimana Gustafta Builder mengubah pengetahuan Anda menjadi ekosistem AI yang hidup dan bekerja 24/7.
+              Lihat bagaimana Gustafta mengubah keahlian konstruksi menjadi AI yang menjawab, menganalisis, dan mendampingi — 24/7.
             </p>
           </div>
 
@@ -1620,13 +1620,12 @@ export default function Landing() {
       <section className="py-16 px-4 bg-white dark:bg-background">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Peluang Kemitraan</p>
+            <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Akses Platform</p>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
               Anda Lembaga atau Profesional Konstruksi?
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-              Bangun Layanan Digital dengan Branding Anda Sendiri. Gustafta menyediakan platform <em>no-code</em> untuk
-              merakit chatbot, mini apps, dan pusat pengetahuan dengan <strong>logo, nama, dan identitas organisasi Anda sendiri</strong>.
+              Gustafta tersedia untuk lembaga maupun profesional individu — dengan pilihan akses yang disesuaikan kebutuhan skala organisasi dan pola kerja Anda.
             </p>
           </div>
 
@@ -1656,10 +1655,10 @@ export default function Landing() {
               <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4">Untuk Profesional<br/><span className="text-sm font-normal text-gray-500">(Konsultan, Fasilitator, Asesor)</span></h3>
               <ul className="space-y-2.5 mb-6">
                 {[
-                  "Template siap pakai — tinggal isi form konfigurasi",
-                  "Monetisasi keahlian Anda langsung ke klien",
-                  "Komisi afiliasi 30% recurring",
-                  "Bangun personal brand digital tanpa tim IT",
+                  "Akses seluruh suite AI konstruksi dalam satu platform",
+                  "Gunakan untuk konsultasi dan pendampingan klien langsung",
+                  "Knowledge base regulasi konstruksi selalu terkini",
+                  "Layani lebih banyak klien dengan produktivitas lebih tinggi",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700 dark:text-gray-300">
                     <Check className="w-4 h-4 text-violet-500 shrink-0 mt-0.5" />{item}
@@ -1667,36 +1666,35 @@ export default function Landing() {
                 ))}
               </ul>
               <Button asChild variant="outline" className="w-full gap-2 border-violet-400 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900/40">
-                <Link href={builderUrl}>Mulai Gunakan AI <ArrowRight className="w-3.5 h-3.5" /></Link>
+                <Link href="/klinik-konsultasi">Mulai Gunakan <ArrowRight className="w-3.5 h-3.5" /></Link>
               </Button>
             </div>
           </div>
 
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 max-w-xl mx-auto italic">
-            Tidak harus jadi Creator hari ini. Gunakan layanan Gustafta terlebih dahulu, dan ketika Anda siap,
-            kami siap mendampingi Anda membangun layanan digital dengan branding Anda sendiri.
+            Mulai dari yang Anda butuhkan sekarang — Gustafta tumbuh bersama kebutuhan Anda.
           </p>
         </div>
       </section>
 
-      {/* ── CREATOR PERSONAS ── */}
+      {/* ── PENGGUNA GUSTAFTA ── */}
       <section className="py-16 px-4 bg-gray-50 dark:bg-muted/20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Untuk Siapa</p>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              Siapa Pun yang Punya Keahlian — Bisa Didampingi Gustafta
+              Gustafta untuk Profesional Konstruksi Indonesia
             </h2>
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
             {[
-              { emoji: "🎓", label: "Instruktur & Trainer", desc: "Rakit modul pelatihan, panduan digital, dan chatbot pendamping untuk peserta Anda." },
-              { emoji: "🏛️", label: "Asosiasi Profesi & Badan Usaha", desc: "Bangun ekosistem kompetensi anggota — dari sertifikasi hingga pembelajaran berkelanjutan." },
-              { emoji: "📜", label: "Lembaga Sertifikasi (LSP)", desc: "Sediakan simulasi asesmen, bank soal, dan panduan kompetensi yang bisa diakses 24/7." },
-              { emoji: "🏫", label: "Universitas & Lembaga Pendidikan", desc: "Digitalisasi materi dosen menjadi ekosistem belajar yang skalabel." },
-              { emoji: "💼", label: "Konsultan Independen", desc: "Kemas keahlian Anda menjadi produk digital — chatbot konsultasi, document generator, mini apps." },
-              { emoji: "👤", label: "Individu Profesional", desc: "Wariskan pengalaman 10–20 tahun menjadi AI Twin yang terus bekerja untuk Anda." },
+              { emoji: "🏗️", label: "Kontraktor & BUJK", desc: "Urus SBU, SKK, tender, dan kepatuhan regulasi lebih cepat — dibantu AI yang paham konstruksi Indonesia." },
+              { emoji: "📐", label: "Konsultan Teknis", desc: "Bedah spesifikasi, analisis kontrak FIDIC, dan pendampingan desain dengan referensi regulasi terkini." },
+              { emoji: "📋", label: "Biro Jasa & Fasilitator", desc: "Layani lebih banyak klien dengan bantuan AI — pengurusan SBU, SKK, perizinan, dan dokumen tender." },
+              { emoji: "🏛️", label: "Asosiasi & LSP Konstruksi", desc: "Sediakan akses informasi kompetensi, simulasi asesmen, dan panduan regulasi untuk seluruh anggota." },
+              { emoji: "📊", label: "Project Manager & Owner", desc: "Monitor proyek, kelola dokumen kontrak, dan ambil keputusan berbasis data lapangan secara real-time." },
+              { emoji: "🎓", label: "Trainer & Asesor SKK", desc: "Siapkan peserta uji kompetensi dengan modul latihan, bank soal, dan simulasi asesmen interaktif." },
             ].map((p) => (
               <div key={p.label} className="rounded-2xl border bg-gray-50 dark:bg-muted/20 p-5 flex flex-col gap-3"
                 data-testid={`card-persona-${p.label.toLowerCase().replace(/\s/g, "-")}`}>
@@ -1716,19 +1714,19 @@ export default function Landing() {
         <div className="max-w-2xl mx-auto">
           <div className="text-5xl mb-6">🧠</div>
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            AI Tidak Menggantikan Keahlian Anda.
+            AI Tidak Menggantikan Praktisi Konstruksi.
           </h2>
           <h3 className="text-xl md:text-2xl font-bold text-yellow-300 mb-6">
-            AI Memperkuat Keahlian Anda.
+            AI Memperkuat Praktisi Konstruksi.
           </h3>
           <p className="text-gray-300 leading-relaxed text-base mb-2">
-            Karena yang paling berharga bukan teknologinya.
+            Pengalaman lapangan, pemahaman regulasi, dan intuisi proyek Anda tidak bisa digantikan.
           </p>
           <p className="text-gray-300 leading-relaxed text-base mb-8">
-            Tetapi <strong className="text-white">pengetahuan yang Anda miliki.</strong>
+            GUSTAFTA menggunakannya sebagai <strong className="text-white">fondasi AI yang benar-benar relevan.</strong>
           </p>
           <p className="text-gray-400 text-sm max-w-lg mx-auto">
-            GUSTAFTA membantu Anda mengubahnya menjadi AI yang mampu bekerja untuk diri Anda, tim, organisasi, maupun pelanggan.
+            Bukan AI generik yang tahu sedikit tentang segalanya — melainkan AI konstruksi yang tahu banyak tentang bidang Anda.
           </p>
         </div>
       </section>
@@ -1765,22 +1763,22 @@ export default function Landing() {
               </Button>
             </div>
 
-            {/* Kolom kanan — Creator */}
+            {/* Kolom kanan — Lembaga & Organisasi */}
             <div className="rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 p-8 flex flex-col gap-4">
               <div className="text-3xl">🏛️</div>
-              <h3 className="text-lg font-bold text-white">Saya Ingin Bangun Layanan Digital dengan Branding Saya</h3>
+              <h3 className="text-lg font-bold text-white">Saya Lembaga, Asosiasi, atau Biro Jasa Konstruksi</h3>
               <p className="text-sm text-blue-200 leading-relaxed">
-                Untuk lembaga atau profesional yang ingin merakit platform digital dengan identitas organisasi sendiri — tanpa coding.
+                Untuk organisasi yang ingin menggunakan platform AI Gustafta dengan branding dan identitas sendiri — untuk tim, staf, atau anggota Anda.
               </p>
               <ul className="space-y-2 text-xs text-blue-200">
-                {["Branding penuh (logo, nama, warna Anda)", "Knowledge base skala besar", "Akses produk AI seluruh katalog", "Tidak perlu tim IT"].map((i) => (
+                {["Branding penuh (logo, nama, warna organisasi)", "Multi-user untuk seluruh tim dan staf", "Knowledge base regulasi dan prosedur internal", "Tidak perlu tim IT — siap pakai"].map((i) => (
                   <li key={i} className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-yellow-400 shrink-0" />{i}</li>
                 ))}
               </ul>
-              <Button asChild size="lg" variant="outline" className="mt-auto border-white/40 text-white hover:bg-white/10 font-bold gap-2" data-testid="btn-cta-final-creator">
-                <Link href={builderUrl}>
+              <Button asChild size="lg" variant="outline" className="mt-auto border-white/40 text-white hover:bg-white/10 font-bold gap-2" data-testid="btn-cta-final-lembaga">
+                <Link href="/packs">
                   <Wrench className="h-4 w-4" />
-                  Pelajari Kemitraan
+                  Lihat Paket Lembaga
                 </Link>
               </Button>
             </div>
@@ -1817,8 +1815,8 @@ export default function Landing() {
                 a: "Bisa. Lewat program afiliasi dengan komisi 30% recurring, atau gunakan langsung untuk layanan ke klien Anda sendiri. Pengetahuan Anda adalah aset — Gustafta membantu mengubahnya menjadi produktivitas nyata.",
               },
               {
-                q: "Apakah Gustafta hanya untuk sektor konstruksi?",
-                a: "Tidak. 30+ sektor industri sudah didukung — konstruksi, energi, HR, pendidikan, keuangan, hukum, dan lainnya. Konstruksi hanya yang paling dalam saat ini.",
+                q: "Apakah Gustafta khusus untuk industri konstruksi?",
+                a: "Ya — Gustafta dirancang dan difokuskan untuk industri konstruksi Indonesia. Mulai dari SBU, SKK, Tender, K3, hingga keuangan proyek dan perizinan berusaha. Kedalaman domain inilah yang membedakan Gustafta dari platform AI generik.",
               },
             ].map((item, i) => (
               <AccordionItem key={i} value={`faq-${i}`} className="border rounded-xl px-4">
