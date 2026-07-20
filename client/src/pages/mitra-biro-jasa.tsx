@@ -5,7 +5,8 @@ import { SharedHeader } from "@/components/shared-header";
 import {
   Check, ArrowRight, MessageCircle, FolderOpen, Bell, TrendingUp,
   Users, Zap, ChevronRight, BarChart3, Layers, ClipboardList,
-  RefreshCcw, DollarSign, AlertTriangle,
+  RefreshCcw, DollarSign, AlertTriangle, ShieldCheck, History,
+  Lock, UserCheck, BookOpen, Building2,
 } from "lucide-react";
 import { trackLead } from "@/lib/meta-pixel";
 
@@ -60,7 +61,11 @@ export default function MitraBiroJasaPage() {
             </a>
           </div>
           <div className="flex flex-wrap gap-6 text-xs text-blue-200 mt-8 justify-center">
-            {["Tidak perlu ganti cara kerja Anda", "Klien tetap mengenal nama biro jasa Anda", "Recurring income baru tanpa effort ekstra"].map((s) => (
+            {[
+              "Setiap perusahaan punya akun sendiri — data tidak tercampur",
+              "Anda dapat marketing fee 20% dari langganan klien yang Anda refer",
+              "Notifikasi dokumen langsung ke perusahaan — bukan hanya ke Anda",
+            ].map((s) => (
               <span key={s} className="flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5 text-yellow-300" />{s}
               </span>
@@ -276,33 +281,42 @@ export default function MitraBiroJasaPage() {
                 ))}
               </div>
               <div className="mt-6 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 p-4 text-center">
-                <p className="text-xs text-emerald-600">Pendapatan per klien per bulan</p>
-                <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1">Rp 99–299 rb</p>
-                <p className="text-[10px] text-emerald-600">Recurring — setiap bulan — dari seluruh portofolio</p>
+                <p className="text-xs text-emerald-600">Marketing fee per klien aktif</p>
+                <p className="text-2xl font-bold text-emerald-700 dark:text-emerald-400 mt-1">20% × Rp 199 rb</p>
+                <p className="text-[10px] text-emerald-600">= Rp 39.800/klien/bln — otomatis, selama klien aktif</p>
               </div>
             </div>
           </div>
 
-          {/* Kalkulasi Potensi */}
+          {/* Kalkulasi Potensi — Marketing Fee */}
           <div className="rounded-2xl border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 p-8">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 text-center">
-              📊 Hitung Potensi Recurring Income Anda
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 text-center">
+              📊 Hitung Potensi Marketing Fee Anda
             </h3>
-            <div className="grid sm:grid-cols-3 gap-6 text-center">
+            <p className="text-xs text-center text-gray-500 dark:text-gray-400 mb-6">
+              Setiap perusahaan klien Anda berlangganan langsung ke Gustafta — Anda mendapat <strong>20% recurring</strong> selama mereka aktif.
+            </p>
+            <div className="grid sm:grid-cols-3 gap-6 text-center mb-6">
               {[
-                { label: "Jika 100 klien × Rp 99.000/bln", value: "Rp 9,9 juta", sub: "per bulan" },
-                { label: "Jika 200 klien × Rp 150.000/bln", value: "Rp 30 juta", sub: "per bulan" },
-                { label: "Jika 500 klien × Rp 199.000/bln", value: "Rp 99,5 juta", sub: "per bulan" },
+                { klien: "30 klien", fee: "Rp 1.194.000", sub: "per bulan" },
+                { klien: "100 klien", fee: "Rp 3.980.000", sub: "per bulan" },
+                { klien: "300 klien", fee: "Rp 11.940.000", sub: "per bulan" },
               ].map((c) => (
-                <div key={c.label} className="rounded-xl bg-white dark:bg-card border p-5">
-                  <p className="text-[10px] text-gray-500 mb-2">{c.label}</p>
-                  <p className="text-2xl font-extrabold text-blue-700 dark:text-blue-300">{c.value}</p>
-                  <p className="text-xs text-gray-400">{c.sub}</p>
+                <div key={c.klien} className="rounded-xl bg-white dark:bg-card border p-5">
+                  <p className="text-[10px] text-gray-500 mb-2">{c.klien} aktif × 20% × Rp 199.000</p>
+                  <p className="text-2xl font-extrabold text-blue-700 dark:text-blue-300">{c.fee}</p>
+                  <p className="text-xs text-gray-400">{c.sub} — pasif</p>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-gray-400 text-center mt-4 italic">
-              Ilustrasi potensi. Harga dan hasil aktual tergantung paket yang dipilih dan aktivitas biro jasa.
+            <div className="rounded-xl bg-white dark:bg-card border border-blue-200 dark:border-blue-700 p-4 text-xs text-gray-600 dark:text-gray-400 text-center">
+              <strong className="text-gray-900 dark:text-white">Cara kerjanya:</strong>{" "}
+              Perusahaan klien Anda daftar & bayar ke Gustafta langsung menggunakan kode referral Anda.
+              Gustafta transfer marketing fee ke Anda setiap bulan secara otomatis.
+              Tidak ada yang perlu Anda tagih sendiri.
+            </div>
+            <p className="text-[10px] text-gray-400 text-center mt-3 italic">
+              Harga berlangganan standar Rp 199.000/bln per perusahaan. Founding partner mendapat fee 22%.
             </p>
           </div>
         </div>
@@ -332,6 +346,76 @@ export default function MitraBiroJasaPage() {
                 <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{p.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PROTEKSI & KEPERCAYAAN ── */}
+      <section className="py-16 px-4 bg-slate-50 dark:bg-muted/20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <Badge className="mb-4 bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
+              Sistem yang Melindungi Semua Pihak
+            </Badge>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+              1 Perusahaan = 1 Akun = 1 Harga
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+              Biro jasa berperan sebagai <strong>operator</strong> — membantu proses, bukan menjadi pemilik data klien.
+              Prinsip ini melindungi perusahaan klien Anda, dan pada saat yang sama melindungi reputasi biro jasa Anda.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-5 mb-8">
+            {[
+              {
+                icon: Building2,
+                color: "text-blue-600",
+                bg: "bg-blue-50 dark:bg-blue-950/30",
+                title: "Data milik perusahaan, selamanya",
+                desc: "Akun didaftarkan atas nama perusahaan klien — bukan atas nama biro jasa. Jika biro jasa berganti, data tetap utuh di akun perusahaan. Tidak ada yang bisa 'membawa' data pergi.",
+              },
+              {
+                icon: History,
+                color: "text-violet-600",
+                bg: "bg-violet-50 dark:bg-violet-950/30",
+                title: "Setiap aksi biro jasa tercatat",
+                desc: "Setiap upload dokumen, update data, atau perubahan yang dilakukan biro jasa otomatis tercatat dengan timestamp. Perusahaan bisa melihat history lengkap kapan saja — tidak ada yang bisa disembunyikan.",
+              },
+              {
+                icon: Bell,
+                color: "text-orange-600",
+                bg: "bg-orange-50 dark:bg-orange-950/30",
+                title: "Notifikasi langsung ke perusahaan",
+                desc: "Pengingat SBU habis, dokumen diperbarui, atau aksi penting — selalu dikirim langsung ke PIC perusahaan, bukan hanya ke biro jasa. Perusahaan tidak buta atas urusannya sendiri.",
+              },
+              {
+                icon: Lock,
+                color: "text-emerald-600",
+                bg: "bg-emerald-50 dark:bg-emerald-950/30",
+                title: "Akses biro jasa bisa dicabut kapan saja",
+                desc: "Jika perusahaan memutus hubungan dengan biro jasa, satu klik cukup untuk mencabut akses. Data tetap ada, riwayat tetap tersimpan. Tidak ada 'kunci-kuncian dokumen'.",
+              },
+            ].map((f) => (
+              <div key={f.title} className={`rounded-2xl ${f.bg} border border-white/60 dark:border-white/5 p-6 flex gap-4`}>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${f.bg}`}>
+                  <f.icon className={`h-5 w-5 ${f.color}`} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1">{f.title}</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">{f.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-card p-6 text-center">
+            <ShieldCheck className="h-8 w-8 text-slate-500 mx-auto mb-3" />
+            <p className="text-sm text-gray-700 dark:text-gray-300 max-w-xl mx-auto leading-relaxed">
+              <strong>Untuk biro jasa yang jujur</strong> — sistem ini justru melindungi reputasi Anda.
+              Jika klien pernah ragu soal transparansi, Gustafta memberikan jawaban konkret:
+              <em> "Semua yang kami kerjakan bisa Anda lihat sendiri di akun Anda, kapan saja."</em>
+            </p>
           </div>
         </div>
       </section>
@@ -383,6 +467,76 @@ export default function MitraBiroJasaPage() {
             <p className="text-center text-xs text-gray-400 mt-3">
               Template ini menjadi milik Anda — dikirim atas nama biro jasa Anda sendiri.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PANDUAN RINGKAS ── */}
+      <section className="py-16 px-4 bg-white dark:bg-background">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <Badge className="mb-4 bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800">
+              Panduan Singkat
+            </Badge>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+              Untuk Siapa Panduan Ini
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Panduan Biro Jasa */}
+            <div className="rounded-2xl border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/10 p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                  <BookOpen className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Panduan untuk Biro Jasa</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Cara kerja sebagai mitra operator</p>
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { no: "1", text: "Daftar akun Gustafta atas nama biro jasa Anda sendiri" },
+                  { no: "2", text: "Hubungi kami — Anda akan mendapat kode referral unik" },
+                  { no: "3", text: "Bantu klien Anda daftar akun atas nama perusahaan mereka masing-masing (bukan atas nama biro jasa)" },
+                  { no: "4", text: "Setiap klien yang berlangganan menggunakan kode referral Anda → Anda dapat 20% marketing fee recurring" },
+                  { no: "5", text: "Anda diberi akses 'operator' ke akun klien sejauh yang mereka izinkan — semua aksi Anda tercatat" },
+                  { no: "6", text: "Marketing fee ditransfer otomatis setiap bulan — tidak perlu tagih sendiri" },
+                ].map((s) => (
+                  <div key={s.no} className="flex items-start gap-3 text-xs text-gray-700 dark:text-gray-300">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.no}</span>
+                    <span className="leading-relaxed">{s.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Panduan Klien Perusahaan */}
+            <div className="rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-950/10 p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center shrink-0">
+                  <UserCheck className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white">Panduan untuk Perusahaan Klien</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Hak dan jaminan yang Anda miliki</p>
+                </div>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { no: "1", text: "Akun Gustafta didaftarkan atas nama perusahaan Anda — bukan atas nama biro jasa" },
+                  { no: "2", text: "Anda bayar langsung ke Gustafta — biro jasa tidak memegang uang langganan Anda" },
+                  { no: "3", text: "Biro jasa Anda diberi akses 'operator' — bisa upload & kelola dokumen, tapi tidak bisa hapus akun atau transfer data" },
+                  { no: "4", text: "Notifikasi dokumen (expiry, update, perubahan) selalu dikirim langsung ke nomor/email Anda" },
+                  { no: "5", text: "Anda bisa melihat history lengkap semua aksi yang dilakukan biro jasa di akun Anda" },
+                  { no: "6", text: "Jika Anda ganti biro jasa — cabut akses mereka kapan saja. Data Anda tetap aman dan utuh." },
+                ].map((s) => (
+                  <div key={s.no} className="flex items-start gap-3 text-xs text-gray-700 dark:text-gray-300">
+                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{s.no}</span>
+                    <span className="leading-relaxed">{s.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -445,9 +599,21 @@ export default function MitraBiroJasaPage() {
           </p>
           <div className="grid sm:grid-cols-3 gap-4 mb-8">
             {[
-              { icon: DollarSign, title: "Harga Founding Partner", desc: "Dikunci di harga awal — tidak naik meski platform berkembang." },
-              { icon: Users, title: "Akses Langsung ke Founder", desc: "Onboarding 1-on-1 dan feedback loop langsung untuk pengembangan fitur." },
-              { icon: Zap, title: "Fitur Eksklusif Lebih Awal", desc: "Renewal Center dan Opportunity Engine tersedia lebih awal untuk founding partners." },
+              {
+                icon: DollarSign,
+                title: "Marketing Fee 22% — Dikunci Selamanya",
+                desc: "Founding partner dapat fee 22% (vs standar 20%). Harga ini dikunci — tidak turun meski platform berkembang dan ramai.",
+              },
+              {
+                icon: Users,
+                title: "Onboarding Langsung dari Founder",
+                desc: "Setup 1-on-1 bersama tim inti Gustafta. Feedback Anda masuk langsung ke roadmap fitur berikutnya.",
+              },
+              {
+                icon: Zap,
+                title: "Fitur Portfolio Dashboard Lebih Awal",
+                desc: "Akses Renewal Center dan Opportunity Engine sebelum dirilis publik — Anda yang pertama merasakan manfaatnya.",
+              },
             ].map((b) => (
               <div key={b.title} className="rounded-xl border border-orange-200 dark:border-orange-800 bg-white dark:bg-card p-5 text-left">
                 <b.icon className="h-5 w-5 text-orange-500 mb-3" />
