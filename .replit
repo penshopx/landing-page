@@ -58,14 +58,3 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
-
-[userenv]
-
-[userenv.shared]
-ADMIN_EMAILS = "tutip98@outlook.com"
-ADMIN_USER_IDS = "58349984,58848919,59024982"
-BREVO_SENDER_EMAIL = "penshopx@gmail.com"
-SMTP_HOST = "smtp-relay.brevo.com"
-SMTP_PORT = "587"
-SUPERADMIN_EMAILS = "penshopx@gmail.com"
-QWEN_MODEL = "qwen-plus"
