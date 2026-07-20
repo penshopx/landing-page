@@ -19470,6 +19470,53 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
             }
           }
         }
+      } else if (matchedMapping.type === "subscription") {
+          // ── Subscription bulanan: aktifkan plan ke akun pembeli ──────────────
+          await storage.createStoreOrder({
+            productId: 0, customerName: customerName || "Customer",
+            customerEmail, customerPhone,
+            amount: Math.round(grossRevenue),
+            midtransOrderId: `scalev_${orderId}`, accessToken, status: "paid",
+          });
+          const subMeta = (matchedMapping.meta as any) || {};
+          const subPlan: string = subMeta.plan || "starter";
+          const subDays: number = subMeta.durationDays || 30;
+          if (customerEmail) {
+            try {
+              const buyer = await storage.getUserByEmail(customerEmail);
+              if (buyer) {
+                const { PLAN_CONFIGS } = await import("@shared/feature-plans");
+                const planConfig = PLAN_CONFIGS[subPlan as keyof typeof PLAN_CONFIGS];
+                const now = new Date();
+                const endDate = new Date(now.getTime() + subDays * 24 * 60 * 60 * 1000);
+                const { db: dbSub } = await import("./db");
+                const { subscriptionsTable: subsTbl } = await import("@shared/schema");
+                const { eq: eqSub, and: andSub } = await import("drizzle-orm");
+                await dbSub.update(subsTbl)
+                  .set({ status: "expired" } as any)
+                  .where(andSub(eqSub(subsTbl.userId, buyer.id), eqSub(subsTbl.status, "active")));
+                await storage.createSubscription({
+                  userId: buyer.id, plan: subPlan, status: "active",
+                  amount: Math.round(grossRevenue), currency: "IDR",
+                  chatbotLimit: planConfig?.maxAgents ?? 10,
+                  mayarOrderId: `scalev_${orderId}`,
+                  startDate: now.toISOString(), endDate: endDate.toISOString(),
+                } as any);
+                console.log(`[Scalev] Subscription "${subPlan}" (${subDays}d) aktif untuk ${customerEmail} (user ${buyer.id})`);
+                const { sendEmail: sendSubEmail } = await import("./lib/email");
+                sendSubEmail({
+                  to: customerEmail,
+                  subject: `✅ Berlangganan Gustafta ${planConfig?.name ?? subPlan} — Aktif!`,
+                  html: `<h2>Halo ${customerName || ""}!</h2><p>Terima kasih sudah berlangganan <strong>Gustafta ${planConfig?.name ?? subPlan}</strong>.</p><p>✅ Akun Anda sudah aktif selama <strong>${subDays} hari</strong>. Login di <a href='https://gustafta.my.id'>gustafta.my.id</a>.</p><p>Salam,<br>Tim Gustafta</p>`,
+                }).catch(() => {});
+              } else {
+                await storage.addPendingPremiumDelivery({ masterAgentId: 0, email: customerEmail, source: "scalev" }).catch(() => {});
+                console.log(`[Scalev] Subscription "${subPlan}" pending delivery ke ${customerEmail} (belum punya akun)`);
+              }
+            } catch (subErr: any) {
+              console.error(`[Scalev] Gagal aktifkan subscription untuk ${customerEmail}:`, subErr?.message);
+            }
+          }
       } else {
         // No mapping found — create a generic store order as placeholder (productId=0)
         await storage.createStoreOrder({
