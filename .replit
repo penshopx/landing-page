@@ -54,3 +54,14 @@ externalPort = 5000
 [[ports]]
 localPort = 23636
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+ADMIN_EMAILS = "tutip98@outlook.com"
+ADMIN_USER_IDS = "58349984,58848919,59024982"
+BREVO_SENDER_EMAIL = "penshopx@gmail.com"
+QWEN_MODEL = "qwen-plus"
+SMTP_HOST = "smtp-relay.brevo.com"
+SMTP_PORT = "587"
+SUPERADMIN_EMAILS = "penshopx@gmail.com"
