@@ -106,16 +106,25 @@ function buildSuperAdminPhones(): Set<string> {
 const SUPERADMIN_PHONES = buildSuperAdminPhones();
 
 // Idempotent, upgrade-only: promotes a user row to role "superadmin" if their
-// phone matches the allowlist and they aren't already superadmin. Safe to call
-// on every register/verify/login — never downgrades, never touches other users.
-async function promoteSuperAdminIfMatch(userId: string, phone: string | null | undefined, currentRole: string | null | undefined): Promise<string> {
-  if (!phone) return currentRole || "user";
-  const normalized = normalizePhone(phone);
-  if (!SUPERADMIN_PHONES.has(normalized)) return currentRole || "user";
+// phone matches the allowlist OR their email appears in SUPERADMIN_EMAILS env.
+// Safe to call on every register/verify/login — never downgrades, never touches other users.
+async function promoteSuperAdminIfMatch(userId: string, phone: string | null | undefined, currentRole: string | null | undefined, email?: string | null): Promise<string> {
   if (currentRole === "superadmin") return "superadmin";
+
+  // Check phone allowlist
+  const phoneMatches = !!phone && SUPERADMIN_PHONES.has(normalizePhone(phone));
+
+  // Check SUPERADMIN_EMAILS env var (comma-separated list of emails)
+  const superadminEmails = (process.env.SUPERADMIN_EMAILS || "")
+    .split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  const emailMatches = !!email && superadminEmails.includes(email.toLowerCase());
+
+  if (!phoneMatches && !emailMatches) return currentRole || "user";
+
   try {
     await db.update(users).set({ role: "superadmin", updatedAt: new Date() }).where(eq(users.id, userId));
-    console.log(`[EmailAuth] Promoted user ${userId} to superadmin (phone match)`);
+    const reason = phoneMatches ? "phone match" : "email match";
+    console.log(`[EmailAuth] Promoted user ${userId} to superadmin (${reason})`);
   } catch (err) {
     console.error(`[EmailAuth] Failed to promote superadmin for ${userId}:`, err);
   }
@@ -325,9 +334,10 @@ export function registerEmailAuthRoutes(app: Express): void {
         });
 
       // Super Admin allowlist check — see promoteSuperAdminIfMatch above.
-      if (normalizedPhone) {
+      // Run unconditionally so email-based admins are also caught at register time.
+      {
         const [rowForPromo] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-        if (rowForPromo) await promoteSuperAdminIfMatch(rowForPromo.id, normalizedPhone, rowForPromo.role);
+        if (rowForPromo) await promoteSuperAdminIfMatch(rowForPromo.id, normalizedPhone, rowForPromo.role, email);
       }
 
       // Invalidate old OTPs
@@ -415,7 +425,7 @@ export function registerEmailAuthRoutes(app: Express): void {
       if (!userRow) return res.status(500).json({ error: "User tidak ditemukan." });
 
       // Super Admin allowlist check — see promoteSuperAdminIfMatch above.
-      const effectiveRole = await promoteSuperAdminIfMatch(userRow.id, userRow.phone, userRow.role);
+      const effectiveRole = await promoteSuperAdminIfMatch(userRow.id, userRow.phone, userRow.role, userRow.email);
 
       // Seed sample agent for new user — non-blocking
       seedSampleAgentForEmailUser(userRow.id, userRow.firstName).catch(() => {});
@@ -562,7 +572,7 @@ export function registerEmailAuthRoutes(app: Express): void {
       }
 
       // Super Admin allowlist check — see promoteSuperAdminIfMatch above.
-      const effectiveRole = await promoteSuperAdminIfMatch(userRow.id, userRow.phone, userRow.role);
+      const effectiveRole = await promoteSuperAdminIfMatch(userRow.id, userRow.phone, userRow.role, userRow.email);
 
       if (!userRow.emailVerified) {
         return res.status(403).json({ error: "Email belum diverifikasi.", needsVerification: true, email, otpChannel: userRow.otpChannel === "email" ? "email" : "wa" });
