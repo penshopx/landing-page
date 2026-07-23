@@ -36,6 +36,7 @@ SKIP_PATTERNS=(
   '^\.agents/memory/'
   '^scripts/install-hooks\.sh$'
   '^scripts/hooks/'
+  '^migrations/meta/'
 )
 
 # ── Main ──────────────────────────────────────────────────────────────────────
