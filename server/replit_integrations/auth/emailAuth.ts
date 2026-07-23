@@ -94,14 +94,16 @@ function normalizePhone(raw: string): string {
   return digits;
 }
 
-// ── Hardcoded Super Admin allowlist (by phone) ──────────────────────────────
-// Founder-designated Super Admin: full, unrestricted access to every feature
-// (blueprint generation/edit/download, Workroom, all AI Partners), no plan/
-// premium gate. Keyed by phone (not email) because that's the durable
-// identifier for this person; role is DB-persisted so every existing
-// admin/superadmin check across the app (getDbRole, isAdminUser, etc.)
-// picks it up automatically — no new bypass logic needed elsewhere.
-const SUPERADMIN_PHONES = new Set([normalizePhone("081287941900")]); // Wuryanto Kusdjali
+// ── Super Admin allowlist (by phone) — loaded from env, never hardcoded ─────
+// Set SUPERADMIN_PHONE in Replit Secrets (comma-separated for multiple numbers).
+// Role is DB-persisted so every existing admin/superadmin check across the app
+// (getDbRole, isAdminUser, etc.) picks it up automatically on next login.
+function buildSuperAdminPhones(): Set<string> {
+  const raw = process.env.SUPERADMIN_PHONE || "";
+  if (!raw.trim()) return new Set();
+  return new Set(raw.split(",").map((p) => normalizePhone(p.trim())).filter(Boolean));
+}
+const SUPERADMIN_PHONES = buildSuperAdminPhones();
 
 // Idempotent, upgrade-only: promotes a user row to role "superadmin" if their
 // phone matches the allowlist and they aren't already superadmin. Safe to call
