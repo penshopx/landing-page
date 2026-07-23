@@ -19489,7 +19489,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
             sendEmail({
               to: customerEmail,
               subject: "🎉 Starter Kit Gustafta — Akses Siap!",
-              html: `<h2>Halo ${customerName || ""}!</h2><p>Terima kasih sudah membeli <strong>Starter Kit Gustafta (Rp 245.000)</strong>.</p>${trialGranted ? "<p>✅ <strong>Trial 7 hari platform sudah aktif</strong> di akun kamu. Login di <a href='https://gustafta.my.id'>gustafta.my.id</a>.</p>" : "<p>Daftar akun di <a href='https://gustafta.my.id/masuk'>gustafta.my.id/masuk</a> untuk mengaktifkan trial 7 hari kamu.</p>"}<p>Salam,<br>Tim Gustafta</p>`,
+              htmlContent: `<h2>Halo ${customerName || ""}!</h2><p>Terima kasih sudah membeli <strong>Starter Kit Gustafta (Rp 245.000)</strong>.</p>${trialGranted ? "<p>✅ <strong>Trial 7 hari platform sudah aktif</strong> di akun kamu. Login di <a href='https://gustafta.my.id'>gustafta.my.id</a>.</p>" : "<p>Daftar akun di <a href='https://gustafta.my.id/masuk'>gustafta.my.id/masuk</a> untuk mengaktifkan trial 7 hari kamu.</p>"}<p>Salam,<br>Tim Gustafta</p>`,
+              textContent: `Halo ${customerName || ""}! Terima kasih sudah membeli Starter Kit Gustafta. ${trialGranted ? "Trial 7 hari platform sudah aktif di akun kamu. Login di https://gustafta.my.id." : "Daftar akun di https://gustafta.my.id/masuk untuk mengaktifkan trial 7 hari kamu."} Salam, Tim Gustafta`,
             }).catch(() => {});
           }
           console.log(`[Scalev] Starter Kit diproses untuk ${customerEmail} — trial: ${trialGranted}`);
@@ -19506,7 +19507,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           sendEmail({
             to: process.env.SUPERADMIN_EMAILS?.split(",")[0] || "penshopx@gmail.com",
             subject: `[${typeLabel}] Pesanan Baru — ${matchedMapping.label || "Produk"} · ${customerName}`,
-            html: `<h3>Pesanan ${typeLabel} Baru</h3><table style="border-collapse:collapse"><tr><td style="padding:4px 12px"><b>Produk</b></td><td>${matchedMapping.label}</td></tr><tr><td style="padding:4px 12px"><b>Nama</b></td><td>${customerName}</td></tr><tr><td style="padding:4px 12px"><b>Email</b></td><td>${customerEmail}</td></tr><tr><td style="padding:4px 12px"><b>Telepon</b></td><td>${customerPhone}</td></tr><tr><td style="padding:4px 12px"><b>Jumlah</b></td><td>Rp ${Math.round(grossRevenue).toLocaleString("id-ID")}</td></tr><tr><td style="padding:4px 12px"><b>Order ID</b></td><td>scalev_${orderId}</td></tr></table>`,
+            htmlContent: `<h3>Pesanan ${typeLabel} Baru</h3><table style="border-collapse:collapse"><tr><td style="padding:4px 12px"><b>Produk</b></td><td>${matchedMapping.label}</td></tr><tr><td style="padding:4px 12px"><b>Nama</b></td><td>${customerName}</td></tr><tr><td style="padding:4px 12px"><b>Email</b></td><td>${customerEmail}</td></tr><tr><td style="padding:4px 12px"><b>Telepon</b></td><td>${customerPhone}</td></tr><tr><td style="padding:4px 12px"><b>Jumlah</b></td><td>Rp ${Math.round(grossRevenue).toLocaleString("id-ID")}</td></tr><tr><td style="padding:4px 12px"><b>Order ID</b></td><td>scalev_${orderId}</td></tr></table>`,
+            textContent: `[${typeLabel}] Pesanan Baru: ${matchedMapping.label || "Produk"} — Nama: ${customerName}, Email: ${customerEmail}, Telepon: ${customerPhone}, Jumlah: Rp ${Math.round(grossRevenue).toLocaleString("id-ID")}, Order ID: scalev_${orderId}`,
           }).catch(() => {});
           console.log(`[Scalev] ${typeLabel} order — ${matchedMapping.label} untuk ${customerEmail}`);
         } else if (matchedMapping.type === "credit") {
@@ -19564,8 +19566,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               console.error(`[Scalev] Gagal update storage plan untuk ${customerEmail}:`, storErr?.message);
             }
           }
-        }
-      } else if (matchedMapping.type === "subscription") {
+        } else if (matchedMapping.type === "subscription") {
           // ── Subscription bulanan: aktifkan plan ke akun pembeli ──────────────
           await storage.createStoreOrder({
             productId: 0, customerName: customerName || "Customer",
@@ -19602,7 +19603,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 sendSubEmail({
                   to: customerEmail,
                   subject: `✅ Berlangganan Gustafta ${planConfig?.name ?? subPlan} — Aktif!`,
-                  html: `<h2>Halo ${customerName || ""}!</h2><p>Terima kasih sudah berlangganan <strong>Gustafta ${planConfig?.name ?? subPlan}</strong>.</p><p>✅ Akun Anda sudah aktif selama <strong>${subDays} hari</strong>. Login di <a href='https://gustafta.my.id'>gustafta.my.id</a>.</p><p>Salam,<br>Tim Gustafta</p>`,
+                  htmlContent: `<h2>Halo ${customerName || ""}!</h2><p>Terima kasih sudah berlangganan <strong>Gustafta ${planConfig?.name ?? subPlan}</strong>.</p><p>✅ Akun Anda sudah aktif selama <strong>${subDays} hari</strong>. Login di <a href='https://gustafta.my.id'>gustafta.my.id</a>.</p><p>Salam,<br>Tim Gustafta</p>`,
+                  textContent: `Halo ${customerName || ""}! Terima kasih sudah berlangganan Gustafta ${planConfig?.name ?? subPlan}. Akun Anda sudah aktif selama ${subDays} hari. Login di https://gustafta.my.id. Salam, Tim Gustafta`,
                 }).catch(() => {});
               } else {
                 await storage.addPendingPremiumDelivery({ masterAgentId: 0, email: customerEmail, source: "scalev" }).catch(() => {});
@@ -19612,6 +19614,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               console.error(`[Scalev] Gagal aktifkan subscription untuk ${customerEmail}:`, subErr?.message);
             }
           }
+        }
       } else {
         // No mapping found — create a generic store order as placeholder (productId=0)
         await storage.createStoreOrder({
