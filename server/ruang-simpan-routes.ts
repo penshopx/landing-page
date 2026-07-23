@@ -76,11 +76,20 @@ const folderSchema = z.object({
 });
 
 const fileMetaSchema = z.object({
-  description:  z.string().max(500).trim().optional().nullable(),
-  tags:         z.array(z.string().max(50)).max(10).optional(),
-  folder_id:    z.string().uuid().optional().nullable(),
-  kelola_doc_id:z.string().uuid().optional().nullable(),
-  doc_status:   z.enum(["draft","aktif","kadaluarsa","arsip"]).optional(),
+  description:    z.string().max(500).trim().optional().nullable(),
+  tags:           z.array(z.string().max(50)).max(10).optional(),
+  folder_id:      z.string().uuid().optional().nullable(),
+  kelola_doc_id:  z.string().uuid().optional().nullable(),
+  doc_status:     z.enum(["draft","aktif","kadaluarsa","arsip"]).optional(),
+  allow_biro_jasa: z.boolean().optional(),
+});
+
+const accessRequestSchema = z.object({
+  requester_name:       z.string().min(1).max(200).trim(),
+  requester_email:      z.string().email().max(100),
+  company_name:         z.string().min(1).max(200).trim(),
+  purpose:              z.string().min(1).max(500).trim(),
+  requested_permissions: z.array(z.enum(["view","download"])).min(1).default(["view"]),
 });
 
 const grantSchema = z.object({
@@ -235,14 +244,106 @@ async function getUsedBytes(userId: string): Promise<number> {
 
 export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
 
+  // ── Base table DDL — runs safely on every server start ───────────────────
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ruang_simpan_folders (
+      id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id    TEXT NOT NULL,
+      name       TEXT NOT NULL,
+      color      TEXT NOT NULL DEFAULT '#6366f1',
+      icon       TEXT NOT NULL DEFAULT 'folder',
+      is_default BOOLEAN NOT NULL DEFAULT FALSE,
+      sort_order INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_rsf_folders_user ON ruang_simpan_folders(user_id)`);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ruang_simpan_files (
+      id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id         TEXT NOT NULL,
+      folder_id       UUID REFERENCES ruang_simpan_folders(id) ON DELETE SET NULL,
+      original_name   TEXT NOT NULL,
+      mime_type       TEXT NOT NULL DEFAULT 'application/octet-stream',
+      size_bytes      BIGINT NOT NULL DEFAULT 0,
+      description     TEXT,
+      tags            TEXT[] NOT NULL DEFAULT '{}',
+      storage_key     TEXT,
+      extracted_text  TEXT,
+      kb_status       TEXT NOT NULL DEFAULT 'pending'
+                      CHECK (kb_status IN ('pending','processing','ready','skipped','failed')),
+      kb_chunk_count  INT NOT NULL DEFAULT 0,
+      kelola_doc_id   UUID,
+      doc_status      TEXT NOT NULL DEFAULT 'aktif'
+                      CHECK (doc_status IN ('draft','aktif','kadaluarsa','arsip')),
+      allow_biro_jasa BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await Promise.all([
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsf_files_user    ON ruang_simpan_files(user_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsf_files_folder  ON ruang_simpan_files(folder_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsf_files_biro    ON ruang_simpan_files(allow_biro_jasa) WHERE allow_biro_jasa = true`),
+  ]);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ruang_simpan_chunks (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      file_id     UUID NOT NULL REFERENCES ruang_simpan_files(id) ON DELETE CASCADE,
+      user_id     TEXT NOT NULL,
+      chunk_index INT NOT NULL,
+      content     TEXT NOT NULL,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_rsf_chunks_file ON ruang_simpan_chunks(file_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_rsf_chunks_user ON ruang_simpan_chunks(user_id)`);
+
   // ── Governance DDL (idempotent — runs safely on every server start) ────────
+  // These are additive columns — safe to skip if table already has them
   try {
     await pool.query(`
       ALTER TABLE ruang_simpan_files
         ADD COLUMN IF NOT EXISTS doc_status TEXT NOT NULL DEFAULT 'aktif'
         CHECK (doc_status IN ('draft','aktif','kadaluarsa','arsip'))
     `);
-  } catch { /* table may not exist yet in dev */ }
+  } catch { /* already exists or constraint conflict — table created above has it */ }
+  try {
+    await pool.query(`
+      ALTER TABLE ruang_simpan_files
+        ADD COLUMN IF NOT EXISTS allow_biro_jasa BOOLEAN NOT NULL DEFAULT FALSE
+    `);
+  } catch { /* already exists — table created above has it */ }
+
+  // Tabel permintaan akses dari biro jasa
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ruang_simpan_access_requests (
+      id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      file_id               UUID NOT NULL,
+      file_owner_user_id    TEXT NOT NULL,
+      requester_name        TEXT NOT NULL,
+      requester_email       TEXT NOT NULL,
+      company_name          TEXT NOT NULL,
+      purpose               TEXT NOT NULL,
+      requested_permissions TEXT[] NOT NULL DEFAULT '{view}',
+      status                TEXT NOT NULL DEFAULT 'pending'
+                            CHECK (status IN ('pending','approved','rejected')),
+      reviewed_at           TIMESTAMPTZ,
+      reviewer_note         TEXT,
+      grant_id              UUID,
+      created_at            TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at            TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+  await Promise.all([
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsa_req_file  ON ruang_simpan_access_requests(file_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsa_req_owner ON ruang_simpan_access_requests(file_owner_user_id)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsa_req_email ON ruang_simpan_access_requests(requester_email)`),
+    pool.query(`CREATE INDEX IF NOT EXISTS idx_rsa_req_status ON ruang_simpan_access_requests(status)`),
+  ]);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS ruang_simpan_access_grants (
@@ -340,7 +441,7 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
     try {
       let q = `SELECT f.id, f.original_name, f.mime_type, f.size_bytes, f.description,
                       f.tags, f.kb_status, f.kb_chunk_count, f.folder_id, f.kelola_doc_id,
-                      f.created_at, f.updated_at,
+                      f.doc_status, f.allow_biro_jasa, f.created_at, f.updated_at,
                       fo.name AS folder_name, fo.color AS folder_color
                FROM ruang_simpan_files f
                LEFT JOIN ruang_simpan_folders fo ON fo.id = f.folder_id
@@ -417,11 +518,11 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
     const parsed = fileMetaSchema.safeParse(req.body);
     if (!parsed.success) return res.status(422).json({ error: "Data tidak valid", issues: parsed.error.flatten().fieldErrors });
 
-    const { description, tags, folder_id, kelola_doc_id, doc_status } = parsed.data;
+    const { description, tags, folder_id, kelola_doc_id, doc_status, allow_biro_jasa } = parsed.data;
     try {
       // Ownership + optional folder ownership
       const { rows: own } = await pool.query(
-        `SELECT id, doc_status AS old_status FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`, [req.params.id, userId]
+        `SELECT id, doc_status AS old_status, allow_biro_jasa AS old_biro FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`, [req.params.id, userId]
       );
       if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
       if (folder_id) {
@@ -431,30 +532,43 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
         if (!rows.length) return res.status(403).json({ error: "Folder tidak ditemukan" });
       }
 
+      const allowBiroVal = allow_biro_jasa !== undefined ? allow_biro_jasa : null;
       const { rows } = await pool.query(
         `UPDATE ruang_simpan_files SET
-           description    = COALESCE($3, description),
-           tags           = COALESCE($4, tags),
-           folder_id      = $5,
-           kelola_doc_id  = $6,
-           doc_status     = COALESCE($7, doc_status),
-           updated_at     = now()
+           description     = COALESCE($3, description),
+           tags            = COALESCE($4, tags),
+           folder_id       = $5,
+           kelola_doc_id   = $6,
+           doc_status      = COALESCE($7, doc_status),
+           allow_biro_jasa = COALESCE($8, allow_biro_jasa),
+           updated_at      = now()
          WHERE id = $1 AND user_id = $2
          RETURNING id, original_name, mime_type, size_bytes, description, tags,
-                   kb_status, kb_chunk_count, folder_id, kelola_doc_id, doc_status, updated_at`,
+                   kb_status, kb_chunk_count, folder_id, kelola_doc_id, doc_status,
+                   allow_biro_jasa, updated_at`,
         [req.params.id, userId, description ?? null,
          tags ? `{${tags.map(t => `"${t.replace(/"/g, '')}"`).join(",")}}` : null,
-         folder_id ?? null, kelola_doc_id ?? null, doc_status ?? null]
+         folder_id ?? null, kelola_doc_id ?? null, doc_status ?? null, allowBiroVal]
       );
-      // Log status change to access log
+      const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
+      // Log status change
       if (doc_status && doc_status !== own[0].old_status) {
-        const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
         pool.query(
           `INSERT INTO ruang_simpan_access_log
              (file_id, file_owner_user_id, actor_user_id, actor_name, action, meta)
            VALUES ($1,$2,$3,$4,'status_change',$5)`,
           [req.params.id, userId, userId, actorName,
            JSON.stringify({ from: own[0].old_status, to: doc_status })]
+        ).catch(() => {});
+      }
+      // Log biro jasa toggle change
+      if (allow_biro_jasa !== undefined && allow_biro_jasa !== own[0].old_biro) {
+        pool.query(
+          `INSERT INTO ruang_simpan_access_log
+             (file_id, file_owner_user_id, actor_user_id, actor_name, action, meta)
+           VALUES ($1,$2,$3,$4,'biro_jasa_toggle',$5)`,
+          [req.params.id, userId, userId, actorName,
+           JSON.stringify({ enabled: allow_biro_jasa })]
         ).catch(() => {});
       }
       res.json(rows[0]);
@@ -672,7 +786,7 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
       );
       if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
 
-      const [logRes, grantRes] = await Promise.all([
+      const [logRes, grantRes, reqRes] = await Promise.all([
         pool.query(
           `SELECT id, actor_name, action, purpose, meta, created_at
            FROM ruang_simpan_access_log
@@ -688,15 +802,25 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
            ORDER BY created_at DESC LIMIT 20`,
           [req.params.id, userId]
         ),
+        pool.query(
+          `SELECT id, requester_name, requester_email, company_name, purpose,
+                  requested_permissions, status, reviewed_at, reviewer_note, created_at
+           FROM ruang_simpan_access_requests
+           WHERE file_id = $1 AND file_owner_user_id = $2
+           ORDER BY created_at DESC LIMIT 20`,
+          [req.params.id, userId]
+        ),
       ]);
 
       res.json({
         file: own[0],
         access_log: logRes.rows,
         grants: grantRes.rows,
+        access_requests: reqRes.rows,
         stats: {
           total_downloads: logRes.rows.filter(r => r.action === "download").length,
           active_grants: grantRes.rows.filter(r => r.is_active).length,
+          pending_requests: reqRes.rows.filter(r => r.status === "pending").length,
         },
       });
     } catch (e) { safeErr(res, e, "GET files/:id/passport"); }
@@ -799,6 +923,243 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
 
       res.json({ ok: true });
     } catch (e) { safeErr(res, e, "DELETE grants/:grantId"); }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // BIRO JASA — Katalog Dokumen Terbuka & Sistem Permintaan Akses
+  // Alur: Perusahaan toggle allow_biro_jasa=true → Biro Jasa lihat katalog →
+  //       Biro Jasa ajukan permintaan → Perusahaan tinjau → Beri Kuasa Digital
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── GET /api/ruang-simpan/biro-jasa/catalog ──────────────────────────────
+  // Katalog dokumen yang perusahaan izinkan dilihat biro jasa.
+  // Hanya metadata — bukan konten. Biro jasa BELUM bisa akses file, hanya bisa
+  // melihat nama, jenis, dan deskripsi dokumen untuk mengajukan permintaan.
+  app.get("/api/ruang-simpan/biro-jasa/catalog", isAuthenticated, rsSearchLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    try {
+      const search = (req.query.q as string || "").trim().slice(0, 100);
+      let q = `
+        SELECT f.id, f.original_name, f.mime_type, f.size_bytes, f.description,
+               f.doc_status, f.created_at,
+               u.first_name || ' ' || COALESCE(u.last_name,'') AS owner_display,
+               -- Cek apakah user sudah mengajukan permintaan untuk file ini
+               EXISTS(
+                 SELECT 1 FROM ruang_simpan_access_requests r
+                 WHERE r.file_id = f.id AND r.requester_email = (
+                   SELECT email FROM users WHERE id = $1
+                 ) AND r.status = 'pending'
+               ) AS has_pending_request,
+               -- Cek apakah sudah punya kuasa aktif
+               EXISTS(
+                 SELECT 1 FROM ruang_simpan_access_grants g
+                 WHERE g.file_id = f.id AND g.grantee_email = (
+                   SELECT email FROM users WHERE id = $1
+                 ) AND g.is_active = true
+               ) AS has_active_grant
+        FROM ruang_simpan_files f
+        JOIN users u ON u.id = f.user_id
+        WHERE f.allow_biro_jasa = true
+          AND f.doc_status = 'aktif'
+          AND f.user_id <> $1`;
+      const params: any[] = [userId];
+      if (search) {
+        params.push(`%${search}%`);
+        q += ` AND (f.original_name ILIKE ${params.length} OR f.description ILIKE ${params.length})`;
+      }
+      q += ` ORDER BY f.created_at DESC LIMIT 50`;
+      const { rows } = await pool.query(q, params);
+      res.json(rows);
+    } catch (e) { safeErr(res, e, "GET biro-jasa/catalog"); }
+  });
+
+  // ── POST /api/ruang-simpan/files/:id/access-requests ─────────────────────
+  // Biro jasa ajukan permintaan akses ke dokumen yang sudah di-allow.
+  app.post("/api/ruang-simpan/files/:id/access-requests", isAuthenticated, rsWriteLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res)) return;
+
+    const parsed = accessRequestSchema.safeParse(req.body);
+    if (!parsed.success) return res.status(422).json({ error: "Data tidak valid", issues: parsed.error.flatten().fieldErrors });
+
+    try {
+      // File harus exist dan allow_biro_jasa=true
+      const { rows: fileRows } = await pool.query(
+        `SELECT id, user_id, original_name, allow_biro_jasa, doc_status
+         FROM ruang_simpan_files WHERE id = $1`,
+        [req.params.id]
+      );
+      if (!fileRows.length) return res.status(404).json({ error: "Dokumen tidak ditemukan." });
+      const file = fileRows[0];
+      if (!file.allow_biro_jasa) {
+        return res.status(403).json({ error: "Dokumen ini belum diizinkan untuk diakses pihak luar oleh pemiliknya." });
+      }
+      if (file.doc_status !== "aktif") {
+        return res.status(400).json({ error: "Dokumen tidak dalam status aktif." });
+      }
+      if (file.user_id === userId) {
+        return res.status(400).json({ error: "Kamu tidak bisa mengajukan permintaan ke dokumenmu sendiri." });
+      }
+
+      // Cek duplicate pending request
+      const { rows: dup } = await pool.query(
+        `SELECT id FROM ruang_simpan_access_requests
+         WHERE file_id = $1 AND requester_email = $2 AND status = 'pending'`,
+        [req.params.id, parsed.data.requester_email]
+      );
+      if (dup.length) return res.status(409).json({ error: "Kamu sudah memiliki permintaan yang sedang menunggu untuk dokumen ini." });
+
+      const { requester_name, requester_email, company_name, purpose, requested_permissions } = parsed.data;
+      const { rows: [reqRow] } = await pool.query(
+        `INSERT INTO ruang_simpan_access_requests
+           (file_id, file_owner_user_id, requester_name, requester_email,
+            company_name, purpose, requested_permissions)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
+         RETURNING id, status, created_at`,
+        [req.params.id, file.user_id, requester_name, requester_email,
+         company_name, purpose, `{${requested_permissions.join(",")}}`]
+      );
+
+      // Log ke audit trail pemilik
+      pool.query(
+        `INSERT INTO ruang_simpan_access_log
+           (file_id, file_owner_user_id, actor_name, action, purpose, meta)
+         VALUES ($1,$2,$3,'access_requested',$4,$5)`,
+        [req.params.id, file.user_id, `${requester_name} (${company_name})`,
+         purpose, JSON.stringify({ requester_email, company_name, permissions: requested_permissions })]
+      ).catch(() => {});
+
+      res.status(201).json({ ok: true, request_id: reqRow.id });
+    } catch (e) { safeErr(res, e, "POST files/:id/access-requests"); }
+  });
+
+  // ── GET /api/ruang-simpan/files/:id/access-requests ──────────────────────
+  // Pemilik melihat permintaan akses yang masuk untuk file-nya.
+  app.get("/api/ruang-simpan/files/:id/access-requests", isAuthenticated, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res)) return;
+    try {
+      const { rows: own } = await pool.query(
+        `SELECT id FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`,
+        [req.params.id, userId]
+      );
+      if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
+
+      const { rows } = await pool.query(
+        `SELECT id, requester_name, requester_email, company_name, purpose,
+                requested_permissions, status, reviewed_at, reviewer_note, grant_id, created_at
+         FROM ruang_simpan_access_requests
+         WHERE file_id = $1 AND file_owner_user_id = $2
+         ORDER BY status = 'pending' DESC, created_at DESC`,
+        [req.params.id, userId]
+      );
+      res.json(rows);
+    } catch (e) { safeErr(res, e, "GET files/:id/access-requests"); }
+  });
+
+  // ── PATCH /api/ruang-simpan/files/:id/access-requests/:reqId/approve ─────
+  // Pemilik menyetujui permintaan → otomatis buat Kuasa Digital.
+  app.patch("/api/ruang-simpan/files/:id/access-requests/:reqId/approve", isAuthenticated, rsWriteLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res) || !guardUUID(req.params.reqId, res)) return;
+
+    const expiresDays = Number(req.body?.expires_days) || 30;
+    const reviewerNote = (req.body?.note as string || "").slice(0, 300).trim();
+
+    try {
+      // Cek ownership file
+      const { rows: own } = await pool.query(
+        `SELECT id, original_name FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`,
+        [req.params.id, userId]
+      );
+      if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
+
+      // Ambil request yang pending
+      const { rows: reqRows } = await pool.query(
+        `SELECT * FROM ruang_simpan_access_requests
+         WHERE id = $1 AND file_id = $2 AND file_owner_user_id = $3 AND status = 'pending'`,
+        [req.params.reqId, req.params.id, userId]
+      );
+      if (!reqRows.length) return res.status(404).json({ error: "Permintaan tidak ditemukan atau sudah diproses." });
+      const request = reqRows[0];
+
+      const expiresAt = expiresDays > 0
+        ? new Date(Date.now() + expiresDays * 86_400_000)
+        : null;
+
+      // Buat Kuasa Digital otomatis
+      const { rows: [grant] } = await pool.query(
+        `INSERT INTO ruang_simpan_access_grants
+           (file_id, owner_user_id, grantee_name, grantee_email, permissions, purpose, expires_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
+         RETURNING id`,
+        [req.params.id, userId, request.requester_name, request.requester_email,
+         request.requested_permissions, request.purpose, expiresAt]
+      );
+
+      // Update status request → approved
+      await pool.query(
+        `UPDATE ruang_simpan_access_requests SET
+           status='approved', reviewed_at=now(), reviewer_note=$3, grant_id=$4, updated_at=now()
+         WHERE id=$1 AND file_id=$2`,
+        [req.params.reqId, req.params.id, reviewerNote || null, grant.id]
+      );
+
+      // Audit log
+      const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
+      pool.query(
+        `INSERT INTO ruang_simpan_access_log
+           (file_id, file_owner_user_id, actor_user_id, actor_name, action, purpose, grant_id, meta)
+         VALUES ($1,$2,$3,$4,'grant_access',$5,$6,$7)`,
+        [req.params.id, userId, userId, actorName, request.purpose, grant.id,
+         JSON.stringify({ via: "access_request", grantee: request.requester_name,
+           company: request.company_name, permissions: request.requested_permissions })]
+      ).catch(() => {});
+
+      res.json({ ok: true, grant_id: grant.id });
+    } catch (e) { safeErr(res, e, "PATCH access-requests/:reqId/approve"); }
+  });
+
+  // ── PATCH /api/ruang-simpan/files/:id/access-requests/:reqId/reject ──────
+  // Pemilik menolak permintaan.
+  app.patch("/api/ruang-simpan/files/:id/access-requests/:reqId/reject", isAuthenticated, rsWriteLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res) || !guardUUID(req.params.reqId, res)) return;
+
+    const reviewerNote = (req.body?.note as string || "").slice(0, 300).trim();
+    try {
+      const { rows: own } = await pool.query(
+        `SELECT id FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`,
+        [req.params.id, userId]
+      );
+      if (!own.length) return res.status(403).json({ error: "File tidak ditemukan atau akses ditolak" });
+
+      const { rows } = await pool.query(
+        `UPDATE ruang_simpan_access_requests SET
+           status='rejected', reviewed_at=now(), reviewer_note=$3, updated_at=now()
+         WHERE id=$1 AND file_id=$2 AND file_owner_user_id=$4 AND status='pending'
+         RETURNING id, requester_name`,
+        [req.params.reqId, req.params.id, reviewerNote || null, userId]
+      );
+      if (!rows.length) return res.status(404).json({ error: "Permintaan tidak ditemukan atau sudah diproses." });
+
+      // Audit log
+      const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
+      pool.query(
+        `INSERT INTO ruang_simpan_access_log
+           (file_id, file_owner_user_id, actor_user_id, actor_name, action, meta)
+         VALUES ($1,$2,$3,$4,'request_rejected',$5)`,
+        [req.params.id, userId, userId, actorName,
+         JSON.stringify({ requester: rows[0].requester_name, note: reviewerNote })]
+      ).catch(() => {});
+
+      res.json({ ok: true });
+    } catch (e) { safeErr(res, e, "PATCH access-requests/:reqId/reject"); }
   });
 }
 

@@ -20,7 +20,7 @@ import {
   Brain, Eye, Link2, Info, Check, ArrowRight, Zap, Lock,
   DatabaseZap, ScanSearch, BrainCircuit, ClipboardList, Star,
   KeyRound, History, UserCheck, CalendarClock, UserX, ChevronDown, ChevronUp,
-  Activity,
+  Activity, Handshake, Building2, CheckCheck, XCircle, ToggleLeft, ToggleRight,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { RUANG_SIMPAN_PLANS } from "@/data/pricing";
@@ -34,6 +34,13 @@ interface RSFile {
   folder_id?: string; folder_name?: string; folder_color?: string;
   kelola_doc_id?: string; created_at: string; snippet?: string;
   doc_status?: "draft" | "aktif" | "kadaluarsa" | "arsip";
+  allow_biro_jasa?: boolean;
+}
+interface RSAccessRequest {
+  id: string; requester_name: string; requester_email: string;
+  company_name: string; purpose: string; requested_permissions: string[];
+  status: "pending" | "approved" | "rejected";
+  reviewed_at?: string; reviewer_note?: string; grant_id?: string; created_at: string;
 }
 interface RSOverview {
   folders: RSFolder[];
@@ -55,7 +62,8 @@ interface RSPassport {
   file: { id: string; original_name: string; doc_status: string; created_at: string };
   access_log: RSAccessLogEntry[];
   grants: RSGrant[];
-  stats: { total_downloads: number; active_grants: number };
+  access_requests: RSAccessRequest[];
+  stats: { total_downloads: number; active_grants: number; pending_requests: number };
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -135,6 +143,9 @@ function actionLabel(action: string): string {
     revoke_access: "Cabut Kuasa",
     status_change: "Ubah Status",
     upload: "Upload",
+    biro_jasa_toggle: "Toggle Biro Jasa",
+    access_requested: "Permintaan Masuk",
+    request_rejected: "Permintaan Ditolak",
   };
   return map[action] || action;
 }
@@ -474,6 +485,11 @@ function FileCard({ file, onClick, onDelete }: { file: RSFile; onClick: () => vo
         <div className="flex gap-1 flex-wrap">
           {kbBadge(file.kb_status, file.kb_chunk_count)}
           {docStatusBadge(file.doc_status)}
+          {file.allow_biro_jasa && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/40">
+              <Handshake className="h-2.5 w-2.5" /> Biro Jasa
+            </span>
+          )}
           {file.folder_name && (
             <Badge variant="outline" className="text-[10px]">{file.folder_name}</Badge>
           )}
@@ -530,9 +546,11 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
   const [desc, setDesc] = useState(file.description || "");
   const [folderId, setFolderId] = useState(file.folder_id || "");
   const [docStatus, setDocStatus] = useState<string>(file.doc_status || "aktif");
+  const [allowBiroJasa, setAllowBiroJasa] = useState<boolean>(file.allow_biro_jasa ?? false);
   const [saving, setSaving] = useState(false);
   const [showGrant, setShowGrant] = useState(false);
   const [showPassportLog, setShowPassportLog] = useState(false);
+  const [processingReqId, setProcessingReqId] = useState<string | null>(null);
   const isImage = file.mime_type.startsWith("image/");
 
   // Passport (access log + grants)
@@ -555,6 +573,7 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
         description: desc || null,
         folder_id: folderId || null,
         doc_status: docStatus,
+        allow_biro_jasa: allowBiroJasa,
       });
       if (!res.ok) throw new Error("Gagal menyimpan");
       toast({ title: "File diperbarui" });
@@ -562,6 +581,51 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
     } catch {
       toast({ title: "Gagal menyimpan", variant: "destructive" });
     } finally { setSaving(false); }
+  };
+
+  // Toggle biro jasa langsung (tanpa masuk edit mode)
+  const toggleBiroJasa = async (val: boolean) => {
+    setAllowBiroJasa(val);
+    try {
+      const res = await apiRequest("PATCH", `/api/ruang-simpan/files/${file.id}`, {
+        allow_biro_jasa: val,
+      });
+      if (!res.ok) { setAllowBiroJasa(!val); throw new Error(); }
+      toast({ title: val ? "Dokumen sekarang terlihat biro jasa" : "Dokumen disembunyikan dari biro jasa" });
+      onUpdated();
+    } catch {
+      setAllowBiroJasa(!val);
+      toast({ title: "Gagal mengubah pengaturan", variant: "destructive" });
+    }
+  };
+
+  const approveRequest = async (reqId: string, expiresDays = 30) => {
+    setProcessingReqId(reqId);
+    try {
+      const res = await apiRequest("PATCH",
+        `/api/ruang-simpan/files/${file.id}/access-requests/${reqId}/approve`,
+        { expires_days: expiresDays }
+      );
+      if (!res.ok) throw new Error();
+      toast({ title: "Permintaan disetujui — Kuasa Digital otomatis dibuat" });
+      refetchPassport();
+    } catch {
+      toast({ title: "Gagal menyetujui permintaan", variant: "destructive" });
+    } finally { setProcessingReqId(null); }
+  };
+
+  const rejectRequest = async (reqId: string) => {
+    setProcessingReqId(reqId);
+    try {
+      const res = await apiRequest("PATCH",
+        `/api/ruang-simpan/files/${file.id}/access-requests/${reqId}/reject`, {}
+      );
+      if (!res.ok) throw new Error();
+      toast({ title: "Permintaan ditolak" });
+      refetchPassport();
+    } catch {
+      toast({ title: "Gagal menolak permintaan", variant: "destructive" });
+    } finally { setProcessingReqId(null); }
   };
 
   return (
@@ -658,6 +722,40 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
                 )
               )}
 
+              {/* Biro Jasa toggle */}
+              <div className={`rounded-xl border p-3 transition-colors ${
+                allowBiroJasa
+                  ? "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900/40"
+                  : "bg-muted/30 border-border"
+              }`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <Handshake className={`h-3.5 w-3.5 ${allowBiroJasa ? "text-blue-600" : "text-muted-foreground"}`} />
+                      <span className={`text-xs font-bold ${allowBiroJasa ? "text-blue-700 dark:text-blue-400" : "text-foreground"}`}>
+                        Izinkan Biro Jasa Melihat Dokumen Ini
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      {allowBiroJasa
+                        ? "Dokumen ini muncul di katalog biro jasa. Mereka hanya bisa melihat nama & deskripsi, dan harus mengajukan permintaan — kamu yang memutuskan apakah memberi akses."
+                        : "Aktifkan agar biro jasa bisa menemukan dokumen ini dan mengajukan permintaan akses. Persetujuan tetap di tangan kamu."}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => toggleBiroJasa(!allowBiroJasa)}
+                    className={`shrink-0 w-10 h-5 rounded-full transition-colors relative ${
+                      allowBiroJasa ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-600"
+                    }`}
+                    title={allowBiroJasa ? "Matikan akses biro jasa" : "Aktifkan akses biro jasa"}
+                  >
+                    <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                      allowBiroJasa ? "translate-x-5" : "translate-x-0.5"
+                    }`} />
+                  </button>
+                </div>
+              </div>
+
               {/* AI context info */}
               {file.kb_status === "ready" && (
                 <div className="bg-violet-50 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30 rounded-xl p-3">
@@ -682,21 +780,32 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
               ) : passport ? (
                 <>
                   {/* Stats */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-indigo-50 dark:bg-indigo-950/20 rounded-xl p-3 text-center border border-indigo-100 dark:border-indigo-900/30">
-                      <Download className="h-4 w-4 text-indigo-500 mx-auto mb-1" />
-                      <p className="text-lg font-black text-indigo-700 dark:text-indigo-400">{passport.stats.total_downloads}</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="bg-indigo-50 dark:bg-indigo-950/20 rounded-xl p-2.5 text-center border border-indigo-100 dark:border-indigo-900/30">
+                      <Download className="h-3.5 w-3.5 text-indigo-500 mx-auto mb-1" />
+                      <p className="text-base font-black text-indigo-700 dark:text-indigo-400">{passport.stats.total_downloads}</p>
                       <p className="text-[10px] text-muted-foreground">Download</p>
                     </div>
-                    <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-3 text-center border border-emerald-100 dark:border-emerald-900/30">
-                      <KeyRound className="h-4 w-4 text-emerald-500 mx-auto mb-1" />
-                      <p className="text-lg font-black text-emerald-700 dark:text-emerald-400">{passport.stats.active_grants}</p>
+                    <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-2.5 text-center border border-emerald-100 dark:border-emerald-900/30">
+                      <KeyRound className="h-3.5 w-3.5 text-emerald-500 mx-auto mb-1" />
+                      <p className="text-base font-black text-emerald-700 dark:text-emerald-400">{passport.stats.active_grants}</p>
                       <p className="text-[10px] text-muted-foreground">Kuasa Aktif</p>
                     </div>
-                    <div className="bg-gray-50 dark:bg-gray-900/20 rounded-xl p-3 text-center border border-gray-100 dark:border-gray-800/30">
-                      <Activity className="h-4 w-4 text-gray-500 mx-auto mb-1" />
-                      <p className="text-lg font-black text-foreground">{passport.access_log.length}</p>
-                      <p className="text-[10px] text-muted-foreground">Log Aktivitas</p>
+                    <div className={`rounded-xl p-2.5 text-center border ${
+                      passport.stats.pending_requests > 0
+                        ? "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40"
+                        : "bg-gray-50 dark:bg-gray-900/20 border-gray-100 dark:border-gray-800/30"
+                    }`}>
+                      <Handshake className={`h-3.5 w-3.5 mx-auto mb-1 ${passport.stats.pending_requests > 0 ? "text-amber-500" : "text-gray-400"}`} />
+                      <p className={`text-base font-black ${passport.stats.pending_requests > 0 ? "text-amber-700 dark:text-amber-400" : "text-foreground"}`}>
+                        {passport.stats.pending_requests}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">Menunggu</p>
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-900/20 rounded-xl p-2.5 text-center border border-gray-100 dark:border-gray-800/30">
+                      <Activity className="h-3.5 w-3.5 text-gray-500 mx-auto mb-1" />
+                      <p className="text-base font-black text-foreground">{passport.access_log.length}</p>
+                      <p className="text-[10px] text-muted-foreground">Aktivitas</p>
                     </div>
                   </div>
 
@@ -759,6 +868,81 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
                       <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1.5">
                         <UserX className="h-3 w-3" /> {passport.grants.filter(g => !g.is_active).length} kuasa sudah dicabut
                       </p>
+                    </div>
+                  )}
+
+                  {/* Permintaan Akses Biro Jasa */}
+                  {passport.access_requests && passport.access_requests.length > 0 && (
+                    <div>
+                      <p className="text-xs font-bold text-foreground flex items-center gap-1.5 mb-2">
+                        <Handshake className="h-3.5 w-3.5 text-blue-500" />
+                        Permintaan Akses Biro Jasa
+                        {passport.stats.pending_requests > 0 && (
+                          <span className="ml-1 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold">
+                            {passport.stats.pending_requests} menunggu
+                          </span>
+                        )}
+                      </p>
+                      <div className="space-y-2">
+                        {passport.access_requests.map(r => (
+                          <div key={r.id} className={`rounded-xl border p-3 ${
+                            r.status === "pending"
+                              ? "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/40"
+                              : r.status === "approved"
+                              ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40"
+                              : "bg-muted/30 border-border opacity-70"
+                          }`}>
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                  <Building2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                                  <span className="text-sm font-semibold truncate">{r.requester_name}</span>
+                                  <span className="text-[10px] text-muted-foreground shrink-0">({r.company_name})</span>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground mb-1">📧 {r.requester_email}</p>
+                                <p className="text-xs text-muted-foreground truncate">Tujuan: {r.purpose}</p>
+                                <div className="flex items-center gap-2 mt-1.5">
+                                  <div className="flex gap-1">
+                                    {r.requested_permissions.map(p => (
+                                      <span key={p} className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{p === "view" ? "Lihat" : "Download"}</span>
+                                    ))}
+                                  </div>
+                                  <span className="text-[10px] text-muted-foreground ml-auto">{formatDate(r.created_at)}</span>
+                                </div>
+                              </div>
+                              {r.status === "pending" && (
+                                <div className="flex flex-col gap-1.5 shrink-0">
+                                  <button
+                                    onClick={() => approveRequest(r.id, 30)}
+                                    disabled={processingReqId === r.id}
+                                    className="flex items-center gap-1 text-[11px] font-semibold text-white bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 px-2.5 py-1 rounded-lg transition-colors"
+                                  >
+                                    {processingReqId === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCheck className="h-3 w-3" />}
+                                    Setuju
+                                  </button>
+                                  <button
+                                    onClick={() => rejectRequest(r.id)}
+                                    disabled={processingReqId === r.id}
+                                    className="flex items-center gap-1 text-[11px] font-semibold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 dark:bg-red-950/30 disabled:opacity-50 px-2.5 py-1 rounded-lg transition-colors"
+                                  >
+                                    <XCircle className="h-3 w-3" />
+                                    Tolak
+                                  </button>
+                                </div>
+                              )}
+                              {r.status !== "pending" && (
+                                <span className={`text-[10px] font-bold px-2 py-1 rounded-lg shrink-0 ${
+                                  r.status === "approved"
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-gray-100 text-gray-500"
+                                }`}>
+                                  {r.status === "approved" ? "✓ Disetujui" : "✗ Ditolak"}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
 
