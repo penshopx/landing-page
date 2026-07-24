@@ -214,6 +214,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
       color: p.color || "#6366f1",
       price,
       isGustafta: p.isGustafta ?? false,
+      paymentUrl: (p as any).paymentUrl || null,
       type: "product",
     };
   });
@@ -6752,7 +6753,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         price: calcPrice,
         originalPrice: calcOriginal,
         isGustafta: p.isGustafta ?? false,
-        paymentUrl: p.agentId ? (linkedPaymentUrlMap.get(p.agentId) || null) : null,
+        paymentUrl: (p as any).paymentUrl || (p.agentId ? (linkedPaymentUrlMap.get(p.agentId) || null) : null),
         type: "product",
       });
 

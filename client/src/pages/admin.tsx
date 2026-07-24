@@ -322,7 +322,9 @@ export default function AdminPage() {
   // Store tab state
   const [manualForm, setManualForm] = useState({ name: "", email: "", phone: "", agentId: "" });
   const [manualResult, setManualResult] = useState<{ accessUrl: string; agentName: string } | null>(null);
-  const [productForm, setProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖" });
+  const [productForm, setProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", paymentUrl: "" });
+  const [editPaymentUrlId, setEditPaymentUrlId] = useState<number | null>(null);
+  const [editPaymentUrlValue, setEditPaymentUrlValue] = useState("");
   const [showProductForm, setShowProductForm] = useState(false);
 
   // ---- Queries ----
@@ -381,6 +383,7 @@ export default function AdminPage() {
     emoji: string;
     isActive: boolean;
     sortOrder: number;
+    paymentUrl: string;
   }
 
   const { data: modulSubs = [], isLoading: modulSubsLoading, refetch: refetchModulSubs } = useQuery<ModulSub[]>({
@@ -615,7 +618,7 @@ export default function AdminPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/store/admin/products"] });
       queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
-      setProductForm({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖" });
+      setProductForm({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", paymentUrl: "" });
       setShowProductForm(false);
       toast({ title: "Produk berhasil ditambahkan!" });
     },
@@ -657,6 +660,18 @@ export default function AdminPage() {
       toast({ title: "Status produk diperbarui." });
     },
     onError: () => toast({ title: "Gagal ubah status produk.", variant: "destructive" }),
+  });
+
+  const updatePaymentUrlMutation = useMutation({
+    mutationFn: ({ id, paymentUrl }: { id: number; paymentUrl: string }) =>
+      apiRequest("PATCH", `/api/store/admin/products/${id}`, { paymentUrl }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/store/admin/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
+      setEditPaymentUrlId(null);
+      toast({ title: "Link pembayaran disimpan." });
+    },
+    onError: () => toast({ title: "Gagal simpan link pembayaran.", variant: "destructive" }),
   });
 
   const seedLexComMutation = useMutation({
@@ -1556,6 +1571,12 @@ export default function AdminPage() {
                             placeholder="🤖" data-testid="input-product-emoji" />
                         </div>
                         <div className="sm:col-span-2">
+                          <label className="text-xs font-medium mb-1 block text-muted-foreground">Link Pembayaran Scalev</label>
+                          <Input value={productForm.paymentUrl} onChange={(e) => setProductForm(f => ({ ...f, paymentUrl: e.target.value }))}
+                            placeholder="https://bayar.gustafta.my.id/p/nama-slug-produk" data-testid="input-product-payment-url" />
+                          <p className="text-xs text-muted-foreground mt-1">Wajib diisi jika produk tidak terhubung ke Agent ID manapun</p>
+                        </div>
+                        <div className="sm:col-span-2">
                           <label className="text-xs font-medium mb-1 block text-muted-foreground">Deskripsi</label>
                           <Textarea value={productForm.description} onChange={(e) => setProductForm(f => ({ ...f, description: e.target.value }))}
                             placeholder="Deskripsi singkat produk..." rows={2} data-testid="input-product-description" />
@@ -1571,6 +1592,7 @@ export default function AdminPage() {
                           price: Number(productForm.price),
                           agentId: productForm.agentId ? Number(productForm.agentId) : null,
                           emoji: productForm.emoji || "🤖",
+                          paymentUrl: productForm.paymentUrl || "",
                           isActive: true,
                         })}
                         data-testid="button-save-product">
@@ -1590,30 +1612,66 @@ export default function AdminPage() {
                   ) : (
                     <div className="space-y-2">
                       {storeProducts.map((p) => (
-                        <div key={p.id} className="border rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap"
+                        <div key={p.id} className="border rounded-lg p-3 space-y-2"
                           data-testid={`row-product-${p.id}`}>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-xl flex-shrink-0">{p.emoji}</span>
-                            <div className="min-w-0">
-                              <p className="font-medium text-sm truncate">{p.name}</p>
-                              <p className="text-xs text-muted-foreground">{p.category} · Rp {p.price.toLocaleString("id-ID")}
-                                {p.agentId ? ` · Agent #${p.agentId}` : ""}
-                              </p>
+                          <div className="flex items-center justify-between gap-3 flex-wrap">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-xl flex-shrink-0">{p.emoji}</span>
+                              <div className="min-w-0">
+                                <p className="font-medium text-sm truncate">{p.name}</p>
+                                <p className="text-xs text-muted-foreground">{p.category} · Rp {p.price.toLocaleString("id-ID")}
+                                  {p.agentId ? ` · Agent #${p.agentId}` : ""}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <button
+                                onClick={() => toggleProductMutation.mutate({ id: p.id, isActive: !p.isActive })}
+                                className={`text-xs px-2 py-0.5 rounded-full font-medium transition-colors cursor-pointer ${p.isActive ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300" : "bg-muted text-muted-foreground"}`}
+                                data-testid={`button-toggle-product-${p.id}`}>
+                                {p.isActive ? "Aktif" : "Nonaktif"}
+                              </button>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                onClick={() => { if (confirm(`Hapus produk "${p.name}"?`)) deleteProductMutation.mutate(p.id); }}
+                                data-testid={`button-delete-product-${p.id}`}>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 flex-shrink-0">
-                            <button
-                              onClick={() => toggleProductMutation.mutate({ id: p.id, isActive: !p.isActive })}
-                              className={`text-xs px-2 py-0.5 rounded-full font-medium transition-colors cursor-pointer ${p.isActive ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300" : "bg-muted text-muted-foreground"}`}
-                              data-testid={`button-toggle-product-${p.id}`}>
-                              {p.isActive ? "Aktif" : "Nonaktif"}
-                            </button>
-                            <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                              onClick={() => { if (confirm(`Hapus produk "${p.name}"?`)) deleteProductMutation.mutate(p.id); }}
-                              data-testid={`button-delete-product-${p.id}`}>
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </Button>
-                          </div>
+                          {/* Inline edit link pembayaran */}
+                          {editPaymentUrlId === p.id ? (
+                            <div className="flex gap-2 items-center">
+                              <Input
+                                className="h-7 text-xs flex-1"
+                                value={editPaymentUrlValue}
+                                onChange={(e) => setEditPaymentUrlValue(e.target.value)}
+                                placeholder="https://bayar.gustafta.my.id/p/slug-produk"
+                                autoFocus
+                              />
+                              <Button size="sm" className="h-7 px-2 text-xs bg-violet-600 hover:bg-violet-700 text-white"
+                                disabled={updatePaymentUrlMutation.isPending}
+                                onClick={() => updatePaymentUrlMutation.mutate({ id: p.id, paymentUrl: editPaymentUrlValue })}>
+                                Simpan
+                              </Button>
+                              <Button size="sm" variant="ghost" className="h-7 px-2 text-xs"
+                                onClick={() => setEditPaymentUrlId(null)}>Batal</Button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              {p.paymentUrl ? (
+                                <a href={p.paymentUrl} target="_blank" rel="noopener noreferrer"
+                                  className="text-xs text-violet-500 hover:underline truncate max-w-xs">
+                                  {p.paymentUrl}
+                                </a>
+                              ) : (
+                                <span className="text-xs text-amber-500 italic">⚠ Belum ada link bayar</span>
+                              )}
+                              <Button size="sm" variant="ghost" className="h-5 px-1.5 text-xs text-muted-foreground"
+                                onClick={() => { setEditPaymentUrlId(p.id); setEditPaymentUrlValue(p.paymentUrl || ""); }}>
+                                Edit Link
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -2156,6 +2156,7 @@ export const storeProducts = pgTable("store_products", {
   isActive: boolean("is_active").default(true),
   isGustafta: boolean("is_gustafta").default(false),
   sortOrder: integer("sort_order").default(0),
+  paymentUrl: text("payment_url").default(""),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   // Store catalog builder filters active products by category.
