@@ -5,6 +5,7 @@ import { PremiumPageGuard } from "@/components/premium-page-guard";
 import { useAuth } from "@/hooks/use-auth";
 import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { apiRequest } from "@/lib/queryClient";
+import { useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -841,8 +842,14 @@ function BedahDokumenContent() {
   const isPremium = hasFeature("ai_tools");
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const searchString = useSearch();
 
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(() => {
+    // Auto-select from ?doc=ID query param (dari Ruang Simpan)
+    const params = new URLSearchParams(searchString);
+    const docParam = params.get("doc");
+    return docParam ? parseInt(docParam) : null;
+  });
   const [ktkModal, setKtkModal] = useState(false);
 
   const { data: docs = [], isLoading } = useQuery<DocAnalysis[]>({

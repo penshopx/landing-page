@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import {
   HardDrive, Upload, Search, FolderOpen, File, FileText, Image,
   FileSpreadsheet, Loader2, Trash2, Download, Pencil, Plus, LogIn,
@@ -156,7 +156,6 @@ export default function RuangSimpanPage() {
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
-
   const [activeFolder, setActiveFolder] = useState<string>("all");
   const [search, setSearch] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -541,6 +540,7 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
 }) {
   const { toast } = useToast();
   const qc = useQueryClient();
+  const [, navigate] = useLocation();
   const [tab, setTab] = useState<"info" | "paspor">("info");
   const [editing, setEditing] = useState(false);
   const [desc, setDesc] = useState(file.description || "");
@@ -551,7 +551,24 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
   const [showGrant, setShowGrant] = useState(false);
   const [showPassportLog, setShowPassportLog] = useState(false);
   const [processingReqId, setProcessingReqId] = useState<string | null>(null);
+  const [bedahLoading, setBedahLoading] = useState(false);
   const isImage = file.mime_type.startsWith("image/");
+
+  // Buka file RS di Bedah Dokumen
+  const openInBedahDokumen = async () => {
+    setBedahLoading(true);
+    try {
+      const res = await fetch(`/api/bedah-dokumen/from-rs/${file.id}`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal membuka file");
+      onClose();
+      navigate(`/bedah-dokumen?doc=${data.id}`);
+    } catch (err: any) {
+      toast({ title: "Gagal", description: err.message, variant: "destructive" });
+    } finally {
+      setBedahLoading(false);
+    }
+  };
 
   // Passport (access log + grants)
   const { data: passport, isLoading: passportLoading, refetch: refetchPassport } = useQuery<RSPassport>({
@@ -756,15 +773,26 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
                 </div>
               </div>
 
-              {/* AI context info */}
+              {/* AI context info + Bedah AI button */}
               {file.kb_status === "ready" && (
-                <div className="bg-violet-50 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30 rounded-xl p-3">
-                  <div className="flex items-center gap-1.5 mb-1">
+                <div className="bg-violet-50 dark:bg-violet-950/20 border border-violet-100 dark:border-violet-900/30 rounded-xl p-3 space-y-2.5">
+                  <div className="flex items-center gap-1.5">
                     <Brain className="h-3.5 w-3.5 text-violet-600" />
-                    <span className="text-xs font-bold text-violet-700 dark:text-violet-400">Cara Gunakan di AI</span>
+                    <span className="text-xs font-bold text-violet-700 dark:text-violet-400">Gunakan di AI</span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Pergi ke <strong>Bedah Dokumen</strong> → pilih "Dari Ruang Simpan". Atau buka <strong>Klinik Konsultasi</strong> → tanya pertanyaan — AI otomatis mencari konteks dari dokumen ini.
+                  <Button
+                    size="sm"
+                    className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white text-xs h-8"
+                    onClick={() => openInBedahDokumen()}
+                    disabled={bedahLoading}
+                  >
+                    {bedahLoading
+                      ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Membuka…</>
+                      : <><ScanSearch className="h-3.5 w-3.5" /> Bedah &amp; Tanya AI</>
+                    }
+                  </Button>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    Atau chat dengan AI manapun — dokumen ini otomatis jadi konteks saat kamu menanyakan hal yang relevan.
                   </p>
                 </div>
               )}

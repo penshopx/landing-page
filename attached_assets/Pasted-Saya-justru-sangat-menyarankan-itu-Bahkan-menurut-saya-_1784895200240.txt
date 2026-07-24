@@ -1,0 +1,388 @@
+Saya justru **sangat menyarankan itu**. Bahkan menurut saya, ini lebih tepat daripada membuat satu landing page yang mencoba menjual semua hal sekaligus.
+
+Tetapi saya akan melangkah **satu tingkat lebih jauh**.
+
+## Jangan membagi berdasarkan produk.
+
+**Bagilah berdasarkan pekerjaan (Job To Be Done).**
+
+Ini adalah pendekatan yang dipakai banyak perusahaan B2B SaaS global seperti HubSpot, Salesforce, Notion, hingga Atlassian. Mereka tidak hanya berkata "ini fitur kami", tetapi "ini solusi untuk tim Sales", "ini solusi untuk HR", "ini solusi untuk Customer Support".
+
+---
+
+# Saya membayangkan Gustafta seperti ini
+
+Homepage bukan untuk menjual semua chatbot.
+
+Homepage hanya menjawab satu pertanyaan:
+
+> **"Apa pekerjaan Anda?"**
+
+Kemudian pengguna memilih.
+
+```
+Saya adalah...
+
+□ Kontraktor
+□ Konsultan
+□ Biro Jasa
+□ Developer
+□ Owner Proyek
+□ Tim Tender
+□ Tim QS / Estimator
+□ Tim HSE
+□ Tim Legal
+□ Tim Keuangan
+```
+
+Setelah memilih...
+
+masuk ke landing page yang berbeda.
+
+---
+
+# Misalnya
+
+## Landing Page 1
+
+# Untuk Kontraktor
+
+Headline
+
+> **Menangkan Tender Lebih Cepat dengan Tim AI Specialist Konstruksi.**
+
+Isi halaman hanya membahas masalah kontraktor.
+
+Pain Point
+
+* Tender
+* SBU
+* SKK
+* Dokumen proyek
+* Kontrak
+* Pengalaman proyek
+* Sertifikasi
+
+AI yang ditampilkan
+
+* TenderClaw
+* SBUClaw
+* SKKClaw
+* KontrakClaw
+* RABClaw
+
+Tidak perlu menampilkan AI Pajak atau AI Marketing.
+
+---
+
+## Landing Page 2
+
+# Untuk Biro Jasa
+
+Headline
+
+> **Layani Lebih Banyak Klien Tanpa Menambah Banyak Staf.**
+
+Pain Point
+
+* Banyak konsultasi berulang
+* Banyak revisi dokumen
+* Klien bertanya hal yang sama
+* Waktu habis menjawab WhatsApp
+
+AI
+
+* SBUClaw
+* SKKClaw
+* OSSClaw
+* LPJKClaw
+* TenderClaw
+
+---
+
+## Landing Page 3
+
+# Untuk Konsultan ISO
+
+Headline
+
+> **Percepat Penyusunan Dokumen ISO dengan AI Specialist.**
+
+AI
+
+ISOClaw
+
+SMK3Claw
+
+DokumenClaw
+
+AuditClaw
+
+---
+
+## Landing Page 4
+
+# Untuk Tim Tender
+
+Headline
+
+> **Jangan Kehilangan Proyek Karena Kesalahan Administrasi.**
+
+AI
+
+TenderClaw
+
+LegalClaw
+
+KontrakClaw
+
+Bedah Dokumen (nanti)
+
+---
+
+# Saya malah melihat peluang lebih besar.
+
+Landing page jangan berdasarkan industri saja.
+
+Tetapi berdasarkan
+
+## Persona.
+
+Misalnya
+
+Kontraktor
+
+↓
+
+Direktur
+
+Project Manager
+
+Admin Tender
+
+Engineering
+
+Estimator
+
+HR
+
+Keuangan
+
+Masing-masing punya masalah yang berbeda.
+
+---
+
+# Contoh
+
+## Direktur
+
+Tidak peduli AI.
+
+Yang dia pedulikan
+
+> proyek menang
+
+> perusahaan tidak bergantung satu orang
+
+---
+
+## Admin Tender
+
+Pedulinya
+
+dokumen cepat dicari
+
+---
+
+## QS
+
+Pedulinya
+
+RAB
+
+AHSP
+
+BoQ
+
+---
+
+## Legal
+
+Pedulinya
+
+kontrak
+
+---
+
+Jadi copywriting-nya juga berbeda.
+
+---
+
+# Saya bahkan tidak akan membuat menu
+
+"Produk"
+
+Saya akan membuat menu
+
+```
+Solusi
+
+Untuk Kontraktor
+
+Untuk Konsultan
+
+Untuk Biro Jasa
+
+Untuk Developer
+
+Untuk Owner Proyek
+
+Untuk Pemerintah
+```
+
+Klik
+
+baru muncul AI Specialist yang relevan.
+
+---
+
+# Ini disebut "Solution Selling"
+
+Bukan
+
+Feature Selling.
+
+---
+
+# Saya juga melihat peluang SEO yang luar biasa.
+
+Misalnya nanti Anda punya:
+
+```
+/kontraktor
+
+/konsultan
+
+/biro-jasa
+
+/iso
+
+/tender
+
+/skk
+
+/sbu
+
+/smk3
+
+/legal
+
+/rab
+
+/pajak
+
+/hr
+```
+
+Setiap halaman memiliki copywriting yang berbeda.
+
+Google sangat menyukai model seperti ini.
+
+---
+
+# Yang menurut saya paling menarik
+
+Saya justru tidak akan menonjolkan
+
+> Ada 50 AI Specialist.
+
+Saya akan mengatakan
+
+> **Gustafta akan merekomendasikan AI Specialist sesuai pekerjaan Anda.**
+
+Misalnya pengguna mengisi formulir singkat:
+
+```
+Jenis perusahaan?
+
+□ Kontraktor
+
+□ Konsultan
+
+□ Developer
+
+□ Biro Jasa
+```
+
+Kemudian
+
+otomatis muncul
+
+```
+Rekomendasi untuk Anda
+
+✓ TenderClaw
+
+✓ SBUClaw
+
+✓ SKKClaw
+
+✓ KontrakClaw
+
+✓ RABClaw
+```
+
+Orang tidak perlu berpikir.
+
+---
+
+# Kalau saya menjadi CMO Gustafta...
+
+Saya akan membuat arsitektur website seperti ini.
+
+```
+Homepage
+│
+├── Solusi
+│   ├── Untuk Kontraktor
+│   ├── Untuk Konsultan
+│   ├── Untuk Biro Jasa
+│   ├── Untuk Developer
+│   ├── Untuk Owner Proyek
+│   └── Untuk Pemerintah
+│
+├── AI Specialist
+│   ├── TenderClaw
+│   ├── SBUClaw
+│   ├── SKKClaw
+│   ├── ISOClaw
+│   ├── LegalClaw
+│   ├── TaxClaw
+│   └── ...
+│
+├── Paket Berlangganan
+│   ├── Essential
+│   ├── Team
+│   ├── Office
+│   └── Enterprise
+│
+├── Studi Kasus
+│
+├── Blog & Insight
+│
+└── Demo
+```
+
+## Ada satu strategi lagi yang menurut saya akan sangat efektif untuk kondisi Gustafta saat ini.
+
+**Jangan membangun 10 landing page sekaligus. Bangun bertahap berdasarkan nilai komersialnya.**
+
+Saya akan memprioritaskan seperti ini:
+
+1. **Kontraktor** (pasar terbesar dan paling sesuai dengan positioning Anda).
+2. **Biro Jasa Perizinan & Sertifikasi** (mereka melayani banyak klien sehingga potensi langganan tinggi).
+3. **Konsultan ISO/SMK3** (memiliki proses yang berulang dan cocok dibantu AI).
+4. **Developer & Owner Proyek** (setelah produk lebih matang).
+5. **Segmen lain** sesuai permintaan pasar.
+
+Dengan cara ini, Anda tidak hanya menghemat waktu membuat konten dan landing page, tetapi juga bisa menguji pesan pemasaran satu segmen dulu, menyempurnakannya berdasarkan data, lalu menduplikasinya ke segmen lain. Pendekatan ini jauh lebih efisien untuk tim yang masih kecil dan produk yang masih berkembang.
