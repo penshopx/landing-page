@@ -91,24 +91,6 @@ export function CreateAgentDialog({ open, onOpenChange, forceOrchestrator, onCre
         if (raw) {
           const parsed = JSON.parse(raw);
           setSavedBlueprint(parsed);
-          // Auto-import when coming from blueprint-saya import button
-          const autoFlag = localStorage.getItem("gustafta_blueprint_auto_import_dialog");
-          if (autoFlag === "1") {
-            localStorage.removeItem("gustafta_blueprint_auto_import_dialog");
-            // Trigger import after state settles
-            setTimeout(() => {
-              setIsOrchestrator(false);
-              setFormData({
-                name: parsed.namaAI,
-                tagline: parsed.domain,
-                description: `${parsed.persona}\n\nSasaran pengguna: ${parsed.sasaranPengguna}`,
-                category: "",
-                subcategory: "",
-                systemPrompt: parsed.systemPromptHint,
-              });
-              setStep("details");
-            }, 50);
-          }
         }
       } catch { setSavedBlueprint(null); }
     }

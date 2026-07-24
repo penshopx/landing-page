@@ -352,20 +352,6 @@ export default function Dashboard() {
   const [activeNav, setActiveNav] = useState<NavItem>("persona");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [createAsOrchestrator, setCreateAsOrchestrator] = useState(false);
-
-  // Auto-open create dialog when coming from Blueprint import
-  useEffect(() => {
-    try {
-      const flag = localStorage.getItem("gustafta_blueprint_auto_import");
-      if (flag === "1") {
-        localStorage.removeItem("gustafta_blueprint_auto_import");
-        // Tell the dialog to auto-trigger blueprint import on open
-        localStorage.setItem("gustafta_blueprint_auto_import_dialog", "1");
-        // Small delay so the dashboard is fully rendered before opening
-        setTimeout(() => setCreateDialogOpen(true), 400);
-      }
-    } catch { /* ignore */ }
-  }, []);
   const [hubDialogOpen, setHubDialogOpen] = useState(false);
   const [hubName, setHubName] = useState("");
   const [hubDescription, setHubDescription] = useState("");

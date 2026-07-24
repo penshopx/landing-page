@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { trackLead } from "@/lib/meta-pixel";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import {
   Sparkles, Lock, Unlock, ShoppingBag, Wrench, MessageCircle,
   Check, Trash2, ArrowRight, Bot, FileDown, RefreshCw, BookOpen,
-  ChevronRight, CreditCard,
+  ChevronRight, CreditCard, Loader2,
 } from "lucide-react";
 
 const BLUEPRINT_STORAGE_KEY = "gustafta_blueprint_pending";
@@ -35,11 +37,18 @@ function formatDate(iso?: string) {
 
 export default function BlueprintSayaPage() {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const { data: adminMe } = useQuery<{ isAdmin: boolean; isSuperAdmin: boolean }>({
     queryKey: ["/api/admin/me"],
     retry: 1,
   });
   const isAdmin = adminMe?.isAdmin === true || adminMe?.isSuperAdmin === true;
+
+  // Ambil active toolbox — diperlukan saat buat agent
+  const { data: activeToolbox } = useQuery<{ id: number | string; name: string } | null>({
+    queryKey: ["/api/toolboxes/active"],
+    enabled: isAuthenticated,
+  });
 
   const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -56,6 +65,93 @@ export default function BlueprintSayaPage() {
     setBlueprint(null);
     setShowDeleteConfirm(false);
   };
+
+  // Mutasi: buat agent langsung dari blueprint → redirect ke halaman konfigurasi
+  const importMutation = useMutation({
+    mutationFn: async (bp: Blueprint) => {
+      // Cek active toolbox terlebih dahulu
+      let toolboxId: string | undefined = activeToolbox?.id ? String(activeToolbox.id) : undefined;
+
+      // Jika belum ada active toolbox, ambil toolbox pertama yang tersedia
+      if (!toolboxId) {
+        const tbData: any[] = await apiRequest("GET", "/api/toolboxes");
+        const first = Array.isArray(tbData) ? tbData[0] : null;
+        toolboxId = first?.id ? String(first.id) : undefined;
+      }
+
+      if (!toolboxId) {
+        throw Object.assign(new Error("Belum ada Chatbot aktif."), { code: "MODULE_NO_TOOLBOX" });
+      }
+
+      // Pakai fetch langsung agar bisa baca JSON error body secara detail
+      const res = await fetch("/api/agents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          name: bp.namaAI,
+          tagline: bp.domain,
+          description: `${bp.persona}\n\nSasaran pengguna: ${bp.sasaranPengguna}`,
+          systemPrompt: bp.systemPromptHint,
+          toolboxId,
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw Object.assign(new Error(data.message || data.error || "Gagal membuat agent"), data);
+      }
+
+      return data;
+    },
+    onSuccess: (agent: { id: number | string }) => {
+      // Tandai blueprint sebagai sudah diimport
+      try {
+        const raw = localStorage.getItem(BLUEPRINT_STORAGE_KEY);
+        if (raw) {
+          const bp = JSON.parse(raw);
+          localStorage.setItem(BLUEPRINT_STORAGE_KEY, JSON.stringify({ ...bp, status: "imported" }));
+          setBlueprint(prev => prev ? { ...prev, status: "imported" } : prev);
+        }
+      } catch { /* ignore */ }
+
+      toast({
+        title: "✅ Agent Berhasil Dibuat!",
+        description: "Mengarahkan ke halaman konfigurasi AI…",
+      });
+
+      // Redirect langsung ke dashboard → deep-link ke agent yang baru dibuat
+      setTimeout(() => {
+        window.location.href = `/dashboard?agent=${agent.id}`;
+      }, 600);
+    },
+    onError: (err: any) => {
+      if (err.message === "NO_TOOLBOX" || err.code === "MODULE_NO_TOOLBOX") {
+        toast({
+          title: "Pilih Chatbot Dulu",
+          description: "Buka Builder dan aktifkan Chatbot sebelum mengimport Blueprint.",
+          variant: "destructive",
+        });
+        setTimeout(() => { window.location.href = "/dashboard"; }, 1500);
+        return;
+      }
+      if (err.code === "NO_SUBSCRIPTION" || err.reason === "dialog_required") {
+        toast({
+          title: "Langganan Diperlukan",
+          description: "Aktifkan paket untuk mulai merakit AI Anda.",
+          variant: "destructive",
+        });
+        setTimeout(() => { window.location.href = "/pricing"; }, 1500);
+        return;
+      }
+      toast({
+        title: "Gagal Import Blueprint",
+        description: err.message || "Terjadi kesalahan. Silakan coba lagi.",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Admin/superadmin selalu bisa lihat Blueprint penuh tanpa perlu beli paket
   const isUnlocked = blueprint?.status === "unlocked" || isAdmin;
@@ -174,17 +270,33 @@ export default function BlueprintSayaPage() {
                     </div>
                   </Section>
                 </div>
-                <div className="px-5 pb-5">
+                <div className="px-5 pb-5 space-y-2">
                   {isAuthenticated ? (
-                    <button
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-11 font-bold gap-2 rounded-md flex items-center justify-center transition-colors"
-                      onClick={() => {
-                        try { localStorage.setItem("gustafta_blueprint_auto_import", "1"); } catch { /* ignore */ }
-                        window.location.href = "/dashboard";
-                      }}
-                    >
-                      <FileDown className="h-4 w-4 mr-2" /> Import ke Gustafta Builder
-                    </button>
+                    blueprint?.status === "imported" ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
+                          <Check className="h-4 w-4 text-green-600 shrink-0" />
+                          <p className="text-sm text-green-700 dark:text-green-400 font-medium">Blueprint sudah diimport ke Builder</p>
+                        </div>
+                        <Link href="/dashboard">
+                          <Button variant="outline" className="w-full gap-2">
+                            <Wrench className="h-4 w-4" /> Buka Builder
+                          </Button>
+                        </Link>
+                      </div>
+                    ) : (
+                      <button
+                        disabled={importMutation.isPending}
+                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:opacity-60 text-white h-11 font-bold rounded-md flex items-center justify-center gap-2 transition-colors"
+                        onClick={() => blueprint && importMutation.mutate(blueprint)}
+                      >
+                        {importMutation.isPending ? (
+                          <><Loader2 className="h-4 w-4 animate-spin" /> Membuat Agent…</>
+                        ) : (
+                          <><FileDown className="h-4 w-4" /> Import & Rakit Sekarang</>
+                        )}
+                      </button>
+                    )
                   ) : (
                     <Link href="/login">
                       <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-11 font-bold gap-2">
@@ -192,7 +304,9 @@ export default function BlueprintSayaPage() {
                       </Button>
                     </Link>
                   )}
-                  <p className="text-xs text-center text-gray-400 mt-2">Dialog "Buat Alat Bantu" akan terbuka otomatis — Blueprint langsung terisi</p>
+                  {!importMutation.isPending && blueprint?.status !== "imported" && isAuthenticated && (
+                    <p className="text-xs text-center text-gray-400">Agent langsung dibuat &amp; Anda diarahkan ke halaman konfigurasi AI</p>
+                  )}
                 </div>
               </div>
             )}
