@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { trackLead } from "@/lib/meta-pixel";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,12 @@ function formatDate(iso?: string) {
 
 export default function BlueprintSayaPage() {
   const { isAuthenticated } = useAuth();
+  const { data: adminMe } = useQuery<{ isAdmin: boolean; isSuperAdmin: boolean }>({
+    queryKey: ["/api/admin/me"],
+    retry: 1,
+  });
+  const isAdmin = adminMe?.isAdmin === true || adminMe?.isSuperAdmin === true;
+
   const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -50,7 +57,8 @@ export default function BlueprintSayaPage() {
     setShowDeleteConfirm(false);
   };
 
-  const isUnlocked = blueprint?.status === "unlocked";
+  // Admin/superadmin selalu bisa lihat Blueprint penuh tanpa perlu beli paket
+  const isUnlocked = blueprint?.status === "unlocked" || isAdmin;
   const waText = blueprint
     ? encodeURIComponent(`Halo Gustafta! Saya sudah menyelesaikan sesi Socratic Dialog. Nama AI: ${blueprint.namaAI} | Domain: ${blueprint.domain}. Saya ingin membeli paket untuk mengakses Blueprint lengkap.`)
     : "";

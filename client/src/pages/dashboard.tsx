@@ -191,6 +191,8 @@ function BlueprintPendingBanner() {
   const { partner } = usePartnerBranding();
   const [bp, setBp] = useState<{ namaAI: string; domain: string; status?: string } | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const { data: adminMe } = useQuery<{ isAdmin: boolean; isSuperAdmin: boolean }>({ queryKey: ["/api/admin/me"], retry: 1 });
+  const isAdmin = adminMe?.isAdmin === true || adminMe?.isSuperAdmin === true;
 
   useEffect(() => {
     try {
@@ -212,19 +214,24 @@ function BlueprintPendingBanner() {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Blueprint AI siap — belum diaktivasi</p>
         <p className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">
-          <strong>{bp.namaAI}</strong> · {bp.domain} — Pilih paket untuk unlock Blueprint lengkap dan import ke Builder.
+          <strong>{bp.namaAI}</strong> · {bp.domain}
+          {isAdmin
+            ? " — Klik untuk lihat Blueprint lengkap di halaman Blueprint Saya."
+            : " — Pilih paket untuk unlock Blueprint lengkap dan import ke Builder."}
         </p>
         <div className="flex gap-2 mt-2">
           <Link href="/blueprint-saya">
             <Button size="sm" className="h-7 text-xs gap-1 bg-amber-500 hover:bg-amber-600 text-white">
-              <Lock className="h-3 w-3" /> Lihat Blueprint
+              {isAdmin ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />} Lihat Blueprint
             </Button>
           </Link>
-          <Link href="/packs">
-            <Button size="sm" variant="outline" className="h-7 text-xs gap-1 border-amber-300 text-amber-700 hover:bg-amber-50">
-              <ShoppingBag className="h-3 w-3" /> Pilih Paket
-            </Button>
-          </Link>
+          {!isAdmin && (
+            <Link href="/packs">
+              <Button size="sm" variant="outline" className="h-7 text-xs gap-1 border-amber-300 text-amber-700 hover:bg-amber-50">
+                <ShoppingBag className="h-3 w-3" /> Pilih Paket
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
       <button
