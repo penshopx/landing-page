@@ -58,6 +58,7 @@ interface AgentProduct {
   isCreatorMade?: boolean;
   isCertified?: boolean;
   licenseClass?: number | null;
+  paymentUrl?: string | null;
   type?: string;
 }
 
@@ -163,12 +164,24 @@ export default function Store() {
 
   const handleBuy = (agent: AgentProduct) => {
     trackViewContent({ content_name: agent.name, content_category: agent.category ?? "chatbot" });
-    const qs = new URLSearchParams({
-      agent: String(agent.agentId ?? ""),
-      agentName: encodeURIComponent(agent.name),
-      agentPrice: String(Math.round(agent.price || 99000)),
-    });
-    navigate(`/checkout?${qs.toString()}`);
+    // Jika produk sudah punya link pembayaran langsung → redirect ke sana
+    if (agent.paymentUrl) {
+      window.open(agent.paymentUrl, "_blank");
+      return;
+    }
+    // Jika ada agentId → internal checkout
+    if (agent.agentId) {
+      const qs = new URLSearchParams({
+        agent: String(agent.agentId),
+        agentName: encodeURIComponent(agent.name),
+        agentPrice: String(Math.round(agent.price || 99000)),
+      });
+      navigate(`/checkout?${qs.toString()}`);
+      return;
+    }
+    // Fallback: produk tanpa agentId dan tanpa paymentUrl → WA
+    const waMsg = encodeURIComponent(`Halo, saya tertarik membeli produk: *${agent.name}*. Mohon informasi cara pembelian.`);
+    window.open(`https://wa.me/6282299417818?text=${waMsg}`, "_blank");
   };
 
   const handleDetail = (agent: AgentProduct) => setDetailAgent(agent);

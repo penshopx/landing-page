@@ -253,6 +253,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
     isCertified: agentsTable.isCertified,
     licenseClass: agentsTable.licenseClass,
     licensePrice: agentsTable.licensePrice,
+    paymentUrl: agentsTable.paymentUrl,
   }).from(agentsTable).where(agentWhere).orderBy(agentsTable.id);
 
   // Count direct child agents per parent for accurate team-size pricing
@@ -337,6 +338,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
         // menggantikan badge amber "Pra-Sertifikasi".
         isCertified: a.isCertified === true,
         licenseClass: isPremiumClass(a.licenseClass) ? a.licenseClass : null,
+        paymentUrl: (a as any).paymentUrl || null,
         type: "agent",
       };
     });
@@ -6725,12 +6727,15 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     try {
       const { db } = await import("./db");
       const { agents: agentsTable, storeProducts } = await import("@shared/schema");
-      const { and, eq } = await import("drizzle-orm");
+      const { and, eq, inArray } = await import("drizzle-orm");
 
       const FEATURED_LIMIT = 8;
 
       const calcPrice = 299000;
       const calcOriginal = 450000;
+
+      // Pre-fetch paymentUrl for linked agents (two-pass: fetch rows first, then populate map)
+      const linkedPaymentUrlMap = new Map<number, string>();
 
       const mapSP = (p: any) => ({
         id: `sp-${p.id}`,
@@ -6747,6 +6752,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         price: calcPrice,
         originalPrice: calcOriginal,
         isGustafta: p.isGustafta ?? false,
+        paymentUrl: p.agentId ? (linkedPaymentUrlMap.get(p.agentId) || null) : null,
         type: "product",
       });
 
@@ -6762,6 +6768,15 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         .orderBy(storeProducts.sortOrder, storeProducts.id)
         .limit(FEATURED_LIMIT);
 
+      // Pre-fetch paymentUrl for all linked agents (gustafta + mitra)
+      const allLinkedIds = [...gustaftaRows, ...mitraSpRows]
+        .map(p => p.agentId).filter(Boolean) as number[];
+      if (allLinkedIds.length > 0) {
+        const puRows = await db.select({ id: agentsTable.id, paymentUrl: agentsTable.paymentUrl })
+          .from(agentsTable).where(inArray(agentsTable.id, allLinkedIds));
+        for (const r of puRows) if (r.paymentUrl) linkedPaymentUrlMap.set(r.id, r.paymentUrl);
+      }
+
       const mitraSpItems = mitraSpRows.map(mapSP);
 
       // If mitra store_products < limit, supplement from agents
@@ -6775,7 +6790,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           tagline: agentsTable.tagline, avatar: agentsTable.avatar,
           widgetColor: agentsTable.widgetColor, agenticSubAgents: agentsTable.agenticSubAgents,
           productSummary: agentsTable.productSummary, productFeatures: agentsTable.productFeatures,
-          parentAgentId: agentsTable.parentAgentId,
+          parentAgentId: agentsTable.parentAgentId, paymentUrl: agentsTable.paymentUrl,
         }).from(agentsTable).where(eq(agentsTable.isActive, true)).limit(FEATURED_LIMIT * 4);
 
         agentMitraItems = agentRows
@@ -6803,6 +6818,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
               originalPrice: calcOriginal,
               agentCount: 1 + sub,
               isGustafta: false,
+              paymentUrl: a.paymentUrl || null,
               type: "agent",
             };
           });
