@@ -33,10 +33,10 @@ export const PRICING = {
     amount: 99000,
   },
   starterKit: {
-    price: "Rp 245.000",
+    price: "Rp 185.000",
     /** Bentuk singkat untuk badge/CTA */
-    short: "Rp 245rb",
-    amount: 245000,
+    short: "Rp 185rb",
+    amount: 185000,
     trialDays: 7,
   },
   setup: {
@@ -58,10 +58,10 @@ export const PRICING = {
 export const TRILOGI = {
   /** PAKET PREMIUM (Bundling Lengkap) — varian Scalev "Bundling" (id 533206) */
   bundle: {
-    price: "Rp 245.000",
+    price: "Rp 185.000",
     normal: "Rp 445.000",
-    amount: 245000,
-    savings: "Hemat Rp 200.000",
+    amount: 185000,
+    savings: "Hemat Rp 260.000",
     bonuses: [
       "Buku 1: DIALOG (PDF, 166 halaman) — Akses Segera",
       "Buku 2: KOLABORASI (PDF) — Dikirim saat rilis",
@@ -100,12 +100,11 @@ export const TRILOGI = {
 } as const;
 
 // ─── Ebook Buku I — DIALOG (produk satuan, entry-level, TERPISAH dari TRILOGI.bukuSatu) ──
-// Dipakai di /ebook-dialog. Harga sengaja lebih murah dari TRILOGI.bukuSatu (Rp245rb) sebagai
-// produk pintu-masuk berdiri sendiri — JANGAN timpa/gabung dengan entry TRILOGI di atas.
+// Dipakai di /ebook-dialog. Slug Scalev: ebook-buku-i-dialog-gustafta → Rp 87.000
 export const EBOOK_DIALOG = {
-  price: "Rp 79.000",
+  price: "Rp 87.000",
   normal: "Rp 149.000",
-  amount: 79000,
+  amount: 87000,
   bonuses: [
     "Ebook Buku I — DIALOG (PDF, 160+ halaman) — download langsung",
     "Prompt Khusus Buku I (menyusul via email)",

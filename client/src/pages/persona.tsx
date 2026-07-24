@@ -315,7 +315,7 @@ export default function PersonaPage() {
                   <li key={i} className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-green-500" />{item}</li>
                 ))}
               </ul>
-              <p className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">Rp 245.000</p>
+              <p className="text-2xl font-extrabold text-gray-900 dark:text-white mb-1">Rp 185.000</p>
               <p className="text-xs text-gray-400 mb-4 line-through">Normal Rp 315.000</p>
               <a href={CHECKOUT_BASIC} target="_blank" rel="noopener noreferrer">
                 <Button className="w-full" variant="outline" data-testid="btn-paket-basic">

@@ -367,7 +367,7 @@ export default function ProductBible() {
                   <div className="p-3 rounded-lg border bg-muted/30">
                     <p className="font-semibold mb-1">Trilogi Bundling</p>
                     <p className="text-muted-foreground mb-1">Buku 1+2+3 + AI Mentor + Prompt</p>
-                    <p className="font-mono font-bold">Rp 245.000</p>
+                    <p className="font-mono font-bold">Rp 185.000</p>
                     <p className="text-muted-foreground">Harga coret: Rp 445.000</p>
                   </div>
                   <div className="p-3 rounded-lg border bg-muted/30">
@@ -379,7 +379,7 @@ export default function ProductBible() {
                   <div className="p-3 rounded-lg border bg-muted/30">
                     <p className="font-semibold mb-1">Ebook DIALOG (satuan)</p>
                     <p className="text-muted-foreground mb-1">PDF saja + trial 7 hari builder</p>
-                    <p className="font-mono font-bold">Rp 79.000</p>
+                    <p className="font-mono font-bold">Rp 87.000</p>
                     <p className="text-muted-foreground">Harga coret: Rp 149.000</p>
                   </div>
                 </div>

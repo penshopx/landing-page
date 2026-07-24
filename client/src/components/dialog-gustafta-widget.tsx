@@ -214,7 +214,7 @@ export function DialogGustaftaWidget() {
                 ))}
               </ul>
               <div className="bg-emerald-500/20 border border-emerald-400/30 rounded-lg px-3 py-1.5 mb-3 text-center">
-                <span className="text-emerald-300 text-xs font-bold">🎁 Starter Kit — Rp 245.000</span>
+                <span className="text-emerald-300 text-xs font-bold">🎁 Starter Kit — Rp 185.000</span>
               </div>
               <a
                 href="/konsultasi"

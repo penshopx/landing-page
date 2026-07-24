@@ -51,7 +51,7 @@ export default function EbookDialog() {
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
               <span className="bg-blue-950/60 text-blue-100 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 inline-block border border-blue-400/30">
-                📖 Mulai dari Rp79rb — Tanpa Beban
+                📖 Mulai dari Rp87rb — Tanpa Beban
               </span>
 
               <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-extrabold mb-5 leading-tight" data-testid="text-ebook-hero">
@@ -61,7 +61,7 @@ export default function EbookDialog() {
 
               <p className="text-base md:text-lg text-blue-100 mb-8 leading-relaxed">
                 <strong className="text-white">Buku I — DIALOG</strong> mengajarkan cara mengubah pengalaman kerjamu
-                jadi chatbot AI pertama — tanpa coding. Cukup <strong className="text-orange-300">Rp79rb</strong>,
+                jadi chatbot AI pertama — tanpa coding. Cukup <strong className="text-orange-300">Rp87rb</strong>,
                 cara paling murah untuk mulai kenal Gustafta sebelum melangkah lebih jauh.
               </p>
 
@@ -116,7 +116,7 @@ export default function EbookDialog() {
             24 jam. Semua itu ada di <strong>Buku I — DIALOG</strong>.
           </p>
           <p className="text-gray-600 text-sm leading-relaxed">
-            Dengan Rp79rb, kamu dapat fondasi lengkap + langsung bisa coba merakit chatbot AI pertamamu lewat
+            Dengan Rp87rb, kamu dapat fondasi lengkap + langsung bisa coba merakit chatbot AI pertamamu lewat
             Trial 7 Hari — sebelum memutuskan mau lanjut ke Trilogi lengkap atau berlangganan Gustafta Builder.
           </p>
         </div>
@@ -204,7 +204,7 @@ export default function EbookDialog() {
             {[
               {
                 q: `🤔 "Apa bedanya dengan Buku I di paket Trilogi?"`,
-                a: "Konten Buku I sama. Ini versi standalone dengan harga paling ringan (Rp79rb) sebagai pintu masuk — pas untuk yang mau kenal Gustafta dulu sebelum ambil paket lebih besar.",
+                a: "Konten Buku I sama. Ini versi standalone dengan harga paling ringan (Rp87rb) sebagai pintu masuk — pas untuk yang mau kenal Gustafta dulu sebelum ambil paket lebih besar.",
               },
               {
                 q: `🤔 "Bagaimana cara mengaktifkan Trial 7 Hari?"`,

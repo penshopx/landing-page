@@ -627,7 +627,7 @@ export default function AffiliatePage() {
               {
                 level: "Mulai Pelan",
                 referral: "5 referral/bulan",
-                produk: "Starter Kit Rp 245rb",
+                produk: "Starter Kit Rp 185rb",
                 komisi: "15%",
                 hasil: "Rp 183.750/bln",
                 recurring: "+ langganan recurring",

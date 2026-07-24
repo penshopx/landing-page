@@ -141,7 +141,7 @@ export default function DialogGustaftaPage() {
   const accentColor = partner?.primaryColor || null;
 
   const s3UnlockWa = waUrl(
-    `Halo, saya sudah menyelesaikan Stage 2 Dialog ${brandName} dan ingin lanjut ke Stage 3 — Pendalaman Blueprint. Saya siap beli Starter Kit Rp 245.000.`,
+    `Halo, saya sudah menyelesaikan Stage 2 Dialog ${brandName} dan ingin lanjut ke Stage 3 — Pendalaman Blueprint. Saya siap beli Starter Kit Rp 185.000.`,
     waPhone
   );
 
@@ -1073,7 +1073,7 @@ export default function DialogGustaftaPage() {
                 <div className="rounded-xl bg-gradient-to-r from-amber-900/40 to-orange-900/40 border border-amber-500/30 p-4 text-center space-y-1">
                   <div className="text-sm font-bold text-white">Blueprint Lengkap menanti di Stage 3</div>
                   <div className="text-xs text-white/60">25 sesi pendalaman + blueprint personalisasi penuh</div>
-                  <div className="text-base font-bold text-amber-300 mt-2">Starter Kit — Rp 245.000</div>
+                  <div className="text-base font-bold text-amber-300 mt-2">Starter Kit — Rp 185.000</div>
                   <div className="text-[10px] text-white/40">Lisensi platform + 3 Panduan Digital + 7 hari trial + Blueprint</div>
                 </div>
                 <a href={s3UnlockWa} target="_blank" rel="noopener noreferrer">
