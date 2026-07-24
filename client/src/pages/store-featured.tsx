@@ -414,7 +414,7 @@ export default function StoreFeatured() {
       const data = await res.json();
       setShowBuyDialog(false);
       if (data.scalevUrl) {
-        toast({ title: "Pesanan dibuat! 🎉", description: "Anda akan diarahkan ke halaman pembayaran Scalev. Setelah bayar, chatbot aktif otomatis." });
+        toast({ title: "Pesanan dibuat! 🎉", description: "Anda akan diarahkan ke halaman pembayaran Scalev. Setelah bayar, AI Specialist aktif otomatis." });
         window.open(data.scalevUrl, "_blank");
       } else if (data.waUrl) {
         toast({ title: "Pesanan dibuat!", description: "Tim kami akan menghubungi Anda untuk konfirmasi pembayaran." });

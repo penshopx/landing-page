@@ -83,6 +83,22 @@ interface BuyFormData {
 
 const LIMIT = 18;
 
+// Paket rekomendasi berdasarkan profesi/kebutuhan bisnis
+const PROFESI_BUNDLES: Record<string, { label: string; emoji: string; desc: string; keywords: string[] }> = {
+  kontraktor: {
+    label: "Kontraktor", emoji: "🏗️", desc: "Tender, SBU, SKK, K3, RAB, Keuangan",
+    keywords: ["tender", "sbu", "skk", "k3", "mep", "rab", "keuangan", "konstruksi", "pengadaan"],
+  },
+  konsultan: {
+    label: "Konsultan", emoji: "📋", desc: "ISO, SKK, K3, Legal, MEP, Konsultansi",
+    keywords: ["iso", "skk", "k3", "legal", "mep", "konsultansi", "kk", "dokumen", "hse"],
+  },
+  biro: {
+    label: "Biro Jasa", emoji: "🏢", desc: "SBU, SKK, OSS, Perizinan, SIMPK",
+    keywords: ["sbu", "skk", "oss", "tender", "simpk", "perizinan", "lpjk", "biro"],
+  },
+};
+
 export default function Store() {
   const { toast } = useToast();
   const initialParams = typeof window !== "undefined"
@@ -108,6 +124,7 @@ export default function Store() {
       localStorage.removeItem("store_last_category");
     }
   }, [searchInput, selectedCategory]);
+  const [profesiFilter, setProfesiFilter] = useState<string>("");
   const [page, setPage] = useState(1);
   const [, navigate] = useLocation();
   const [selectedAgent, setSelectedAgent] = useState<AgentProduct | null>(null);
@@ -147,7 +164,7 @@ export default function Store() {
       setShowBuyDialog(false);
       trackInitiateCheckout({ content_name: selectedAgent?.name ?? "Store Product", currency: "IDR" });
       if (scalevUrl) {
-        toast({ title: "Pesanan dibuat! 🎉", description: "Anda akan diarahkan ke halaman pembayaran Scalev. Setelah bayar, chatbot aktif otomatis." });
+        toast({ title: "Pesanan dibuat! 🎉", description: "Anda akan diarahkan ke halaman pembayaran Scalev. Setelah bayar, AI Specialist aktif otomatis." });
         window.open(scalevUrl, "_blank");
       } else if (waUrl) {
         toast({ title: "Pesanan dibuat!", description: "Tim kami akan menghubungi Anda untuk konfirmasi pembayaran." });
@@ -206,6 +223,14 @@ export default function Store() {
   const total = catalog?.total || 0;
   const pages = catalog?.pages || 1;
 
+  // Client-side profesi filter applied on top of server results
+  const displayItems = profesiFilter
+    ? items.filter((a) => {
+        const text = `${a.name} ${a.tagline || ""} ${a.description || ""}`.toLowerCase();
+        return PROFESI_BUNDLES[profesiFilter]?.keywords.some((kw) => text.includes(kw));
+      })
+    : items;
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -253,7 +278,7 @@ export default function Store() {
         </p>
 
         <p className="text-gray-600 max-w-xl mx-auto mb-5">
-          Seperti domain dan hosting — chatbot dari Store dan Paket Berlangganan adalah dua hal yang <strong className="text-gray-900">saling melengkapi dan keduanya wajib</strong>.
+          Seperti domain dan hosting — AI Specialist dari Store dan Paket Berlangganan adalah dua hal yang <strong className="text-gray-900">saling melengkapi dan keduanya wajib</strong>.
         </p>
 
         {/* Domain-Hosting analogy cards */}
@@ -297,7 +322,7 @@ export default function Store() {
                   <p className="font-bold text-gray-900 text-sm">Paket Bisnis AI</p>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-200 text-violet-800 border border-violet-300 font-medium">DIY — Anda Admin</span>
                 </div>
-                <p className="text-xs text-gray-700 leading-relaxed">Anda yang build & kelola sendiri. Beli chatbot di Store, pasang di dashboard, konfigurasi sesuai kebutuhan.</p>
+                <p className="text-xs text-gray-700 leading-relaxed">Anda yang build & kelola sendiri. Beli AI Specialist di Store, pasang di dashboard, konfigurasi sesuai kebutuhan.</p>
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5 text-xs text-violet-700 group-hover:text-violet-800 transition-colors font-semibold">
@@ -332,7 +357,7 @@ export default function Store() {
               <div className="flex items-center justify-between rounded-xl bg-white border border-violet-200 px-4 py-3 shadow-sm">
                 <div>
                   <p className="text-xs font-bold text-gray-700">Biaya Aktivasi</p>
-                  <p className="text-[11px] text-gray-400">Hak pakai chatbot — sekali bayar, install mandiri</p>
+                  <p className="text-[11px] text-gray-400">Hak pakai AI Specialist — sekali bayar, install mandiri</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[10px] text-gray-400 line-through">{PRICING.license.normal}</p>
@@ -360,21 +385,52 @@ export default function Store() {
         {/* Divider ke katalog chatbot */}
         <div className="flex items-center gap-3 max-w-2xl mx-auto mb-1">
           <div className="h-px flex-1 bg-gray-300" />
-          <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">pilih chatbot bundle</span>
+          <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">pilih AI Specialist</span>
           <div className="h-px flex-1 bg-gray-300" />
         </div>
-        <p className="text-xs text-gray-500 font-medium mb-6">{total > 0 ? `${total.toLocaleString("id-ID")} chatbot AI tersedia` : "Katalog chatbot AI siap pakai"}</p>
+        <p className="text-xs text-gray-500 font-medium mb-6">{total > 0 ? `${total.toLocaleString("id-ID")} AI Specialist tersedia` : "AI Specialist siap pakai"}</p>
 
         <div className="flex gap-2 max-w-lg mx-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <Input placeholder="Cari chatbot..." value={searchInput}
+            <Input placeholder="Cari AI Specialist..." value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="pl-9 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-violet-500 shadow-sm"
               data-testid="input-search-store" />
           </div>
           <Button onClick={handleSearch} className="bg-violet-600 hover:bg-violet-700 shadow-sm" data-testid="button-search">Cari</Button>
+        </div>
+
+        {/* Profesi filter chips */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-5">
+          <span className="text-xs text-gray-400 font-medium mr-1">Berdasarkan profesi:</span>
+          {Object.entries(PROFESI_BUNDLES).map(([key, p]) => (
+            <button
+              key={key}
+              onClick={() => {
+                setProfesiFilter(profesiFilter === key ? "" : key);
+                setSelectedCategory("");
+                setSearch("");
+                setSearchInput("");
+                setPage(1);
+              }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                profesiFilter === key
+                  ? "bg-violet-600 text-white border-violet-600 shadow-sm"
+                  : "bg-white text-gray-600 border-gray-300 hover:border-violet-400 hover:text-violet-700"
+              }`}
+              title={p.desc}>
+              {p.emoji} {p.label}
+            </button>
+          ))}
+          {profesiFilter && (
+            <button
+              onClick={() => setProfesiFilter("")}
+              className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 ml-1">
+              Tampilkan semua
+            </button>
+          )}
         </div>
       </section>
 
@@ -420,8 +476,8 @@ export default function Store() {
         <main className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm text-gray-500">
-              {isLoading ? "Memuat..." : `${total.toLocaleString("id-ID")} chatbot`}
-              {selectedCategory ? ` · ${CATEGORY_LABELS[selectedCategory] || selectedCategory}` : ""}
+              {isLoading ? "Memuat..." : `${total.toLocaleString("id-ID")} AI Specialist`}
+              {profesiFilter ? ` · Paket ${PROFESI_BUNDLES[profesiFilter]?.label}` : selectedCategory ? ` · ${CATEGORY_LABELS[selectedCategory] || selectedCategory}` : ""}
               {search ? ` · "${search}"` : ""}
             </p>
             <p className="text-xs text-gray-400">Hal. {page} / {pages}</p>
@@ -433,22 +489,22 @@ export default function Store() {
                 <div key={i} className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
               ))}
             </div>
-          ) : items.length === 0 ? (
+          ) : displayItems.length === 0 ? (
             <div className="text-center py-20 text-gray-400">
               <Bot className="h-16 w-16 mx-auto mb-4 opacity-20" />
-              {search || selectedCategory ? (
+              {search || selectedCategory || profesiFilter ? (
                 <>
-                  <p className="text-lg font-medium text-gray-500 mb-1">Tidak ada chatbot yang cocok</p>
-                  <p className="text-sm">Coba kata kunci atau kategori lain</p>
+                  <p className="text-lg font-medium text-gray-500 mb-1">Tidak ada AI Specialist yang cocok</p>
+                  <p className="text-sm">Coba kata kunci, kategori, atau profesi lain</p>
                   <Button variant="outline" size="sm" className="mt-4"
-                    onClick={() => { setSearch(""); setSearchInput(""); setSelectedCategory(""); setPage(1); }}>
+                    onClick={() => { setSearch(""); setSearchInput(""); setSelectedCategory(""); setProfesiFilter(""); setPage(1); }}>
                     Reset Filter
                   </Button>
                 </>
               ) : (
                 <>
-                  <p className="text-lg font-medium text-gray-500 mb-1">Belum ada produk yang tersedia</p>
-                  <p className="text-sm">Produk chatbot akan segera hadir.</p>
+                  <p className="text-lg font-medium text-gray-500 mb-1">Belum ada AI Specialist yang tersedia</p>
+                  <p className="text-sm">AI Specialist baru akan segera hadir.</p>
                   <a href="https://wa.me/6281287941900" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm transition-colors">
                     <Smartphone className="h-4 w-4" />Hubungi via WhatsApp
@@ -458,10 +514,10 @@ export default function Store() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {items.map((agent) => (
+              {displayItems.map((agent) => (
                 <AgentCard key={agent.id} agent={agent} onBuy={handleBuy} onDetail={handleDetail} />
               ))}
-              {page === 1 && !search && !selectedCategory && <CustomChatbotCard />}
+              {page === 1 && !search && !selectedCategory && !profesiFilter && <CustomChatbotCard />}
             </div>
           )}
 
@@ -632,7 +688,7 @@ export default function Store() {
               <span className="line-clamp-2">{selectedAgent?.name}</span>
             </DialogTitle>
             <DialogDescription className="text-sm">
-              {selectedAgent?.tagline || "Chatbot AI siap pakai untuk industri konstruksi Indonesia."}
+              {selectedAgent?.tagline || "AI Specialist siap pakai untuk industri konstruksi Indonesia."}
             </DialogDescription>
           </DialogHeader>
 
@@ -680,7 +736,7 @@ export default function Store() {
                   {buyForm.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyForm.email) ? (
                     <p className="text-xs text-red-500 mt-1">Format email tidak valid. Contoh: nama@gmail.com</p>
                   ) : (
-                    <p className="text-xs text-gray-400 mt-1">Link akses chatbot akan dikirim ke email ini</p>
+                    <p className="text-xs text-gray-400 mt-1">Link akses AI Specialist akan dikirim ke email ini</p>
                   )}
                 </div>
                 <div>
@@ -733,10 +789,10 @@ function CustomChatbotCard() {
         </div>
 
         <h3 className="font-semibold text-white text-sm leading-snug mb-1 group-hover:text-violet-300 transition-colors">
-          Chatbot Kustom — Sesuai Kebutuhan Anda
+          AI Specialist Kustom — Sesuai Kebutuhan Anda
         </h3>
         <p className="text-gray-400 text-xs leading-relaxed mb-3">
-          Chatbot yang tidak ada di katalog? Tim kami siap membangun, mengkonfigurasi, dan menginstal chatbot AI sepenuhnya sesuai alur bisnis Anda.
+          AI Specialist yang tidak ada di katalog? Tim kami siap membangun, mengkonfigurasi, dan menginstal sepenuhnya sesuai alur bisnis Anda.
         </p>
 
         <div className="space-y-1.5 mb-3 flex-1">
