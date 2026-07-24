@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreateSubscription } from "@/hooks/use-subscription";
@@ -160,6 +160,17 @@ export default function CheckoutPage() {
   // ─────────────────────────────────────────────────────────────────────────────
 
   const { user, isAuthenticated } = useAuth();
+
+  // Pre-fill form dari data user yang sudah login
+  useEffect(() => {
+    if (user && isAgent) {
+      setAgentForm(f => ({
+        name: f.name || `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        email: f.email || user.email || "",
+        phone: f.phone,
+      }));
+    }
+  }, [user, isAgent]);
   const { toast } = useToast();
   const createSubscription = useCreateSubscription();
   const queryClient = useQueryClient();

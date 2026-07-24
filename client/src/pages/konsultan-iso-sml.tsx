@@ -15,7 +15,7 @@ function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }
 
-const CHECKOUT_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%21%20Saya%20tertarik%20berlangganan.%20Mohon%20informasi%20cara%20pembayarannya.";
+const CHECKOUT_URL = "/pricing";
 
 const STATS_SML = [
   { icon: Leaf, value: "300.410", label: "Sertifikat ISO 14001 valid di seluruh dunia", source: "ISO Survey 2023" },

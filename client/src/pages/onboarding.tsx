@@ -303,21 +303,20 @@ export default function OnboardingPage() {
               </Button>
             </a>
           ) : (
-            <a href={waMsg(selected)} target="_blank" rel="noopener noreferrer">
-              <Button
-                size="lg"
-                className="w-full gap-2 py-6 text-base"
-                data-testid={`button-subscribe-${selected}`}
-              >
-                <Rocket className="h-5 w-5" />
-                Mulai Paket {PLAN_CONFIGS[selected]?.name}
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </a>
+            <Button
+              size="lg"
+              className="w-full gap-2 py-6 text-base"
+              data-testid={`button-subscribe-${selected}`}
+              onClick={() => navigate("/pricing")}
+            >
+              <Rocket className="h-5 w-5" />
+              Mulai Paket {PLAN_CONFIGS[selected]?.name}
+              <ArrowRight className="h-5 w-5" />
+            </Button>
           )}
 
           <p className="text-xs text-muted-foreground">
-            Setelah klik, tim kami akan menghubungi via WhatsApp dalam 1×24 jam untuk proses setup & invoice.
+            Pilih durasi berlangganan &amp; bayar via Scalev — transfer bank, e-wallet, QRIS, kartu kredit.
           </p>
 
           <div className="border-t pt-4">

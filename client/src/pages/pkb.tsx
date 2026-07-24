@@ -15,8 +15,8 @@ function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }
 
-const CHECKOUT_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%21%20Saya%20tertarik%20berlangganan.%20Mohon%20informasi%20cara%20pembayarannya.";
-const CHECKOUT_BASIC = "https://wa.me/6282299417818?text=Halo%20Gustafta%21%20Saya%20tertarik%20berlangganan.%20Mohon%20informasi%20cara%20pembayarannya.";
+const CHECKOUT_URL = "/pricing";
+const CHECKOUT_BASIC = "/pricing";
 
 const SKK_TRACKS = [
   { label: "Manajemen Konstruksi", claw: "ManprojakClaw", color: "indigo", jobs: ["Manajer Proyek", "Site Manager", "Manajer Konstruksi", "Pengawas Lapangan"] },
