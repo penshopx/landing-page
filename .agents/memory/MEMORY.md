@@ -66,3 +66,4 @@
 - [Ruang Simpan governance layer](ruang-simpan-governance.md) — doc_status lifecycle + access grants (Kuasa Digital) + audit trail (access_log) added; DDL runs idempotent at startup; UI: tabs Info/Paspor, GrantModal, status badge on file cards.
 - [AI Specialist Platform positioning](ai-specialist-platform.md) — Gustafta = AI Specialist Platform (bukan chatbot/SaaS); Standard=Coach, Premium=Claw; 5-level hierarchy; paket profesi Kontraktor/Konsultan/Biro Jasa; 3-fase roadmap; 7 revenue streams.
 - [Terminologi customer-facing](terminologi-customer-facing.md) — "chatbot" dilarang di halaman pelanggan; ganti "Asisten AI" (default) atau "AI Specialist" (produk Store/Claw); kode internal boleh tetap chatbot/getChatbot.
+- [Landing page segmen](segment-landing-pages.md) — 4 halaman solusi per segmen: /kontraktor /biro-jasa /konsultan-iso /skk (portal ekosistem interaktif); nav header punya baris "Solusi untuk:" di shared-header navSolusi.

@@ -414,6 +414,10 @@ import ProyekBotPage from "@/pages/proyekbot";
 import PerijinanBotPage from "@/pages/perijinanbot";
 import KontraktorBotPage from "@/pages/kontraktorbot";
 import KonsultanBotPage from "@/pages/konsultanbot";
+import SolusiKontraktorPage from "@/pages/solusi-kontraktor";
+import SolusiBiroJasaPage from "@/pages/solusi-biro-jasa";
+import SolusiKonsultanISOPage from "@/pages/solusi-konsultan-iso";
+import PortalSKKPage from "@/pages/portal-skk";
 import OwnerBotPage from "@/pages/ownerbot";
 import BoheerBotPage from "@/pages/boheerbot";
 import SupplierBotPage from "@/pages/supplierbot";
@@ -545,6 +549,10 @@ function Router() {
       <Route path="/multiclaw-suite" component={MulticlawSuitePage} />
       <Route path="/persona" component={PersonaPage} />
       <Route path="/konstruksi" component={KonstruksiPage} />
+      <Route path="/kontraktor" component={SolusiKontraktorPage} />
+      <Route path="/biro-jasa" component={SolusiBiroJasaPage} />
+      <Route path="/konsultan-iso" component={SolusiKonsultanISOPage} />
+      <Route path="/skk" component={PortalSKKPage} />
       <Route path="/energi" component={EnergiPage} />
       <Route path="/transisi-energi" component={TransisiEnergiPage} />
       <Route path="/tender" component={TenderPage} />

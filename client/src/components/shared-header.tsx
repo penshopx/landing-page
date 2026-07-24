@@ -10,7 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
-import { Bot, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon } from "lucide-react";
+import { Bot, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2 } from "lucide-react";
 
 const WA_NUMBERS = [
   { display: "081287941900", link: "6281287941900" },
@@ -253,6 +253,14 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
   ];
 
+  // Baris 1.5 — solusi per segmen
+  const navSolusi = [
+    { href: "/kontraktor",    label: "Untuk Kontraktor",    icon: Building2 },
+    { href: "/biro-jasa",     label: "Untuk Biro Jasa",     icon: Briefcase },
+    { href: "/konsultan-iso", label: "Untuk Konsultan ISO", icon: ClipboardList },
+    { href: "/skk",           label: "Portal SKK",          icon: GraduationCap, badge: "Ekosistem" },
+  ];
+
   // Baris 2 — tools & layanan spesifik
   const navRow2 = [
     { href: "/toolkit",                label: "Toolkit",                icon: Hammer },
@@ -267,7 +275,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
   ];
 
   // Untuk mobile: semua item gabungan
-  const allNavItems = partnerItems ?? [...navRow1, ...navRow2];
+  const allNavItems = partnerItems ?? [...navSolusi, ...navRow1, ...navRow2];
 
   const isActive = (href: string) => location === href;
 
@@ -504,6 +512,26 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
                     {item.label}
                     {"badge" in item && item.badge && (
                       <span className="ml-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full leading-none bg-emerald-500 text-white">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+            {/* Baris 1.5 — solusi per segmen */}
+            <div className="flex items-center justify-center gap-0.5 h-8 border-t border-border/30 bg-emerald-50/50 dark:bg-emerald-950/10">
+              <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mr-1">Solusi untuk:</span>
+              {navSolusi.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant={isActive(item.href) ? "secondary" : "ghost"}
+                    size="sm"
+                    className="text-xs px-2.5 h-7 font-medium text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                  >
+                    {item.label}
+                    {"badge" in item && item.badge && (
+                      <span className="ml-1 text-[8px] font-bold px-1 py-0.5 rounded-full leading-none bg-emerald-500 text-white">
                         {item.badge}
                       </span>
                     )}
