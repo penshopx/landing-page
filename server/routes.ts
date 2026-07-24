@@ -6473,7 +6473,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         };
         const scalevSlug = SCALEV_SLUG_MAP[selectedPlan];
         const scalevCheckoutUrl = scalevSlug
-          ? `https://app.scalev.com/checkout/${scalevSlug}`
+          ? `https://bayar.gustafta.my.id/p/${scalevSlug}`
           : null;
 
         // Fallback WA if no Scalev product configured
@@ -6988,7 +6988,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           if (phone) qs.set("pre_fill[phone]", String(phone));
           qs.set("agent_id", String(resolvedAgentId));
           qs.set("order_ref", orderId);
-          scalevUrl = `https://app.scalev.com/checkout/${effectiveSlug}?${qs.toString()}`;
+          scalevUrl = `https://bayar.gustafta.my.id/p/${effectiveSlug}?${qs.toString()}`;
         }
       }
       // ──────────────────────────────────────────────────────────────────────

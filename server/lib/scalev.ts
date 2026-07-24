@@ -86,6 +86,6 @@ export async function createScalevProduct(params: {
     id: product.id,
     slug: product.slug,
     name: product.name,
-    checkoutUrl: `https://app.scalev.com/checkout/${product.slug}`,
+    checkoutUrl: `https://bayar.gustafta.my.id/p/${product.slug}`,
   };
 }

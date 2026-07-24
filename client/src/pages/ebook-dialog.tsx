@@ -9,7 +9,7 @@ import { EBOOK_DIALOG } from "@/data/pricing";
 import coverFlat from "@assets/Monolog-_cover_1781287565935.jpg";
 import cover3D from "@assets/Buku_3D_1781288556255.png";
 
-const SCALEV_EBOOK = "https://app.scalev.com/checkout/ebook-buku-i-dialog-gustafta";
+const SCALEV_EBOOK = "https://bayar.gustafta.my.id/p/ebook-buku-i-dialog-gustafta";
 const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Ebook%20Buku%20I%20-%20DIALOG";
 
 const BONUS_ICONS = [BookOpen, Sparkles, FileText, Video, Gift];

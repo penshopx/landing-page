@@ -74,7 +74,7 @@ const SUBSCRIPTION_PLANS: Record<string, {
   },
 };
 
-const SCALEV_BASE = "https://app.scalev.com/checkout";
+const SCALEV_BASE = "https://bayar.gustafta.my.id/p";
 
 const JASA_PLANS: Record<string, {
   key: string; name: string; price: string; priceNum: number;
