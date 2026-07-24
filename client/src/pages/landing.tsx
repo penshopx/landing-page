@@ -787,7 +787,7 @@ export default function Landing() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
             {[
               { icon: "🗺️", label: "Peta Jalan", href: "/persona" },
-              { icon: "🏥", label: "Klinik Konsultasi", href: "/klinik" },
+              { icon: "🏥", label: "Klinik Konsultasi", href: "/klinik-konsultasi" },
               { icon: "📄", label: "Bedah Dokumen", href: "/bedah-dokumen" },
               { icon: "🧠", label: "Brain Project", href: "/brain-project" },
               { icon: "🛠️", label: "Toolkit", href: "/toolkit" },
@@ -1139,7 +1139,7 @@ export default function Landing() {
                 title: "Ada Pertanyaan Mendesak? Klinik Siap 24/7.",
                 desc: "Regulasi baru, persyaratan SBU/SKK, tender yang membingungkan, masalah perizinan — jawaban cepat dari AI yang sudah dilatih khusus di bidang konstruksi Indonesia. Tidak perlu menunggu jam kerja, tidak perlu antri.",
                 items: ["Konsultasi SBU, SKK, dan SBUJK", "Regulasi tender & pengadaan terbaru", "Klinik Hukum Konstruksi", "Klinik K3 & Lingkungan", "Klinik Keuangan Proyek", "Tanya-jawab 24/7 tanpa batas"],
-                cta: "Buka Klinik Konsultasi", href: "/klinik",
+                cta: "Buka Klinik Konsultasi", href: "/klinik-konsultasi",
               },
               {
                 emoji: "📄", num: "03", label: "BEDAH DOKUMEN",
@@ -1518,7 +1518,7 @@ export default function Landing() {
               {
                 emoji: "🏥", label: "Konsultasi Langsung",
                 desc: "Ada pertanyaan mendesak seputar SBU, SKK, tender, atau regulasi? Klinik Konsultasi siap 24/7.",
-                cta: "Buka Klinik", href: "/klinik",
+                cta: "Buka Klinik", href: "/klinik-konsultasi",
                 color: "border-violet-200 dark:border-violet-800 hover:border-violet-400",
                 badge: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
               },

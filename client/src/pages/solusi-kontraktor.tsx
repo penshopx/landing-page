@@ -261,7 +261,7 @@ export default function SolusiKontraktorPage() {
             {[
               {
                 name: "Starter",
-                price: "Rp 99.000",
+                price: "Rp 199.000",
                 period: "/bulan",
                 desc: "Untuk kontraktor yang baru mulai memanfaatkan AI",
                 features: ["1 Asisten AI aktif", "5.000 pesan/bulan", "KB 20 dokumen", "Semua AI Specialist dasar"],
@@ -271,7 +271,7 @@ export default function SolusiKontraktorPage() {
               },
               {
                 name: "Profesional",
-                price: "Rp 149.000",
+                price: "Rp 499.000",
                 period: "/bulan",
                 desc: "Untuk tim tender dan administrasi BUJK",
                 features: ["3 Asisten AI aktif", "15.000 pesan/bulan", "KB 30 dokumen", "TenderClaw + SBUClaw + SKKClaw", "Orchestrator Multi-Agent"],
@@ -281,7 +281,7 @@ export default function SolusiKontraktorPage() {
               },
               {
                 name: "Bisnis",
-                price: "Rp 499.000",
+                price: "Rp 999.000",
                 period: "/bulan",
                 desc: "Untuk perusahaan konstruksi dengan banyak proyek",
                 features: ["10 Asisten AI aktif", "Pesan tak terbatas", "KB 50 dokumen", "Semua AI Specialist premium", "Priority support WA"],

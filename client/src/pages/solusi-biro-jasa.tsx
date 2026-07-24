@@ -150,7 +150,7 @@ export default function SolusiBiroJasaPage() {
               </Button>
             </a>
           </div>
-          <p className="mt-4 text-sm text-purple-200">Aktif dalam 1 hari · Tanpa kode · Mulai dari Rp 99.000/bulan</p>
+          <p className="mt-4 text-sm text-purple-200">Aktif dalam 1 hari · Tanpa kode · Mulai dari Rp 199.000/bulan</p>
         </div>
       </section>
 
