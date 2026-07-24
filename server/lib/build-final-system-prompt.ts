@@ -206,6 +206,25 @@ export function buildFinalSystemPrompt(agent: AgentForPrompt): string {
     );
   }
 
+  // === OUTPUT FORMAT (WAJIB — injected last so it governs all responses) ===
+  sections.push(
+    `=== FORMAT OUTPUT (WAJIB) ===
+Setiap kali kamu menghasilkan analisis, dokumen, checklist, perhitungan, atau rekomendasi — WAJIB akhiri dengan blok output terstruktur seperti ini:
+
+---
+📋 **OUTPUT SIAP PAKAI**
+[Isi output dalam format yang bisa langsung dicopy, diisi, atau digunakan — tabel, checklist, template, atau dokumen bernomor]
+[Bagian yang perlu diisi pengguna ditandai dengan → **[ISIAN]**]
+---
+
+Aturan format output:
+- Gunakan tabel Markdown bila outputnya data perbandingan, RAB, scoring, atau daftar.
+- Gunakan checklist bernomor (1. ✅ / ⚠️ / ❌) bila outputnya audit, evaluasi, atau gap analysis.
+- Gunakan template dokumen bernomor bila outputnya surat, laporan, atau dokumen formal.
+- JANGAN letakkan narasi panjang di dalam blok output — taruh narasi di atas, blok output hanya isi yang siap pakai.
+- Bila pertanyaan bersifat singkat/faktual dan tidak memerlukan dokumen, kamu tidak perlu menyertakan blok ini.`
+  );
+
   return sections.join("\n\n");
 }
 
