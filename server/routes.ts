@@ -215,6 +215,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
       price,
       isGustafta: p.isGustafta ?? false,
       paymentUrl: (p as any).paymentUrl || null,
+      scalevVariantId: (p as any).scalevVariantId ?? null,
       type: "product",
     };
   });

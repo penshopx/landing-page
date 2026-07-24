@@ -427,6 +427,7 @@ import { ChaesaWidget } from "@/components/chaesa-widget";
 import { MultiClawProvider } from "@/contexts/multiclaw-context";
 import { ProfileCompletionGuard } from "@/components/profile-completion-guard";
 import { NewAgentGrantsNotice } from "@/components/new-agent-grants-notice";
+import { CartProvider } from "@/hooks/use-cart";
 
 const WIDGET_EXCLUDED_PATHS = ["/legal", "/embed/", "/chaesa", "/demo/", "/bot/", "/chat/", "/chatbot/", "/modul/", "/m/", "/mini-app/"];
 
@@ -2107,7 +2108,9 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <MultiClawProvider>
-            <AppContent />
+            <CartProvider>
+              <AppContent />
+            </CartProvider>
           </MultiClawProvider>
         </TooltipProvider>
       </QueryClientProvider>

@@ -11,11 +11,13 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Loader2, Bot, ShoppingCart, Smartphone, Search,
   ChevronLeft, ChevronRight, Layers, CheckCircle2, Info, X, MessageCircle,
-  Wrench, Sparkles, ShieldAlert, ShieldCheck, FileText,
+  Wrench, Sparkles, ShieldAlert, ShieldCheck, FileText, Plus,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { trackLead, trackViewContent, trackInitiateCheckout } from "@/lib/meta-pixel";
 import { PRICING } from "@/data/pricing";
+import { useCart } from "@/hooks/use-cart";
+import { CartDrawer } from "@/components/cart-drawer";
 
 const CATEGORY_LABELS: Record<string, string> = {
   engineering: "Teknik & Engineering",
@@ -60,6 +62,7 @@ interface AgentProduct {
   isCertified?: boolean;
   licenseClass?: number | null;
   paymentUrl?: string | null;
+  scalevVariantId?: number | null;
   type?: string;
 }
 
@@ -102,6 +105,7 @@ const PROFESI_BUNDLES: Record<string, { label: string; emoji: string; desc: stri
 
 export default function Store() {
   const { toast } = useToast();
+  const { addItem, totalItems, openCart } = useCart();
   const initialParams = typeof window !== "undefined"
     ? new URLSearchParams(window.location.search)
     : new URLSearchParams();
@@ -180,27 +184,39 @@ export default function Store() {
   const handleSearch = useCallback(() => { setSearch(searchInput); setPage(1); }, [searchInput]);
   const handleCategoryChange = (cat: string) => { setSelectedCategory(cat); setPage(1); };
 
-  const handleBuy = (agent: AgentProduct) => {
+  const handleAddToCart = (agent: AgentProduct) => {
     trackViewContent({ content_name: agent.name, content_category: agent.category ?? "chatbot" });
-    // Jika produk sudah punya link pembayaran langsung → redirect ke sana
+    addItem({
+      id: String(agent.id),
+      productId: agent.productId,
+      agentId: agent.agentId ?? undefined,
+      name: agent.name,
+      price: agent.price,
+      emoji: agent.emoji,
+      scalevVariantId: agent.scalevVariantId ?? null,
+    });
+  };
+
+  const handleBuyNow = (agent: AgentProduct) => {
+    trackViewContent({ content_name: agent.name, content_category: agent.category ?? "chatbot" });
+    // Produk dengan variant Scalev → langsung checkout via Scalev (1 item)
+    if (agent.scalevVariantId) {
+      const url = `https://bayar.gustafta.my.id/c/checkout?variant_ids=${agent.scalevVariantId}&qty=1`;
+      window.open(url, "_blank");
+      return;
+    }
+    // Fallback: ada paymentUrl langsung
     if (agent.paymentUrl) {
       window.open(agent.paymentUrl, "_blank");
       return;
     }
-    // Jika ada agentId → internal checkout
-    if (agent.agentId) {
-      const qs = new URLSearchParams({
-        agent: String(agent.agentId),
-        agentName: encodeURIComponent(agent.name),
-        agentPrice: String(Math.round(agent.price || 99000)),
-      });
-      navigate(`/checkout?${qs.toString()}`);
-      return;
-    }
-    // Fallback: produk tanpa agentId dan tanpa paymentUrl → WA
-    const waMsg = encodeURIComponent(`Halo, saya tertarik membeli produk: *${agent.name}*. Mohon informasi cara pembelian.`);
+    // Fallback WA
+    const waMsg = encodeURIComponent(`Halo, saya ingin membeli: *${agent.name}*. Mohon informasi pembelian.`);
     window.open(`https://wa.me/6282299417818?text=${waMsg}`, "_blank");
   };
+
+  // Keep backward compat for other callers
+  const handleBuy = handleBuyNow;
 
   const handleDetail = (agent: AgentProduct) => setDetailAgent(agent);
 
@@ -234,6 +250,7 @@ export default function Store() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <CartDrawer />
       {/* Header */}
       <header className="border-b border-gray-200 bg-white/95 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -256,11 +273,20 @@ export default function Store() {
               <Smartphone className="h-4 w-4" />
               <span className="hidden sm:inline">081287941900</span>
             </a>
-            <span className="hidden sm:inline text-gray-300">·</span>
-            <a href="https://wa.me/6282299417818" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 hover:text-gray-900 transition-colors" data-testid="link-wa-header-2">
-              082299417818
-            </a>
+            {/* Cart icon */}
+            <button
+              onClick={openCart}
+              className="relative flex items-center gap-1.5 hover:text-violet-700 transition-colors p-1.5 rounded-lg hover:bg-violet-50"
+              data-testid="button-open-cart"
+              title="Keranjang belanja"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-violet-600 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                  {totalItems > 9 ? "9+" : totalItems}
+                </span>
+              )}
+            </button>
           </div>
         </div>
       </header>
@@ -516,7 +542,7 @@ export default function Store() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {displayItems.map((agent) => (
-                <AgentCard key={agent.id} agent={agent} onBuy={handleBuy} onDetail={handleDetail} />
+                <AgentCard key={agent.id} agent={agent} onBuy={handleBuyNow} onAddToCart={handleAddToCart} onDetail={handleDetail} />
               ))}
               {page === 1 && !search && !selectedCategory && !profesiFilter && <CustomChatbotCard />}
             </div>
@@ -836,7 +862,14 @@ function getChatbotTier(agentCount?: number): { label: string; className: string
   return       { label: "Basic",               className: "bg-gray-100 text-gray-600 border-gray-200" };
 }
 
-function AgentCard({ agent, onBuy, onDetail }: { agent: AgentProduct; onBuy: (a: AgentProduct) => void; onDetail: (a: AgentProduct) => void }) {
+function AgentCard({
+  agent, onBuy, onAddToCart, onDetail,
+}: {
+  agent: AgentProduct;
+  onBuy: (a: AgentProduct) => void;
+  onAddToCart: (a: AgentProduct) => void;
+  onDetail: (a: AgentProduct) => void;
+}) {
   const categoryLabel = CATEGORY_LABELS[agent.category] || agent.category;
   const hasDetail = !!(agent.productSummary || agent.description || (agent.productFeatures ?? []).length > 0);
   const tier = getChatbotTier(agent.agentCount);
@@ -905,7 +938,8 @@ function AgentCard({ agent, onBuy, onDetail }: { agent: AgentProduct; onBuy: (a:
           </div>
         )}
 
-        <div className="mt-auto pt-3 border-t border-gray-100">
+        <div className="mt-auto pt-3 border-t border-gray-100 space-y-2">
+          {/* Price row */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col">
               {agent.originalPrice && agent.originalPrice > agent.price && (
@@ -913,29 +947,34 @@ function AgentCard({ agent, onBuy, onDetail }: { agent: AgentProduct; onBuy: (a:
               )}
               <span className="font-bold text-gray-900 text-base">{formatPrice(agent.price)}</span>
             </div>
-            <div className="flex gap-1.5">
-              {hasDetail && (
-                agent.agentId ? (
-                  <a href={`/product/${agent.agentId}`} data-testid={`link-detail-${agent.id}`}>
-                    <Button size="sm" variant="ghost"
-                      className="text-gray-400 hover:text-violet-700 text-xs h-8 px-2.5">
-                      Detail
-                    </Button>
-                  </a>
-                ) : (
-                  <Button size="sm" variant="ghost" onClick={() => onDetail(agent)}
-                    className="text-gray-400 hover:text-gray-700 text-xs h-8 px-2.5"
-                    data-testid={`button-detail-${agent.id}`}>
+            {hasDetail && (
+              agent.agentId ? (
+                <a href={`/product/${agent.agentId}`} data-testid={`link-detail-${agent.id}`}>
+                  <Button size="sm" variant="ghost" className="text-gray-400 hover:text-violet-700 text-xs h-7 px-2">
                     Detail
                   </Button>
-                )
-              )}
-              <Button size="sm" onClick={() => onBuy(agent)}
-                className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 px-3 flex-shrink-0"
-                data-testid={`button-buy-${agent.id}`}>
-                <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />Beli
-              </Button>
-            </div>
+                </a>
+              ) : (
+                <Button size="sm" variant="ghost" onClick={() => onDetail(agent)}
+                  className="text-gray-400 hover:text-gray-700 text-xs h-7 px-2"
+                  data-testid={`button-detail-${agent.id}`}>
+                  Detail
+                </Button>
+              )
+            )}
+          </div>
+          {/* Action buttons row */}
+          <div className="flex gap-1.5">
+            <Button size="sm" variant="outline" onClick={() => onAddToCart(agent)}
+              className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50 text-xs h-8 gap-1"
+              data-testid={`button-add-cart-${agent.id}`}>
+              <Plus className="h-3.5 w-3.5" />Keranjang
+            </Button>
+            <Button size="sm" onClick={() => onBuy(agent)}
+              className="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1"
+              data-testid={`button-buy-${agent.id}`}>
+              <ShoppingCart className="h-3.5 w-3.5" />Beli
+            </Button>
           </div>
         </div>
       </CardContent>
