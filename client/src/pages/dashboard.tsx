@@ -6,7 +6,7 @@ import {
   ShoppingBag, Users, Handshake, TrendingUp, Users2, Ticket, Pencil, Trash2, Radio, FileText, FolderOpen, Target, Globe, Megaphone, Loader2, PackageCheck, Wand2, Scale,
   Download, Upload, Folder, FolderPlus, Power, PowerOff, Cpu, Archive, ArchiveRestore, Eye, EyeOff, Crown, AlertCircle, Rocket, CheckCircle2, GraduationCap, DatabaseZap, UserPlus, Share2,
   Award, Shield, ShieldCheck, ShieldAlert, Leaf, Search, HardHat, Building2, Construction, Map as MapIcon, Landmark, Calculator, Package,
-  FileSignature, GitBranch, Lock, FileDown, ArrowRight, Wallet, Trophy
+  FileSignature, GitBranch, Lock, Unlock, FileDown, ArrowRight, Wallet, Trophy
 } from "lucide-react";
 import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding } from "@/hooks/use-partner-branding";
