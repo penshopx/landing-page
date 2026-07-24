@@ -176,6 +176,7 @@ import * as M_esimpanClaw from "./seed-esimpan-claw";
 import * as M_ossClaw from "./seed-oss-claw";
 import * as M_terasLpjk1 from "./seed-teras-lpjk1";
 import * as M_penulisCerdasPkb from "./seed-penulis-cerdas";
+import { seedStoreProducts } from "./seed-store-products";
 
 const seedModuleRegistry: Record<string, any> = {
   "./seed-knowledge-base": M_knowledgeBase,
@@ -1930,6 +1931,9 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
       try { await M_ossClaw.seedOssClaw(); } catch (err) { log("[Seed OSSClaw] Error: " + (err as Error).message); }
       try { await M_terasLpjk1.seedTerasLpjk1(); } catch (err) { log("[Seed TerasLPJK1] Error: " + (err as Error).message); }
       try { await M_penulisCerdasPkb.seedPenulisCerdasPKB(); } catch (err) { log("[Seed PenulisCerdasPKB] Error: " + (err as Error).message); }
+
+      // ── Store Products — produk unggulan di katalog marketplace ──────────
+      try { await seedStoreProducts(); } catch (err) { log("[Seed StoreProducts] Error: " + (err as Error).message); }
 
       // ── SMART MODEL UPGRADE — SEMUA chatbot/agen wajib model cerdas ──────────
       // Kualitas jawaban ditentukan tier model, bukan KB. Seed MELEWATI agen yang
