@@ -17,12 +17,26 @@ export function CartDrawer() {
   const { toast } = useToast();
 
   const handleCheckout = () => {
-    const url = buildCheckoutUrl();
-    if (!url) {
+    const selected = items.filter(i => i.selected);
+    if (selected.length === 0) {
       toast({ title: "Pilih produk dulu", description: "Centang minimal satu produk untuk checkout.", variant: "destructive" });
       return;
     }
-    window.open(url, "_blank");
+
+    // Items with Scalev variant → checkout via Scalev
+    const scalevItems = selected.filter(i => i.scalevVariantId);
+    if (scalevItems.length > 0) {
+      const url = buildCheckoutUrl();
+      if (url) window.open(url, "_blank");
+    }
+
+    // Items without Scalev variant → WA inquiry
+    const waItems = selected.filter(i => !i.scalevVariantId);
+    if (waItems.length > 0) {
+      const list = waItems.map(i => `- ${i.name} (${formatPrice(i.price)})`).join("%0A");
+      const msg = encodeURIComponent(`Halo, saya ingin membeli:\n`) + list + encodeURIComponent(`\n\nMohon info cara pembelian.`);
+      window.open(`https://wa.me/6282299417818?text=${msg}`, "_blank");
+    }
   };
 
   const allSelected = items.length > 0 && items.every(i => i.selected);
