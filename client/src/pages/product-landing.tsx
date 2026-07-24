@@ -23,7 +23,72 @@ import {
   BookOpen,
   GraduationCap,
   FileText,
+  Table2,
+  ClipboardList,
+  Calculator,
+  Database,
+  Wrench,
 } from "lucide-react";
+
+// Output types setiap chatbot bisa hasilkan
+const OUTPUT_TYPES = [
+  { icon: FileText,     label: "Dokumen Formal",    desc: "Surat, laporan, HSE Plan, kontrak, template" },
+  { icon: ClipboardList,label: "Checklist & Audit", desc: "Evaluasi, gap analysis, kesiapan pengajuan" },
+  { icon: Table2,       label: "Tabel & RAB",       desc: "Bill of Quantities, scoring, perbandingan" },
+  { icon: Calculator,   label: "Perhitungan",       desc: "Volume, EVM, risk score, HPS" },
+];
+
+// KB customization section component
+function KBCustomSection({ agentName }: { agentName: string }) {
+  return (
+    <section className="py-14 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+      <div className="container mx-auto px-4 max-w-4xl">
+        <div className="flex flex-col md:flex-row items-center gap-8">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-3 py-1 text-xs mb-4">
+              <Database className="w-3 h-3" />
+              <span>Knowledge Base Kustom</span>
+            </div>
+            <h3 className="text-xl font-bold mb-3">
+              Masukkan Pengetahuan Bisnis Anda
+            </h3>
+            <p className="text-slate-300 text-sm mb-4 leading-relaxed">
+              {agentName} bisa dikustomisasi dengan dokumen, SOP, regulasi, dan data spesifik bisnis Anda —
+              sehingga jawabannya selalu relevan dengan konteks perusahaan, bukan jawaban generik.
+            </p>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {[
+                "Upload PDF, Word, atau teks regulasi internal",
+                "Chatbot prioritaskan KB Anda sebelum menjawab",
+                "Cocok untuk SOP perusahaan, produk, atau kebijakan internal",
+                "Bisa diperbarui kapan saja tanpa rebuild",
+              ].map((item, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="flex-shrink-0 text-center">
+            <div className="w-24 h-24 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mb-3 mx-auto">
+              <Wrench className="w-10 h-10 text-violet-300" />
+            </div>
+            <p className="text-xs text-slate-400">Kustomisasi via dashboard<br />atau hubungi tim Gustafta</p>
+            <a
+              href="https://wa.me/6281287941900?text=Halo%2C+saya+ingin+kustomisasi+KB+untuk+chatbot"
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-3 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-colors"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              Konsultasi via WA
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 interface DemoItem {
   title: string;
@@ -160,8 +225,39 @@ export default function ProductLanding() {
           </div>
         </section>
 
+        {/* Output yang Dihasilkan */}
+        <section className="py-14 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold">📋 Output yang Dihasilkan</h2>
+              <p className="text-muted-foreground text-sm mt-2">Bukan sekadar jawaban — chatbot ini menghasilkan dokumen siap pakai</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-6">
+              {OUTPUT_TYPES.map((t, i) => {
+                const Icon = t.icon;
+                return (
+                  <div key={i} className="rounded-xl border bg-background p-4 text-center">
+                    <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mx-auto mb-2">
+                      <Icon className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                    </div>
+                    <p className="text-xs font-semibold mb-1">{t.label}</p>
+                    <p className="text-xs text-muted-foreground leading-tight">{t.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="text-center">
+              <Link href="/panduan-output">
+                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                  <Eye className="w-3.5 h-3.5" /> Lihat Panduan Lengkap Input → Output
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {(agent.productFeatures ?? []).length > 0 && (
-          <section className="py-16 md:py-20 bg-muted/50">
+          <section className="py-14 bg-muted/50">
             <div className="container mx-auto px-4">
               <SectionHeader title="Yang Bisa Dilakukan" />
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
@@ -192,18 +288,28 @@ export default function ProductLanding() {
           </div>
         </section>
 
+        {/* KB Customization */}
+        <KBCustomSection agentName={agent.name} />
+
         <section className="py-20 md:py-32 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <div className="container mx-auto px-4 text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Siap Mulai?</h2>
-            <p className="text-gray-300 mb-10 max-w-xl mx-auto">Gunakan {agent.name} sekarang — tanya apa saja seputar keahliannya.</p>
-            <Link href={chatUrl}>
-              <Button size="lg" className="gap-2 text-lg px-8" data-testid="button-final-cta">
-                <MessageSquare className="h-5 w-5" />
-                Mulai Chat
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
+            <p className="text-gray-300 mb-10 max-w-xl mx-auto">Gunakan {agent.name} sekarang — hasilkan dokumen, checklist, dan analisis siap pakai.</p>
+            <div className="flex gap-3 justify-center flex-wrap">
+              <Link href={chatUrl}>
+                <Button size="lg" className="gap-2 text-lg px-8" data-testid="button-final-cta">
+                  <MessageSquare className="h-5 w-5" />
+                  Mulai Chat
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="/panduan-output">
+                <Button size="lg" variant="outline" className="gap-2 border-white/20 text-white hover:bg-white/10">
+                  <Eye className="h-5 w-5" /> Panduan Output
+                </Button>
+              </Link>
+            </div>
           </div>
         </section>
       </div>
@@ -471,6 +577,37 @@ export default function ProductLanding() {
         </section>
       )}
 
+      {/* Output yang Dihasilkan */}
+      <section className="py-14 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold">📋 Output yang Dihasilkan</h2>
+            <p className="text-muted-foreground text-sm mt-2">Bukan sekadar jawaban — chatbot ini menghasilkan dokumen siap pakai</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-6">
+            {OUTPUT_TYPES.map((t, i) => {
+              const Icon = t.icon;
+              return (
+                <div key={i} className="rounded-xl border bg-background p-4 text-center">
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center mx-auto mb-2">
+                    <Icon className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                  </div>
+                  <p className="text-xs font-semibold mb-1">{t.label}</p>
+                  <p className="text-xs text-muted-foreground leading-tight">{t.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-center">
+            <Link href="/panduan-output">
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                <Eye className="w-3.5 h-3.5" /> Panduan Input → Output
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Demo Chat — coba langsung */}
       <section className="py-16 md:py-20" data-testid="section-demo-chat">
         <div className="container mx-auto px-4">
@@ -487,6 +624,9 @@ export default function ProductLanding() {
           />
         </div>
       </section>
+
+      {/* KB Customization */}
+      <KBCustomSection agentName={agent.name} />
 
       {/* Pricing / Offers */}
       {(conversionOffers.length > 0 || monthlyPrice > 0) && (

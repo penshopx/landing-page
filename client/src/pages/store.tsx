@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Loader2, Bot, ShoppingCart, Smartphone, Search,
   ChevronLeft, ChevronRight, Layers, CheckCircle2, Info, X, MessageCircle,
-  Wrench, Sparkles, ShieldAlert, ShieldCheck,
+  Wrench, Sparkles, ShieldAlert, ShieldCheck, FileText,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { trackLead, trackViewContent, trackInitiateCheckout } from "@/lib/meta-pixel";
@@ -809,8 +809,12 @@ function AgentCard({ agent, onBuy, onDetail }: { agent: AgentProduct; onBuy: (a:
           {agent.name}
         </h3>
         {agent.tagline && (
-          <p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-2">{agent.tagline}</p>
+          <p className="text-gray-600 text-xs leading-relaxed line-clamp-2 mb-1">{agent.tagline}</p>
         )}
+        <div className="flex items-center gap-1 mb-2">
+          <FileText className="h-3 w-3 text-violet-400 shrink-0" />
+          <span className="text-[10px] text-violet-600 font-medium">Hasilkan dokumen siap pakai</span>
+        </div>
 
         {(agent.productFeatures ?? []).length > 0 && (
           <div className="space-y-1 mb-3 flex-1">
