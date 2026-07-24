@@ -249,7 +249,7 @@ export default function GeneratorSertifikatPengalaman() {
             <div className="flex gap-3">
               <Button onClick={() => setResult(null)} variant="outline" className="flex-1 text-xs"><RotateCcw className="h-3 w-3 mr-1" />Buat Ulang</Button>
               <Button asChild className="flex-1 bg-rose-600 hover:bg-rose-700 text-xs">
-                <Link href="/panduan-apl-01">Panduan APL-01 →</Link>
+                <Link href="/panduan-apl01">Panduan APL-01 →</Link>
               </Button>
             </div>
           </>

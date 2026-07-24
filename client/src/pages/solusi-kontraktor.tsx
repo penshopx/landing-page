@@ -58,7 +58,7 @@ const AI_SPECIALISTS = [
     name: "SKKClaw",
     emoji: "🎓",
     desc: "Cek kelayakan SKK, pemetaan jabatan kerja, checklist dokumen per skema kompetensi",
-    href: "/skk-coach-landing",
+    href: "/skk-coach",
   },
   {
     name: "RABClaw",

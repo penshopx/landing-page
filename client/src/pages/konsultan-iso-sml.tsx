@@ -218,7 +218,7 @@ export default function KonsultanIsoSmlPage() {
             Lihat juga:{" "}
             <Link href="/konsultan-iso-smm"><span className="underline font-semibold cursor-pointer">ISO 9001 (Mutu) →</span></Link>
             {" · "}
-            <Link href="/esg-sustainability"><span className="underline font-semibold cursor-pointer">ESGClaw →</span></Link>
+            <Link href="/esg-claw"><span className="underline font-semibold cursor-pointer">ESGClaw →</span></Link>
           </p>
         </div>
       </section>

@@ -52,7 +52,7 @@ const AI_SPECIALISTS = [
     name: "SKKClaw",
     emoji: "🎓",
     desc: "Panduan SKK untuk klien Anda — cek kelayakan, checklist dokumen, jadwal asesmen",
-    href: "/skk-coach-landing",
+    href: "/skk-coach",
   },
   {
     name: "OSSClaw",
