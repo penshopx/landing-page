@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   Sparkles, Lock, Unlock, ShoppingBag, Wrench, MessageCircle,
   Check, Trash2, ArrowRight, Bot, FileDown, RefreshCw, BookOpen,
-  ChevronRight,
+  ChevronRight, CreditCard,
 } from "lucide-react";
 
 const BLUEPRINT_STORAGE_KEY = "gustafta_blueprint_pending";
@@ -175,12 +175,24 @@ export default function BlueprintSayaPage() {
                   </Section>
                 </div>
                 <div className="px-5 pb-5">
-                  <Link href={isAuthenticated ? "/dashboard" : "/login"}>
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-11 font-bold gap-2">
-                      <FileDown className="h-4 w-4" /> Import ke Gustafta Builder
-                    </Button>
-                  </Link>
-                  <p className="text-xs text-center text-gray-400 mt-2">Buka "Buat Chatbot Baru" di Builder — Blueprint akan muncul otomatis di atas</p>
+                  {isAuthenticated ? (
+                    <button
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-11 font-bold gap-2 rounded-md flex items-center justify-center transition-colors"
+                      onClick={() => {
+                        try { localStorage.setItem("gustafta_blueprint_auto_import", "1"); } catch { /* ignore */ }
+                        window.location.href = "/dashboard";
+                      }}
+                    >
+                      <FileDown className="h-4 w-4 mr-2" /> Import ke Gustafta Builder
+                    </button>
+                  ) : (
+                    <Link href="/login">
+                      <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-11 font-bold gap-2">
+                        <FileDown className="h-4 w-4" /> Login untuk Import
+                      </Button>
+                    </Link>
+                  )}
+                  <p className="text-xs text-center text-gray-400 mt-2">Dialog "Buat Alat Bantu" akan terbuka otomatis — Blueprint langsung terisi</p>
                 </div>
               </div>
             )}
@@ -244,9 +256,9 @@ export default function BlueprintSayaPage() {
 
                 {/* CTAs */}
                 <div className="px-5 pb-5 space-y-2">
-                  <a href="https://wa.me/6282299417818?text=Halo%20Gustafta%21%20Saya%20tertarik%20berlangganan.%20Mohon%20informasi%20cara%20pembayarannya." target="_blank" rel="noopener noreferrer" className="block">
+                  <a href="/pricing" className="block">
                     <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white h-11 font-bold gap-2 shadow-md">
-                      <MessageCircle className="h-4 w-4" /> Tanya Info Pembayaran via WA
+                      <CreditCard className="h-4 w-4" /> Lihat Paket &amp; Bayar via Scalev
                     </Button>
                   </a>
                   <p className="text-center text-[11px] text-gray-400">Sekali bayar · Termasuk lisensi + trial 7 hari</p>

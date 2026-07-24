@@ -81,9 +81,9 @@ function FrameworkLocked() {
                 >
                   <LogIn className="h-4 w-4" /> Masuk ke Akun Saya
                 </a>
-                <Link href="/starter-kit">
+                <Link href="/pricing">
                   <div className="inline-flex items-center justify-center gap-2 w-full border border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400 font-semibold py-2.5 px-5 rounded-xl text-sm hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors cursor-pointer">
-                    <ShoppingCart className="h-4 w-4" /> Tanya Info Pembayaran via WA
+                    <ShoppingCart className="h-4 w-4" /> Lihat Paket &amp; Bayar via Scalev
                   </div>
                 </Link>
               </div>

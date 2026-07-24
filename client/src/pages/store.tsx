@@ -760,7 +760,7 @@ export default function Store() {
               </Button>
 
               <p className="text-xs text-gray-400 text-center">
-                Pembayaran aman via Scalev.id. Konfirmasi order via WhatsApp tim kami.
+                Pembayaran aman via Scalev.id — QRIS, transfer bank, e-wallet, kartu kredit.
               </p>
             </div>
           )}

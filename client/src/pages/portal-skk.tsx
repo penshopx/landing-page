@@ -41,7 +41,7 @@ const SEGMENTS: Array<{
       "Tidak mengerti unit kompetensi yang akan diujikan",
     ],
     aiSpecialists: [
-      { name: "SKKClaw", emoji: "🎓", desc: "Cek kelayakan, pemetaan jabatan kerja, checklist dokumen per skema KKNI", href: "/skk-coach-landing" },
+      { name: "SKKClaw", emoji: "🎓", desc: "Cek kelayakan, pemetaan jabatan kerja, checklist dokumen per skema KKNI", href: "/skk-coach" },
       { name: "SimulatorSKK", emoji: "🎯", desc: "Simulasi wawancara dan asesmen teknis sesuai skema kompetensi Anda", href: "/simulator-wawancara-skk" },
       { name: "PortofolioClaw", emoji: "📁", desc: "Panduan menyusun portofolio dan eviden pengalaman kerja yang kuat", href: "/generator-portofolio-skk" },
       { name: "MateriClaw", emoji: "📚", desc: "Materi belajar dan bank soal sesuai unit kompetensi SKKNI yang diujikan", href: "/materi-belajar-skk" },
@@ -64,7 +64,7 @@ const SEGMENTS: Array<{
     ],
     aiSpecialists: [
       { name: "AssessmentClaw", emoji: "📋", desc: "Panduan proses asesmen — FR, MUK, BAPAK, dan rekaman eviden terstruktur", href: "/store" },
-      { name: "SKKClaw", emoji: "🎓", desc: "Update regulasi terbaru BNSP, perubahan skema, dan persyaratan jabatan kerja", href: "/skk-coach-landing" },
+      { name: "SKKClaw", emoji: "🎓", desc: "Update regulasi terbaru BNSP, perubahan skema, dan persyaratan jabatan kerja", href: "/skk-coach" },
       { name: "EvidenceClaw", emoji: "🔍", desc: "Panduan verifikasi eviden pengalaman kerja asesi per unit kompetensi", href: "/store" },
       { name: "ReportClaw", emoji: "📄", desc: "Draft laporan asesmen terstruktur — tinggal lengkapi dengan temuan spesifik", href: "/store" },
     ],
@@ -85,7 +85,7 @@ const SEGMENTS: Array<{
       "Update informasi regulasi BNSP harus dikomunikasikan ke seluruh asesi",
     ],
     aiSpecialists: [
-      { name: "SKKClaw", emoji: "🎓", desc: "Jawab pertanyaan asesi otomatis 24/7 — persyaratan, alur, checklist dokumen per skema", href: "/skk-coach-landing" },
+      { name: "SKKClaw", emoji: "🎓", desc: "Jawab pertanyaan asesi otomatis 24/7 — persyaratan, alur, checklist dokumen per skema", href: "/skk-coach" },
       { name: "RegulationClaw", emoji: "📜", desc: "Update regulasi BNSP, SK Dirjen, dan perubahan kebijakan sertifikasi terkini", href: "/skk-pedoman-bnsp" },
       { name: "AssessmentClaw", emoji: "📋", desc: "Panduan proses asesmen sesuai BNSP — untuk digunakan staf dan asesor LSP", href: "/store" },
       { name: "AdminClaw", emoji: "💼", desc: "Bantuan administrasi LSP — verifikasi kelengkapan dokumen, checklist pendaftaran", href: "/store" },
@@ -108,7 +108,7 @@ const SEGMENTS: Array<{
     ],
     aiSpecialists: [
       { name: "AssessmentClaw", emoji: "📋", desc: "Checklist persiapan TUK — kelengkapan sarana, dokumen, dan prosedur operasional", href: "/store" },
-      { name: "SKKClaw", emoji: "🎓", desc: "Informasi persyaratan per skema untuk dikomunikasikan ke asesi yang akan diuji", href: "/skk-coach-landing" },
+      { name: "SKKClaw", emoji: "🎓", desc: "Informasi persyaratan per skema untuk dikomunikasikan ke asesi yang akan diuji", href: "/skk-coach" },
       { name: "DocumentClaw", emoji: "📄", desc: "Template dokumen TUK — panduan asesi, form rekaman, dan laporan pasca asesmen", href: "/store" },
       { name: "AdminClaw", emoji: "💼", desc: "Bantuan verifikasi dokumen dan checklist kesiapan asesmen harian", href: "/store" },
     ],
@@ -131,7 +131,7 @@ const SEGMENTS: Array<{
     aiSpecialists: [
       { name: "TrackerSKK", emoji: "📊", desc: "Pantau status SKK seluruh tim — yang aktif, akan habis, dan perlu diperpanjang", href: "/tracker-skk" },
       { name: "PlannerSKK", emoji: "🗓️", desc: "Rencanakan kebutuhan SKK per proyek dan jadwal sertifikasi tim secara sistematis", href: "/planner-skk-bujk" },
-      { name: "SKKClaw", emoji: "🎓", desc: "Panduan persyaratan SKK per jabatan dan jenjang untuk seluruh anggota tim", href: "/skk-coach-landing" },
+      { name: "SKKClaw", emoji: "🎓", desc: "Panduan persyaratan SKK per jabatan dan jenjang untuk seluruh anggota tim", href: "/skk-coach" },
       { name: "ManfaatSKK", emoji: "💰", desc: "Hitung manfaat finansial investasi SKK untuk BUJK — kualifikasi tender dan upah", href: "/kalkulator-manfaat-skk-bujk" },
     ],
     ctaLabel: "Kelola SKK Perusahaan",
@@ -293,7 +293,7 @@ export default function PortalSKKPage() {
                 ))}
               </div>
               <div className="mt-4">
-                <Link href="/skk-coach-landing">
+                <Link href="/skk-coach">
                   <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white gap-2">
                     {segment.ctaLabel} <ArrowRight className="h-4 w-4" />
                   </Button>
@@ -344,7 +344,7 @@ export default function PortalSKKPage() {
             Mulai hari ini, gratis.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/skk-coach-landing">
+            <Link href="/skk-coach">
               <Button size="lg" className="bg-white text-emerald-700 hover:bg-emerald-50 font-bold gap-2">
                 <Star className="h-4 w-4" />
                 Mulai dengan SKKClaw

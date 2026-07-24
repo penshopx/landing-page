@@ -7090,10 +7090,9 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       const waUrl = `https://wa.me/6282299417818?text=${waMsg}`;
 
       // ── Scalev checkout otomatis ───────────────────────────────────────────
-      // Per-agent: cek dulu apakah agen ini punya produk Scalev sendiri
-      // di scalev_mappings (scalevSlug non-kosong). Kalau tidak ada,
-      // gunakan SCALEV_CHATBOT_SLUG env (slug global) sebagai fallback.
-      const scalevChatbotSlug = process.env.SCALEV_CHATBOT_SLUG;
+      // Per-agent: gunakan slug dari scalev_mappings (khusus per-agen).
+      // Tidak ada fallback ke slug global — slug generik biasanya 404 di Scalev
+      // karena produk belum tentu sesuai dengan agen yang dipesan.
       let scalevUrl: string | null = null;
       if (resolvedAgentId) {
         let effectiveSlug: string | null = null;
@@ -7101,7 +7100,6 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           const agentMapping = await storage.getScalevMappingByAgentId(resolvedAgentId);
           if (agentMapping?.scalevSlug) effectiveSlug = agentMapping.scalevSlug;
         } catch {}
-        if (!effectiveSlug) effectiveSlug = scalevChatbotSlug || null;
         if (effectiveSlug) {
           const qs = new URLSearchParams();
           qs.set("pre_fill[name]", String(name));

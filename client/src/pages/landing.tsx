@@ -13,7 +13,7 @@ import overviewVideo from "@assets/generated_videos/gustafta_explainer.mp4";
 import overviewPoster from "@assets/generated_videos/gustafta_explainer_poster.jpg";
 import {
   Rocket, ArrowRight, Check, BookOpen, Wrench, Zap, Lightbulb, TrendingUp,
-  MessageCircle, ShieldCheck, Store, Bot, FileText,
+  MessageCircle, ShieldCheck, Store, Bot, FileText, CreditCard,
   GraduationCap, Smartphone, Users, Building2, Briefcase, User,
   Send, Loader2, Sparkles, X, ChevronDown, Lock, ShoppingBag, FileDown,
   Mic, MicOff, Paperclip, Bell, Clock, Target, Mail, Stethoscope, CalendarDays,
@@ -114,7 +114,7 @@ Buat Blueprint Konfigurasi AI dalam format JSON yang valid SAJA (tanpa markdown,
 
 const BLUEPRINT_STORAGE_KEY = "gustafta_blueprint_pending";
 
-const STARTER_KIT_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%21%20Saya%20tertarik%20berlangganan.%20Mohon%20informasi%20cara%20pembayarannya.";
+const STARTER_KIT_URL = "/pricing";
 
 function BlueprintLockedCard({ bp, onClose }: { bp: Blueprint; onClose: () => void }) {
   const waText = encodeURIComponent(
@@ -169,10 +169,10 @@ function BlueprintLockedCard({ bp, onClose }: { bp: Blueprint; onClose: () => vo
         </div>
 
         {/* SATU CTA utama */}
-        <a href={STARTER_KIT_URL} target="_blank" rel="noopener noreferrer" className="block">
+        <a href={STARTER_KIT_URL} className="block">
           <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white h-10 text-sm font-bold gap-2 shadow-md">
-            <MessageCircle className="h-4 w-4" />
-            Tanya Info Pembayaran via WA
+            <CreditCard className="h-4 w-4" />
+            Lihat Paket &amp; Bayar via Scalev
           </Button>
         </a>
         <p className="text-center text-[10px] text-gray-500 dark:text-gray-400 -mt-1">

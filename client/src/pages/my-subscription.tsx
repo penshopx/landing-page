@@ -16,7 +16,7 @@ import {
   MessageSquare, BookOpen, Blocks, PlaySquare, FileText, Mic,
   Globe, Headphones, Cpu, Bot, Zap, Building2,
   RefreshCw, Phone, ChevronRight, Sparkles, BarChart3, AlertCircle, CheckCircle2,
-  HardHat, Briefcase, Loader2,
+  HardHat, Briefcase, Loader2, CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -277,10 +277,10 @@ export default function MySubscriptionPage() {
                       {formatPrice(PLAN_CONFIGS[pendingUpgrade.plan as keyof typeof PLAN_CONFIGS]?.monthlyFee ?? 0)}/bln
                     </span>
                   </div>
-                  <a href={WA(pendingUpgrade.plan, user?.email ?? "")} target="_blank" rel="noopener noreferrer">
+                  <a href="/pricing">
                     <Button size="sm" variant="outline" className="w-full gap-2" data-testid="button-complete-payment">
-                      <Phone className="h-4 w-4" />
-                      Selesaikan Pembayaran
+                      <CreditCard className="h-4 w-4" />
+                      Selesaikan Pembayaran via Scalev
                     </Button>
                   </a>
                 </CardContent>

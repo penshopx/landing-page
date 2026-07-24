@@ -216,13 +216,9 @@ export default function Subscription() {
                             </div>
                           ))}
                         </div>
-                        <a
-                          href="https://wa.me/628123456789?text=Konfirmasi%20Pembayaran%20Gustafta" onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
+                        <a href="/pricing">
                           <Button className="mt-3" size="sm" variant="outline">
-                            Konfirmasi via WhatsApp
+                            Bayar via Scalev
                           </Button>
                         </a>
                       </div>

@@ -936,7 +936,7 @@ export default function StoreFeatured() {
                   : <><ShoppingCart className="h-4 w-4 mr-2" />Bayar {formatPrice(selectedAgent.price)}</>}
               </Button>
               <p className="text-xs text-gray-400 text-center">
-                Pembayaran aman via Scalev.id. Konfirmasi order via WhatsApp tim kami.
+                Pembayaran aman via Scalev.id — QRIS, transfer bank, e-wallet, kartu kredit.
               </p>
             </div>
           )}

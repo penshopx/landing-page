@@ -210,7 +210,7 @@ export default function KonsultanPancekSmapPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-white text-teal-800 hover:bg-teal-50 font-bold gap-2 px-8 h-12" data-testid="btn-cta-checkout">
-                Tanya Info Pembayaran via WA <ArrowRight className="h-5 w-5" />
+                Lihat Paket & Bayar via Scalev <ArrowRight className="h-5 w-5" />
               </Button>
             </a>
             <a href={WA_URL} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">

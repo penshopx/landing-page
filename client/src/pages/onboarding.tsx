@@ -122,7 +122,7 @@ export default function OnboardingPage() {
           <h1 className="text-2xl font-bold">Selamat datang di Gustafta Apps!</h1>
           <p className="text-muted-foreground">
             {selected === "starter" || selected === "profesional" || selected === "bisnis"
-              ? "Tim kami akan menghubungi Anda dalam 1×24 jam untuk proses setup. Cek WhatsApp Anda."
+              ? "Pilih durasi berlangganan dan selesaikan pembayaran via Scalev — QRIS, transfer, e-wallet, kartu kredit."
               : "Trial Anda sudah aktif. Eksplorasi platform sekarang!"}
           </p>
           <div className="flex gap-3 justify-center">
@@ -179,7 +179,7 @@ export default function OnboardingPage() {
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Setiap paket terdiri dari <strong>Biaya Setup</strong> (satu kali, sudah termasuk lisensi + Starter Kit) + <strong>Biaya Bulanan</strong>. 
-            Pilih paket yang sesuai kebutuhan, tim kami akan menghubungi Anda dalam 24 jam.
+            Pilih paket yang sesuai, bayar hosting via Scalev — transfer bank, QRIS, e-wallet, kartu kredit.
           </p>
         </div>
 

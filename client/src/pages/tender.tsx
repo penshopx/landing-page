@@ -324,7 +324,7 @@ export default function TenderPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-white text-indigo-800 hover:bg-indigo-50 font-bold gap-2 px-8 h-12" data-testid="btn-cta-bundle">
-                Tanya Info Pembayaran via WA <ArrowRight className="h-5 w-5" />
+                Lihat Paket & Bayar via Scalev <ArrowRight className="h-5 w-5" />
               </Button>
             </a>
             <a href={WA_URL} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">

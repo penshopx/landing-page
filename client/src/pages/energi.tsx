@@ -301,7 +301,7 @@ export default function EnergiPage() {
                 ))}
               </ul>
               <a href={CHECKOUT_BASIC} target="_blank" rel="noopener noreferrer">
-                <Button className="w-full" variant="outline" data-testid="btn-paket-basic">Tanya Info Pembayaran via WA →</Button>
+                <Button className="w-full" variant="outline" data-testid="btn-paket-basic">Lihat Paket & Bayar via Scalev →</Button>
               </a>
             </div>
             <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-orange-400 text-left relative">
@@ -314,7 +314,7 @@ export default function EnergiPage() {
                 ))}
               </ul>
               <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
-                <Button className="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold" data-testid="btn-paket-bundle">Tanya Info Pembayaran via WA →</Button>
+                <Button className="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold" data-testid="btn-paket-bundle">Lihat Paket & Bayar via Scalev →</Button>
               </a>
             </div>
           </div>
@@ -331,7 +331,7 @@ export default function EnergiPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href={CHECKOUT_URL} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="bg-white text-orange-800 hover:bg-orange-50 font-bold gap-2 px-8 h-12" data-testid="btn-cta-bundle">
-                Tanya Info Pembayaran via WA <ArrowRight className="h-5 w-5" />
+                Lihat Paket & Bayar via Scalev <ArrowRight className="h-5 w-5" />
               </Button>
             </a>
             <a href={WA_URL} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">
