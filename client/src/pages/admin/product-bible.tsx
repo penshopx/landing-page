@@ -18,6 +18,7 @@ import {
   Package, CreditCard, HardDrive, Zap, BookOpen, GraduationCap, Award, Wrench,
   FileText, Users2, TrendingUp, ClipboardList, Database, Layers, Info,
   CircleDollarSign, Scale, RefreshCw, Building2, ShoppingBag, Plus, Minus,
+  LayoutGrid, Clock, BatteryLow, Moon,
 } from "lucide-react";
 import {
   PRICING, MARKETPLACE, HOSTING_PERIODS, SERVICE_TIERS,
@@ -152,6 +153,7 @@ export default function ProductBible() {
           <TabsList className="mb-6 flex-wrap h-auto gap-1">
             <TabsTrigger value="produk" className="gap-1.5 text-xs"><Package className="h-3.5 w-3.5" /> Katalog Produk</TabsTrigger>
             <TabsTrigger value="akses" className="gap-1.5 text-xs"><Lock className="h-3.5 w-3.5" /> Akses & Tier</TabsTrigger>
+            <TabsTrigger value="kapasitas" className="gap-1.5 text-xs"><LayoutGrid className="h-3.5 w-3.5" /> Kapasitas & Slot</TabsTrigger>
             <TabsTrigger value="harga" className="gap-1.5 text-xs"><CreditCard className="h-3.5 w-3.5" /> Harga & Langganan</TabsTrigger>
             <TabsTrigger value="bisnis" className="gap-1.5 text-xs"><Scale className="h-3.5 w-3.5" /> Aturan Bisnis</TabsTrigger>
             <TabsTrigger value="storage" className="gap-1.5 text-xs"><HardDrive className="h-3.5 w-3.5" /> Storage</TabsTrigger>
@@ -489,6 +491,218 @@ export default function ProductBible() {
             </Card>
           </TabsContent>
 
+          {/* ══ TAB: KAPASITAS & SLOT ═════════════════════════════════════════ */}
+          <TabsContent value="kapasitas" className="space-y-6">
+
+            {/* Butir 1-4 — apa yang dibuka setiap jenis pembelian */}
+            <Card>
+              <CardHeader className="pb-2">
+                <SectionTitle icon={Unlock} title="Yang Terbuka per Jenis Pembelian (Butir 1–4)" subtitle="Kerangka kanonik — evaluasi efektivitas sambil jalan" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {[
+                  {
+                    no: "1",
+                    judul: "Chatbot Spesialis + Berlangganan Hosting",
+                    contoh: "Beli chatbot K3, Tender, SBU, ISO, dll dari /store",
+                    model: "Lisensi sekali bayar + hosting recurring",
+                    buka: ["Ruang Kelola (slot aktif sesuai tier)", "Ruang Simpan (500 MB – 25 GB sesuai tier)"],
+                    tidak: ["Ekosistem Kompetensi"],
+                    color: "border-l-blue-400",
+                    bg: "bg-blue-50/50 dark:bg-blue-950/20",
+                  },
+                  {
+                    no: "2",
+                    judul: "Chatbot Premium + Berlangganan Hosting",
+                    contoh: "Chatbot premium dikurasi Gustafta (premiumClass: private)",
+                    model: "Lisensi premium sekali bayar + hosting recurring",
+                    buka: ["Ruang Kelola (slot aktif sesuai tier)", "Ruang Simpan (sesuai tier)", "Ekosistem Kompetensi (penuh, via Workroom)"],
+                    tidak: [],
+                    color: "border-l-violet-400",
+                    bg: "bg-violet-50/50 dark:bg-violet-950/20",
+                  },
+                  {
+                    no: "3",
+                    judul: "Bedah Dokumen · Brain Project · Klinik Konsultasi",
+                    contoh: "Produk tools yang dipakai berulang per proyek/sesi",
+                    model: "Berlangganan sendiri (quota/bulan) — ATAU per sesi + bonus 30 hari akses platform",
+                    buka: ["Ruang Kelola (slot aktif sesuai tier)", "Ruang Simpan (sesuai tier)", "Ekosistem Kompetensi (selama berlangganan aktif)"],
+                    tidak: [],
+                    color: "border-l-emerald-400",
+                    bg: "bg-emerald-50/50 dark:bg-emerald-950/20",
+                    catatan: "Klinik per sesi → bonus 30 hari akses platform. Habis → dorong berlangganan.",
+                  },
+                  {
+                    no: "4",
+                    judul: "Jasa Dokumen · Bimtek · Executive Summary · Jasa Keuangan",
+                    contoh: "Jasa sekali selesai — ada deliverable nyata yang diserahkan",
+                    model: "Bayar sekali → terima deliverable → bonus akses platform berbatas waktu",
+                    buka: ["Ruang Kelola (slot aktif sesuai tier, selama bonus aktif)", "Ruang Simpan (sesuai tier, selama bonus aktif)", "Ekosistem Kompetensi (selama bonus aktif)"],
+                    tidak: [],
+                    color: "border-l-amber-400",
+                    bg: "bg-amber-50/50 dark:bg-amber-950/20",
+                    catatan: "Jasa Dokumen/Executive Summary/Jasa Keuangan → bonus 30 hari. Bimtek → bonus 60 hari. Setelah habis → tawaran berlangganan.",
+                  },
+                ].map(b => (
+                  <div key={b.no} className={`border-l-4 ${b.color} ${b.bg} rounded-r-lg p-4 space-y-2`}>
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">{b.no}</span>
+                      <span className="font-semibold text-sm">{b.judul}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground pl-8">{b.contoh}</p>
+                    <p className="text-xs pl-8"><span className="font-medium">Model:</span> {b.model}</p>
+                    <div className="pl-8 grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                      <div>
+                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Yang Terbuka</p>
+                        <ul className="space-y-0.5">
+                          {b.buka.map(item => <li key={item} className="text-xs flex gap-1.5"><CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0 mt-0.5" />{item}</li>)}
+                        </ul>
+                      </div>
+                      {b.tidak.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Tidak Termasuk</p>
+                          <ul className="space-y-0.5">
+                            {b.tidak.map(item => <li key={item} className="text-xs flex gap-1.5 text-muted-foreground"><XCircle className="h-3 w-3 text-rose-400 shrink-0 mt-0.5" />{item}</li>)}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                    {b.catatan && (
+                      <p className="pl-8 text-[11px] text-amber-700 dark:text-amber-400 flex gap-1.5 items-start">
+                        <AlertTriangle className="h-3 w-3 shrink-0 mt-0.5" />{b.catatan}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Kapasitas Ruang Kelola — Slot Chatbot Aktif */}
+            <Card>
+              <CardHeader className="pb-2">
+                <SectionTitle icon={LayoutGrid} title="Kapasitas Ruang Kelola — Slot Chatbot Aktif" subtitle="Analoginya: bisa BELI chatbot sebanyak apapun, tapi yang bisa JALAN bersamaan tergantung tier hosting" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-2 pr-4 font-semibold min-w-[160px]">Tier</th>
+                        <th className="text-center py-2 px-3 font-semibold">Chatbot Bisa Dibeli</th>
+                        <th className="text-center py-2 px-3 font-semibold">Chatbot Aktif Bersamaan</th>
+                        <th className="text-center py-2 px-3 font-semibold">Ruang Simpan</th>
+                        <th className="text-center py-2 px-3 font-semibold">Ekosistem Kompetensi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {[
+                        { tier: "Belum berlangganan", beli: "∞", aktif: "0", storage: "—", ekosistem: false, color: "text-muted-foreground", note: "Chatbot tidak bisa jalan" },
+                        { tier: "Starter (beli ≥1 produk)", beli: "∞", aktif: "3", storage: "500 MB", ekosistem: false, color: "text-emerald-600" },
+                        { tier: "Profesional", beli: "∞", aktif: "10", storage: "5 GB", ekosistem: true, color: "text-blue-600" },
+                        { tier: "Bisnis", beli: "∞", aktif: "25", storage: "25 GB", ekosistem: true, color: "text-violet-600" },
+                        { tier: "Enterprise", beli: "∞", aktif: "Unlimited", storage: "Custom", ekosistem: true, color: "text-purple-600" },
+                      ].map(r => (
+                        <tr key={r.tier} className="hover:bg-muted/30">
+                          <td className={`py-2.5 pr-4 font-semibold text-xs ${r.color}`}>
+                            {r.tier}
+                            {r.note && <span className="block font-normal text-muted-foreground">{r.note}</span>}
+                          </td>
+                          <td className="py-2.5 px-3 text-center font-mono">∞</td>
+                          <td className="py-2.5 px-3 text-center font-mono font-bold">{r.aktif}</td>
+                          <td className="py-2.5 px-3 text-center font-mono">{r.storage}</td>
+                          <td className="py-2.5 px-3 text-center">
+                            {r.ekosistem ? <YaBadge /> : <TidakBadge />}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Kebijakan Chatbot Dormant */}
+                <div className="p-3 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
+                    <Moon className="h-4 w-4" /> Kebijakan Chatbot Dormant
+                  </div>
+                  <ul className="space-y-1.5 text-xs text-muted-foreground pl-6">
+                    <li className="flex gap-1.5"><CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0 mt-0.5" />Chatbot yang dibeli tapi melebihi kuota slot aktif → masuk mode <strong>Dormant</strong> (tidak bisa diakses, tapi tidak dihapus)</li>
+                    <li className="flex gap-1.5"><CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0 mt-0.5" />Downgrade plan: chatbot yang melebihi slot baru → otomatis Dormant</li>
+                    <li className="flex gap-1.5"><CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0 mt-0.5" />Upgrade plan: chatbot Dormant langsung aktif kembali — tidak perlu setup ulang</li>
+                    <li className="flex gap-1.5"><CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0 mt-0.5" />Lisensi tetap milik user selamanya — Dormant bukan pencabutan hak</li>
+                    <li className="flex gap-1.5 text-amber-700 dark:text-amber-400"><AlertTriangle className="h-3 w-3 shrink-0 mt-0.5" />Notifikasi wajib: "X chatbot Anda sedang Dormant — upgrade untuk mengaktifkan"</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Bonus Akses Berbatas Waktu — Butir 3 & 4 */}
+            <Card>
+              <CardHeader className="pb-2">
+                <SectionTitle icon={Clock} title="Bonus Akses Platform — Butir 3 & 4" subtitle="Jembatan ke langganan — bukan pengganti langganan" />
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left py-2 pr-4 font-semibold">Produk</th>
+                        <th className="text-center py-2 px-3 font-semibold">Butir</th>
+                        <th className="text-center py-2 px-3 font-semibold">Model</th>
+                        <th className="text-center py-2 px-3 font-semibold">Bonus Akses Platform</th>
+                        <th className="text-left py-2 px-3 font-semibold">Setelah Habis</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {[
+                        { produk: "Bedah Dokumen", butir: "3", model: "Berlangganan (quota/bln)", bonus: "Selama berlangganan", setelah: "Nonaktif jika berhenti" },
+                        { produk: "Brain Project", butir: "3", model: "Berlangganan (per proyek)", bonus: "Selama berlangganan", setelah: "Nonaktif jika berhenti" },
+                        { produk: "Klinik Konsultasi (paket)", butir: "3", model: "Per paket + 30 hari akses", bonus: "30 hari", setelah: "Tawaran berlangganan" },
+                        { produk: "Klinik Konsultasi (per sesi)", butir: "3", model: "Per sesi", bonus: "30 hari", setelah: "Tawaran berlangganan" },
+                        { produk: "Jasa Dokumen", butir: "4", model: "Sekali bayar → deliverable", bonus: "30 hari", setelah: "Tawaran berlangganan" },
+                        { produk: "Executive Summary", butir: "4", model: "Sekali bayar → deliverable", bonus: "30 hari", setelah: "Tawaran berlangganan" },
+                        { produk: "Jasa Keuangan", butir: "4", model: "Sekali bayar → deliverable", bonus: "30 hari", setelah: "Tawaran berlangganan" },
+                        { produk: "Bimtek Uji Kompetensi", butir: "4", model: "Sekali bayar → pelatihan", bonus: "60 hari", setelah: "Tawaran berlangganan" },
+                      ].map(r => (
+                        <tr key={r.produk} className="hover:bg-muted/30">
+                          <td className="py-2 pr-4 font-medium">{r.produk}</td>
+                          <td className="py-2 px-3 text-center">
+                            <Badge variant="outline" className="text-[10px]">{r.butir}</Badge>
+                          </td>
+                          <td className="py-2 px-3 text-muted-foreground">{r.model}</td>
+                          <td className="py-2 px-3 text-center font-semibold text-emerald-600 dark:text-emerald-400">{r.bonus}</td>
+                          <td className="py-2 px-3 text-muted-foreground">{r.setelah}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="mt-3 text-[11px] text-muted-foreground">
+                  ⚠️ <strong>Status:</strong> Ini kerangka yang disepakati — belum diimplementasi sepenuhnya di sistem. Perlu mekanisme bonus access timer di DB dan notifikasi expiry.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Upsell Path */}
+            <Card>
+              <CardHeader className="pb-2">
+                <SectionTitle icon={TrendingUp} title="Jalur Upsell Alami" subtitle="Setiap state memiliki tekanan upsell organik" />
+              </CardHeader>
+              <CardContent className="space-y-2 text-xs">
+                {[
+                  { trigger: "User beli 4 chatbot, slot Starter penuh (3)", pesan: '"Anda punya 4 chatbot, tapi 1 sedang Dormant. Upgrade Profesional untuk aktifkan semua 10."' },
+                  { trigger: "Ruang Simpan 500 MB hampir penuh", pesan: '"Storage Anda 90% penuh. Upgrade ke Profesional untuk 5 GB."' },
+                  { trigger: "Bonus 30 hari hampir habis (H-7)", pesan: '"Akses Workroom Anda berakhir 7 hari lagi. Berlangganan untuk tetap bisa mengakses Ruang Simpan & Ekosistem Kompetensi."' },
+                  { trigger: "User Butir 1 coba akses Ekosistem Kompetensi", pesan: '"Ekosistem Kompetensi tersedia untuk pengguna Chatbot Premium atau berlangganan Profesional."' },
+                ].map((u, i) => (
+                  <div key={i} className="p-2.5 rounded-lg border bg-muted/30 space-y-1">
+                    <p className="font-medium text-muted-foreground">Trigger: {u.trigger}</p>
+                    <p className="italic text-primary/80">{u.pesan}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* ══ TAB 3: HARGA & LANGGANAN ══════════════════════════════════════ */}
           <TabsContent value="harga" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -729,6 +943,42 @@ export default function ProductBible() {
                     dampak: "Product_features diupdate untuk 163+ chatbot. Store cards punya micro-label output. Landing page punya section Output yang Dihasilkan.",
                     status: "Selesai",
                     statusColor: "text-emerald-600",
+                  },
+                  {
+                    tanggal: "Juli 2026",
+                    judul: "Kapasitas Tier-Based — Slot Chatbot Aktif, Bukan Fixed Minimum",
+                    keputusan: "Kapasitas Ruang Kelola (slot chatbot aktif bersamaan) mengikuti tier langganan: Starter=3, Profesional=10, Bisnis=25, Enterprise=unlimited. User bisa BELI chatbot sebanyak apapun — yang dibatasi hanya yang bisa JALAN bersamaan.",
+                    alasan: "Fixed minimum (misal '5 chatbot gratis') tidak memberi insentif upgrade. Tier-based menciptakan tekanan upsell alami: user beli 8 chatbot di plan Starter → upgrade sendiri ke Profesional.",
+                    dampak: "Perlu implementasi slot enforcement di DB dan UI. Chatbot melebihi kuota → Dormant (tidak dihapus, tidak bisa diakses). Notifikasi dormant wajib ditampilkan.",
+                    status: "Diputuskan, belum diimplementasi",
+                    statusColor: "text-amber-600",
+                  },
+                  {
+                    tanggal: "Juli 2026",
+                    judul: "Kebijakan Chatbot Dormant — Aman saat Downgrade",
+                    keputusan: "Chatbot yang melebihi slot aktif → masuk Dormant (tidak bisa diakses tapi tidak dihapus). Upgrade plan → langsung aktif kembali tanpa setup ulang. Lisensi tetap milik user selamanya.",
+                    alasan: "User takut downgrade karena khawatir kehilangan chatbot yang sudah dibeli. Kebijakan Dormant menghilangkan rasa takut itu → user lebih berani eksperimen plan, lebih mudah kembali upgrade.",
+                    dampak: "Perlu kolom status di tabel agents/subscriptions untuk state Dormant. UI Ruang Kelola harus tampilkan chatbot Dormant dengan badge dan CTA upgrade.",
+                    status: "Diputuskan, belum diimplementasi",
+                    statusColor: "text-amber-600",
+                  },
+                  {
+                    tanggal: "Juli 2026",
+                    judul: "Butir 3 = Berlangganan Sendiri, Butir 4 = Jasa + Bonus Akses 30-60 Hari",
+                    keputusan: "Bedah Dokumen/Brain Project/Klinik (Butir 3) = model berlangganan karena dipakai berulang. Klinik per sesi = bonus 30 hari akses platform. Jasa Dokumen/Bimtek/Executive Summary/Jasa Keuangan (Butir 4) = sekali bayar + bonus akses 30 hari (Bimtek 60 hari) sebagai jembatan ke langganan.",
+                    alasan: "Butir 3 = tools yang dipakai ulang → cocok recurring. Butir 4 = deliverable sekali selesai → tidak logis dijadikan langganan, tapi perlu akses platform untuk simpan dan gunakan hasil jasa.",
+                    dampak: "Perlu mekanisme bonus access timer di DB (expired_at per user). Notifikasi H-7 sebelum bonus habis. Semua Butir 4 harus punya CTA berlangganan setelah delivery.",
+                    status: "Diputuskan, belum diimplementasi",
+                    statusColor: "text-amber-600",
+                  },
+                  {
+                    tanggal: "Juli 2026",
+                    judul: "Ekosistem Kompetensi: Butir 1 TIDAK dapat, Butir 2/3/4 dapat",
+                    keputusan: "Chatbot Spesialis (Butir 1) tidak membuka Ekosistem Kompetensi — hanya Ruang Kelola dan Ruang Simpan. Chatbot Premium (Butir 2), Butir 3, dan Butir 4 membuka Ekosistem Kompetensi (selama akses aktif).",
+                    alasan: "Ekosistem Kompetensi adalah nilai tambah premium. Butir 1 sudah punya nilai dari chatbot spesialis itu sendiri. Diferensiasi ini mendorong upgrade ke chatbot premium atau langganan lebih tinggi.",
+                    dampak: "Perlu flag di DB atau logic: jika user hanya punya chatbot spesialis → blokir Ekosistem Kompetensi. Jika punya ≥1 chatbot premium atau Butir 3/4 aktif → buka akses.",
+                    status: "Diputuskan, belum diimplementasi gating di sistem",
+                    statusColor: "text-amber-600",
                   },
                 ].map((log, i) => (
                   <div key={i} className="border rounded-lg overflow-hidden">
