@@ -1,5 +1,46 @@
 const SCALEV_API_URL = "https://api.scalev.id/v2";
 
+// ── Subscription plan definitions (moved from mayar.ts, provider-agnostic) ──
+export const subscriptionPlans = {
+  free_trial: {
+    name: "Free Trial",
+    duration: 7,
+    price: 0,
+    chatbotLimit: 1,
+    description: "7 hari gratis, 75 pesan, 1 chatbot — via Dialog Gustafta",
+  },
+  monthly_1: {
+    name: "1 Bulan",
+    duration: 30,
+    price: 199000,
+    chatbotLimit: 3,
+    description: "Langganan bulanan dengan akses penuh",
+  },
+  monthly_3: {
+    name: "3 Bulan",
+    duration: 90,
+    price: 499000,
+    chatbotLimit: 5,
+    description: "Hemat 16% dibanding bulanan",
+  },
+  monthly_6: {
+    name: "6 Bulan",
+    duration: 180,
+    price: 999000,
+    chatbotLimit: 10,
+    description: "Hemat 17% dibanding bulanan",
+  },
+  monthly_12: {
+    name: "12 Bulan",
+    duration: 365,
+    price: 1999000,
+    chatbotLimit: 25,
+    description: "Hemat 16% dibanding bulanan",
+  },
+};
+
+export type SubscriptionPlanKey = keyof typeof subscriptionPlans;
+
 export interface ScalevProductResult {
   id: number;
   slug: string;

@@ -1159,36 +1159,7 @@ Gustafta memiliki sistem self-service **menjual akses chatbot premium** kepada p
 
 ---
 
-### 11.1 MAYAR.ID (Payment Gateway Utama)
-
-**Apa itu Mayar?**
-Mayar.id adalah platform pembayaran digital Indonesia yang Gustafta integrasikan untuk menjual akses chatbot secara self-service. Pengguna platform Gustafta (pemilik chatbot) bisa menerima pembayaran dari klien mereka melalui Mayar.
-
-**Cara Kerja (End-to-End):**
-1. Admin/pemilik chatbot buka panel Product Settings chatbot → klik tombol "Generate Mayar"
-2. Sistem otomatis membuat link pembayaran Mayar dengan deskripsi produk format: CHATBOT_AKSES-[agentId]-[namaAgent]
-3. Link dibagikan ke klien (bisa via WhatsApp, email, atau langsung di website)
-4. Klien membayar lewat link Mayar (transfer bank, QRIS, e-wallet, kartu kredit)
-5. Webhook otomatis — Mayar kirim notifikasi ke endpoint POST /api/webhooks/mayar di server Gustafta
-6. Server parse agentId dari deskripsi produk → otomatis aktivasi clientSubscription untuk klien yang baru bayar
-7. Klien langsung mendapat akses premium ke chatbot — tanpa perlu konfirmasi manual!
-
-**Setup Mayar (untuk admin platform):**
-- Daftarkan akun di mayar.id → verifikasi akun/bisnis
-- Dapatkan API key Mayar → masukkan sebagai environment secret MAYAR_API_KEY
-- Set webhook URL di dashboard Mayar: https://DOMAIN.replit.app/api/webhooks/mayar
-- Set MAYAR_WEBHOOK_SECRET untuk verifikasi signature keamanan
-- Mayar masih dalam proses verifikasi (1–3 hari kerja)
-
-**Endpoint terkait:**
-- POST /api/mayar/create-chatbot-link — admin: buat link bayar baru
-- POST /api/webhooks/mayar — Mayar callback setelah pembayaran sukses
-- GET /api/products/settings/:agentId — ambil product settings chatbot
-- PATCH /api/products/settings/:agentId — simpan payment URL ke chatbot
-
----
-
-### 11.2 SCALEV.ID (Payment Gateway Alternatif)
+### 11.1 SCALEV.ID (Payment Gateway Utama)
 
 **Apa itu Scalev?**
 Scalev.id adalah platform pembayaran yang digunakan sebagai alternatif, terutama untuk pengguna yang sudah aktif di ekosistem Scalev. Saat ini sudah fully aktif di Gustafta.
@@ -1211,7 +1182,7 @@ Cara setup bundle: Admin Panel → tab Scalev → Buat Mapping baru → pilih ti
 
 ---
 
-### 11.3 FITUR PRODUCT SETTINGS (Per Chatbot)
+### 11.2 FITUR PRODUCT SETTINGS (Per Chatbot)
 
 Setiap chatbot di Gustafta memiliki panel "Product Settings" yang mengatur:
 
@@ -1220,40 +1191,34 @@ Setiap chatbot di Gustafta memiliki panel "Product Settings" yang mengatur:
 | **Nama Produk** | Nama yang tampil di halaman jual |
 | **Harga** | Harga produk (dalam Rupiah) |
 | **Deskripsi Produk** | Penjelasan untuk calon pembeli |
-| **Payment URL** | Link pembayaran (Mayar / Scalev / lainnya) |
+| **Payment URL** | Link checkout Scalev (tempel manual dari dashboard Scalev) |
 | **Tombol CTA** | Teks tombol beli di chatbot publik |
 | **Fitur Unggulan** | List benefit yang ditampilkan |
 
-Tombol "Generate Mayar" (hijau) otomatis membuat link dan mengisi field Payment URL.
+Cara mendapat link pembayaran: buat produk di dashboard Scalev → salin URL checkout → tempel di field Payment URL.
 
 ---
 
-### 11.4 CLIENT SUBSCRIPTIONS
+### 11.3 CLIENT SUBSCRIPTIONS
 
-Setelah pembayaran sukses (via webhook Mayar atau Scalev):
+Setelah pembayaran sukses (via webhook Scalev):
 - Record clientSubscription dibuat di database untuk buyer
-- Field: agentId, userId (buyer), plan ("mayar_chatbot" atau "scalev_bundle"), status "active", expiresAt
+- Field: agentId, userId (buyer), plan ("scalev" atau "scalev_bundle"), status "active", expiresAt
 - Buyer mendapat akses premium — chat tanpa batas, fitur terkunci terbuka
 - Admin bisa lihat dan kelola di panel Admin → tab Subscriptions
 
 ---
 
-### 11.5 FAQ PEMBAYARAN
+### 11.4 FAQ PEMBAYARAN
 
 **Q: Apakah bisa terima pembayaran dari klien untuk akses chatbot saya?**
-A: Ya! Gunakan Mayar.id (masih verifikasi) atau Scalev.id (sudah aktif). Webhook otomatis aktifkan akses — tanpa konfirmasi manual.
-
-**Q: Apa bedanya Mayar dan Scalev untuk menjual chatbot?**
-A: Mayar: self-service per chatbot (generate link langsung dari panel). Scalev: berbasis mapping produk, lebih cocok untuk bisnis yang sudah pakai Scalev. Keduanya mendukung aktivasi otomatis via webhook.
+A: Ya! Gunakan Scalev.id — buat produk di dashboard Scalev, salin URL checkout, tempel di Product Settings chatbot. Webhook otomatis aktifkan akses tanpa konfirmasi manual.
 
 **Q: Apa itu fitur Bundle?**
 A: Bundle memungkinkan 1 pembayaran mengaktifkan akses ke beberapa chatbot sekaligus. Setup via Admin Panel → tab Scalev → tipe "bundle" → isi agent IDs. Cocok untuk "paket bundling" beberapa layanan AI.
 
-**Q: Bagaimana cara generate payment link Mayar?**
-A: Buka chatbot di dashboard → tab Product Settings → isi data produk → klik tombol "Generate Mayar" (hijau). Link otomatis terbuat dan tersimpan di field Payment URL.
-
 **Q: Apakah pengguna yang bayar langsung mendapat akses?**
-A: Ya, otomatis via webhook. Mayar/Scalev kirim notifikasi ke server Gustafta → server aktivasi akses dalam hitungan detik setelah pembayaran dikonfirmasi gateway.
+A: Ya, otomatis via webhook. Scalev kirim notifikasi ke server Gustafta → server aktivasi akses dalam hitungan detik setelah pembayaran dikonfirmasi.
 
 ═══════════════════════════════════════════════════════════
 ## BAGIAN 12: META PIXEL & TRACKING KONVERSI
@@ -1270,7 +1235,7 @@ Gustafta memiliki integrasi **Meta Pixel** (Facebook/Instagram Pixel) untuk trac
 ### Manfaat untuk Pemilik Chatbot:
 - Track berapa banyak pengunjung dari iklan yang akhirnya klik link pembayaran
 - Optimalkan bidding iklan berdasarkan data konversi nyata
-- Integrasikan dengan Scalev & Mayar untuk track seluruh funnel penjualan chatbot
+- Integrasikan dengan Scalev untuk track seluruh funnel penjualan chatbot
 
 ### Setup:
 1. Buat pixel di Meta Business Manager
@@ -1280,7 +1245,7 @@ Gustafta memiliki integrasi **Meta Pixel** (Facebook/Instagram Pixel) untuk trac
 
 ### Catatan:
 - Pixel hanya client-side (tidak ada Conversions API server-side saat ini)
-- Cocok digunakan berdampingan dengan Mayar/Scalev, bukan pengganti keduanya
+- Cocok digunakan berdampingan dengan Scalev, bukan pengganti pembayaran
 - User yang tidak punya VITE_META_PIXEL_ID: Pixel tidak aktif, tidak ada error
 
 ═══════════════════════════════════════════════════════════

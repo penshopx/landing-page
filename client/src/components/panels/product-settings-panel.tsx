@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ShoppingBag, Globe, DollarSign, Shield, ShieldAlert, ShieldCheck, Tag, Copy, ExternalLink, Check, Plus, Trash2, Target, Lightbulb, CreditCard, Link2, Zap, Loader2 } from "lucide-react";
+import { ShoppingBag, Globe, DollarSign, Shield, ShieldAlert, ShieldCheck, Tag, Copy, ExternalLink, Check, Plus, Trash2, Target, Lightbulb, CreditCard, Link2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,36 +60,6 @@ export function ProductSettingsPanel({ agent }: { agent: any }) {
   const [newFeature, setNewFeature] = useState("");
   const [copiedMarketplace, setCopiedMarketplace] = useState(false);
   const [copiedChat, setCopiedChat] = useState(false);
-  const [generatingMayar, setGeneratingMayar] = useState(false);
-
-  const generateMayarLinkMutation = useMutation({
-    mutationFn: async () => {
-      const amount = resolveLicensePrice(settings.licenseClass, settings.licensePrice);
-      if (!amount || amount <= 0) throw new Error("Isi harga dulu sebelum generate link.");
-      const res = await apiRequest("POST", "/api/mayar/create-chatbot-link", {
-        agentId: agent.id,
-        agentName: agent.name,
-        amount,
-      });
-      return res.json();
-    },
-    onSuccess: (data: any) => {
-      if (data.paymentUrl) {
-        set("paymentUrl", data.paymentUrl);
-        toast({ title: "✅ Link Mayar berhasil dibuat!", description: "Link sudah otomatis terisi. Klik Simpan untuk menyimpan." });
-      } else {
-        toast({ title: "Gagal", description: data.error || "Tidak ada link dari Mayar.", variant: "destructive" });
-      }
-    },
-    onError: (err: any) => {
-      const msg = err?.message || "Gagal generate link Mayar.";
-      if (msg.includes("MAYAR_API_KEY")) {
-        toast({ title: "API Key Mayar belum diset", description: "Masukkan MAYAR_API_KEY di Secrets / Environment Variables.", variant: "destructive" });
-      } else {
-        toast({ title: "Gagal", description: msg, variant: "destructive" });
-      }
-    },
-  });
 
   useEffect(() => {
     setSettings({
@@ -388,26 +358,13 @@ export function ProductSettingsPanel({ agent }: { agent: any }) {
                     <Input
                       value={settings.paymentUrl}
                       onChange={(e) => set("paymentUrl", e.target.value)}
-                      placeholder="https://mayar.id/checkout/... atau tempel link manual"
+                      placeholder="https://app.scalev.com/checkout/... atau tempel link manual"
                       data-testid="input-payment-url"
                       className="flex-1"
                     />
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="shrink-0 gap-1.5 text-xs border-green-500 text-green-700 hover:bg-green-50 dark:border-green-600 dark:text-green-400 dark:hover:bg-green-950/30"
-                      onClick={() => generateMayarLinkMutation.mutate()}
-                      disabled={generateMayarLinkMutation.isPending || !salePrice}
-                      data-testid="button-generate-mayar-link"
-                      title="Generate link pembayaran Mayar otomatis dari harga di atas"
-                    >
-                      {generateMayarLinkMutation.isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-                      Generate Mayar
-                    </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Tempel link manual dari Scalev / Midtrans / dll, <strong>atau</strong> klik <em>Generate Mayar</em> untuk buat link otomatis via Mayar.id (butuh MAYAR_API_KEY di Secrets).
+                    Tempel link checkout dari Scalev. Dapatkan link di dashboard Scalev → produk → salin URL checkout.
                   </p>
                   {settings.paymentUrl && (
                     <a href={settings.paymentUrl} target="_blank" rel="noopener noreferrer">
@@ -448,17 +405,17 @@ export function ProductSettingsPanel({ agent }: { agent: any }) {
               {settings.monthlyPrice > 0 && (
                 <div className="rounded-lg bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 p-3 space-y-1.5">
                   <p className="text-xs font-semibold text-green-800 dark:text-green-300 flex items-center gap-1.5">
-                    <CreditCard className="w-3.5 h-3.5" /> Alur Penjualan via Mayar.id
+                    <CreditCard className="w-3.5 h-3.5" /> Alur Penjualan via Scalev
                   </p>
                   <ol className="text-xs text-green-700 dark:text-green-400 space-y-1 list-decimal list-inside">
-                    <li>Isi harga di atas → klik <strong>Generate Mayar</strong> → link otomatis terisi</li>
+                    <li>Buat produk di dashboard Scalev → salin URL checkout → tempel di kolom Link Pembayaran</li>
                     <li>Klik <strong>Simpan Perubahan</strong> agar link tersimpan ke chatbot</li>
-                    <li>Customer klik "Bayar Sekarang" di chatbot → redirect ke Mayar → bayar</li>
-                    <li>Mayar kirim webhook ke <code className="bg-green-100 dark:bg-green-900/40 px-1 rounded">/api/webhooks/mayar</code> → akses aktif otomatis 30 hari</li>
+                    <li>Customer klik "Bayar Sekarang" di chatbot → redirect ke Scalev → bayar</li>
+                    <li>Scalev kirim webhook ke <code className="bg-green-100 dark:bg-green-900/40 px-1 rounded">/api/webhooks/scalev</code> → akses aktif otomatis</li>
                     <li>Customer kembali ke chatbot → "Sudah bayar?" → masukkan email → langsung chat</li>
                   </ol>
                   <p className="text-xs text-green-600 dark:text-green-500 pt-1 border-t border-green-200 dark:border-green-800">
-                    Butuh: <strong>MAYAR_API_KEY</strong> + <strong>MAYAR_WEBHOOK_SECRET</strong> di Secrets, dan set webhook URL di dashboard Mayar.id
+                    Butuh: <strong>SCALEV_WEBHOOK_SECRET</strong> di Secrets, dan set URL webhook di dashboard Scalev
                   </p>
                 </div>
               )}
