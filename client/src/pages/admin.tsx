@@ -326,6 +326,8 @@ export default function AdminPage() {
   const [editPaymentUrlId, setEditPaymentUrlId] = useState<number | null>(null);
   const [editPaymentUrlValue, setEditPaymentUrlValue] = useState("");
   const [showProductForm, setShowProductForm] = useState(false);
+  const [editProductDialog, setEditProductDialog] = useState<{ open: boolean; product: StoreProduct | null }>({ open: false, product: null });
+  const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true });
 
   // ---- Queries ----
   const { data: meData, isError: meError, isLoading: meLoading } = useQuery<AdminMeData>({
@@ -381,6 +383,9 @@ export default function AdminPage() {
     price: number;
     agentId: number | null;
     emoji: string;
+    features: string[] | null;
+    color: string | null;
+    isGustafta: boolean;
     isActive: boolean;
     sortOrder: number;
     paymentUrl: string;
@@ -688,6 +693,18 @@ export default function AdminPage() {
       toast({ title: "Produk dihapus." });
     },
     onError: () => toast({ title: "Gagal hapus produk.", variant: "destructive" }),
+  });
+
+  const updateProductMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: object }) =>
+      apiRequest("PATCH", `/api/store/admin/products/${id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/store/admin/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
+      setEditProductDialog({ open: false, product: null });
+      toast({ title: "Produk berhasil diperbarui!" });
+    },
+    onError: () => toast({ title: "Gagal memperbarui produk.", variant: "destructive" }),
   });
 
   const updateModulSubMutation = useMutation({
@@ -1707,6 +1724,24 @@ export default function AdminPage() {
                                 data-testid={`button-toggle-product-${p.id}`}>
                                 {p.isActive ? "Aktif" : "Nonaktif"}
                               </button>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-blue-500 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                onClick={() => {
+                                  setEditProductForm({
+                                    name: p.name,
+                                    description: p.description || "",
+                                    category: p.category || "Konstruksi",
+                                    price: String(p.price),
+                                    agentId: p.agentId != null ? String(p.agentId) : "",
+                                    emoji: p.emoji || "🤖",
+                                    features: (p.features ?? []).join("\n"),
+                                    sortOrder: String(p.sortOrder ?? 0),
+                                    isActive: p.isActive,
+                                  });
+                                  setEditProductDialog({ open: true, product: p });
+                                }}
+                                data-testid={`button-edit-product-${p.id}`}>
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
                               <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                                 onClick={() => { if (confirm(`Hapus produk "${p.name}"?`)) deleteProductMutation.mutate(p.id); }}
                                 data-testid={`button-delete-product-${p.id}`}>
@@ -3041,6 +3076,119 @@ Selamat menggunakan! 🚀
           })()}
           <DialogFooter>
             <Button variant="outline" onClick={() => setStoreWaDialog({ open: false, order: null })}>Tutup</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Edit Product Dialog ── */}
+      <Dialog open={editProductDialog.open} onOpenChange={(open) => { if (!open) setEditProductDialog({ open: false, product: null }); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-4 w-4 text-blue-500" /> Edit Produk Store
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Nama Produk *</label>
+              <Input value={editProductForm.name}
+                onChange={(e) => setEditProductForm(f => ({ ...f, name: e.target.value }))}
+                placeholder="mis. Tender Readiness Checker"
+                data-testid="input-edit-product-name" />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Harga (IDR) *</label>
+              <Input type="number" value={editProductForm.price}
+                onChange={(e) => setEditProductForm(f => ({ ...f, price: e.target.value }))}
+                placeholder="149000"
+                data-testid="input-edit-product-price" />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Kategori</label>
+              <Input value={editProductForm.category}
+                onChange={(e) => setEditProductForm(f => ({ ...f, category: e.target.value }))}
+                placeholder="Konstruksi"
+                data-testid="input-edit-product-category" />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Agent ID (opsional)</label>
+              <Input type="number" value={editProductForm.agentId}
+                onChange={(e) => setEditProductForm(f => ({ ...f, agentId: e.target.value }))}
+                placeholder="mis. 24"
+                data-testid="input-edit-product-agent-id" />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Emoji</label>
+              <Input value={editProductForm.emoji}
+                onChange={(e) => setEditProductForm(f => ({ ...f, emoji: e.target.value }))}
+                placeholder="🤖"
+                data-testid="input-edit-product-emoji" />
+            </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Sort Order</label>
+              <Input type="number" value={editProductForm.sortOrder}
+                onChange={(e) => setEditProductForm(f => ({ ...f, sortOrder: e.target.value }))}
+                placeholder="0"
+                data-testid="input-edit-product-sort-order" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Deskripsi</label>
+              <Textarea value={editProductForm.description}
+                onChange={(e) => setEditProductForm(f => ({ ...f, description: e.target.value }))}
+                placeholder="Deskripsi singkat produk..."
+                rows={2}
+                data-testid="input-edit-product-description" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Fitur (satu per baris)</label>
+              <Textarea value={editProductForm.features}
+                onChange={(e) => setEditProductForm(f => ({ ...f, features: e.target.value }))}
+                placeholder={"Analisis dokumen tender\nRekomendasi strategi\nLaporan kesiapan"}
+                rows={3}
+                data-testid="input-edit-product-features" />
+              <p className="text-xs text-muted-foreground mt-1">Setiap baris menjadi satu poin fitur di halaman store.</p>
+            </div>
+            <div className="sm:col-span-2 flex items-center gap-3">
+              <label className="text-xs font-medium text-muted-foreground">Status</label>
+              <button
+                type="button"
+                onClick={() => setEditProductForm(f => ({ ...f, isActive: !f.isActive }))}
+                className={`text-xs px-3 py-1 rounded-full font-medium transition-colors cursor-pointer ${editProductForm.isActive ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300" : "bg-muted text-muted-foreground"}`}
+                data-testid="button-edit-product-toggle-active">
+                {editProductForm.isActive ? "Aktif" : "Nonaktif"}
+              </button>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setEditProductDialog({ open: false, product: null })}>Batal</Button>
+            <Button
+              className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
+              disabled={updateProductMutation.isPending || !editProductForm.name || !editProductForm.price}
+              onClick={() => {
+                if (!editProductDialog.product) return;
+                const featuresArr = editProductForm.features
+                  .split("\n")
+                  .map(s => s.trim())
+                  .filter(Boolean);
+                updateProductMutation.mutate({
+                  id: editProductDialog.product.id,
+                  data: {
+                    name: editProductForm.name,
+                    description: editProductForm.description,
+                    category: editProductForm.category,
+                    price: Number(editProductForm.price),
+                    agentId: editProductForm.agentId ? Number(editProductForm.agentId) : null,
+                    emoji: editProductForm.emoji || "🤖",
+                    features: featuresArr,
+                    sortOrder: Number(editProductForm.sortOrder) || 0,
+                    isActive: editProductForm.isActive,
+                  },
+                });
+              }}
+              data-testid="button-save-edit-product"
+            >
+              {updateProductMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Menyimpan...</> : "Simpan Perubahan"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
