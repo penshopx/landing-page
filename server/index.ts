@@ -543,6 +543,66 @@ for (const envVar of requiredEnvVars) {
       }
 
 
+      // ── SUPERADMIN BACKFILL — promote existing users who match SUPERADMIN_PHONE/EMAILS ──
+      // Handles the case where the founder account was created before SUPERADMIN_PHONE was set.
+      // Idempotent: only promotes users whose role is not already "superadmin". Never downgrades.
+      // Non-fatal: a DB error here must never block startup.
+      try {
+        const rawPhone = process.env.SUPERADMIN_PHONE || "";
+        const rawEmails = process.env.SUPERADMIN_EMAILS || "";
+
+        const normalizePhoneLocal = (p: string): string => {
+          let d = p.replace(/[^\d]/g, "");
+          if (d.startsWith("0")) d = "62" + d.slice(1);
+          else if (d.startsWith("8")) d = "62" + d;
+          return d;
+        };
+
+        const superPhones = rawPhone.split(",").map((p) => normalizePhoneLocal(p.trim())).filter(Boolean);
+        const superEmails = rawEmails.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+
+        if (superPhones.length > 0 || superEmails.length > 0) {
+          const { db: rawDb } = await import("./db");
+          const { sql: rawSql } = await import("drizzle-orm");
+
+          let promoted = 0;
+
+          // Promote by phone
+          for (const phone of superPhones) {
+            const res: any = await rawDb.execute(rawSql`
+              UPDATE users SET role = 'superadmin', updated_at = NOW()
+              WHERE phone = ${phone} AND role != 'superadmin'
+              RETURNING id, email
+            `);
+            const rows: any[] = res?.rows ?? [];
+            for (const row of rows) {
+              log(`[SuperAdminBackfill] Promoted user ${row.id} (${row.email}) → superadmin (phone match)`);
+              promoted++;
+            }
+          }
+
+          // Promote by email
+          for (const email of superEmails) {
+            const res: any = await rawDb.execute(rawSql`
+              UPDATE users SET role = 'superadmin', updated_at = NOW()
+              WHERE LOWER(email) = ${email} AND role != 'superadmin'
+              RETURNING id, email
+            `);
+            const rows: any[] = res?.rows ?? [];
+            for (const row of rows) {
+              log(`[SuperAdminBackfill] Promoted user ${row.id} (${row.email}) → superadmin (email match)`);
+              promoted++;
+            }
+          }
+
+          if (promoted === 0) {
+            log("[SuperAdminBackfill] All matching users already have superadmin role — no changes needed");
+          }
+        }
+      } catch (err) {
+        log("[SuperAdminBackfill] error (non-fatal): " + (err as Error).message);
+      }
+
       // ── MODUL SLUG SEEDING — auto-generate slug untuk semua big_ideas ──
       // Berlaku di dev & prod. Idempoten: hanya update yang belum punya slug.
       try {
