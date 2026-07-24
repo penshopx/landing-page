@@ -752,6 +752,14 @@ export default function AdminPage() {
               </Button>
             </Link>
             {isSuperAdmin && (
+              <Link href="/admin/product-bible">
+                <Button variant="outline" size="sm" className="gap-1.5 text-xs hidden sm:flex border-purple-500/40 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10" data-testid="button-product-bible">
+                  <BookOpen className="h-3.5 w-3.5" />
+                  Product Bible
+                </Button>
+              </Link>
+            )}
+            {isSuperAdmin && (
               <Link href="/multiclaw-admin">
                 <Button variant="outline" size="sm" className="gap-1.5 text-xs hidden sm:flex border-violet-500/40 text-violet-500 hover:bg-violet-500/10" data-testid="button-multiclaw-admin-header">
                   <Wrench className="h-3.5 w-3.5" />

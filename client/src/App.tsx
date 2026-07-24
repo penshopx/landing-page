@@ -23,6 +23,7 @@ import BergabungPage from "@/pages/bergabung";
 import AdminAccessCodesPage from "@/pages/admin-access-codes";
 import AdminSystemLoadPage from "@/pages/admin-system-load";
 import AdminAiHealthPage from "@/pages/admin-ai-health";
+import ProductBible from "@/pages/admin/product-bible";
 import { usePartnerBranding } from "@/hooks/use-partner-branding";
 import Profil from "@/pages/profil";
 import BootstrapAdmin from "@/pages/bootstrap-admin";
@@ -523,6 +524,7 @@ function Router() {
       <Route path="/admin/access-codes" component={AdminAccessCodesPage} />
       <Route path="/admin/system-load" component={AdminSystemLoadPage} />
       <Route path="/admin/ai-health" component={AdminAiHealthPage} />
+      <Route path="/admin/product-bible" component={ProductBible} />
       <Route path="/legal" component={LegalLanding} />
       <Route path="/trilogi" component={TrilogiLanding} />
       <Route path="/ebook-dialog" component={EbookDialog} />
