@@ -33,8 +33,8 @@ export function CartDrawer() {
     // Items without Scalev variant → WA inquiry
     const waItems = selected.filter(i => !i.scalevVariantId);
     if (waItems.length > 0) {
-      const list = waItems.map(i => `- ${i.name} (${formatPrice(i.price)})`).join("%0A");
-      const msg = encodeURIComponent(`Halo, saya ingin membeli:\n`) + list + encodeURIComponent(`\n\nMohon info cara pembelian.`);
+      const productList = waItems.map(i => `- ${i.name} (${formatPrice(i.price)})`).join("\n");
+      const msg = encodeURIComponent(`Halo, saya ingin membeli:\n${productList}\n\nMohon info cara pembelian.`);
       window.open(`https://wa.me/6282299417818?text=${msg}`, "_blank");
     }
   };
