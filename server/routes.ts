@@ -7239,6 +7239,21 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
+  // Bulk reorder — must be BEFORE /:id routes so Express doesn't treat "reorder" as an ID
+  app.post("/api/store/admin/products/reorder", isAuthenticated, async (req, res) => {
+    try {
+      const { items } = req.body as { items: { id: number; sortOrder: number }[] };
+      if (!Array.isArray(items)) return res.status(400).json({ error: "items array required" });
+      await Promise.all(
+        items.map(({ id, sortOrder }) => storage.updateStoreProduct(id, { sortOrder } as any))
+      );
+      invalidateStoreCatalog();
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to reorder products" });
+    }
+  });
+
   app.delete("/api/store/admin/products/:id", isAuthenticated, async (req, res) => {
     try {
       const ok = await storage.deleteStoreProduct(Number(req.params.id));

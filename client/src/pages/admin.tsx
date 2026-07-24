@@ -14,7 +14,7 @@ import {
   CheckCircle2, XCircle, Shield, ArrowLeft, Copy,
   UserCheck, AlertCircle, RefreshCw, Crown, UserCog, Wrench, Scale, Database,
   ShoppingBag, Plus, ExternalLink, Package, Trash2, Pencil, MessageCircle, Loader2,
-  Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu
+  Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical
 } from "lucide-react";
 
 // ---- Types ----
@@ -438,6 +438,61 @@ export default function AdminPage() {
     queryFn: async () => { const res = await fetch("/api/store/admin/products"); return res.json(); },
     enabled: isAdmin && activeTab === "store",
   });
+
+  // ── Drag-and-drop reorder state ──────────────────────────────────────────────
+  const [orderedProducts, setOrderedProducts] = useState<StoreProduct[]>([]);
+  const [draggedProductId, setDraggedProductId] = useState<number | null>(null);
+  const [dragOverProductId, setDragOverProductId] = useState<number | null>(null);
+
+  // Sync local order when server data arrives (but not while dragging)
+  useEffect(() => {
+    if (storeProducts.length > 0) {
+      setOrderedProducts([...storeProducts].sort((a, b) => (a.sortOrder - b.sortOrder) || (a.id - b.id)));
+    }
+  }, [storeProducts]);
+
+  const reorderProductsMutation = useMutation({
+    mutationFn: (items: { id: number; sortOrder: number }[]) =>
+      apiRequest("POST", "/api/store/admin/products/reorder", { items }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/store/admin/products"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
+      toast({ title: "✅ Urutan produk disimpan." });
+    },
+    onError: () => toast({ title: "Gagal simpan urutan.", variant: "destructive" }),
+  });
+
+  const handleProductDragStart = (e: React.DragEvent, id: number) => {
+    setDraggedProductId(id);
+    e.dataTransfer.effectAllowed = "move";
+  };
+  const handleProductDragOver = (e: React.DragEvent, id: number) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (id !== draggedProductId) setDragOverProductId(id);
+  };
+  const handleProductDrop = (e: React.DragEvent, targetId: number) => {
+    e.preventDefault();
+    if (!draggedProductId || draggedProductId === targetId) {
+      setDraggedProductId(null);
+      setDragOverProductId(null);
+      return;
+    }
+    const items = [...orderedProducts];
+    const fromIdx = items.findIndex(p => p.id === draggedProductId);
+    const toIdx = items.findIndex(p => p.id === targetId);
+    const [moved] = items.splice(fromIdx, 1);
+    items.splice(toIdx, 0, moved);
+    setOrderedProducts(items);
+    setDraggedProductId(null);
+    setDragOverProductId(null);
+    reorderProductsMutation.mutate(items.map((p, idx) => ({ id: p.id, sortOrder: idx * 10 })));
+  };
+  const handleProductDragEnd = () => {
+    setDraggedProductId(null);
+    setDragOverProductId(null);
+  };
+  // ─────────────────────────────────────────────────────────────────────────────
 
   const { data: scalevMappings = [], isLoading: scalevLoading, refetch: refetchScalev } = useQuery<ScalevMapping[]>({
     queryKey: ["/api/admin/scalev-mappings"],
@@ -1526,6 +1581,9 @@ export default function AdminPage() {
                       <ShoppingBag className="h-4 w-4 text-violet-500" />
                       <CardTitle className="text-base">Kelola Produk Store</CardTitle>
                     </div>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <GripVertical className="h-3 w-3" /> Drag ⠿ untuk mengubah urutan
+                    </p>
                     <div className="flex items-center gap-2">
                       <Button variant="ghost" size="sm" onClick={() => refetchProducts()} data-testid="button-refresh-products">
                         <RefreshCw className="h-4 w-4" />
@@ -1604,18 +1662,36 @@ export default function AdminPage() {
                   {/* Daftar produk */}
                   {storeProductsLoading ? (
                     <div className="text-center py-6 text-muted-foreground text-sm">Memuat produk...</div>
-                  ) : storeProducts.length === 0 ? (
+                  ) : orderedProducts.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground text-sm">
                       <Package className="h-8 w-8 mx-auto mb-2 opacity-40" />
                       <p>Belum ada produk. Klik <strong>Tambah Produk</strong> untuk mulai.</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {storeProducts.map((p) => (
-                        <div key={p.id} className="border rounded-lg p-3 space-y-2"
+                      {reorderProductsMutation.isPending && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1.5 pb-1">
+                          <Loader2 className="h-3 w-3 animate-spin" /> Menyimpan urutan…
+                        </p>
+                      )}
+                      {orderedProducts.map((p) => (
+                        <div
+                          key={p.id}
+                          draggable
+                          onDragStart={(e) => handleProductDragStart(e, p.id)}
+                          onDragOver={(e) => handleProductDragOver(e, p.id)}
+                          onDrop={(e) => handleProductDrop(e, p.id)}
+                          onDragEnd={handleProductDragEnd}
+                          className={`border rounded-lg p-3 space-y-2 transition-colors select-none ${
+                            draggedProductId === p.id ? "opacity-40" : ""
+                          } ${
+                            dragOverProductId === p.id ? "border-violet-400 bg-violet-50 dark:bg-violet-950/20" : ""
+                          }`}
                           data-testid={`row-product-${p.id}`}>
                           <div className="flex items-center justify-between gap-3 flex-wrap">
                             <div className="flex items-center gap-2 min-w-0">
+                              {/* Drag handle */}
+                              <GripVertical className="h-4 w-4 text-muted-foreground/50 cursor-grab active:cursor-grabbing flex-shrink-0" />
                               <span className="text-xl flex-shrink-0">{p.emoji}</span>
                               <div className="min-w-0">
                                 <p className="font-medium text-sm truncate">{p.name}</p>
