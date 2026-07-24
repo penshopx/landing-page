@@ -66,7 +66,7 @@ const STATUS_CONFIG: Record<Project["status"], { label: string; color: string; d
   aktif:   { label: "Aktif",    color: "text-blue-400 bg-blue-950/40 border-blue-800/40",    dot: "bg-blue-400" },
   selesai: { label: "Selesai",  color: "text-emerald-400 bg-emerald-950/40 border-emerald-800/40", dot: "bg-emerald-400" },
   delay:   { label: "Delay",    color: "text-orange-400 bg-orange-950/40 border-orange-800/40", dot: "bg-orange-400 animate-pulse" },
-  suspend: { label: "Suspend",  color: "text-slate-400 bg-slate-800/40 border-slate-700/40", dot: "bg-slate-500" },
+  suspend: { label: "Suspend",  color: "text-muted-foreground bg-muted/40 border-border/40", dot: "bg-slate-500" },
 };
 
 // ─── Local storage helpers ────────────────────────────────────────────────────
@@ -81,11 +81,11 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
   const running = agents.filter(a => a.status === "running").length;
   const done = agents.filter(a => a.status === "done").length;
   return (
-    <div className="mt-2 rounded-lg border border-slate-700/40 bg-slate-800/30 text-xs overflow-hidden">
+    <div className="mt-2 rounded-lg border border-border/40 bg-muted/30 text-xs overflow-hidden">
       <button className="w-full flex items-center gap-2 px-3 py-2 hover:bg-white/5 transition-colors"
         onClick={() => setExpanded(!expanded)} data-testid="button-expand-subagents">
-        <BarChart3 className="h-3 w-3 text-slate-400 shrink-0" />
-        <span className="text-slate-400 font-medium">
+        <BarChart3 className="h-3 w-3 text-muted-foreground shrink-0" />
+        <span className="text-muted-foreground font-medium">
           {running > 0 ? `${running} agen menganalisis...` : `${done}/${agents.length} agen selesai`}
         </span>
         <div className="flex gap-1 ml-auto flex-wrap">
@@ -95,10 +95,10 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               a.status==="error" ? "bg-red-400" : "bg-white/20"}`} />
           ))}
         </div>
-        {expanded ? <ChevronUp className="h-3 w-3 text-white/30 shrink-0" /> : <ChevronDown className="h-3 w-3 text-white/30 shrink-0" />}
+        {expanded ? <ChevronUp className="h-3 w-3 text-muted-foreground/40 shrink-0" /> : <ChevronDown className="h-3 w-3 text-muted-foreground/40 shrink-0" />}
       </button>
       {expanded && (
-        <div className="border-t border-slate-700/30 px-3 py-2 grid grid-cols-2 gap-1.5">
+        <div className="border-t border-border/30 px-3 py-2 grid grid-cols-2 gap-1.5">
           {agents.map((a, i) => {
             const meta = getMeta(a.role);
             const Icon = meta.icon;
@@ -107,12 +107,12 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
                 {a.status==="running" ? <Loader2 className="h-3 w-3 animate-spin text-yellow-400" /> :
                  a.status==="done"    ? <CheckCircle2 className="h-3 w-3 text-green-400" /> :
                  a.status==="error"   ? <AlertCircle className="h-3 w-3 text-red-400" /> :
-                                        <Clock className="h-3 w-3 text-white/20" />}
+                                        <Clock className="h-3 w-3 text-muted-foreground/30" />}
                 <div className={`flex items-center gap-1 px-1.5 py-0.5 rounded border ${meta.color}`}>
                   <Icon className="h-2.5 w-2.5" />
                 </div>
                 <span className="text-white/40 text-[10px] truncate">{meta.label}</span>
-                {a.elapsed && <span className="text-white/25 ml-auto text-[10px]">{(a.elapsed/1000).toFixed(1)}s</span>}
+                {a.elapsed && <span className="text-muted-foreground/60 ml-auto text-[10px]">{(a.elapsed/1000).toFixed(1)}s</span>}
               </div>
             );
           })}
@@ -192,17 +192,17 @@ function ChatTab({ agentId }: { agentId: number }) {
       {messages.length === 0 && (
         <div className="p-4 space-y-3">
           <div className="text-center py-6">
-            <div className="w-14 h-14 rounded-2xl bg-slate-700/30 border border-slate-600/40 flex items-center justify-center mx-auto mb-3">
-              <Construction className="w-7 h-7 text-slate-300" />
+            <div className="w-14 h-14 rounded-2xl bg-slate-700/30 border border-border/40 flex items-center justify-center mx-auto mb-3">
+              <Construction className="w-7 h-7 text-muted-foreground" />
             </div>
-            <div className="text-base font-semibold text-white">ProyekBot AI</div>
-            <div className="text-xs text-slate-400 mt-1">9 agen spesialis PM · Teknik · Kontrak · K3 · QC · Lingkungan · Alat · Logistik · Keuangan</div>
+            <div className="text-base font-semibold text-foreground">ProyekBot AI</div>
+            <div className="text-xs text-muted-foreground mt-1">9 agen spesialis PM · Teknik · Kontrak · K3 · QC · Lingkungan · Alat · Logistik · Keuangan</div>
           </div>
-          <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
+          <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
           <div className="grid grid-cols-1 gap-2">
             {SAMPLE_PROMPTS.map((p, i) => (
               <button key={i} onClick={() => send(p)}
-                className="text-left px-3 py-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-slate-600/60 hover:bg-slate-800/60 text-xs text-slate-300 transition-colors"
+                className="text-left px-3 py-2.5 rounded-lg border border-border bg-muted/60 hover:border-border/60 hover:bg-muted/60 text-xs text-muted-foreground transition-colors"
                 data-testid={`sample-prompt-${i}`}>
                 {p}
               </button>
@@ -215,12 +215,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           {messages.map((m, i) => (
             <div key={i} className={`flex ${m.role==="user"?"justify-end":"justify-start"}`}>
               {m.role==="user" ? (
-                <div className="max-w-[85%] bg-slate-700/50 border border-slate-600/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
+                <div className="max-w-[85%] bg-slate-700/50 border border-border/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
               ) : (
                 <div className="max-w-[92%] space-y-2">
-                  <div className="bg-slate-800/60 border border-slate-700/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-slate-200">
+                  <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground">
                     {m.isStreaming && !m.content ? (
-                      <div className="flex items-center gap-2 text-slate-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">9 agen menganalisis...</span></div>
+                      <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">9 agen menganalisis...</span></div>
                     ) : <MessageContent text={m.content} />}
                     {m.isStreaming && m.content && <span className="inline-block w-1.5 h-4 bg-slate-400 animate-pulse ml-0.5 align-middle" />}
                   </div>
@@ -231,12 +231,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           ))}
         </div>
       )}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Tanya tentang PM, jadwal, kontrak, K3, biaya, material, FIDIC..."
-            className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-600 text-sm"
+            className="bg-muted/80 border-border text-foreground placeholder:text-muted-foreground text-sm"
             disabled={streaming} data-testid="input-chat" />
           <Button onClick={() => streaming?abortRef.current?.abort():send()} size="icon"
             className={`shrink-0 ${streaming?"bg-red-600/80 hover:bg-red-600":"bg-slate-600 hover:bg-slate-500"}`}
@@ -245,7 +245,7 @@ function ChatTab({ agentId }: { agentId: number }) {
           </Button>
         </div>
         {messages.length > 0 && (
-          <button onClick={() => setMessages([])} className="text-[10px] text-slate-600 hover:text-slate-400 mt-1.5 ml-1" data-testid="button-clear-chat">
+          <button onClick={() => setMessages([])} className="text-[10px] text-muted-foreground hover:text-muted-foreground mt-1.5 ml-1" data-testid="button-clear-chat">
             Bersihkan percakapan
           </button>
         )}
@@ -307,9 +307,9 @@ function TrackerTab() {
             { label: "Delay",        val: delay,           color: "text-orange-400" },
             { label: "Total Nilai (M)", val: `${totalNilai.toLocaleString("id-ID")}`, color: "text-emerald-400" },
           ].map(s => (
-            <div key={s.label} className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5 text-center">
+            <div key={s.label} className="bg-muted/40 border border-border/40 rounded-lg p-2.5 text-center">
               <div className={`text-lg font-bold ${s.color}`}>{s.val}</div>
-              <div className="text-[10px] text-slate-600">{s.label}</div>
+              <div className="text-[10px] text-muted-foreground">{s.label}</div>
             </div>
           ))}
         </div>
@@ -317,50 +317,50 @@ function TrackerTab() {
 
       {/* Add/Edit button */}
       <button onClick={() => { setForm(blank()); setEditId(null); setShowAdd(!showAdd); }}
-        className="w-full flex items-center justify-center gap-2 border border-dashed border-slate-700 hover:border-slate-600 hover:bg-slate-800/20 rounded-lg py-2.5 text-xs text-slate-500 hover:text-slate-400 transition-colors"
+        className="w-full flex items-center justify-center gap-2 border border-dashed border-border hover:border-border hover:bg-muted/20 rounded-lg py-2.5 text-xs text-muted-foreground hover:text-muted-foreground transition-colors"
         data-testid="button-add-project">
         <Plus className="w-3.5 h-3.5" /> Tambah Proyek
       </button>
 
       {/* Form */}
       {showAdd && (
-        <div className="border border-slate-700/40 bg-slate-800/30 rounded-xl p-4 space-y-3">
-          <div className="text-xs font-semibold text-slate-300">{editId ? "Edit Proyek" : "Proyek Baru"}</div>
+        <div className="border border-border/40 bg-muted/30 rounded-xl p-4 space-y-3">
+          <div className="text-xs font-semibold text-muted-foreground">{editId ? "Edit Proyek" : "Proyek Baru"}</div>
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <Label className="text-[11px] text-slate-500">Nama Proyek</Label>
+              <Label className="text-[11px] text-muted-foreground">Nama Proyek</Label>
               <Input value={form.name??""} onChange={e=>setForm(f=>({...f,name:e.target.value}))}
-                placeholder="Pembangunan Gedung Kantor..." className="bg-slate-900 border-slate-700 text-white text-sm h-8 mt-1" />
+                placeholder="Pembangunan Gedung Kantor..." className="bg-muted border-border text-foreground text-sm h-8 mt-1" />
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Owner / Klien</Label>
+              <Label className="text-[11px] text-muted-foreground">Owner / Klien</Label>
               <Input value={form.client??""} onChange={e=>setForm(f=>({...f,client:e.target.value}))}
-                placeholder="Dinas PU Kab. ..." className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" />
+                placeholder="Dinas PU Kab. ..." className="bg-muted border-border text-foreground text-xs h-8 mt-1" />
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Nilai Kontrak (Juta Rp)</Label>
+              <Label className="text-[11px] text-muted-foreground">Nilai Kontrak (Juta Rp)</Label>
               <Input type="number" value={form.nilai??0} onChange={e=>setForm(f=>({...f,nilai:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" />
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1" />
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Mulai</Label>
+              <Label className="text-[11px] text-muted-foreground">Mulai</Label>
               <Input type="date" value={form.startDate??""} onChange={e=>setForm(f=>({...f,startDate:e.target.value}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" />
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1" />
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Selesai (target)</Label>
+              <Label className="text-[11px] text-muted-foreground">Selesai (target)</Label>
               <Input type="date" value={form.endDate??""} onChange={e=>setForm(f=>({...f,endDate:e.target.value}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" />
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1" />
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Progress (%)</Label>
+              <Label className="text-[11px] text-muted-foreground">Progress (%)</Label>
               <Input type="number" min={0} max={100} value={form.progress??0} onChange={e=>setForm(f=>({...f,progress:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" />
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1" />
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Status</Label>
+              <Label className="text-[11px] text-muted-foreground">Status</Label>
               <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value as any}))}
-                className="w-full mt-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5">
+                className="w-full mt-1 bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5">
                 <option value="aktif">Aktif</option>
                 <option value="delay">Delay</option>
                 <option value="selesai">Selesai</option>
@@ -368,22 +368,22 @@ function TrackerTab() {
               </select>
             </div>
             <div className="col-span-2">
-              <Label className="text-[11px] text-slate-500">Catatan</Label>
+              <Label className="text-[11px] text-muted-foreground">Catatan</Label>
               <Input value={form.notes??""} onChange={e=>setForm(f=>({...f,notes:e.target.value}))}
-                placeholder="Catatan singkat..." className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" />
+                placeholder="Catatan singkat..." className="bg-muted border-border text-foreground text-xs h-8 mt-1" />
             </div>
           </div>
           <div className="flex gap-2">
             <Button onClick={addOrUpdate} size="sm" className="flex-1 bg-slate-600 hover:bg-slate-500 text-white h-8 text-xs"
               disabled={!form.name} data-testid="button-save-project">Simpan</Button>
-            <Button onClick={() => { setShowAdd(false); setEditId(null); setForm(blank()); }} size="sm" variant="ghost" className="text-slate-400 h-8 text-xs">Batal</Button>
+            <Button onClick={() => { setShowAdd(false); setEditId(null); setForm(blank()); }} size="sm" variant="ghost" className="text-muted-foreground h-8 text-xs">Batal</Button>
           </div>
         </div>
       )}
 
       {/* Project cards */}
       {projects.length === 0 && !showAdd ? (
-        <div className="py-10 text-center text-slate-600">
+        <div className="py-10 text-center text-muted-foreground">
           <FolderOpen className="w-10 h-10 mx-auto mb-3 text-slate-800" />
           <div className="text-sm">Belum ada proyek</div>
           <div className="text-xs mt-1">Tambahkan proyek konstruksi aktif Anda untuk pantau progress & jadwal</div>
@@ -395,19 +395,19 @@ function TrackerTab() {
             const timePct = timeProgress(p);
             const sv = timePct !== null ? p.progress - timePct : null;
             return (
-              <div key={p.id} className="border border-slate-800 bg-slate-900/40 rounded-xl p-3.5 space-y-2.5" data-testid={`project-${p.id}`}>
+              <div key={p.id} className="border border-border bg-muted/40 rounded-xl p-3.5 space-y-2.5" data-testid={`project-${p.id}`}>
                 <div className="flex items-start gap-2">
                   <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${st.dot}`} />
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-white truncate">{p.name}</div>
-                    {p.client && <div className="text-[11px] text-slate-500">{p.client}</div>}
+                    <div className="text-sm font-semibold text-foreground truncate">{p.name}</div>
+                    {p.client && <div className="text-[11px] text-muted-foreground">{p.client}</div>}
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${st.color}`}>{st.label}</span>
-                    <button onClick={() => startEdit(p)} className="text-slate-700 hover:text-slate-400 p-0.5" data-testid={`edit-project-${p.id}`}>
+                    <button onClick={() => startEdit(p)} className="text-muted-foreground hover:text-muted-foreground p-0.5" data-testid={`edit-project-${p.id}`}>
                       <RefreshCw className="w-3 h-3" />
                     </button>
-                    <button onClick={() => remove(p.id)} className="text-slate-700 hover:text-red-400 p-0.5" data-testid={`delete-project-${p.id}`}>
+                    <button onClick={() => remove(p.id)} className="text-muted-foreground hover:text-red-400 p-0.5" data-testid={`delete-project-${p.id}`}>
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </div>
@@ -415,20 +415,20 @@ function TrackerTab() {
 
                 {/* Progress bars */}
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-[10px] text-slate-500">
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                     <span>Progress Fisik</span>
                     <span className="text-white font-medium">{p.progress}%</span>
                   </div>
-                  <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                     <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${p.progress}%` }} />
                   </div>
                   {timePct !== null && (
                     <>
-                      <div className="flex items-center justify-between text-[10px] text-slate-500">
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                         <span>Progress Waktu</span>
                         <span className={sv !== null ? (sv >= 0 ? "text-emerald-400" : "text-orange-400") : "text-white"}>{timePct}%</span>
                       </div>
-                      <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-1 bg-muted rounded-full overflow-hidden">
                         <div className="h-full bg-slate-500 rounded-full transition-all" style={{ width: `${timePct}%` }} />
                       </div>
                       {sv !== null && (
@@ -441,11 +441,11 @@ function TrackerTab() {
                 </div>
 
                 {/* Meta */}
-                <div className="flex flex-wrap gap-3 text-[10px] text-slate-600">
+                <div className="flex flex-wrap gap-3 text-[10px] text-muted-foreground">
                   {p.nilai > 0 && <span className="text-emerald-600">Rp {p.nilai.toLocaleString("id-ID")} juta</span>}
                   {p.startDate && <span>{new Date(p.startDate).toLocaleDateString("id-ID")} →</span>}
                   {p.endDate && <span>{new Date(p.endDate).toLocaleDateString("id-ID")}</span>}
-                  {p.notes && <span className="text-slate-700 italic">{p.notes}</span>}
+                  {p.notes && <span className="text-muted-foreground italic">{p.notes}</span>}
                 </div>
               </div>
             );
@@ -482,29 +482,29 @@ function EvmTab() {
 
   return (
     <div className="p-4 space-y-4 overflow-y-auto h-full">
-      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kalkulator EVM (Earned Value Management)</div>
+      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kalkulator EVM (Earned Value Management)</div>
 
-      <div className="bg-slate-800/30 border border-slate-700/40 rounded-xl p-4 space-y-3">
+      <div className="bg-muted/30 border border-border/40 rounded-xl p-4 space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-[11px] text-slate-400">BAC — Anggaran Total (Miliar Rp)</Label>
+            <Label className="text-[11px] text-muted-foreground">BAC — Anggaran Total (Miliar Rp)</Label>
             <Input type="number" value={bac} onChange={e=>setBac(e.target.value)}
-              placeholder="cth: 25" className="bg-slate-900 border-slate-700 text-white text-sm h-9 mt-1" data-testid="input-bac" />
+              placeholder="cth: 25" className="bg-muted border-border text-foreground text-sm h-9 mt-1" data-testid="input-bac" />
           </div>
           <div>
-            <Label className="text-[11px] text-slate-400">Actual Cost (Miliar Rp)</Label>
+            <Label className="text-[11px] text-muted-foreground">Actual Cost (Miliar Rp)</Label>
             <Input type="number" value={ac} onChange={e=>setAc(e.target.value)}
-              placeholder="cth: 8.5" className="bg-slate-900 border-slate-700 text-white text-sm h-9 mt-1" data-testid="input-ac" />
+              placeholder="cth: 8.5" className="bg-muted border-border text-foreground text-sm h-9 mt-1" data-testid="input-ac" />
           </div>
           <div>
-            <Label className="text-[11px] text-slate-400">% Progress Fisik</Label>
+            <Label className="text-[11px] text-muted-foreground">% Progress Fisik</Label>
             <Input type="number" min={0} max={100} value={pct} onChange={e=>setPct(e.target.value)}
-              placeholder="cth: 40" className="bg-slate-900 border-slate-700 text-white text-sm h-9 mt-1" data-testid="input-pct" />
+              placeholder="cth: 40" className="bg-muted border-border text-foreground text-sm h-9 mt-1" data-testid="input-pct" />
           </div>
           <div>
-            <Label className="text-[11px] text-slate-400">% Waktu Kontrak Terpakai</Label>
+            <Label className="text-[11px] text-muted-foreground">% Waktu Kontrak Terpakai</Label>
             <Input type="number" min={0} max={100} value={timePct} onChange={e=>setTimePct(e.target.value)}
-              placeholder="cth: 55" className="bg-slate-900 border-slate-700 text-white text-sm h-9 mt-1" data-testid="input-timepct" />
+              placeholder="cth: 55" className="bg-muted border-border text-foreground text-sm h-9 mt-1" data-testid="input-timepct" />
           </div>
         </div>
       </div>
@@ -515,16 +515,16 @@ function EvmTab() {
           <div className="grid grid-cols-2 gap-2">
             {[
               { label: "Earned Value (EV)",    val: `${fmt(r.EV)} M`,  desc: "Nilai pekerjaan terlaksana",    color: "text-blue-400" },
-              { label: "Planned Value (PV)",   val: r.PV ? `${fmt(r.PV)} M` : "—", desc: "Target nilai menurut jadwal", color: "text-slate-400" },
+              { label: "Planned Value (PV)",   val: r.PV ? `${fmt(r.PV)} M` : "—", desc: "Target nilai menurut jadwal", color: "text-muted-foreground" },
               { label: "Schedule Variance (SV)", val: r.SV !== null ? `${fmt(r.SV)} M` : "—", desc: r.SV !== null ? (r.SV >= 0 ? "✓ Ahead of Schedule" : "⚠ Behind Schedule") : "—",
-                color: r.SV !== null ? (r.SV >= 0 ? "text-emerald-400" : "text-orange-400") : "text-slate-400" },
+                color: r.SV !== null ? (r.SV >= 0 ? "text-emerald-400" : "text-orange-400") : "text-muted-foreground" },
               { label: "Cost Variance (CV)",   val: `${fmt(r.CV)} M`,  desc: r.CV >= 0 ? "✓ Under Budget" : "⚠ Over Budget",
                 color: r.CV >= 0 ? "text-emerald-400" : "text-red-400" },
             ].map(item => (
-              <div key={item.label} className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-3">
+              <div key={item.label} className="bg-muted/40 border border-border/40 rounded-xl p-3">
                 <div className={`text-xl font-bold ${item.color}`}>{item.val}</div>
                 <div className="text-[11px] text-white mt-0.5">{item.label}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">{item.desc}</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">{item.desc}</div>
               </div>
             ))}
           </div>
@@ -538,39 +538,39 @@ function EvmTab() {
               <div key={item.label} className={`border rounded-xl p-3 ${item.good ? "border-emerald-800/40 bg-emerald-950/20" : "border-orange-800/40 bg-orange-950/20"}`}>
                 <div className={`text-2xl font-bold ${item.good ? "text-emerald-400" : "text-orange-400"}`}>{item.val}</div>
                 <div className="text-[11px] text-white mt-0.5">{item.label}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">{item.desc}</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">{item.desc}</div>
               </div>
             ))}
           </div>
 
           {/* Forecast */}
           {r.EAC && (
-            <div className="border border-slate-700/40 bg-slate-800/30 rounded-xl p-3">
-              <div className="text-xs font-semibold text-slate-400 mb-2">Proyeksi Biaya Akhir</div>
+            <div className="border border-border/40 bg-muted/30 rounded-xl p-3">
+              <div className="text-xs font-semibold text-muted-foreground mb-2">Proyeksi Biaya Akhir</div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="text-lg font-bold text-white">{fmt(r.EAC)} M</div>
-                  <div className="text-[11px] text-slate-500">EAC — Estimasi biaya saat selesai</div>
+                  <div className="text-[11px] text-muted-foreground">EAC — Estimasi biaya saat selesai</div>
                 </div>
                 <div>
                   <div className={`text-lg font-bold ${(r.VAC??0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>{fmt(r.VAC)} M</div>
-                  <div className="text-[11px] text-slate-500">VAC — {(r.VAC??0) >= 0 ? "Sisa anggaran" : "Kelebihan biaya proyeksi"}</div>
+                  <div className="text-[11px] text-muted-foreground">VAC — {(r.VAC??0) >= 0 ? "Sisa anggaran" : "Kelebihan biaya proyeksi"}</div>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="text-[10px] text-slate-600 text-center">
+          <div className="text-[10px] text-muted-foreground text-center">
             EVM berdasarkan PMBOK · Perpres 16/2018 · PSAK 34 · PermenPUPR 01/2022
           </div>
         </div>
       )}
 
       {!r && bac && pct && ac && (
-        <div className="text-xs text-slate-600 text-center py-4">Masukkan semua angka untuk melihat hasil</div>
+        <div className="text-xs text-muted-foreground text-center py-4">Masukkan semua angka untuk melihat hasil</div>
       )}
       {!bac && !pct && !ac && (
-        <div className="py-6 text-center text-slate-600">
+        <div className="py-6 text-center text-muted-foreground">
           <Calculator className="w-10 h-10 mx-auto mb-3 text-slate-800" />
           <div className="text-sm">Kalkulator EVM</div>
           <div className="text-xs mt-1">Isi anggaran, progress fisik, dan actual cost untuk analisis Earned Value</div>
@@ -593,23 +593,23 @@ export default function ProyekBot() {
   const aktif = projects.filter(p => p.status === "aktif").length;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+      <div className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-13 flex items-center gap-3 py-2.5">
           <Link href="/dashboard">
-            <button className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm" data-testid="button-back">
+            <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm" data-testid="button-back">
               <ArrowLeft className="w-4 h-4" />
             </button>
           </Link>
-          <span className="text-slate-700">|</span>
+          <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-slate-700/50 border border-slate-600/40 flex items-center justify-center">
-              <Construction className="w-4 h-4 text-slate-300" />
+            <div className="w-7 h-7 rounded-lg bg-slate-700/50 border border-border/40 flex items-center justify-center">
+              <Construction className="w-4 h-4 text-muted-foreground" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white leading-tight">ProyekBot</div>
-              <div className="text-[10px] text-slate-500 leading-tight">AI Manajemen Proyek Konstruksi · 9 Agen · FIDIC · PSAK 34 · EVM</div>
+              <div className="text-sm font-semibold text-foreground leading-tight">ProyekBot</div>
+              <div className="text-[10px] text-muted-foreground leading-tight">AI Manajemen Proyek Konstruksi · 9 Agen · FIDIC · PSAK 34 · EVM</div>
             </div>
           </div>
           <div className="ml-auto flex items-center gap-2">
@@ -625,7 +625,7 @@ export default function ProyekBot() {
             )}
           </div>
         </div>
-        <div className="flex border-t border-slate-800/60 max-w-7xl mx-auto px-4">
+        <div className="flex border-t border-border/60 max-w-7xl mx-auto px-4">
           {[
             { key: "chat",    label: "Chat AI",              icon: Zap },
             { key: "tracker", label: `Proyek${projects.length > 0 ? ` (${projects.length})` : ""}`, icon: FolderOpen },
@@ -634,7 +634,7 @@ export default function ProyekBot() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               data-testid={`tab-${t.key}`}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab === t.key ? "text-slate-200 border-slate-400 bg-slate-800/30" : "text-slate-500 border-transparent hover:text-slate-400"
+                tab === t.key ? "text-foreground border-slate-400 bg-muted/30" : "text-muted-foreground border-transparent hover:text-muted-foreground"
               }`}>
               <t.icon className="w-3.5 h-3.5" />
               {t.label}

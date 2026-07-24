@@ -173,7 +173,7 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               a.status==="done"?"bg-green-400":a.status==="running"?"bg-yellow-400 animate-pulse":a.status==="error"?"bg-red-400":"bg-white/20"}`} />
           ))}
         </div>
-        {exp ? <ChevronUp className="h-3 w-3 text-white/30 shrink-0"/> : <ChevronDown className="h-3 w-3 text-white/30 shrink-0"/>}
+        {exp ? <ChevronUp className="h-3 w-3 text-muted-foreground/40 shrink-0"/> : <ChevronDown className="h-3 w-3 text-muted-foreground/40 shrink-0"/>}
       </button>
       {exp && (
         <div className="border-t border-emerald-800/30 px-3 py-2 space-y-1">
@@ -182,9 +182,9 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               {a.status==="running"?<Loader2 className="h-3 w-3 animate-spin text-yellow-400"/>:
                a.status==="done"   ?<CheckCircle2 className="h-3 w-3 text-green-400"/>:
                a.status==="error"  ?<AlertCircle className="h-3 w-3 text-red-400"/>:
-                                    <Clock className="h-3 w-3 text-white/20"/>}
-              <span className="text-white/50 font-mono">{a.role}</span>
-              {a.elapsed && <span className="text-white/25 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
+                                    <Clock className="h-3 w-3 text-muted-foreground/30"/>}
+              <span className="text-muted-foreground font-mono">{a.role}</span>
+              {a.elapsed && <span className="text-muted-foreground/60 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
             </div>
           ))}
         </div>
@@ -259,14 +259,14 @@ function ChatTab({ agentId }: { agentId: number }) {
             <div className="w-14 h-14 rounded-2xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3">
               <Globe className="w-7 h-7 text-emerald-400" />
             </div>
-            <div className="text-base font-semibold text-white">PerijinanBot AI</div>
-            <div className="text-xs text-slate-400 mt-1">8 agen spesialis OSS-RBA · NIB · IUJK · PBG · SLF · AMDAL · KBLI</div>
+            <div className="text-base font-semibold text-foreground">PerijinanBot AI</div>
+            <div className="text-xs text-muted-foreground mt-1">8 agen spesialis OSS-RBA · NIB · IUJK · PBG · SLF · AMDAL · KBLI</div>
           </div>
-          <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
+          <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
           <div className="grid grid-cols-1 gap-2">
             {SAMPLE_PROMPTS.map((p, i) => (
               <button key={i} onClick={() => send(p)}
-                className="text-left px-3 py-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-emerald-700/50 hover:bg-emerald-950/20 text-xs text-slate-300 transition-colors"
+                className="text-left px-3 py-2.5 rounded-lg border border-border bg-muted/60 hover:border-emerald-700/50 hover:bg-emerald-950/20 text-xs text-muted-foreground transition-colors"
                 data-testid={`sample-prompt-${i}`}>{p}</button>
             ))}
           </div>
@@ -280,9 +280,9 @@ function ChatTab({ agentId }: { agentId: number }) {
                 <div className="max-w-[85%] bg-emerald-700/30 border border-emerald-600/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
               ) : (
                 <div className="max-w-[92%] space-y-2">
-                  <div className="bg-slate-800/60 border border-slate-700/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-slate-200">
+                  <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground">
                     {m.isStreaming && !m.content ? (
-                      <div className="flex items-center gap-2 text-slate-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">8 agen memproses...</span></div>
+                      <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">8 agen memproses...</span></div>
                     ) : <MessageContent text={m.content}/>}
                     {m.isStreaming && m.content && <span className="inline-block w-1.5 h-4 bg-emerald-400 animate-pulse ml-0.5 align-middle"/>}
                   </div>
@@ -293,12 +293,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           ))}
         </div>
       )}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Tanya tentang NIB, OSS-RBA, IUJK, PBG, SLF, KBLI, AMDAL..."
-            className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-600 text-sm"
+            className="bg-muted/80 border-border text-foreground placeholder:text-muted-foreground text-sm"
             disabled={streaming} data-testid="input-chat"/>
           <Button onClick={()=>streaming?abortRef.current?.abort():send()} size="icon"
             className={`shrink-0 ${streaming?"bg-red-600/80 hover:bg-red-600":"bg-emerald-600 hover:bg-emerald-500"}`}
@@ -306,7 +306,7 @@ function ChatTab({ agentId }: { agentId: number }) {
             {streaming?<X className="w-4 h-4"/>:<Send className="w-4 h-4"/>}
           </Button>
         </div>
-        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-slate-600 hover:text-slate-400 mt-1.5 ml-1">Bersihkan percakapan</button>}
+        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-muted-foreground hover:text-muted-foreground mt-1.5 ml-1">Bersihkan percakapan</button>}
       </div>
     </div>
   );
@@ -344,7 +344,7 @@ function ChecklistTab() {
 
   return (
     <div className="p-4 space-y-3 overflow-y-auto h-full">
-      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pilih jenis perizinan yang ingin dicek</div>
+      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pilih jenis perizinan yang ingin dicek</div>
 
       {PERIZINAN_TYPES.map(t => {
         const items = getItems(t.code);
@@ -353,19 +353,19 @@ function ChecklistTab() {
         const pct = items.length > 0 ? Math.round(doneCount / items.length * 100) : 0;
 
         return (
-          <div key={t.code} className={`border rounded-xl overflow-hidden transition-all ${isOpen ? t.color : "border-slate-800 bg-slate-900/40"}`}>
+          <div key={t.code} className={`border rounded-xl overflow-hidden transition-all ${isOpen ? t.color : "border-border bg-muted/40"}`}>
             <button className="w-full flex items-start gap-3 p-3.5 text-left"
               onClick={() => selectType(t.code)} data-testid={`expand-${t.code}`}>
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${isOpen ? "bg-white/10" : "bg-slate-800"}`}>
-                <FileCheck className={`w-4.5 h-4.5 ${isOpen ? "text-current" : "text-slate-500"}`} />
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${isOpen ? "bg-white/10" : "bg-muted"}`}>
+                <FileCheck className={`w-4.5 h-4.5 ${isOpen ? "text-current" : "text-muted-foreground"}`} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className={`text-xs font-mono font-bold ${isOpen ? "" : "text-slate-400"}`}>{t.code}</span>
-                  <span className={`text-sm font-medium ${isOpen ? "text-white" : "text-slate-300"}`}>{t.label.split("(")[1]?.replace(")", "") ?? t.label}</span>
+                  <span className={`text-xs font-mono font-bold ${isOpen ? "" : "text-muted-foreground"}`}>{t.code}</span>
+                  <span className={`text-sm font-medium ${isOpen ? "text-foreground" : "text-muted-foreground"}`}>{t.label.split("(")[1]?.replace(")", "") ?? t.label}</span>
                 </div>
-                <div className={`text-[11px] mt-0.5 ${isOpen ? "text-current opacity-70" : "text-slate-600"}`}>{t.desc}</div>
-                <div className={`flex gap-3 mt-1 text-[10px] ${isOpen ? "opacity-60" : "text-slate-700"}`}>
+                <div className={`text-[11px] mt-0.5 ${isOpen ? "text-current opacity-70" : "text-muted-foreground"}`}>{t.desc}</div>
+                <div className={`flex gap-3 mt-1 text-[10px] ${isOpen ? "opacity-60" : "text-muted-foreground"}`}>
                   <span>⏱ {t.lama}</span>
                   <span>💰 {t.biaya}</span>
                 </div>
@@ -378,7 +378,7 @@ function ChecklistTab() {
                   </div>
                 )}
               </div>
-              {isOpen ? <ChevronUp className="w-4 h-4 shrink-0 mt-1 opacity-50" /> : <ChevronDown className="w-4 h-4 shrink-0 mt-1 text-slate-600" />}
+              {isOpen ? <ChevronUp className="w-4 h-4 shrink-0 mt-1 opacity-50" /> : <ChevronDown className="w-4 h-4 shrink-0 mt-1 text-muted-foreground" />}
             </button>
 
             {isOpen && items.length > 0 && (
@@ -391,12 +391,12 @@ function ChecklistTab() {
                       item.done ? "bg-green-500 border-green-500" : "border-white/30 group-hover:border-white/50"}`}>
                       {item.done && <Check className="w-3 h-3 text-white" />}
                     </div>
-                    <span className={`text-xs transition-colors ${item.done ? "line-through opacity-50" : "text-white/80"}`}>{item.label}</span>
+                    <span className={`text-xs transition-colors ${item.done ? "line-through opacity-50" : "text-foreground/80"}`}>{item.label}</span>
                   </button>
                 ))}
                 <div className="flex justify-end pt-1">
                   <button onClick={() => reset(t.code)}
-                    className="text-[10px] text-white/30 hover:text-white/60 transition-colors"
+                    className="text-[10px] text-muted-foreground/40 hover:text-muted-foreground transition-colors"
                     data-testid={`reset-${t.code}`}>Reset checklist</button>
                 </div>
               </div>
@@ -422,7 +422,7 @@ function KbliTab() {
         <Globe className="w-5 h-5 text-emerald-400 shrink-0" />
         <div className="flex-1">
           <div className="text-sm font-medium text-emerald-300">Portal OSS-RBA Resmi</div>
-          <div className="text-xs text-slate-500">oss.go.id — untuk pendaftaran NIB, IUJK, dan semua perizinan berusaha</div>
+          <div className="text-xs text-muted-foreground">oss.go.id — untuk pendaftaran NIB, IUJK, dan semua perizinan berusaha</div>
         </div>
         <a href="https://oss.go.id" target="_blank" rel="noopener noreferrer"
           className="text-emerald-400 hover:text-emerald-300 transition-colors shrink-0" data-testid="link-oss-portal">
@@ -432,23 +432,23 @@ function KbliTab() {
 
       {/* KBLI table */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Kode KBLI Konstruksi yang Relevan</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Kode KBLI Konstruksi yang Relevan</div>
         <Input placeholder="Cari kode atau nama KBLI..." value={search} onChange={e => setSearch(e.target.value)}
-          className="bg-slate-800 border-slate-700 text-white text-xs h-8 mb-3" data-testid="input-search-kbli" />
+          className="bg-muted border-border text-foreground text-xs h-8 mb-3" data-testid="input-search-kbli" />
         <div className="space-y-1.5">
           {filtered.map(k => (
-            <div key={k.kode} className="flex items-center gap-3 bg-slate-800/30 border border-slate-800 rounded-lg px-3 py-2">
+            <div key={k.kode} className="flex items-center gap-3 bg-muted/30 border border-border rounded-lg px-3 py-2">
               <span className="font-mono text-emerald-400 text-sm font-bold shrink-0">{k.kode}</span>
-              <span className="text-xs text-slate-300">{k.label}</span>
+              <span className="text-xs text-muted-foreground">{k.label}</span>
             </div>
           ))}
-          {filtered.length === 0 && <div className="text-xs text-slate-600 text-center py-4">Tidak ditemukan</div>}
+          {filtered.length === 0 && <div className="text-xs text-muted-foreground text-center py-4">Tidak ditemukan</div>}
         </div>
       </div>
 
       {/* Key regulations */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Regulasi Kunci</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Regulasi Kunci</div>
         <div className="space-y-1.5">
           {[
             { reg:"PP 5/2021", about:"Penyelenggaraan Perizinan Berusaha Berbasis Risiko (OSS-RBA)" },
@@ -458,11 +458,11 @@ function KbliTab() {
             { reg:"PP 22/2021", about:"Perlindungan & Pengelolaan Lingkungan Hidup (AMDAL/UKL-UPL)" },
             { reg:"Perpres 91/2017", about:"Percepatan pelaksanaan berusaha — dasar OSS generasi awal" },
           ].map((r, i) => (
-            <div key={i} className="flex items-start gap-2.5 bg-slate-800/30 border border-slate-800 rounded-lg px-3 py-2">
+            <div key={i} className="flex items-start gap-2.5 bg-muted/30 border border-border rounded-lg px-3 py-2">
               <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
               <div>
                 <div className="text-xs font-mono text-emerald-300">{r.reg}</div>
-                <div className="text-[11px] text-slate-500">{r.about}</div>
+                <div className="text-[11px] text-muted-foreground">{r.about}</div>
               </div>
             </div>
           ))}
@@ -481,26 +481,26 @@ export default function PerijinanBot() {
   const agentId = orchestrator?.id ?? OSS_ID;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <div className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-13 flex items-center gap-3 py-2.5">
           <Link href="/dashboard">
-            <button className="text-slate-400 hover:text-white" data-testid="button-back">
+            <button className="text-muted-foreground hover:text-foreground" data-testid="button-back">
               <ArrowLeft className="w-4 h-4" />
             </button>
           </Link>
-          <span className="text-slate-700">|</span>
+          <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center">
               <Globe className="w-4 h-4 text-emerald-400" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white leading-tight">PerijinanBot</div>
-              <div className="text-[10px] text-slate-500 leading-tight">AI Konsultan OSS-RBA · NIB · IUJK · PBG · SLF · 8 Agen</div>
+              <div className="text-sm font-semibold text-foreground leading-tight">PerijinanBot</div>
+              <div className="text-[10px] text-muted-foreground leading-tight">AI Konsultan OSS-RBA · NIB · IUJK · PBG · SLF · 8 Agen</div>
             </div>
           </div>
         </div>
-        <div className="flex border-t border-slate-800/60 max-w-7xl mx-auto px-4">
+        <div className="flex border-t border-border/60 max-w-7xl mx-auto px-4">
           {[
             { key:"chat",      label:"Chat AI",            icon:Zap },
             { key:"checklist", label:"Checklist Perizinan", icon:FileCheck },
@@ -509,7 +509,7 @@ export default function PerijinanBot() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               data-testid={`tab-${t.key}`}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab === t.key ? "text-emerald-400 border-emerald-500 bg-emerald-900/10" : "text-slate-500 border-transparent hover:text-slate-400"
+                tab === t.key ? "text-emerald-400 border-emerald-500 bg-emerald-900/10" : "text-muted-foreground border-transparent hover:text-muted-foreground"
               }`}>
               <t.icon className="w-3.5 h-3.5" />
               {t.label}

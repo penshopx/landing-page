@@ -80,7 +80,7 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               a.status==="done"?"bg-green-400":a.status==="running"?"bg-yellow-400 animate-pulse":a.status==="error"?"bg-red-400":"bg-white/20"}`} />
           ))}
         </div>
-        {exp?<ChevronUp className="h-3 w-3 text-white/30 shrink-0"/>:<ChevronDown className="h-3 w-3 text-white/30 shrink-0"/>}
+        {exp?<ChevronUp className="h-3 w-3 text-muted-foreground/40 shrink-0"/>:<ChevronDown className="h-3 w-3 text-muted-foreground/40 shrink-0"/>}
       </button>
       {exp && (
         <div className="border-t border-rose-800/30 px-3 py-2 space-y-1">
@@ -89,9 +89,9 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               {a.status==="running"?<Loader2 className="h-3 w-3 animate-spin text-yellow-400"/>:
                a.status==="done"   ?<CheckCircle2 className="h-3 w-3 text-green-400"/>:
                a.status==="error"  ?<AlertCircle className="h-3 w-3 text-red-400"/>:
-                                    <Clock className="h-3 w-3 text-white/20"/>}
-              <span className="text-white/50 font-mono">{a.role}</span>
-              {a.elapsed && <span className="text-white/25 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
+                                    <Clock className="h-3 w-3 text-muted-foreground/30"/>}
+              <span className="text-muted-foreground font-mono">{a.role}</span>
+              {a.elapsed && <span className="text-muted-foreground/60 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
             </div>
           ))}
         </div>
@@ -159,14 +159,14 @@ function ChatTab({ agentId }: { agentId: number }) {
             <div className="w-14 h-14 rounded-2xl bg-rose-600/20 border border-rose-500/30 flex items-center justify-center mx-auto mb-3">
               <Pencil className="w-7 h-7 text-rose-400" />
             </div>
-            <div className="text-base font-semibold text-white">KonsultanBot AI</div>
-            <div className="text-xs text-slate-400 mt-1">7 agen konsultansi konstruksi · DED · MK · Pengawas · FIDIC · SKK · Beauty Contest</div>
+            <div className="text-base font-semibold text-foreground">KonsultanBot AI</div>
+            <div className="text-xs text-muted-foreground mt-1">7 agen konsultansi konstruksi · DED · MK · Pengawas · FIDIC · SKK · Beauty Contest</div>
           </div>
-          <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
+          <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
           <div className="grid grid-cols-1 gap-2">
             {SAMPLE_PROMPTS.map((p, i) => (
               <button key={i} onClick={() => send(p)}
-                className="text-left px-3 py-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-rose-700/50 hover:bg-rose-950/20 text-xs text-slate-300 transition-colors"
+                className="text-left px-3 py-2.5 rounded-lg border border-border bg-muted/60 hover:border-rose-700/50 hover:bg-rose-950/20 text-xs text-muted-foreground transition-colors"
                 data-testid={`sample-prompt-${i}`}>{p}</button>
             ))}
           </div>
@@ -180,9 +180,9 @@ function ChatTab({ agentId }: { agentId: number }) {
                 <div className="max-w-[85%] bg-rose-700/30 border border-rose-600/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
               ) : (
                 <div className="max-w-[92%] space-y-2">
-                  <div className="bg-slate-800/60 border border-slate-700/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-slate-200">
+                  <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground">
                     {m.isStreaming && !m.content
-                      ? <div className="flex items-center gap-2 text-slate-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">7 agen menganalisis...</span></div>
+                      ? <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">7 agen menganalisis...</span></div>
                       : <MessageContent text={m.content}/>}
                     {m.isStreaming && m.content && <span className="inline-block w-1.5 h-4 bg-rose-400 animate-pulse ml-0.5 align-middle"/>}
                   </div>
@@ -193,12 +193,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           ))}
         </div>
       )}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Tanya tentang DED, MK, kontrak, fee, SKK, tender konsultan..."
-            className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-600 text-sm"
+            className="bg-muted/80 border-border text-foreground placeholder:text-muted-foreground text-sm"
             disabled={streaming} data-testid="input-chat"/>
           <Button onClick={()=>streaming?abortRef.current?.abort():send()} size="icon"
             className={`shrink-0 ${streaming?"bg-red-600/80 hover:bg-red-600":"bg-rose-600 hover:bg-rose-500"}`}
@@ -206,7 +206,7 @@ function ChatTab({ agentId }: { agentId: number }) {
             {streaming?<X className="w-4 h-4"/>:<Send className="w-4 h-4"/>}
           </Button>
         </div>
-        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-slate-600 hover:text-slate-400 mt-1.5 ml-1">Bersihkan percakapan</button>}
+        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-muted-foreground hover:text-muted-foreground mt-1.5 ml-1">Bersihkan percakapan</button>}
       </div>
     </div>
   );
@@ -244,17 +244,17 @@ function FeeTab() {
       {/* KPI */}
       {projects.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5 text-center">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5 text-center">
             <div className="text-lg font-bold text-white">{projects.length}</div>
-            <div className="text-[10px] text-slate-600">Total Proyek</div>
+            <div className="text-[10px] text-muted-foreground">Total Proyek</div>
           </div>
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5 text-center">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5 text-center">
             <div className="text-lg font-bold text-blue-400">{berjalan}</div>
-            <div className="text-[10px] text-slate-600">Berjalan</div>
+            <div className="text-[10px] text-muted-foreground">Berjalan</div>
           </div>
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5 text-center">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5 text-center">
             <div className="text-sm font-bold text-rose-400">{fmt(totalFee)}</div>
-            <div className="text-[10px] text-slate-600">Total Fee</div>
+            <div className="text-[10px] text-muted-foreground">Total Fee</div>
           </div>
         </div>
       )}
@@ -268,18 +268,18 @@ function FeeTab() {
             { label:"MK",        pct:"1.5–3.5%" },
             { label:"Pengawas",  pct:"1.5–3.5%" },
           ].map(f => (
-            <div key={f.label} className="bg-slate-800/40 rounded-lg p-2">
+            <div key={f.label} className="bg-muted/40 rounded-lg p-2">
               <div className="text-xs font-bold text-rose-300">{f.pct}</div>
-              <div className="text-[10px] text-slate-500">{f.label}</div>
+              <div className="text-[10px] text-muted-foreground">{f.label}</div>
             </div>
           ))}
         </div>
-        <div className="text-[10px] text-slate-600">Ref: Permen PUPR tentang honorarium jasa konsultansi konstruksi</div>
+        <div className="text-[10px] text-muted-foreground">Ref: Permen PUPR tentang honorarium jasa konsultansi konstruksi</div>
       </div>
 
       {/* Add button */}
       <button onClick={() => {setForm(blank());setShowAdd(!showAdd);}}
-        className="w-full flex items-center justify-center gap-2 border border-dashed border-slate-700 hover:border-rose-700/50 hover:bg-rose-950/10 rounded-lg py-2.5 text-xs text-slate-500 hover:text-rose-400 transition-colors"
+        className="w-full flex items-center justify-center gap-2 border border-dashed border-border hover:border-rose-700/50 hover:bg-rose-950/10 rounded-lg py-2.5 text-xs text-muted-foreground hover:text-rose-400 transition-colors"
         data-testid="button-add-project">
         <Plus className="w-3.5 h-3.5"/> Tambah Proyek Konsultansi
       </button>
@@ -289,41 +289,41 @@ function FeeTab() {
           <div className="text-xs font-semibold text-rose-300">Proyek Baru</div>
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <Label className="text-[11px] text-slate-500">Nama Proyek</Label>
+              <Label className="text-[11px] text-muted-foreground">Nama Proyek</Label>
               <Input value={form.nama??""} onChange={e=>setForm(f=>({...f,nama:e.target.value}))}
-                placeholder="DED Gedung Kantor Pemerintah..." className="bg-slate-900 border-slate-700 text-white text-sm h-8 mt-1"/>
+                placeholder="DED Gedung Kantor Pemerintah..." className="bg-muted border-border text-foreground text-sm h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Klien / Owner</Label>
+              <Label className="text-[11px] text-muted-foreground">Klien / Owner</Label>
               <Input value={form.klien??""} onChange={e=>setForm(f=>({...f,klien:e.target.value}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Tipe Proyek</Label>
+              <Label className="text-[11px] text-muted-foreground">Tipe Proyek</Label>
               <select value={form.tipe} onChange={e=>setForm(f=>({...f,tipe:e.target.value}))}
-                className="w-full mt-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5">
+                className="w-full mt-1 bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5">
                 {TIPE_PROYEK.map(t=><option key={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Nilai Konstruksi (Miliar Rp)</Label>
+              <Label className="text-[11px] text-muted-foreground">Nilai Konstruksi (Miliar Rp)</Label>
               <Input type="number" value={form.nilaiKonstruksi??""} onChange={e=>setForm(f=>({...f,nilaiKonstruksi:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Fee (%)</Label>
+              <Label className="text-[11px] text-muted-foreground">Fee (%)</Label>
               <Input type="number" step="0.1" value={form.fee??""} onChange={e=>setForm(f=>({...f,fee:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Durasi (minggu)</Label>
+              <Label className="text-[11px] text-muted-foreground">Durasi (minggu)</Label>
               <Input type="number" value={form.durasiMinggu??""} onChange={e=>setForm(f=>({...f,durasiMinggu:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Status</Label>
+              <Label className="text-[11px] text-muted-foreground">Status</Label>
               <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value as any}))}
-                className="w-full mt-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5">
+                className="w-full mt-1 bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5">
                 <option value="prospek">Prospek</option>
                 <option value="berjalan">Berjalan</option>
                 <option value="selesai">Selesai</option>
@@ -331,21 +331,21 @@ function FeeTab() {
             </div>
           </div>
           {form.nilaiKonstruksi && form.fee && (
-            <div className="bg-slate-800/40 rounded-lg p-2.5 text-center">
-              <div className="text-xs text-slate-500">Estimasi Fee</div>
+            <div className="bg-muted/40 rounded-lg p-2.5 text-center">
+              <div className="text-xs text-muted-foreground">Estimasi Fee</div>
               <div className="text-lg font-bold text-rose-400">{fmt(feeAmount(form as FeeProject))}</div>
-              <div className="text-[10px] text-slate-600">= {form.nilaiKonstruksi}M × {form.fee}%</div>
+              <div className="text-[10px] text-muted-foreground">= {form.nilaiKonstruksi}M × {form.fee}%</div>
             </div>
           )}
           <div className="flex gap-2">
             <Button onClick={add} size="sm" className="flex-1 bg-rose-600 hover:bg-rose-500 h-8 text-xs" disabled={!form.nama}>Simpan</Button>
-            <Button onClick={()=>setShowAdd(false)} size="sm" variant="ghost" className="text-slate-400 h-8 text-xs">Batal</Button>
+            <Button onClick={()=>setShowAdd(false)} size="sm" variant="ghost" className="text-muted-foreground h-8 text-xs">Batal</Button>
           </div>
         </div>
       )}
 
       {projects.length === 0 && !showAdd ? (
-        <div className="py-10 text-center text-slate-600">
+        <div className="py-10 text-center text-muted-foreground">
           <DollarSign className="w-10 h-10 mx-auto mb-3 text-slate-800"/>
           <div className="text-sm">Belum ada proyek</div>
           <div className="text-xs mt-1">Tambahkan proyek konsultansi untuk track fee dan pipeline Anda</div>
@@ -353,23 +353,23 @@ function FeeTab() {
       ) : (
         <div className="space-y-2">
           {projects.map(p => (
-            <div key={p.id} className="border border-slate-800 bg-slate-900/40 rounded-xl p-3.5 flex items-start gap-3"
+            <div key={p.id} className="border border-border bg-muted/40 rounded-xl p-3.5 flex items-start gap-3"
               data-testid={`project-${p.id}`}>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start gap-2 flex-wrap">
                   <span className="text-sm font-medium text-white truncate">{p.nama}</span>
                   <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium shrink-0 ${STATUS_COLOR[p.status]}`}>{p.status}</span>
                 </div>
-                {p.klien && <div className="text-[11px] text-slate-500 mt-0.5">{p.klien} · {p.tipe}</div>}
+                {p.klien && <div className="text-[11px] text-muted-foreground mt-0.5">{p.klien} · {p.tipe}</div>}
                 <div className="flex gap-3 mt-1.5 text-[11px]">
-                  <span className="text-slate-600">Konstruksi: Rp {p.nilaiKonstruksi}M</span>
-                  <span className="text-slate-600">Fee: {p.fee}%</span>
-                  <span className="text-slate-600">{p.durasiMinggu} minggu</span>
+                  <span className="text-muted-foreground">Konstruksi: Rp {p.nilaiKonstruksi}M</span>
+                  <span className="text-muted-foreground">Fee: {p.fee}%</span>
+                  <span className="text-muted-foreground">{p.durasiMinggu} minggu</span>
                 </div>
               </div>
               <div className="flex flex-col items-end gap-2 shrink-0">
                 <span className="text-sm font-bold text-rose-400 font-mono">{fmt(feeAmount(p))}</span>
-                <button onClick={()=>remove(p.id)} className="text-slate-700 hover:text-red-400 transition-colors"
+                <button onClick={()=>remove(p.id)} className="text-muted-foreground hover:text-red-400 transition-colors"
                   data-testid={`delete-${p.id}`}>
                   <Trash2 className="w-3.5 h-3.5"/>
                 </button>
@@ -444,12 +444,12 @@ function DeliverablesTab() {
 
   return (
     <div className="p-4 space-y-3 overflow-y-auto h-full">
-      <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Deliverables per Fase Konsultansi</div>
+      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Deliverables per Fase Konsultansi</div>
       <div className="grid grid-cols-4 gap-1.5">
         {Object.entries(phases).map(([k,v]) => (
           <button key={k} onClick={() => setSelected(selected===k?null:k)}
             className={`py-2 rounded-lg border text-xs font-mono font-bold transition-colors ${
-              selected===k ? v.color : "border-slate-800 bg-slate-900/40 text-slate-500 hover:border-slate-700"}`}
+              selected===k ? v.color : "border-border bg-muted/40 text-muted-foreground hover:border-border"}`}
             data-testid={`phase-${k}`}>{k}</button>
         ))}
       </div>
@@ -459,7 +459,7 @@ function DeliverablesTab() {
           {phases[selected].items.map((item, i) => (
             <div key={i} className="flex items-start gap-2 text-xs">
               <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5 opacity-60"/>
-              <span className="text-slate-200">{item}</span>
+              <span className="text-foreground">{item}</span>
             </div>
           ))}
         </div>
@@ -467,7 +467,7 @@ function DeliverablesTab() {
 
       {/* Winning tips */}
       <div className="mt-4">
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Strategi Beauty Contest</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Strategi Beauty Contest</div>
         <div className="space-y-2">
           {[
             { emoji:"🏆", tip:"Tampilkan portofolio proyek serupa — relevansi lebih penting daripada volume" },
@@ -476,9 +476,9 @@ function DeliverablesTab() {
             { emoji:"💰", tip:"Harga bukan satu-satunya faktor — sistem MBS (Merit Point System) biasanya 80% teknis : 20% biaya" },
             { emoji:"🤝", tip:"Bangun relasi dengan owner sebelum proses seleksi dimulai — networking adalah aset utama" },
           ].map((t,i) => (
-            <div key={i} className="flex items-start gap-2.5 bg-slate-800/30 border border-slate-800 rounded-lg px-3 py-2.5">
+            <div key={i} className="flex items-start gap-2.5 bg-muted/30 border border-border rounded-lg px-3 py-2.5">
               <span className="text-base shrink-0 leading-tight">{t.emoji}</span>
-              <span className="text-xs text-slate-300">{t.tip}</span>
+              <span className="text-xs text-muted-foreground">{t.tip}</span>
             </div>
           ))}
         </div>
@@ -497,22 +497,22 @@ export default function KonsultanBot() {
   const projects = loadProjects();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <div className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-13 flex items-center gap-3 py-2.5">
           <Link href="/dashboard">
-            <button className="text-slate-400 hover:text-white" data-testid="button-back">
+            <button className="text-muted-foreground hover:text-foreground" data-testid="button-back">
               <ArrowLeft className="w-4 h-4"/>
             </button>
           </Link>
-          <span className="text-slate-700">|</span>
+          <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-rose-600/20 border border-rose-500/40 flex items-center justify-center">
               <Pencil className="w-4 h-4 text-rose-400"/>
             </div>
             <div>
-              <div className="text-sm font-semibold text-white leading-tight">KonsultanBot</div>
-              <div className="text-[10px] text-slate-500 leading-tight">AI Jasa Konsultansi Konstruksi · DED · MK · Pengawas · 7 Agen</div>
+              <div className="text-sm font-semibold text-foreground leading-tight">KonsultanBot</div>
+              <div className="text-[10px] text-muted-foreground leading-tight">AI Jasa Konsultansi Konstruksi · DED · MK · Pengawas · 7 Agen</div>
             </div>
           </div>
           {projects.length > 0 && (
@@ -521,7 +521,7 @@ export default function KonsultanBot() {
             </div>
           )}
         </div>
-        <div className="flex border-t border-slate-800/60 max-w-7xl mx-auto px-4">
+        <div className="flex border-t border-border/60 max-w-7xl mx-auto px-4">
           {[
             { key:"chat",         label:"Chat AI",             icon:Zap },
             { key:"fee",          label:`Fee Tracker${projects.length>0?` (${projects.length})`:""}`, icon:DollarSign },
@@ -530,7 +530,7 @@ export default function KonsultanBot() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               data-testid={`tab-${t.key}`}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab===t.key ? "text-rose-400 border-rose-500 bg-rose-900/10" : "text-slate-500 border-transparent hover:text-slate-400"
+                tab===t.key ? "text-rose-400 border-rose-500 bg-rose-900/10" : "text-muted-foreground border-transparent hover:text-muted-foreground"
               }`}>
               <t.icon className="w-3.5 h-3.5"/>
               {t.label}

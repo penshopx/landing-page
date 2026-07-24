@@ -100,7 +100,7 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               a.status==="done"?"bg-green-400":a.status==="running"?"bg-yellow-400 animate-pulse":a.status==="error"?"bg-red-400":"bg-white/20"}`} />
           ))}
         </div>
-        {exp ? <ChevronUp className="h-3 w-3 text-white/30 shrink-0"/> : <ChevronDown className="h-3 w-3 text-white/30 shrink-0"/>}
+        {exp ? <ChevronUp className="h-3 w-3 text-muted-foreground/40 shrink-0"/> : <ChevronDown className="h-3 w-3 text-muted-foreground/40 shrink-0"/>}
       </button>
       {exp && (
         <div className="border-t border-amber-800/30 px-3 py-2 space-y-1">
@@ -109,9 +109,9 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               {a.status==="running"?<Loader2 className="h-3 w-3 animate-spin text-yellow-400"/>:
                a.status==="done"   ?<CheckCircle2 className="h-3 w-3 text-green-400"/>:
                a.status==="error"  ?<AlertCircle className="h-3 w-3 text-red-400"/>:
-                                    <Clock className="h-3 w-3 text-white/20"/>}
-              <span className="text-white/50 font-mono">{a.role}</span>
-              {a.elapsed && <span className="text-white/25 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
+                                    <Clock className="h-3 w-3 text-muted-foreground/30"/>}
+              <span className="text-muted-foreground font-mono">{a.role}</span>
+              {a.elapsed && <span className="text-muted-foreground/60 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
             </div>
           ))}
         </div>
@@ -179,14 +179,14 @@ function ChatTab({ agentId }: { agentId: number }) {
             <div className="w-14 h-14 rounded-2xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center mx-auto mb-3">
               <HardHat className="w-7 h-7 text-amber-400" />
             </div>
-            <div className="text-base font-semibold text-white">KontraktorBot AI</div>
-            <div className="text-xs text-slate-400 mt-1">7 agen QS · Takeoff · RAB · Harga Satuan · Cost Control · VE · Tender · BIM5D</div>
+            <div className="text-base font-semibold text-foreground">KontraktorBot AI</div>
+            <div className="text-xs text-muted-foreground mt-1">7 agen QS · Takeoff · RAB · Harga Satuan · Cost Control · VE · Tender · BIM5D</div>
           </div>
-          <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
+          <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
           <div className="grid grid-cols-1 gap-2">
             {SAMPLE_PROMPTS.map((p, i) => (
               <button key={i} onClick={() => send(p)}
-                className="text-left px-3 py-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-amber-700/50 hover:bg-amber-950/20 text-xs text-slate-300 transition-colors"
+                className="text-left px-3 py-2.5 rounded-lg border border-border bg-muted/60 hover:border-amber-700/50 hover:bg-amber-950/20 text-xs text-muted-foreground transition-colors"
                 data-testid={`sample-prompt-${i}`}>{p}</button>
             ))}
           </div>
@@ -200,9 +200,9 @@ function ChatTab({ agentId }: { agentId: number }) {
                 <div className="max-w-[85%] bg-amber-700/30 border border-amber-600/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
               ) : (
                 <div className="max-w-[92%] space-y-2">
-                  <div className="bg-slate-800/60 border border-slate-700/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-slate-200">
+                  <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground">
                     {m.isStreaming && !m.content ? (
-                      <div className="flex items-center gap-2 text-slate-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">7 QS agen menghitung...</span></div>
+                      <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">7 QS agen menghitung...</span></div>
                     ) : <MessageContent text={m.content}/>}
                     {m.isStreaming && m.content && <span className="inline-block w-1.5 h-4 bg-amber-400 animate-pulse ml-0.5 align-middle"/>}
                   </div>
@@ -213,12 +213,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           ))}
         </div>
       )}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Tanya tentang RAB, harga satuan, takeoff, value engineering..."
-            className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-600 text-sm"
+            className="bg-muted/80 border-border text-foreground placeholder:text-muted-foreground text-sm"
             disabled={streaming} data-testid="input-chat"/>
           <Button onClick={()=>streaming?abortRef.current?.abort():send()} size="icon"
             className={`shrink-0 ${streaming?"bg-red-600/80 hover:bg-red-600":"bg-amber-600 hover:bg-amber-500"}`}
@@ -226,7 +226,7 @@ function ChatTab({ agentId }: { agentId: number }) {
             {streaming?<X className="w-4 h-4"/>:<Send className="w-4 h-4"/>}
           </Button>
         </div>
-        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-slate-600 hover:text-slate-400 mt-1.5 ml-1">Bersihkan percakapan</button>}
+        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-muted-foreground hover:text-muted-foreground mt-1.5 ml-1">Bersihkan percakapan</button>}
       </div>
     </div>
   );
@@ -268,54 +268,54 @@ function TakeoffTab() {
   return (
     <div className="p-4 space-y-4 overflow-y-auto h-full">
       {/* Add item */}
-      <div className="bg-slate-800/30 border border-slate-700/40 rounded-xl p-4 space-y-3">
-        <div className="text-xs font-semibold text-slate-400">Tambah Item Pekerjaan</div>
+      <div className="bg-muted/30 border border-border/40 rounded-xl p-4 space-y-3">
+        <div className="text-xs font-semibold text-muted-foreground">Tambah Item Pekerjaan</div>
 
         {/* AHSP quick-fill */}
         <div>
-          <Label className="text-[11px] text-slate-500">Cari dari AHSP (PermenPUPR 01/2022)</Label>
+          <Label className="text-[11px] text-muted-foreground">Cari dari AHSP (PermenPUPR 01/2022)</Label>
           <Input value={ahspSearch} onChange={e=>setAhspSearch(e.target.value)}
-            placeholder="Cari pekerjaan beton, bata, keramik..." className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"
+            placeholder="Cari pekerjaan beton, bata, keramik..." className="bg-muted border-border text-foreground text-xs h-8 mt-1"
             data-testid="input-ahsp-search"/>
           {ahspSearch && (
             <div className="mt-1.5 space-y-1 max-h-36 overflow-y-auto">
               {filteredAhsp.slice(0,8).map(r => (
                 <button key={r.kode} onClick={() => applyAhsp(r)}
-                  className="w-full flex items-center gap-2 text-left px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-amber-900/30 border border-slate-700 hover:border-amber-700/50 transition-colors"
+                  className="w-full flex items-center gap-2 text-left px-2 py-1.5 rounded-lg bg-muted hover:bg-amber-900/30 border border-border hover:border-amber-700/50 transition-colors"
                   data-testid={`ahsp-${r.kode}`}>
                   <span className="font-mono text-[10px] text-amber-400 shrink-0">{r.kode}</span>
-                  <span className="text-xs text-slate-300 flex-1 truncate">{r.pekerjaan}</span>
-                  <span className="text-[10px] text-slate-500 shrink-0">{fmt(r.harga)}/{r.satuan}</span>
+                  <span className="text-xs text-muted-foreground flex-1 truncate">{r.pekerjaan}</span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">{fmt(r.harga)}/{r.satuan}</span>
                 </button>
               ))}
-              {filteredAhsp.length === 0 && <div className="text-xs text-slate-600 text-center py-2">Tidak ditemukan</div>}
+              {filteredAhsp.length === 0 && <div className="text-xs text-muted-foreground text-center py-2">Tidak ditemukan</div>}
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div className="col-span-2">
-            <Label className="text-[11px] text-slate-500">Uraian Pekerjaan</Label>
+            <Label className="text-[11px] text-muted-foreground">Uraian Pekerjaan</Label>
             <Input value={form.pekerjaan} onChange={e=>setForm(f=>({...f,pekerjaan:e.target.value}))}
-              placeholder="cth: Pekerjaan beton K-300" className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"
+              placeholder="cth: Pekerjaan beton K-300" className="bg-muted border-border text-foreground text-xs h-8 mt-1"
               data-testid="input-pekerjaan"/>
           </div>
           <div>
-            <Label className="text-[11px] text-slate-500">Satuan</Label>
+            <Label className="text-[11px] text-muted-foreground">Satuan</Label>
             <select value={form.satuan} onChange={e=>setForm(f=>({...f,satuan:e.target.value}))}
-              className="w-full mt-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5">
+              className="w-full mt-1 bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5">
               {SATUAN_OPTS.map(s => <option key={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <Label className="text-[11px] text-slate-500">Volume</Label>
+            <Label className="text-[11px] text-muted-foreground">Volume</Label>
             <Input type="number" value={form.volume||""} onChange={e=>setForm(f=>({...f,volume:Number(e.target.value)}))}
-              placeholder="0" className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" data-testid="input-volume"/>
+              placeholder="0" className="bg-muted border-border text-foreground text-xs h-8 mt-1" data-testid="input-volume"/>
           </div>
           <div className="col-span-2">
-            <Label className="text-[11px] text-slate-500">Harga Satuan (Rp)</Label>
+            <Label className="text-[11px] text-muted-foreground">Harga Satuan (Rp)</Label>
             <Input type="number" value={form.harga||""} onChange={e=>setForm(f=>({...f,harga:Number(e.target.value)}))}
-              placeholder="0" className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1" data-testid="input-harga"/>
+              placeholder="0" className="bg-muted border-border text-foreground text-xs h-8 mt-1" data-testid="input-harga"/>
           </div>
         </div>
         <Button onClick={add} size="sm" className="w-full bg-amber-600 hover:bg-amber-500 h-8 text-xs"
@@ -327,18 +327,18 @@ function TakeoffTab() {
       {/* Item table */}
       {items.length > 0 && (
         <div className="space-y-2">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Daftar Pekerjaan</div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Daftar Pekerjaan</div>
           <div className="space-y-1.5">
             {items.map((item, idx) => (
-              <div key={item.id} className="flex items-center gap-2 bg-slate-800/40 border border-slate-800 rounded-lg px-3 py-2"
+              <div key={item.id} className="flex items-center gap-2 bg-muted/40 border border-border rounded-lg px-3 py-2"
                 data-testid={`item-${item.id}`}>
-                <span className="text-[10px] text-slate-600 w-5 shrink-0">{idx+1}</span>
+                <span className="text-[10px] text-muted-foreground w-5 shrink-0">{idx+1}</span>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs text-white truncate">{item.pekerjaan}</div>
-                  <div className="text-[10px] text-slate-500">{item.volume.toLocaleString("id-ID")} {item.satuan} × {fmt(item.harga)}</div>
+                  <div className="text-[10px] text-muted-foreground">{item.volume.toLocaleString("id-ID")} {item.satuan} × {fmt(item.harga)}</div>
                 </div>
                 <div className="text-xs font-mono text-amber-400 shrink-0">{fmt(item.volume * item.harga)}</div>
-                <button onClick={() => remove(item.id)} className="text-slate-700 hover:text-red-400 transition-colors shrink-0"
+                <button onClick={() => remove(item.id)} className="text-muted-foreground hover:text-red-400 transition-colors shrink-0"
                   data-testid={`delete-item-${item.id}`}>
                   <Trash2 className="w-3.5 h-3.5"/>
                 </button>
@@ -350,36 +350,36 @@ function TakeoffTab() {
 
       {/* Summary */}
       {items.length > 0 && (
-        <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-4 space-y-2">
-          <div className="text-xs font-semibold text-slate-400 mb-3">Rekapitulasi RAB</div>
+        <div className="bg-muted/40 border border-border/40 rounded-xl p-4 space-y-2">
+          <div className="text-xs font-semibold text-muted-foreground mb-3">Rekapitulasi RAB</div>
 
           <div className="flex justify-between text-xs">
-            <span className="text-slate-400">Jumlah Harga Pekerjaan (A)</span>
+            <span className="text-muted-foreground">Jumlah Harga Pekerjaan (A)</span>
             <span className="font-mono text-white">{fmt(totalDirect)}</span>
           </div>
 
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-400">Overhead & Keuntungan</span>
+            <span className="text-muted-foreground">Overhead & Keuntungan</span>
             <div className="flex items-center gap-2">
               <Input type="number" value={overhead} onChange={e=>setOverhead(Number(e.target.value))}
-                className="w-14 h-6 bg-slate-900 border-slate-700 text-white text-xs text-center px-1"
-                data-testid="input-overhead"/> <span className="text-slate-500">%</span>
+                className="w-14 h-6 bg-muted border-border text-foreground text-xs text-center px-1"
+                data-testid="input-overhead"/> <span className="text-muted-foreground">%</span>
               <span className="font-mono text-amber-400">{fmt(totalOverhead)}</span>
             </div>
           </div>
 
-          <div className="flex justify-between text-xs border-t border-slate-700/40 pt-2">
-            <span className="text-slate-400">Sub Total (B = A + OH)</span>
+          <div className="flex justify-between text-xs border-t border-border/40 pt-2">
+            <span className="text-muted-foreground">Sub Total (B = A + OH)</span>
             <span className="font-mono text-white">{fmt(subtotal)}</span>
           </div>
 
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-400">PPN</span>
+            <span className="text-muted-foreground">PPN</span>
             <div className="flex items-center gap-2">
               <Input type="number" value={ppn} onChange={e=>setPpn(Number(e.target.value))}
-                className="w-14 h-6 bg-slate-900 border-slate-700 text-white text-xs text-center px-1"
-                data-testid="input-ppn"/> <span className="text-slate-500">%</span>
-              <span className="font-mono text-slate-400">{fmt(totalPpn)}</span>
+                className="w-14 h-6 bg-muted border-border text-foreground text-xs text-center px-1"
+                data-testid="input-ppn"/> <span className="text-muted-foreground">%</span>
+              <span className="font-mono text-muted-foreground">{fmt(totalPpn)}</span>
             </div>
           </div>
 
@@ -389,14 +389,14 @@ function TakeoffTab() {
           </div>
 
           <button onClick={() => { if(confirm("Reset semua item?")) save([]); }}
-            className="text-[10px] text-slate-700 hover:text-red-400 mt-1" data-testid="button-reset-takeoff">
+            className="text-[10px] text-muted-foreground hover:text-red-400 mt-1" data-testid="button-reset-takeoff">
             Reset semua
           </button>
         </div>
       )}
 
       {items.length === 0 && (
-        <div className="py-8 text-center text-slate-600">
+        <div className="py-8 text-center text-muted-foreground">
           <Calculator className="w-10 h-10 mx-auto mb-3 text-slate-800"/>
           <div className="text-sm">Belum ada item pekerjaan</div>
           <div className="text-xs mt-1">Tambahkan item atau pilih dari referensi AHSP di atas</div>
@@ -412,26 +412,26 @@ function OverheadTab() {
     <div className="p-4 space-y-5 overflow-y-auto h-full">
       {/* Overhead guide */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Komponen Overhead & Keuntungan</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Komponen Overhead & Keuntungan</div>
         <div className="space-y-2">
           {OVERHEAD_GUIDE.map((item, i) => (
-            <div key={i} className="bg-slate-800/30 border border-slate-800 rounded-xl p-3 flex items-start gap-3">
+            <div key={i} className="bg-muted/30 border border-border rounded-xl p-3 flex items-start gap-3">
               <div className="w-16 shrink-0">
                 <span className="text-xs font-bold text-amber-400">{item.persen}</span>
               </div>
               <div>
                 <div className="text-xs font-medium text-white">{item.komponen}</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">{item.note}</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">{item.note}</div>
               </div>
             </div>
           ))}
         </div>
-        <div className="text-[10px] text-slate-600 mt-2 text-center">Referensi: AHSP PermenPUPR 01/2022 · Perpres 16/2018 · LKPP</div>
+        <div className="text-[10px] text-muted-foreground mt-2 text-center">Referensi: AHSP PermenPUPR 01/2022 · Perpres 16/2018 · LKPP</div>
       </div>
 
       {/* BQ Tips */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Tips Menyusun Penawaran</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Tips Menyusun Penawaran</div>
         <div className="space-y-2">
           {[
             { icon:"💡", tip:"Selalu survey lapangan sebelum menghitung volume — gambar DED sering berbeda dengan kondisi aktual" },
@@ -441,9 +441,9 @@ function OverheadTab() {
             { icon:"📅", tip:"Pastikan jadwal cash flow sesuai termin pembayaran — keterlambatan modal kerja paling sering jadi penyebab gagal bayar" },
             { icon:"🔒", tip:"Kunci harga material volatile (besi, beton, BBM) dengan klausul price adjustment jika durasi > 6 bulan" },
           ].map((t, i) => (
-            <div key={i} className="flex items-start gap-2.5 bg-slate-800/30 border border-slate-800 rounded-lg px-3 py-2.5">
+            <div key={i} className="flex items-start gap-2.5 bg-muted/30 border border-border rounded-lg px-3 py-2.5">
               <span className="text-base shrink-0 leading-tight">{t.icon}</span>
-              <span className="text-xs text-slate-300">{t.tip}</span>
+              <span className="text-xs text-muted-foreground">{t.tip}</span>
             </div>
           ))}
         </div>
@@ -462,22 +462,22 @@ export default function KontraktorBot() {
   const items = loadTakeoff();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <div className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-13 flex items-center gap-3 py-2.5">
           <Link href="/dashboard">
-            <button className="text-slate-400 hover:text-white" data-testid="button-back">
+            <button className="text-muted-foreground hover:text-foreground" data-testid="button-back">
               <ArrowLeft className="w-4 h-4"/>
             </button>
           </Link>
-          <span className="text-slate-700">|</span>
+          <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-amber-600/20 border border-amber-500/40 flex items-center justify-center">
               <HardHat className="w-4 h-4 text-amber-400"/>
             </div>
             <div>
-              <div className="text-sm font-semibold text-white leading-tight">KontraktorBot</div>
-              <div className="text-[10px] text-slate-500 leading-tight">AI QS & Estimasi Biaya · RAB · Takeoff · AHSP · 7 Agen</div>
+              <div className="text-sm font-semibold text-foreground leading-tight">KontraktorBot</div>
+              <div className="text-[10px] text-muted-foreground leading-tight">AI QS & Estimasi Biaya · RAB · Takeoff · AHSP · 7 Agen</div>
             </div>
           </div>
           {items.length > 0 && (
@@ -486,7 +486,7 @@ export default function KontraktorBot() {
             </div>
           )}
         </div>
-        <div className="flex border-t border-slate-800/60 max-w-7xl mx-auto px-4">
+        <div className="flex border-t border-border/60 max-w-7xl mx-auto px-4">
           {[
             { key:"chat",     label:"Chat AI QS",     icon:Zap },
             { key:"takeoff",  label:`Quick RAB${items.length > 0 ? ` (${items.length})` : ""}`, icon:Calculator },
@@ -495,7 +495,7 @@ export default function KontraktorBot() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               data-testid={`tab-${t.key}`}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab === t.key ? "text-amber-400 border-amber-500 bg-amber-900/10" : "text-slate-500 border-transparent hover:text-slate-400"
+                tab === t.key ? "text-amber-400 border-amber-500 bg-amber-900/10" : "text-muted-foreground border-transparent hover:text-muted-foreground"
               }`}>
               <t.icon className="w-3.5 h-3.5"/>
               {t.label}

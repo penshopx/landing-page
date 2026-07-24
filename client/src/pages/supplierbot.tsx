@@ -84,7 +84,7 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               a.status==="done"?"bg-green-400":a.status==="running"?"bg-yellow-400 animate-pulse":a.status==="error"?"bg-red-400":"bg-white/20"}`} />
           ))}
         </div>
-        {exp?<ChevronUp className="h-3 w-3 text-white/30 shrink-0"/>:<ChevronDown className="h-3 w-3 text-white/30 shrink-0"/>}
+        {exp?<ChevronUp className="h-3 w-3 text-muted-foreground/40 shrink-0"/>:<ChevronDown className="h-3 w-3 text-muted-foreground/40 shrink-0"/>}
       </button>
       {exp && (
         <div className="border-t border-teal-800/30 px-3 py-2 space-y-1">
@@ -93,9 +93,9 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               {a.status==="running"?<Loader2 className="h-3 w-3 animate-spin text-yellow-400"/>:
                a.status==="done"   ?<CheckCircle2 className="h-3 w-3 text-green-400"/>:
                a.status==="error"  ?<AlertCircle className="h-3 w-3 text-red-400"/>:
-                                    <Clock className="h-3 w-3 text-white/20"/>}
-              <span className="text-white/50 font-mono">{a.role}</span>
-              {a.elapsed && <span className="text-white/25 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
+                                    <Clock className="h-3 w-3 text-muted-foreground/30"/>}
+              <span className="text-muted-foreground font-mono">{a.role}</span>
+              {a.elapsed && <span className="text-muted-foreground/60 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
             </div>
           ))}
         </div>
@@ -163,14 +163,14 @@ function ChatTab({ agentId }: { agentId: number }) {
             <div className="w-14 h-14 rounded-2xl bg-teal-600/20 border border-teal-500/30 flex items-center justify-center mx-auto mb-3">
               <Package className="w-7 h-7 text-teal-400" />
             </div>
-            <div className="text-base font-semibold text-white">SupplierBot AI</div>
-            <div className="text-xs text-slate-400 mt-1">8 agen supply chain · Harga Material · Pengadaan · Negosiasi · MMP · Logistik</div>
+            <div className="text-base font-semibold text-foreground">SupplierBot AI</div>
+            <div className="text-xs text-muted-foreground mt-1">8 agen supply chain · Harga Material · Pengadaan · Negosiasi · MMP · Logistik</div>
           </div>
-          <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
+          <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
           <div className="grid grid-cols-1 gap-2">
             {SAMPLE_PROMPTS.map((p, i) => (
               <button key={i} onClick={() => send(p)}
-                className="text-left px-3 py-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-teal-700/50 hover:bg-teal-950/20 text-xs text-slate-300 transition-colors"
+                className="text-left px-3 py-2.5 rounded-lg border border-border bg-muted/60 hover:border-teal-700/50 hover:bg-teal-950/20 text-xs text-muted-foreground transition-colors"
                 data-testid={`sample-prompt-${i}`}>{p}</button>
             ))}
           </div>
@@ -184,9 +184,9 @@ function ChatTab({ agentId }: { agentId: number }) {
                 <div className="max-w-[85%] bg-teal-700/30 border border-teal-600/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
               ) : (
                 <div className="max-w-[92%] space-y-2">
-                  <div className="bg-slate-800/60 border border-slate-700/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-slate-200">
+                  <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground">
                     {m.isStreaming && !m.content
-                      ? <div className="flex items-center gap-2 text-slate-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">Menganalisis harga & supply chain...</span></div>
+                      ? <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">Menganalisis harga & supply chain...</span></div>
                       : <MessageContent text={m.content}/>}
                     {m.isStreaming && m.content && <span className="inline-block w-1.5 h-4 bg-teal-400 animate-pulse ml-0.5 align-middle"/>}
                   </div>
@@ -197,12 +197,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           ))}
         </div>
       )}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Tanya harga material, strategi pengadaan, negosiasi supplier..."
-            className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-600 text-sm"
+            className="bg-muted/80 border-border text-foreground placeholder:text-muted-foreground text-sm"
             disabled={streaming} data-testid="input-chat"/>
           <Button onClick={()=>streaming?abortRef.current?.abort():send()} size="icon"
             className={`shrink-0 ${streaming?"bg-red-600/80 hover:bg-red-600":"bg-teal-600 hover:bg-teal-500"}`}
@@ -210,7 +210,7 @@ function ChatTab({ agentId }: { agentId: number }) {
             {streaming?<X className="w-4 h-4"/>:<Send className="w-4 h-4"/>}
           </Button>
         </div>
-        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-slate-600 hover:text-slate-400 mt-1.5 ml-1">Bersihkan percakapan</button>}
+        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-muted-foreground hover:text-muted-foreground mt-1.5 ml-1">Bersihkan percakapan</button>}
       </div>
     </div>
   );
@@ -252,28 +252,28 @@ function WatchlistTab() {
     <div className="p-4 space-y-4 overflow-y-auto h-full">
       {materials.length > 0 && (
         <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5">
             <div className="text-xl font-bold text-white">{materials.length}</div>
-            <div className="text-[10px] text-slate-600">Material</div>
+            <div className="text-[10px] text-muted-foreground">Material</div>
           </div>
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5">
             <div className={`text-lg font-bold ${overBudget>0?"text-red-400":"text-emerald-400"}`}>{overBudget}</div>
-            <div className="text-[10px] text-slate-600">Over Budget</div>
+            <div className="text-[10px] text-muted-foreground">Over Budget</div>
           </div>
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5">
             <div className={`text-lg font-bold ${avgVariance>5?"text-red-400":avgVariance>0?"text-amber-400":"text-emerald-400"}`}>
               {avgVariance>=0?"+":""}{avgVariance.toFixed(1)}%
             </div>
-            <div className="text-[10px] text-slate-600">Avg Variance</div>
+            <div className="text-[10px] text-muted-foreground">Avg Variance</div>
           </div>
         </div>
       )}
 
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600"/>
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground"/>
           <Input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Cari material..."
-            className="pl-8 bg-slate-900 border-slate-800 text-white text-xs h-8" data-testid="input-search"/>
+            className="pl-8 bg-muted border-border text-foreground text-xs h-8" data-testid="input-search"/>
         </div>
         <button onClick={() => {setForm(blank());setShowAdd(!showAdd);}}
           className="flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-teal-700/50 hover:bg-teal-950/20 rounded-lg text-xs text-teal-500 hover:text-teal-400 transition-colors whitespace-nowrap"
@@ -287,63 +287,63 @@ function WatchlistTab() {
           <div className="text-xs font-semibold text-teal-300">Material Baru</div>
           {/* Preset quick-fill */}
           <div>
-            <Label className="text-[11px] text-slate-500">Pilih dari preset material umum</Label>
+            <Label className="text-[11px] text-muted-foreground">Pilih dari preset material umum</Label>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {MATERIAL_PRESETS.slice(0,6).map((p,i) => (
                 <button key={i} onClick={()=>applyPreset(p)}
-                  className="text-[10px] px-2 py-1 rounded bg-slate-800 border border-slate-700 hover:border-teal-700/50 text-slate-400 hover:text-teal-400 transition-colors"
+                  className="text-[10px] px-2 py-1 rounded bg-muted border border-border hover:border-teal-700/50 text-muted-foreground hover:text-teal-400 transition-colors"
                   data-testid={`preset-${i}`}>{p.nama.split(" ").slice(0,2).join(" ")}</button>
               ))}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <Label className="text-[11px] text-slate-500">Nama Material</Label>
+              <Label className="text-[11px] text-muted-foreground">Nama Material</Label>
               <Input value={form.nama??""} onChange={e=>setForm(f=>({...f,nama:e.target.value}))}
-                placeholder="cth: Besi beton ulir D16" className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                placeholder="cth: Besi beton ulir D16" className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Satuan</Label>
+              <Label className="text-[11px] text-muted-foreground">Satuan</Label>
               <select value={form.satuan} onChange={e=>setForm(f=>({...f,satuan:e.target.value}))}
-                className="w-full mt-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5">
+                className="w-full mt-1 bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5">
                 {["kg","ton","m³","m²","m","zak","lbr","bh","btg","set"].map(s=><option key={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Lead Time (hari)</Label>
+              <Label className="text-[11px] text-muted-foreground">Lead Time (hari)</Label>
               <Input type="number" value={form.lead??""} onChange={e=>setForm(f=>({...f,lead:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Harga Ref / Target (Rp)</Label>
+              <Label className="text-[11px] text-muted-foreground">Harga Ref / Target (Rp)</Label>
               <Input type="number" value={form.hargaRef||""} onChange={e=>setForm(f=>({...f,hargaRef:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Harga Pasar Terkini (Rp)</Label>
+              <Label className="text-[11px] text-muted-foreground">Harga Pasar Terkini (Rp)</Label>
               <Input type="number" value={form.hargaMarket||""} onChange={e=>setForm(f=>({...f,hargaMarket:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Supplier / Distributor</Label>
+              <Label className="text-[11px] text-muted-foreground">Supplier / Distributor</Label>
               <Input value={form.supplier??""} onChange={e=>setForm(f=>({...f,supplier:e.target.value}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Tanggal Update</Label>
+              <Label className="text-[11px] text-muted-foreground">Tanggal Update</Label>
               <Input type="date" value={form.updated??""} onChange={e=>setForm(f=>({...f,updated:e.target.value}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
           </div>
           <div className="flex gap-2">
             <Button onClick={add} size="sm" className="flex-1 bg-teal-600 hover:bg-teal-500 h-8 text-xs" disabled={!form.nama}>Simpan</Button>
-            <Button onClick={()=>setShowAdd(false)} size="sm" variant="ghost" className="text-slate-400 h-8 text-xs">Batal</Button>
+            <Button onClick={()=>setShowAdd(false)} size="sm" variant="ghost" className="text-muted-foreground h-8 text-xs">Batal</Button>
           </div>
         </div>
       )}
 
       {filtered.length === 0 && !showAdd ? (
-        <div className="py-10 text-center text-slate-600">
+        <div className="py-10 text-center text-muted-foreground">
           <Package className="w-10 h-10 mx-auto mb-3 text-slate-800"/>
           <div className="text-sm">Belum ada material</div>
           <div className="text-xs mt-1">Tambahkan material untuk memantau harga & variance terhadap budget RAB</div>
@@ -354,15 +354,15 @@ function WatchlistTab() {
             const variance = pct(m);
             const isOver = variance > 0;
             return (
-              <div key={m.id} className="bg-slate-900/40 border border-slate-800 rounded-xl px-3.5 py-3 flex items-center gap-3"
+              <div key={m.id} className="bg-muted/40 border border-border rounded-xl px-3.5 py-3 flex items-center gap-3"
                 data-testid={`material-${m.id}`}>
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-medium text-white truncate">{m.nama}</div>
                   <div className="flex gap-3 mt-1">
-                    <span className="text-[11px] text-slate-600">Ref: {fmt(m.hargaRef)}/{m.satuan}</span>
-                    <span className="text-[11px] text-slate-500">Pasar: {fmt(m.hargaMarket)}/{m.satuan}</span>
+                    <span className="text-[11px] text-muted-foreground">Ref: {fmt(m.hargaRef)}/{m.satuan}</span>
+                    <span className="text-[11px] text-muted-foreground">Pasar: {fmt(m.hargaMarket)}/{m.satuan}</span>
                   </div>
-                  {m.supplier && <div className="text-[10px] text-slate-700 mt-0.5">{m.supplier} · Lead {m.lead}h</div>}
+                  {m.supplier && <div className="text-[10px] text-muted-foreground mt-0.5">{m.supplier} · Lead {m.lead}h</div>}
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   <div className={`flex items-center gap-1 text-xs font-bold ${isOver?"text-red-400":"text-emerald-400"}`}>
@@ -370,7 +370,7 @@ function WatchlistTab() {
                     {isOver?"+":""}{variance.toFixed(1)}%
                   </div>
                   {isOver && variance > 5 && <AlertTriangle className="w-3.5 h-3.5 text-amber-500"/>}
-                  <button onClick={()=>remove(m.id)} className="text-slate-700 hover:text-red-400 transition-colors"
+                  <button onClick={()=>remove(m.id)} className="text-muted-foreground hover:text-red-400 transition-colors"
                     data-testid={`delete-${m.id}`}><Trash2 className="w-3 h-3"/></button>
                 </div>
               </div>
@@ -387,7 +387,7 @@ function StrategiTab() {
   return (
     <div className="p-4 space-y-5 overflow-y-auto h-full">
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Strategi Pengadaan Material Konstruksi</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Strategi Pengadaan Material Konstruksi</div>
         <div className="space-y-2">
           {[
             { emoji:"📦", judul:"Bulk Purchase & Volume Discount",  isi:"Beli material utama (besi, semen) dalam volume besar di awal proyek saat harga rendah. Negosiasikan discount 3–7% untuk pembelian > 100 ton." },
@@ -397,19 +397,19 @@ function StrategiTab() {
             { emoji:"🔄", judul:"Material Exchange / Barter",       isi:"Untuk material sisa atau over-order — jual atau tukar dengan kontraktor lain via grup WhatsApp / marketplace material konstruksi." },
             { emoji:"📊", judul:"Material Requirement Planning (MRP)", isi:"Hitung kebutuhan material per item berdasarkan jadwal rinci (S-curve). Hindari under/over order yang sama-sama merugikan." },
           ].map((s,i) => (
-            <div key={i} className="bg-slate-800/30 border border-slate-800 rounded-xl px-3.5 py-3">
+            <div key={i} className="bg-muted/30 border border-border rounded-xl px-3.5 py-3">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-base shrink-0">{s.emoji}</span>
                 <span className="text-xs font-semibold text-teal-300">{s.judul}</span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed pl-6">{s.isi}</p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed pl-6">{s.isi}</p>
             </div>
           ))}
         </div>
       </div>
 
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Material Paling Volatile (Perlu Monitoring Ketat)</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Material Paling Volatile (Perlu Monitoring Ketat)</div>
         <div className="space-y-1.5">
           {[
             { mat:"Besi Beton & Baja Struktur",  alasan:"Sangat tergantung harga global (LME) dan kurs USD/IDR. Volatilitas ±15–25% per tahun." },
@@ -419,11 +419,11 @@ function StrategiTab() {
             { mat:"Batu Split & Pasir",          alasan:"Tergantung kuota tambang lokal, musim hujan, dan kebijakan lingkungan daerah." },
             { mat:"Kayu & Multipleks",           alasan:"Sangat dipengaruhi kebijakan SVLK, moratorium hutan, dan musim panen kayu." },
           ].map((item,i) => (
-            <div key={i} className="flex items-start gap-2 bg-slate-800/30 border border-slate-800 rounded-lg px-3 py-2.5">
+            <div key={i} className="flex items-start gap-2 bg-muted/30 border border-border rounded-lg px-3 py-2.5">
               <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5"/>
               <div>
                 <div className="text-xs font-medium text-white">{item.mat}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">{item.alasan}</div>
+                <div className="text-[10px] text-muted-foreground mt-0.5">{item.alasan}</div>
               </div>
             </div>
           ))}
@@ -443,22 +443,22 @@ export default function SupplierBot() {
   const materials = loadMaterials();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <div className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-13 flex items-center gap-3 py-2.5">
           <Link href="/dashboard">
-            <button className="text-slate-400 hover:text-white" data-testid="button-back">
+            <button className="text-muted-foreground hover:text-foreground" data-testid="button-back">
               <ArrowLeft className="w-4 h-4"/>
             </button>
           </Link>
-          <span className="text-slate-700">|</span>
+          <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-teal-600/20 border border-teal-500/40 flex items-center justify-center">
               <Package className="w-4 h-4 text-teal-400"/>
             </div>
             <div>
-              <div className="text-sm font-semibold text-white leading-tight">SupplierBot</div>
-              <div className="text-[10px] text-slate-500 leading-tight">AI Supply Chain & Material · Harga · Pengadaan · Negosiasi · 8 Agen</div>
+              <div className="text-sm font-semibold text-foreground leading-tight">SupplierBot</div>
+              <div className="text-[10px] text-muted-foreground leading-tight">AI Supply Chain & Material · Harga · Pengadaan · Negosiasi · 8 Agen</div>
             </div>
           </div>
           {materials.length > 0 && (
@@ -467,7 +467,7 @@ export default function SupplierBot() {
             </div>
           )}
         </div>
-        <div className="flex border-t border-slate-800/60 max-w-7xl mx-auto px-4">
+        <div className="flex border-t border-border/60 max-w-7xl mx-auto px-4">
           {[
             { key:"chat",      label:"Chat AI",                      icon:Zap },
             { key:"watchlist", label:`Pantau Harga${materials.length>0?` (${materials.length})`:""}`, icon:BarChart3 },
@@ -476,7 +476,7 @@ export default function SupplierBot() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               data-testid={`tab-${t.key}`}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab===t.key ? "text-teal-400 border-teal-500 bg-teal-900/10" : "text-slate-500 border-transparent hover:text-slate-400"
+                tab===t.key ? "text-teal-400 border-teal-500 bg-teal-900/10" : "text-muted-foreground border-transparent hover:text-muted-foreground"
               }`}>
               <t.icon className="w-3.5 h-3.5"/>
               {t.label}

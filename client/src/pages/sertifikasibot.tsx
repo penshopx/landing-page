@@ -131,7 +131,7 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               a.status==="error" ? "bg-red-400" : "bg-white/20"}`} />
           ))}
         </div>
-        {expanded ? <ChevronUp className="h-3 w-3 text-white/30 shrink-0" /> : <ChevronDown className="h-3 w-3 text-white/30 shrink-0" />}
+        {expanded ? <ChevronUp className="h-3 w-3 text-muted-foreground/40 shrink-0" /> : <ChevronDown className="h-3 w-3 text-muted-foreground/40 shrink-0" />}
       </button>
       {expanded && (
         <div className="border-t border-blue-800/30 px-3 py-2 space-y-1">
@@ -140,9 +140,9 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               {a.status==="running" ? <Loader2 className="h-3 w-3 animate-spin text-yellow-400" /> :
                a.status==="done"    ? <CheckCircle2 className="h-3 w-3 text-green-400" /> :
                a.status==="error"   ? <AlertCircle className="h-3 w-3 text-red-400" /> :
-                                       <Clock className="h-3 w-3 text-white/20" />}
-              <span className="text-white/50 font-mono">{a.role}</span>
-              {a.elapsed && <span className="text-white/25 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
+                                       <Clock className="h-3 w-3 text-muted-foreground/30" />}
+              <span className="text-muted-foreground font-mono">{a.role}</span>
+              {a.elapsed && <span className="text-muted-foreground/60 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
             </div>
           ))}
         </div>
@@ -236,14 +236,14 @@ function ChatTab({ agentId }: { agentId: number }) {
             <div className="w-14 h-14 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center mx-auto mb-3">
               <Award className="w-7 h-7 text-blue-400" />
             </div>
-            <div className="text-base font-semibold text-white">SertifikasiBot AI</div>
-            <div className="text-xs text-slate-400 mt-1">9 agen spesialis SBU/SKK · Permen PU 6/2025 · LSBU · ABU</div>
+            <div className="text-base font-semibold text-foreground">SertifikasiBot AI</div>
+            <div className="text-xs text-muted-foreground mt-1">9 agen spesialis SBU/SKK · Permen PU 6/2025 · LSBU · ABU</div>
           </div>
-          <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
+          <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
           <div className="grid grid-cols-1 gap-2">
             {SAMPLE_PROMPTS.map((p, i) => (
               <button key={i} onClick={() => send(p)}
-                className="text-left px-3 py-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-blue-600/50 hover:bg-blue-950/20 text-xs text-slate-300 transition-colors"
+                className="text-left px-3 py-2.5 rounded-lg border border-border bg-muted/60 hover:border-blue-600/50 hover:bg-blue-950/20 text-xs text-muted-foreground transition-colors"
                 data-testid={`sample-prompt-${i}`}>
                 {p}
               </button>
@@ -259,9 +259,9 @@ function ChatTab({ agentId }: { agentId: number }) {
                 <div className="max-w-[85%] bg-blue-600/30 border border-blue-500/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
               ) : (
                 <div className="max-w-[92%] space-y-2">
-                  <div className="bg-slate-800/60 border border-slate-700/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-slate-200">
+                  <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground">
                     {m.isStreaming && !m.content ? (
-                      <div className="flex items-center gap-2 text-slate-500"><Loader2 className="w-3.5 h-3.5 animate-spin" /><span className="text-xs">9 agen menganalisis...</span></div>
+                      <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-3.5 h-3.5 animate-spin" /><span className="text-xs">9 agen menganalisis...</span></div>
                     ) : <MessageContent text={m.content} />}
                     {m.isStreaming && m.content && <span className="inline-block w-1.5 h-4 bg-blue-400 animate-pulse ml-0.5 align-middle" />}
                   </div>
@@ -272,12 +272,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           ))}
         </div>
       )}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key==="Enter" && !e.shiftKey && send()}
             placeholder="Tanya tentang SBU, SKK, LSBU, persyaratan, alur proses..."
-            className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-600 text-sm"
+            className="bg-muted/80 border-border text-foreground placeholder:text-muted-foreground text-sm"
             disabled={streaming} data-testid="input-chat" />
           <Button onClick={() => streaming ? abortRef.current?.abort() : send()} size="icon"
             className={`shrink-0 ${streaming ? "bg-red-600/80 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-500"}`}
@@ -286,7 +286,7 @@ function ChatTab({ agentId }: { agentId: number }) {
           </Button>
         </div>
         {messages.length > 0 && (
-          <button onClick={() => setMessages([])} className="text-[10px] text-slate-600 hover:text-slate-400 mt-1.5 ml-1" data-testid="button-clear-chat">
+          <button onClick={() => setMessages([])} className="text-[10px] text-muted-foreground hover:text-muted-foreground mt-1.5 ml-1" data-testid="button-clear-chat">
             Bersihkan percakapan
           </button>
         )}
@@ -349,9 +349,9 @@ function TrackerTab() {
             { label: "Perlu Perhatian", val: warning, color: "text-yellow-400" },
             { label: "Kedaluwarsa", val: expired, color: "text-red-400" },
           ].map(s => (
-            <div key={s.label} className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-3 text-center">
+            <div key={s.label} className="bg-muted/40 border border-border/40 rounded-lg p-3 text-center">
               <div className={`text-xl font-bold ${s.color}`}>{s.val}</div>
-              <div className="text-[10px] text-slate-500">{s.label}</div>
+              <div className="text-[10px] text-muted-foreground">{s.label}</div>
             </div>
           ))}
         </div>
@@ -359,7 +359,7 @@ function TrackerTab() {
 
       {/* Add button */}
       <button onClick={() => setShowAdd(!showAdd)}
-        className="w-full flex items-center justify-center gap-2 border border-dashed border-slate-700 hover:border-blue-600/50 hover:bg-blue-950/10 rounded-lg py-2.5 text-xs text-slate-500 hover:text-blue-400 transition-colors"
+        className="w-full flex items-center justify-center gap-2 border border-dashed border-border hover:border-blue-600/50 hover:bg-blue-950/10 rounded-lg py-2.5 text-xs text-muted-foreground hover:text-blue-400 transition-colors"
         data-testid="button-add-sbu">
         <Plus className="w-3.5 h-3.5" /> Tambah SBU
       </button>
@@ -369,18 +369,18 @@ function TrackerTab() {
         <div className="border border-blue-800/40 bg-blue-950/20 rounded-xl p-4 space-y-3">
           <div className="text-xs font-semibold text-blue-300">Tambah SBU Baru</div>
           <div className="space-y-1">
-            <div className="text-[11px] text-slate-500">Kode SBU</div>
+            <div className="text-[11px] text-muted-foreground">Kode SBU</div>
             <div className="space-y-1.5">
               <Input placeholder="Cari kode atau nama..." value={codeSearch} onChange={e => setCodeSearch(e.target.value)}
-                className="bg-slate-800 border-slate-700 text-white text-xs h-8" />
+                className="bg-muted border-border text-foreground text-xs h-8" />
               <div className="grid grid-cols-2 gap-1 max-h-32 overflow-y-auto">
                 {filteredCodes.slice(0, 30).map(([code, name]) => (
                   <button key={code} onClick={() => { setForm(f=>({...f,code})); setCodeSearch(""); }}
                     className={`text-[11px] px-2 py-1 rounded border text-left transition-colors ${
-                      form.code===code ? "bg-blue-600/30 border-blue-500/50 text-blue-200" : "bg-slate-800/50 border-slate-700/30 text-slate-500 hover:border-slate-600"
+                      form.code===code ? "bg-blue-600/30 border-blue-500/50 text-blue-200" : "bg-muted/50 border-border/30 text-muted-foreground hover:border-border"
                     }`}>
                     <span className="font-mono">{code}</span>
-                    <span className="text-slate-600 ml-1 text-[10px]">— {name.substring(0,18)}</span>
+                    <span className="text-muted-foreground ml-1 text-[10px]">— {name.substring(0,18)}</span>
                   </button>
                 ))}
               </div>
@@ -388,28 +388,28 @@ function TrackerTab() {
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <div className="text-[11px] text-slate-500 mb-1">Kualifikasi</div>
+              <div className="text-[11px] text-muted-foreground mb-1">Kualifikasi</div>
               <select value={form.kualifikasi} onChange={e => setForm(f=>({...f,kualifikasi:e.target.value}))}
-                className="w-full bg-slate-800 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5"
+                className="w-full bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5"
                 data-testid="select-kualifikasi">
                 <option>Kecil</option><option>Menengah</option><option>Besar</option>
               </select>
             </div>
             <div>
-              <div className="text-[11px] text-slate-500 mb-1">Tanggal Terbit</div>
+              <div className="text-[11px] text-muted-foreground mb-1">Tanggal Terbit</div>
               <Input type="date" value={form.tanggalTerbit} onChange={e=>setForm(f=>({...f,tanggalTerbit:e.target.value}))}
-                className="bg-slate-800 border-slate-700 text-white text-xs h-8" data-testid="input-terbit" />
+                className="bg-muted border-border text-foreground text-xs h-8" data-testid="input-terbit" />
             </div>
             <div>
-              <div className="text-[11px] text-slate-500 mb-1">Tanggal Ekspirasi</div>
+              <div className="text-[11px] text-muted-foreground mb-1">Tanggal Ekspirasi</div>
               <Input type="date" value={form.tanggalExpiry} onChange={e=>setForm(f=>({...f,tanggalExpiry:e.target.value}))}
-                className="bg-slate-800 border-slate-700 text-white text-xs h-8" data-testid="input-expiry" />
+                className="bg-muted border-border text-foreground text-xs h-8" data-testid="input-expiry" />
             </div>
           </div>
           <div>
-            <div className="text-[11px] text-slate-500 mb-1">Nomor Sertifikat (opsional)</div>
+            <div className="text-[11px] text-muted-foreground mb-1">Nomor Sertifikat (opsional)</div>
             <Input value={form.nomorSertifikat} onChange={e=>setForm(f=>({...f,nomorSertifikat:e.target.value}))}
-              placeholder="SBU-BG001-2024-XXXXX" className="bg-slate-800 border-slate-700 text-white text-xs h-8"
+              placeholder="SBU-BG001-2024-XXXXX" className="bg-muted border-border text-foreground text-xs h-8"
               data-testid="input-nomor-sertifikat" />
           </div>
           <div className="flex gap-2">
@@ -417,7 +417,7 @@ function TrackerTab() {
               disabled={!form.code || !form.tanggalExpiry} data-testid="button-save-sbu">
               Simpan
             </Button>
-            <Button onClick={() => setShowAdd(false)} size="sm" variant="ghost" className="text-slate-400 h-8 text-xs">
+            <Button onClick={() => setShowAdd(false)} size="sm" variant="ghost" className="text-muted-foreground h-8 text-xs">
               Batal
             </Button>
           </div>
@@ -426,8 +426,8 @@ function TrackerTab() {
 
       {/* Entry list */}
       {entries.length === 0 && !showAdd ? (
-        <div className="py-10 text-center text-slate-600">
-          <Award className="w-10 h-10 mx-auto mb-3 text-slate-800" />
+        <div className="py-10 text-center text-muted-foreground">
+          <Award className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
           <div className="text-sm">Belum ada SBU terdaftar</div>
           <div className="text-xs mt-1">Tambahkan SBU perusahaan Anda untuk memantau masa berlakunya</div>
         </div>
@@ -436,23 +436,23 @@ function TrackerTab() {
           {[...entries].sort((a,b) => new Date(a.tanggalExpiry).getTime() - new Date(b.tanggalExpiry).getTime()).map(e => {
             const urg = urgency(e.tanggalExpiry);
             return (
-              <div key={e.id} className="border border-slate-800 bg-slate-900/40 rounded-xl p-3 flex items-start gap-3"
+              <div key={e.id} className="border border-border bg-muted/40 rounded-xl p-3 flex items-start gap-3"
                 data-testid={`sbu-entry-${e.id}`}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-sm font-bold text-white">{e.code}</span>
-                    <span className="text-[10px] bg-slate-700/60 text-slate-400 px-1.5 py-0.5 rounded">{e.kualifikasi}</span>
+                    <span className="text-[10px] bg-muted/60 text-muted-foreground px-1.5 py-0.5 rounded">{e.kualifikasi}</span>
                   </div>
-                  <div className="text-xs text-slate-400 mb-1.5">{e.name}</div>
-                  {e.nomorSertifikat && <div className="text-[10px] text-slate-600 mb-1.5 font-mono">{e.nomorSertifikat}</div>}
-                  <div className="flex items-center gap-3 text-[10px] text-slate-600">
+                  <div className="text-xs text-muted-foreground mb-1.5">{e.name}</div>
+                  {e.nomorSertifikat && <div className="text-[10px] text-muted-foreground mb-1.5 font-mono">{e.nomorSertifikat}</div>}
+                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
                     {e.tanggalTerbit && <span>Terbit: {new Date(e.tanggalTerbit).toLocaleDateString("id-ID")}</span>}
                     <span>Ekspirasi: {new Date(e.tanggalExpiry).toLocaleDateString("id-ID")}</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${urg.color}`}>{urg.label}</span>
-                  <button onClick={() => remove(e.id)} className="text-slate-700 hover:text-red-400 transition-colors"
+                  <button onClick={() => remove(e.id)} className="text-muted-foreground hover:text-red-400 transition-colors"
                     data-testid={`delete-sbu-${e.id}`}>
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -475,18 +475,18 @@ function PanduanTab() {
     <div className="p-4 space-y-5 overflow-y-auto h-full">
       {/* Alur sertifikasi */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Alur Proses Sertifikasi SBU</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Alur Proses Sertifikasi SBU</div>
         <div className="relative">
-          <div className="absolute left-5 top-4 bottom-4 w-px bg-slate-800" />
+          <div className="absolute left-5 top-4 bottom-4 w-px bg-muted" />
           <div className="space-y-3">
             {ALUR_STEPS.map((s) => (
               <div key={s.no} className="flex items-start gap-3 relative">
-                <div className={`w-10 h-10 rounded-full ${s.color} flex items-center justify-center text-white text-sm font-bold shrink-0 z-10 border-4 border-slate-950`}>
+                <div className={`w-10 h-10 rounded-full ${s.color} flex items-center justify-center text-white text-sm font-bold shrink-0 z-10 border-4 border-background`}>
                   {s.no}
                 </div>
-                <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl px-3 py-2.5 flex-1 mt-1">
+                <div className="bg-muted/40 border border-border/40 rounded-xl px-3 py-2.5 flex-1 mt-1">
                   <div className="text-sm font-medium text-white">{s.label}</div>
-                  <div className="text-xs text-slate-500 mt-0.5">{s.sub}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{s.sub}</div>
                 </div>
               </div>
             ))}
@@ -496,12 +496,12 @@ function PanduanTab() {
 
       {/* Persyaratan per kelas */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Persyaratan Dokumen per Kualifikasi</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Persyaratan Dokumen per Kualifikasi</div>
         <div className="grid grid-cols-3 gap-2 mb-3">
           {SYARAT_PER_KUALIFIKASI.map(k => (
             <button key={k.kelas} onClick={() => setSelectedKelas(selectedKelas === k.kelas ? null : k.kelas)}
               className={`py-2 rounded-lg border text-xs font-medium transition-colors ${
-                selectedKelas === k.kelas ? k.color : "bg-slate-800/40 border-slate-700/40 text-slate-400 hover:border-slate-600"
+                selectedKelas === k.kelas ? k.color : "bg-muted/40 border-border/40 text-muted-foreground hover:border-border"
               }`}
               data-testid={`kelas-${k.kelas}`}>
               {k.kelas}
@@ -514,19 +514,19 @@ function PanduanTab() {
             {syarat.items.map((item, i) => (
               <div key={i} className="flex items-start gap-2.5 text-xs">
                 <CheckSquare className="w-3.5 h-3.5 shrink-0 mt-0.5 opacity-70" />
-                <span className="text-slate-300">{item.label}</span>
+                <span className="text-muted-foreground">{item.label}</span>
               </div>
             ))}
           </div>
         )}
         {!selectedKelas && (
-          <div className="text-center text-xs text-slate-600 py-4">Pilih kualifikasi untuk melihat persyaratan dokumen</div>
+          <div className="text-center text-xs text-muted-foreground py-4">Pilih kualifikasi untuk melihat persyaratan dokumen</div>
         )}
       </div>
 
       {/* Referensi regulasi */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Referensi Regulasi</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Referensi Regulasi</div>
         <div className="space-y-1.5">
           {[
             { reg: "Permen PUPR 6/2025", about: "Sertifikasi Badan Usaha Jasa Konstruksi" },
@@ -535,11 +535,11 @@ function PanduanTab() {
             { reg: "SE PUPR 02/2022", about: "Panduan teknis implementasi sertifikasi BUJK" },
             { reg: "Kepmen PUPR 1328/2022", about: "Standar dan pedoman LSBU" },
           ].map((r, i) => (
-            <div key={i} className="flex items-start gap-2.5 bg-slate-800/30 border border-slate-800 rounded-lg px-3 py-2">
+            <div key={i} className="flex items-start gap-2.5 bg-muted/30 border border-border rounded-lg px-3 py-2">
               <BookOpen className="w-3.5 h-3.5 text-blue-400 shrink-0 mt-0.5" />
               <div>
                 <div className="text-xs font-mono text-blue-300">{r.reg}</div>
-                <div className="text-[11px] text-slate-500">{r.about}</div>
+                <div className="text-[11px] text-muted-foreground">{r.about}</div>
               </div>
             </div>
           ))}
@@ -564,23 +564,23 @@ export default function SertifikasiBot() {
   }).length;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header */}
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+      <div className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-13 flex items-center gap-3 py-2.5">
           <Link href="/dashboard">
-            <button className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm" data-testid="button-back">
+            <button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground text-sm" data-testid="button-back">
               <ArrowLeft className="w-4 h-4" />
             </button>
           </Link>
-          <span className="text-slate-700">|</span>
+          <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center">
               <Award className="w-4 h-4 text-blue-400" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white leading-tight">SertifikasiBot</div>
-              <div className="text-[10px] text-slate-500 leading-tight">Konsultan AI Sertifikasi SBU/SKK BUJK · Permen PU 6/2025</div>
+              <div className="text-sm font-semibold text-foreground leading-tight">SertifikasiBot</div>
+              <div className="text-[10px] text-muted-foreground leading-tight">Konsultan AI Sertifikasi SBU/SKK BUJK · Permen PU 6/2025</div>
             </div>
           </div>
           <div className="ml-auto flex items-center gap-2">
@@ -593,7 +593,7 @@ export default function SertifikasiBot() {
           </div>
         </div>
         {/* Tabs */}
-        <div className="flex border-t border-slate-800/60 max-w-7xl mx-auto px-4">
+        <div className="flex border-t border-border/60 max-w-7xl mx-auto px-4">
           {[
             { key: "chat",    label: "Chat AI",             icon: Zap },
             { key: "tracker", label: `Cek SBU${entries.length > 0 ? ` (${entries.length})` : ""}`, icon: Calendar },
@@ -602,7 +602,7 @@ export default function SertifikasiBot() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               data-testid={`tab-${t.key}`}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab === t.key ? "text-blue-400 border-blue-500 bg-blue-900/10" : "text-slate-500 border-transparent hover:text-slate-400"
+                tab === t.key ? "text-blue-400 border-blue-500 bg-blue-900/10" : "text-muted-foreground border-transparent hover:text-muted-foreground"
               }`}>
               <t.icon className="w-3.5 h-3.5" />
               {t.label}

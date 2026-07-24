@@ -51,7 +51,7 @@ const SAMPLE_PROMPTS = [
 ];
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  planning:    { label:"Perencanaan", color:"text-slate-400",   bg:"bg-slate-800/40 border-slate-700/40" },
+  planning:    { label:"Perencanaan", color:"text-muted-foreground",   bg:"bg-muted/40 border-border/40" },
   konstruksi:  { label:"Konstruksi",  color:"text-amber-400",   bg:"bg-amber-900/20 border-amber-700/30" },
   marketing:   { label:"Marketing",   color:"text-violet-400",  bg:"bg-violet-900/20 border-violet-700/30" },
   selesai:     { label:"Selesai",     color:"text-emerald-400", bg:"bg-emerald-900/20 border-emerald-700/30" },
@@ -81,7 +81,7 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               a.status==="done"?"bg-green-400":a.status==="running"?"bg-yellow-400 animate-pulse":a.status==="error"?"bg-red-400":"bg-white/20"}`} />
           ))}
         </div>
-        {exp?<ChevronUp className="h-3 w-3 text-white/30 shrink-0"/>:<ChevronDown className="h-3 w-3 text-white/30 shrink-0"/>}
+        {exp?<ChevronUp className="h-3 w-3 text-muted-foreground/40 shrink-0"/>:<ChevronDown className="h-3 w-3 text-muted-foreground/40 shrink-0"/>}
       </button>
       {exp && (
         <div className="border-t border-violet-800/30 px-3 py-2 space-y-1">
@@ -90,9 +90,9 @@ function SubAgentPanel({ agents }: { agents: SubAgentStatus[] }) {
               {a.status==="running"?<Loader2 className="h-3 w-3 animate-spin text-yellow-400"/>:
                a.status==="done"   ?<CheckCircle2 className="h-3 w-3 text-green-400"/>:
                a.status==="error"  ?<AlertCircle className="h-3 w-3 text-red-400"/>:
-                                    <Clock className="h-3 w-3 text-white/20"/>}
-              <span className="text-white/50 font-mono">{a.role}</span>
-              {a.elapsed && <span className="text-white/25 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
+                                    <Clock className="h-3 w-3 text-muted-foreground/30"/>}
+              <span className="text-muted-foreground font-mono">{a.role}</span>
+              {a.elapsed && <span className="text-muted-foreground/60 ml-auto">{(a.elapsed/1000).toFixed(1)}s</span>}
             </div>
           ))}
         </div>
@@ -160,14 +160,14 @@ function ChatTab({ agentId }: { agentId: number }) {
             <div className="w-14 h-14 rounded-2xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center mx-auto mb-3">
               <Building2 className="w-7 h-7 text-violet-400" />
             </div>
-            <div className="text-base font-semibold text-white">OwnerBot AI</div>
-            <div className="text-xs text-slate-400 mt-1">10 agen developer properti · Investasi · Kelayakan · Pre-Sales · Perizinan · Pembiayaan</div>
+            <div className="text-base font-semibold text-foreground">OwnerBot AI</div>
+            <div className="text-xs text-muted-foreground mt-1">10 agen developer properti · Investasi · Kelayakan · Pre-Sales · Perizinan · Pembiayaan</div>
           </div>
-          <div className="text-xs text-slate-500 font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
+          <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider px-1">Coba tanya:</div>
           <div className="grid grid-cols-1 gap-2">
             {SAMPLE_PROMPTS.map((p, i) => (
               <button key={i} onClick={() => send(p)}
-                className="text-left px-3 py-2.5 rounded-lg border border-slate-800 bg-slate-900/60 hover:border-violet-700/50 hover:bg-violet-950/20 text-xs text-slate-300 transition-colors"
+                className="text-left px-3 py-2.5 rounded-lg border border-border bg-muted/60 hover:border-violet-700/50 hover:bg-violet-950/20 text-xs text-muted-foreground transition-colors"
                 data-testid={`sample-prompt-${i}`}>{p}</button>
             ))}
           </div>
@@ -181,9 +181,9 @@ function ChatTab({ agentId }: { agentId: number }) {
                 <div className="max-w-[85%] bg-violet-700/30 border border-violet-600/40 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-white">{m.content}</div>
               ) : (
                 <div className="max-w-[92%] space-y-2">
-                  <div className="bg-slate-800/60 border border-slate-700/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-slate-200">
+                  <div className="bg-muted/60 border border-border/40 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-foreground">
                     {m.isStreaming && !m.content
-                      ? <div className="flex items-center gap-2 text-slate-500"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">10 agen menganalisis...</span></div>
+                      ? <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="w-3.5 h-3.5 animate-spin"/><span className="text-xs">10 agen menganalisis...</span></div>
                       : <MessageContent text={m.content}/>}
                     {m.isStreaming && m.content && <span className="inline-block w-1.5 h-4 bg-violet-400 animate-pulse ml-0.5 align-middle"/>}
                   </div>
@@ -194,12 +194,12 @@ function ChatTab({ agentId }: { agentId: number }) {
           ))}
         </div>
       )}
-      <div className="p-3 border-t border-slate-800">
+      <div className="p-3 border-t border-border">
         <div className="flex gap-2">
           <Input value={input} onChange={e=>setInput(e.target.value)}
             onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()}
             placeholder="Tanya tentang investasi, perizinan, pre-sales, pembiayaan properti..."
-            className="bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-600 text-sm"
+            className="bg-muted/80 border-border text-foreground placeholder:text-muted-foreground text-sm"
             disabled={streaming} data-testid="input-chat"/>
           <Button onClick={()=>streaming?abortRef.current?.abort():send()} size="icon"
             className={`shrink-0 ${streaming?"bg-red-600/80 hover:bg-red-600":"bg-violet-600 hover:bg-violet-500"}`}
@@ -207,7 +207,7 @@ function ChatTab({ agentId }: { agentId: number }) {
             {streaming?<X className="w-4 h-4"/>:<Send className="w-4 h-4"/>}
           </Button>
         </div>
-        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-slate-600 hover:text-slate-400 mt-1.5 ml-1">Bersihkan percakapan</button>}
+        {messages.length > 0 && <button onClick={()=>setMessages([])} className="text-[10px] text-muted-foreground hover:text-muted-foreground mt-1.5 ml-1">Bersihkan percakapan</button>}
       </div>
     </div>
   );
@@ -246,23 +246,23 @@ function PortfolioTab() {
       {/* KPI row */}
       {projects.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5 text-center">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5 text-center">
             <div className="text-xl font-bold text-white">{projects.length}</div>
-            <div className="text-[10px] text-slate-600">Proyek</div>
+            <div className="text-[10px] text-muted-foreground">Proyek</div>
           </div>
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5 text-center">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5 text-center">
             <div className="text-sm font-bold text-violet-400">{fmtM(totalInv)}</div>
-            <div className="text-[10px] text-slate-600">Total Investasi</div>
+            <div className="text-[10px] text-muted-foreground">Total Investasi</div>
           </div>
-          <div className="bg-slate-800/40 border border-slate-700/40 rounded-lg p-2.5 text-center">
+          <div className="bg-muted/40 border border-border/40 rounded-lg p-2.5 text-center">
             <div className="text-sm font-bold text-emerald-400">{fmtM(Math.round(totalRev))}</div>
-            <div className="text-[10px] text-slate-600">Revenue Terjual</div>
+            <div className="text-[10px] text-muted-foreground">Revenue Terjual</div>
           </div>
         </div>
       )}
 
       <button onClick={() => {setForm(blank());setShowAdd(!showAdd);}}
-        className="w-full flex items-center justify-center gap-2 border border-dashed border-slate-700 hover:border-violet-700/50 hover:bg-violet-950/10 rounded-lg py-2.5 text-xs text-slate-500 hover:text-violet-400 transition-colors"
+        className="w-full flex items-center justify-center gap-2 border border-dashed border-border hover:border-violet-700/50 hover:bg-violet-950/10 rounded-lg py-2.5 text-xs text-muted-foreground hover:text-violet-400 transition-colors"
         data-testid="button-add-project">
         <Plus className="w-3.5 h-3.5"/> Tambah Proyek Investasi
       </button>
@@ -272,51 +272,51 @@ function PortfolioTab() {
           <div className="text-xs font-semibold text-violet-300">Proyek Baru</div>
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <Label className="text-[11px] text-slate-500">Nama Proyek</Label>
+              <Label className="text-[11px] text-muted-foreground">Nama Proyek</Label>
               <Input value={form.nama??""} onChange={e=>setForm(f=>({...f,nama:e.target.value}))}
-                placeholder="Perumahan Grand Perkasa..." className="bg-slate-900 border-slate-700 text-white text-sm h-8 mt-1"/>
+                placeholder="Perumahan Grand Perkasa..." className="bg-muted border-border text-foreground text-sm h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Lokasi</Label>
+              <Label className="text-[11px] text-muted-foreground">Lokasi</Label>
               <Input value={form.lokasi??""} onChange={e=>setForm(f=>({...f,lokasi:e.target.value}))}
-                placeholder="Kota/Kabupaten..." className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                placeholder="Kota/Kabupaten..." className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Tipe Proyek</Label>
+              <Label className="text-[11px] text-muted-foreground">Tipe Proyek</Label>
               <select value={form.tipe} onChange={e=>setForm(f=>({...f,tipe:e.target.value as any}))}
-                className="w-full mt-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5">
+                className="w-full mt-1 bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5">
                 {["Rumah Tapak","Apartemen","Ruko","Perkantoran","Pergudangan","Hotel","Mixed-Use"].map(t=><option key={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Total Investasi (Miliar Rp)</Label>
+              <Label className="text-[11px] text-muted-foreground">Total Investasi (Miliar Rp)</Label>
               <Input type="number" value={form.nilaiInvestasi??""} onChange={e=>setForm(f=>({...f,nilaiInvestasi:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Harga Jual per Unit (Miliar Rp)</Label>
+              <Label className="text-[11px] text-muted-foreground">Harga Jual per Unit (Miliar Rp)</Label>
               <Input type="number" step="0.1" value={form.targetJual??""} onChange={e=>setForm(f=>({...f,targetJual:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Jumlah Unit</Label>
+              <Label className="text-[11px] text-muted-foreground">Jumlah Unit</Label>
               <Input type="number" value={form.jumlahUnit??""} onChange={e=>setForm(f=>({...f,jumlahUnit:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Unit Terjual</Label>
+              <Label className="text-[11px] text-muted-foreground">Unit Terjual</Label>
               <Input type="number" value={form.unitTerjual??""} onChange={e=>setForm(f=>({...f,unitTerjual:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Progres Fisik (%)</Label>
+              <Label className="text-[11px] text-muted-foreground">Progres Fisik (%)</Label>
               <Input type="number" min="0" max="100" value={form.progres??""} onChange={e=>setForm(f=>({...f,progres:Number(e.target.value)}))}
-                className="bg-slate-900 border-slate-700 text-white text-xs h-8 mt-1"/>
+                className="bg-muted border-border text-foreground text-xs h-8 mt-1"/>
             </div>
             <div>
-              <Label className="text-[11px] text-slate-500">Status</Label>
+              <Label className="text-[11px] text-muted-foreground">Status</Label>
               <select value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value as any}))}
-                className="w-full mt-1 bg-slate-900 border border-slate-700 text-white text-xs rounded-md px-2 py-1.5">
+                className="w-full mt-1 bg-muted border border-border text-foreground text-xs rounded-md px-2 py-1.5">
                 <option value="planning">Perencanaan</option>
                 <option value="konstruksi">Konstruksi</option>
                 <option value="marketing">Marketing</option>
@@ -325,15 +325,15 @@ function PortfolioTab() {
             </div>
           </div>
           {form.nilaiInvestasi && form.targetJual && form.jumlahUnit && (
-            <div className="bg-slate-800/40 rounded-lg p-3 grid grid-cols-2 gap-3 text-center">
+            <div className="bg-muted/40 rounded-lg p-3 grid grid-cols-2 gap-3 text-center">
               <div>
-                <div className="text-[10px] text-slate-600">GDV (Gross Dev. Value)</div>
+                <div className="text-[10px] text-muted-foreground">GDV (Gross Dev. Value)</div>
                 <div className="text-sm font-bold text-violet-400">
                   {fmtM(Math.round((form.targetJual??0)*(form.jumlahUnit??0)))}
                 </div>
               </div>
               <div>
-                <div className="text-[10px] text-slate-600">Est. Gross Margin</div>
+                <div className="text-[10px] text-muted-foreground">Est. Gross Margin</div>
                 <div className="text-sm font-bold text-emerald-400">
                   {(((form.targetJual??0)*(form.jumlahUnit??0) - (form.nilaiInvestasi??0)) / ((form.nilaiInvestasi??0)||1) * 100).toFixed(0)}%
                 </div>
@@ -342,13 +342,13 @@ function PortfolioTab() {
           )}
           <div className="flex gap-2">
             <Button onClick={add} size="sm" className="flex-1 bg-violet-600 hover:bg-violet-500 h-8 text-xs" disabled={!form.nama}>Simpan</Button>
-            <Button onClick={()=>setShowAdd(false)} size="sm" variant="ghost" className="text-slate-400 h-8 text-xs">Batal</Button>
+            <Button onClick={()=>setShowAdd(false)} size="sm" variant="ghost" className="text-muted-foreground h-8 text-xs">Batal</Button>
           </div>
         </div>
       )}
 
       {projects.length === 0 && !showAdd ? (
-        <div className="py-10 text-center text-slate-600">
+        <div className="py-10 text-center text-muted-foreground">
           <Building2 className="w-10 h-10 mx-auto mb-3 text-slate-800"/>
           <div className="text-sm">Belum ada proyek</div>
           <div className="text-xs mt-1">Tambahkan proyek investasi properti untuk track portofolio Anda</div>
@@ -364,23 +364,23 @@ function PortfolioTab() {
                 <div className="flex items-start gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-white">{p.nama}</span>
+                      <span className="text-sm font-semibold text-foreground">{p.nama}</span>
                       <button onClick={()=>toggleStatus(p.id)}
                         className={`text-[10px] px-2 py-0.5 rounded-full border font-medium transition-opacity hover:opacity-70 ${s.color} border-current/30`}
                         data-testid={`status-${p.id}`}>{s.label}</button>
                     </div>
-                    {p.lokasi && <div className="text-[11px] text-slate-500 mt-0.5">{p.lokasi} · {p.tipe}</div>}
+                    {p.lokasi && <div className="text-[11px] text-muted-foreground mt-0.5">{p.lokasi} · {p.tipe}</div>}
                     <div className="grid grid-cols-3 gap-2 mt-2">
                       <div className="text-center">
-                        <div className="text-[10px] text-slate-600">Investasi</div>
+                        <div className="text-[10px] text-muted-foreground">Investasi</div>
                         <div className="text-xs font-bold text-white">{fmtM(p.nilaiInvestasi)}</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-[10px] text-slate-600">GDV</div>
+                        <div className="text-[10px] text-muted-foreground">GDV</div>
                         <div className="text-xs font-bold text-violet-400">{fmtM(Math.round(gdv))}</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-[10px] text-slate-600">Take-Up</div>
+                        <div className="text-[10px] text-muted-foreground">Take-Up</div>
                         <div className={`text-xs font-bold ${takeUp>=70?"text-emerald-400":takeUp>=40?"text-amber-400":"text-red-400"}`}>
                           {takeUp.toFixed(0)}%
                         </div>
@@ -389,24 +389,24 @@ function PortfolioTab() {
                     {/* Progress bars */}
                     <div className="mt-2 space-y-1.5">
                       <div>
-                        <div className="flex justify-between text-[10px] text-slate-600 mb-0.5">
+                        <div className="flex justify-between text-[10px] text-muted-foreground mb-0.5">
                           <span>Fisik</span><span>{p.progres}%</span>
                         </div>
-                        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                           <div className="h-full bg-amber-500 rounded-full transition-all" style={{width:`${p.progres}%`}}/>
                         </div>
                       </div>
                       <div>
-                        <div className="flex justify-between text-[10px] text-slate-600 mb-0.5">
+                        <div className="flex justify-between text-[10px] text-muted-foreground mb-0.5">
                           <span>Penjualan {p.unitTerjual}/{p.jumlahUnit} unit</span><span>{takeUp.toFixed(0)}%</span>
                         </div>
-                        <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                           <div className="h-full bg-emerald-500 rounded-full transition-all" style={{width:`${takeUp}%`}}/>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <button onClick={()=>remove(p.id)} className="text-slate-700 hover:text-red-400 transition-colors shrink-0 mt-0.5"
+                  <button onClick={()=>remove(p.id)} className="text-muted-foreground hover:text-red-400 transition-colors shrink-0 mt-0.5"
                     data-testid={`delete-${p.id}`}>
                     <Trash2 className="w-3.5 h-3.5"/>
                   </button>
@@ -426,7 +426,7 @@ function InsightTab() {
     <div className="p-4 space-y-5 overflow-y-auto h-full">
       {/* KPI Benchmark */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Benchmark Developer Properti Indonesia</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Benchmark Developer Properti Indonesia</div>
         <div className="space-y-2">
           {[
             { label:"Gross Profit Margin", ideal:"25–40%",   warn:"< 20%",  note:"Margin kotor proyek sebelum overhead korporat" },
@@ -436,10 +436,10 @@ function InsightTab() {
             { label:"Inventory Turnover",      ideal:"< 24 bln", warn:"> 36 bln", note:"Lama rata-rata unit tersisa terjual" },
             { label:"ROE (Return on Equity)",  ideal:"> 15%", warn:"< 8%",  note:"Return untuk pemegang saham" },
           ].map((item, i) => (
-            <div key={i} className="bg-slate-800/30 border border-slate-800 rounded-xl p-3 flex items-start gap-3">
+            <div key={i} className="bg-muted/30 border border-border rounded-xl p-3 flex items-start gap-3">
               <div className="flex-1">
                 <div className="text-xs font-medium text-white">{item.label}</div>
-                <div className="text-[11px] text-slate-500 mt-0.5">{item.note}</div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">{item.note}</div>
               </div>
               <div className="text-right shrink-0">
                 <div className="text-xs font-bold text-emerald-400">{item.ideal}</div>
@@ -452,7 +452,7 @@ function InsightTab() {
 
       {/* Struktur pembiayaan */}
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Skema Pembiayaan Proyek Properti</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Skema Pembiayaan Proyek Properti</div>
         <div className="space-y-2">
           {[
             { icon:"🏦", judul:"KYC / Kredit Konstruksi Bank",   isi:"Pinjaman jangka pendek 1–3 tahun untuk biaya bangun. Agunan: tanah + bangunan. Plafon biasanya 70% HPP." },
@@ -461,16 +461,16 @@ function InsightTab() {
             { icon:"📈", judul:"Rights Issue / Obligasi",        isi:"Khusus developer Tbk — penerbitan saham baru atau surat utang korporasi (obligasi) melalui bursa." },
             { icon:"🔄", judul:"Sale & Leaseback",               isi:"Jual aset (gedung kantor/komersil) lalu sewa kembali. Cocok untuk unlocking equity tanpa pindah operasional." },
           ].map((s,i) => (
-            <div key={i} className="bg-slate-800/30 border border-slate-800 rounded-xl px-3 py-2.5">
+            <div key={i} className="bg-muted/30 border border-border rounded-xl px-3 py-2.5">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-base">{s.icon}</span>
                 <span className="text-xs font-semibold text-white">{s.judul}</span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed pl-6">{s.isi}</p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed pl-6">{s.isi}</p>
             </div>
           ))}
         </div>
-        <div className="text-[10px] text-slate-600 text-center mt-2">Ref: OJK POJK 40/2019 · UU 1/2011 (Perumahan) · PP 12/2021 · POJK KPR</div>
+        <div className="text-[10px] text-muted-foreground text-center mt-2">Ref: OJK POJK 40/2019 · UU 1/2011 (Perumahan) · PP 12/2021 · POJK KPR</div>
       </div>
     </div>
   );
@@ -486,22 +486,22 @@ export default function OwnerBot() {
   const projects = loadProjects();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col">
-      <div className="border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm sticky top-0 z-10">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <div className="border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 h-13 flex items-center gap-3 py-2.5">
           <Link href="/dashboard">
-            <button className="text-slate-400 hover:text-white" data-testid="button-back">
+            <button className="text-muted-foreground hover:text-foreground" data-testid="button-back">
               <ArrowLeft className="w-4 h-4"/>
             </button>
           </Link>
-          <span className="text-slate-700">|</span>
+          <span className="text-muted-foreground">|</span>
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-violet-600/20 border border-violet-500/40 flex items-center justify-center">
               <Building2 className="w-4 h-4 text-violet-400"/>
             </div>
             <div>
-              <div className="text-sm font-semibold text-white leading-tight">OwnerBot</div>
-              <div className="text-[10px] text-slate-500 leading-tight">AI Developer & Pemilik Proyek · Investasi · Perizinan · 10 Agen</div>
+              <div className="text-sm font-semibold text-foreground leading-tight">OwnerBot</div>
+              <div className="text-[10px] text-muted-foreground leading-tight">AI Developer & Pemilik Proyek · Investasi · Perizinan · 10 Agen</div>
             </div>
           </div>
           {projects.length > 0 && (
@@ -510,7 +510,7 @@ export default function OwnerBot() {
             </div>
           )}
         </div>
-        <div className="flex border-t border-slate-800/60 max-w-7xl mx-auto px-4">
+        <div className="flex border-t border-border/60 max-w-7xl mx-auto px-4">
           {[
             { key:"chat",      label:"Chat AI",                  icon:Zap },
             { key:"portfolio", label:`Portofolio${projects.length>0?` (${projects.length})`:""}`, icon:Building2 },
@@ -519,7 +519,7 @@ export default function OwnerBot() {
             <button key={t.key} onClick={() => setTab(t.key as any)}
               data-testid={`tab-${t.key}`}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium border-b-2 transition-colors whitespace-nowrap ${
-                tab===t.key ? "text-violet-400 border-violet-500 bg-violet-900/10" : "text-slate-500 border-transparent hover:text-slate-400"
+                tab===t.key ? "text-violet-400 border-violet-500 bg-violet-900/10" : "text-muted-foreground border-transparent hover:text-muted-foreground"
               }`}>
               <t.icon className="w-3.5 h-3.5"/>
               {t.label}
