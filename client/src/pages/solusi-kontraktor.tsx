@@ -151,7 +151,7 @@ export default function SolusiKontraktorPage() {
               </Button>
             </a>
           </div>
-          <p className="mt-4 text-sm text-orange-200">Tidak perlu coding · Aktivasi hari ini · Mulai dari Rp 99.000/bulan</p>
+          <p className="mt-4 text-sm text-orange-200">Tidak perlu coding · Aktivasi Rp 99.000 (sekali) · Hosting mulai Rp 199.000/bln</p>
         </div>
       </section>
 

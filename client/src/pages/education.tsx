@@ -24,11 +24,11 @@ const segments = [
     tagline: "AI Tutor 24/7 — Lebih Pintar, Lebih Hemat dari Bimbel Konvensional",
     desc: "Bukan sekadar video tutorial — AI aktif menjawab pertanyaanmu, menjelaskan konsep yang tidak dipahami, dan membuat latihan soal sesuai kelemahanmu. Tersedia kapan pun, bahkan tengah malam sebelum ujian.",
     packs: [
-      { name: "Paket SMA IPA", agents: 7, subjects: ["Matematika", "Fisika", "Kimia", "Biologi", "B. Indonesia", "B. Inggris", "UTBK TPS"], price: "Rp 99rb/bln" },
-      { name: "Paket SMA IPS", agents: 7, subjects: ["Ekonomi", "Sosiologi", "Geografi", "Sejarah", "B. Indonesia", "B. Inggris", "UTBK TPS"], price: "Rp 99rb/bln" },
-      { name: "Paket SMK Vokasi", agents: 5, subjects: ["Matematika Vokasi", "B. Indonesia", "B. Inggris", "Kompetensi Kejuruan", "Etika Profesi"], price: "Rp 79rb/bln" },
-      { name: "Paket UTBK & Kedinasan Saintek", agents: 5, subjects: ["TPS Penalaran", "Matematika UTBK", "Fisika", "Kimia / Biologi", "TWK / TIU / TKP Kedinasan"], price: "Rp 79rb/bln", popular: true },
-      { name: "Paket Sekolah Kedinasan", agents: 5, subjects: ["SKD: TWK, TIU, TKP", "Psikotes & Tes Karakteristik Pribadi", "Wawasan Kebangsaan", "Tes Fisik & Kesehatan", "Simulasi seleksi per instansi (STAN, IPDN, STIS, dll)"], price: "Rp 89rb/bln" },
+      { name: "Paket SMA IPA", agents: 7, subjects: ["Matematika", "Fisika", "Kimia", "Biologi", "B. Indonesia", "B. Inggris", "UTBK TPS"], price: "Rp 199rb/bln" },
+      { name: "Paket SMA IPS", agents: 7, subjects: ["Ekonomi", "Sosiologi", "Geografi", "Sejarah", "B. Indonesia", "B. Inggris", "UTBK TPS"], price: "Rp 199rb/bln" },
+      { name: "Paket SMK Vokasi", agents: 5, subjects: ["Matematika Vokasi", "B. Indonesia", "B. Inggris", "Kompetensi Kejuruan", "Etika Profesi"], price: "Rp 199rb/bln" },
+      { name: "Paket UTBK & Kedinasan Saintek", agents: 5, subjects: ["TPS Penalaran", "Matematika UTBK", "Fisika", "Kimia / Biologi", "TWK / TIU / TKP Kedinasan"], price: "Rp 199rb/bln", popular: true },
+      { name: "Paket Sekolah Kedinasan", agents: 5, subjects: ["SKD: TWK, TIU, TKP", "Psikotes & Tes Karakteristik Pribadi", "Wawasan Kebangsaan", "Tes Fisik & Kesehatan", "Simulasi seleksi per instansi (STAN, IPDN, STIS, dll)"], price: "Rp 199rb/bln" },
     ],
     usps: ["Jawab soal + penjelasan langkah per langkah", "Bank soal adaptif berdasarkan kelemahanmu", "Simulasi ujian UTBK & Kedinasan mode waktu", "Tidak terikat jadwal — belajar kapan saja"],
   },
@@ -43,10 +43,10 @@ const segments = [
     tagline: "Tutor Mata Kuliah, Asisten TA & Skripsi, Pemahaman Jurnal",
     desc: "AI yang paham silabus kampus, bisa menjelaskan konsep teknis dengan bahasa sederhana, membantu analisis jurnal penelitian, dan menemani proses TA dari awal hingga sidang.",
     packs: [
-      { name: "Paket Mahasiswa Teknik Sipil", agents: 6, subjects: ["Mekanika Bahan", "Struktur Bangunan", "Manajemen Konstruksi", "RAB & Estimasi", "Regulasi Konstruksi", "Asisten Skripsi"], price: "Rp 149rb/bln", popular: true },
-      { name: "Paket Mahasiswa Arsitektur", agents: 5, subjects: ["Teori Arsitektur", "Konstruksi & Material", "Regulasi Bangunan", "Desain Konsep AI", "Asisten TA"], price: "Rp 149rb/bln" },
-      { name: "Paket Mahasiswa Hukum", agents: 5, subjects: ["Hukum Perdata", "Hukum Pidana", "Hukum Konstruksi", "Legal Drafting", "Asisten Skripsi"], price: "Rp 149rb/bln" },
-      { name: "Paket Asisten Skripsi AI", agents: 3, subjects: ["Analisis Masalah & Judul", "Tinjauan Pustaka & Jurnal", "Metodologi Penelitian"], price: "Rp 99rb/bln" },
+      { name: "Paket Mahasiswa Teknik Sipil", agents: 6, subjects: ["Mekanika Bahan", "Struktur Bangunan", "Manajemen Konstruksi", "RAB & Estimasi", "Regulasi Konstruksi", "Asisten Skripsi"], price: "Rp 199rb/bln", popular: true },
+      { name: "Paket Mahasiswa Arsitektur", agents: 5, subjects: ["Teori Arsitektur", "Konstruksi & Material", "Regulasi Bangunan", "Desain Konsep AI", "Asisten TA"], price: "Rp 199rb/bln" },
+      { name: "Paket Mahasiswa Hukum", agents: 5, subjects: ["Hukum Perdata", "Hukum Pidana", "Hukum Konstruksi", "Legal Drafting", "Asisten Skripsi"], price: "Rp 199rb/bln" },
+      { name: "Paket Asisten Skripsi AI", agents: 3, subjects: ["Analisis Masalah & Judul", "Tinjauan Pustaka & Jurnal", "Metodologi Penelitian"], price: "Rp 199rb/bln" },
     ],
     usps: ["Penjelasan konsep dari silabus nyata", "Bantu analisis jurnal internasional", "Asisten TA: brainstorm judul, kerangka teori, metodologi", "Latihan soal UTS/UAS per mata kuliah"],
   },
@@ -127,9 +127,9 @@ const segments = [
     tagline: "Simulasi Asesmen Kompetensi — Latihan Tanya-Jawab Gaya Assessor BNSP",
     desc: "AI mensimulasikan sesi asesmen nyata per unit kompetensi SKKNI: tanya-jawab gaya assessor, uji pemahaman regulasi, demonstrasi prosedur, dan rekap kesiapan sebelum hari H. Tersedia untuk semua skema jabatan kerja konstruksi.",
     packs: [
-      { name: "Paket SKK Pelaksana Konstruksi", agents: 6, subjects: ["Simulasi asesmen per unit kompetensi", "Tanya-jawab gaya assessor BNSP", "Regulasi & SKKNI jabatan kerja", "Prosedur K3 & SMK3 praktis", "Dokumen portofolio & APL", "Rekap kesiapan & gap area"], price: "Rp 149rb/bln", popular: true },
+      { name: "Paket SKK Pelaksana Konstruksi", agents: 6, subjects: ["Simulasi asesmen per unit kompetensi", "Tanya-jawab gaya assessor BNSP", "Regulasi & SKKNI jabatan kerja", "Prosedur K3 & SMK3 praktis", "Dokumen portofolio & APL", "Rekap kesiapan & gap area"], price: "Rp 199rb/bln", popular: true },
       { name: "Paket SKK Tenaga Ahli Madya/Utama", agents: 5, subjects: ["Kompetensi manajerial & teknis", "Etika profesi & hukum konstruksi", "Simulasi wawancara assessor", "SKKNI multi-jabatan", "Strategi lolos sidang asesmen"], price: "Rp 199rb/bln" },
-      { name: "Paket Persiapan BNSP Multi-Skema", agents: 4, subjects: ["Pemetaan skema per jabatan", "Unit kompetensi wajib & pilihan", "Simulasi portofolio & bukti kerja", "Latihan soal tulis asesmen"], price: "Rp 129rb/bln" },
+      { name: "Paket Persiapan BNSP Multi-Skema", agents: 4, subjects: ["Pemetaan skema per jabatan", "Unit kompetensi wajib & pilihan", "Simulasi portofolio & bukti kerja", "Latihan soal tulis asesmen"], price: "Rp 199rb/bln" },
     ],
     usps: [
       "Simulasi tanya-jawab persis gaya assessor BNSP",
@@ -149,9 +149,9 @@ const segments = [
     tagline: "Persiapan Ujian Lisensi Profesional — SIPp, STRP, IUJK & Izin Praktek Lainnya",
     desc: "Simulasi ujian lisensi praktek kerja yang sesungguhnya: soal regulasi Jasa Konstruksi, prosedur perizinan IUJK, standar kompetensi SIPp Perencana, STRP Teknik — dikerjakan bersama AI yang tahu aturan terkini.",
     packs: [
-      { name: "Paket Siap Ujian SIPp Perencana", agents: 5, subjects: ["Regulasi perencanaan & tata bangunan", "Simulasi soal ujian SIPp", "Standar kompetensi perencana profesional", "Prosedur permohonan & perpanjangan", "Etika profesi Arsitek / Sipil"], price: "Rp 149rb/bln", popular: true },
-      { name: "Paket Siap IUJK & Perizinan Usaha", agents: 5, subjects: ["Prosedur IUJK & OSS-RBA", "Regulasi Perpres 46/2025", "Simulasi soal ujian perizinan", "Klasifikasi & kualifikasi SBU", "Sanksi & kepatuhan hukum konstruksi"], price: "Rp 149rb/bln" },
-      { name: "Paket Siap Ujian STRP Teknik", agents: 4, subjects: ["Regulasi teknik & standar SNI", "Simulasi soal ujian STRP", "Tanggung jawab profesional teknik", "Prosedur permohonan STRP"], price: "Rp 129rb/bln" },
+      { name: "Paket Siap Ujian SIPp Perencana", agents: 5, subjects: ["Regulasi perencanaan & tata bangunan", "Simulasi soal ujian SIPp", "Standar kompetensi perencana profesional", "Prosedur permohonan & perpanjangan", "Etika profesi Arsitek / Sipil"], price: "Rp 199rb/bln", popular: true },
+      { name: "Paket Siap IUJK & Perizinan Usaha", agents: 5, subjects: ["Prosedur IUJK & OSS-RBA", "Regulasi Perpres 46/2025", "Simulasi soal ujian perizinan", "Klasifikasi & kualifikasi SBU", "Sanksi & kepatuhan hukum konstruksi"], price: "Rp 199rb/bln" },
+      { name: "Paket Siap Ujian STRP Teknik", agents: 4, subjects: ["Regulasi teknik & standar SNI", "Simulasi soal ujian STRP", "Tanggung jawab profesional teknik", "Prosedur permohonan STRP"], price: "Rp 199rb/bln" },
     ],
     usps: [
       "Simulasi soal ujian lisensi — mirip ujian nyata",
@@ -164,7 +164,7 @@ const segments = [
 
 const comparison = [
   ["Jam belajar", "24/7 kapan saja", "Terjadwal, terbatas"],
-  ["Biaya/bulan", "Rp 79rb – 299rb", "Rp 300rb – 1jt+"],
+  ["Biaya/bulan", "Rp 199rb – 999rb", "Rp 1jt+"],
   ["Personalisasi", "Adaptif per pertanyaan", "Satu kurikulum semua"],
   ["Lokasi", "HP/PC di mana saja", "Harus hadir fisik"],
   ["Multi-subject", "Bundle semua sekaligus", "Bayar per mapel"],
@@ -232,7 +232,7 @@ export default function EducationPage() {
             {[
               { value: "6", label: "Segmen Pengguna" },
               { value: "24/7", label: "AI Tutor Aktif" },
-              { value: "Rp 79rb", label: "Mulai Dari" },
+              { value: "Rp 199rb", label: "Mulai Dari" },
               { value: "971+", label: "Agent Spesialis" },
             ].map(s => (
               <div key={s.label}>

@@ -641,7 +641,7 @@ export default function Landing() {
                 badge: "text-teal-700 bg-teal-100 dark:text-teal-300 dark:bg-teal-900/40",
                 badgeLabel: "Paling Populer",
                 desc: "Tanya jawab instan seputar SBU, SKK, LSBU/ABU, dan Tender. AI kami dilatih dengan regulasi konstruksi terbaru — jawaban terstruktur dalam hitungan detik, atau eskalasi ke ahli jika kasus Anda kompleks.",
-                price: "Gratis untuk pertanyaan dasar · Premium mulai Rp 99.000/bln",
+                price: "Gratis untuk pertanyaan dasar · Premium mulai Rp 199.000/bln",
                 cta: "Buka Klinik",
                 href: "/klinik-konsultasi",
               },
@@ -675,7 +675,7 @@ export default function Landing() {
                 badge: "text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900/40",
                 badgeLabel: "Akses Tanpa Batas",
                 desc: "Akses tanpa batas ke asisten virtual khusus SBU dan SKK. Tanya sebanyak yang Anda mau, 24/7, tanpa iklan. Cocok untuk kontraktor yang sedang mengurus banyak proyek sekaligus.",
-                price: "Rp 99.000/bulan",
+                price: "Rp 199.000/bulan",
                 cta: "Aktifkan Premium",
                 href: "/store",
               },
@@ -1609,7 +1609,7 @@ export default function Landing() {
             {[
               { icon: "⚡", title: "Cepat & Instan", desc: "Tidak perlu menunggu jadwal konsultan. AI kami menjawab dalam hitungan detik, 24/7 tanpa hari libur." },
               { icon: "📋", title: "Berdasarkan Regulasi Terbaru", desc: "Knowledge base kami terus diperbarui mengikuti perubahan regulasi konstruksi (UU Cipta Kerja, PP Jasa Konstruksi, SIKaP LPJK)." },
-              { icon: "💰", title: "Terjangkau", desc: "Mulai dari Rp 99.000/bulan atau Rp 149.000 per kasus. Jauh lebih murah daripada menyewa konsultan penuh." },
+              { icon: "💰", title: "Terjangkau", desc: "Mulai dari Rp 199.000/bulan atau Rp 149.000 per kasus. Jauh lebih murah daripada menyewa konsultan penuh." },
               { icon: "🔍", title: "Terstruktur & Transparan", desc: "Setiap jawaban dilengkapi referensi regulasi. Tidak ada jawaban 'kira-kira' — semuanya berbasis dokumen resmi." },
               { icon: "🤝", title: "Pendampingan Hingga Tuntas", desc: "Tidak hanya bedah dokumen — kami dampingi Anda hingga proyek selesai atau tender menang." },
               { icon: "🏗️", title: "Spesialis Konstruksi", desc: "Fokus pada industri konstruksi Indonesia. Bukan AI generik — pengetahuan mendalam di SBU, SKK, SMAP, dan Tender." },
@@ -1759,7 +1759,7 @@ export default function Landing() {
                 Tanya jawab SBU/SKK/Tender, bedah dokumen, pendampingan proyek, atau akses AI Specialist premium — semua tersedia sekarang.
               </p>
               <ul className="space-y-2 text-xs text-blue-200">
-                {["Klinik Konsultasi (gratis & premium)", "Bedah Dokumen Rp 149.000/kasus", "Pendampingan Proyek mulai Rp 499.000", "AI Specialist mulai Rp 99.000/bln"].map((i) => (
+                {["Klinik Konsultasi (gratis & premium)", "Bedah Dokumen Rp 149.000/kasus", "Pendampingan Proyek mulai Rp 499.000", "AI Specialist mulai Rp 199.000/bln"].map((i) => (
                   <li key={i} className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-green-400 shrink-0" />{i}</li>
                 ))}
               </ul>

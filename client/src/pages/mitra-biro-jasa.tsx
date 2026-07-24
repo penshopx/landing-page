@@ -460,7 +460,7 @@ export default function MitraBiroJasaPage() {
                   <p>✅ Riwayat layanan perusahaan Anda tercatat lengkap</p>
                   <p>✅ Siap dikirim ulang kapan pun tanpa repot</p>
                 </div>
-                <p>Mulai dari Rp 99.000/bulan.</p>
+                <p>Mulai dari Rp 199.000/bulan.</p>
                 <p className="font-semibold">Balas pesan ini dengan <span className="text-green-700 dark:text-green-400">DAFTAR</span> untuk informasi lebih lanjut.</p>
               </div>
             </div>
