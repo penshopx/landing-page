@@ -301,6 +301,12 @@ function FeaturedCard({
             <div className="flex flex-col items-end gap-1">
               <Badge variant="secondary" className="text-xs px-2 py-0">{catLabel}</Badge>
               <Badge className={`text-xs px-2 py-0 border ${tier.className}`}>{tier.label}</Badge>
+              {agent.isGustafta && (
+                <Badge className="bg-violet-600 text-white border-violet-700 text-xs px-2 py-0 flex items-center gap-1"
+                  data-testid={`badge-gustafta-official-${agent.id}`} title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin.">
+                  <Shield className="h-2.5 w-2.5" />Gustafta Official
+                </Badge>
+              )}
             </div>
           </div>
 

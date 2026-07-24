@@ -55,6 +55,7 @@ interface AgentProduct {
   originalPrice?: number | null;
   agentId?: number | null;
   agentCount?: number;
+  isGustafta?: boolean;
   isCreatorMade?: boolean;
   isCertified?: boolean;
   licenseClass?: number | null;
@@ -854,7 +855,12 @@ function AgentCard({ agent, onBuy, onDetail }: { agent: AgentProduct; onBuy: (a:
             <Badge className={`text-xs px-2 py-0 border ${tier.className}`}>
               {tier.label}
             </Badge>
-            {agent.isCertified ? (
+            {agent.isGustafta ? (
+              <Badge className="bg-violet-600 text-white border-violet-700 text-xs px-2 py-0 flex items-center gap-1"
+                data-testid={`badge-gustafta-official-${agent.id}`} title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin.">
+                <ShieldCheck className="h-2.5 w-2.5" />Gustafta Official
+              </Badge>
+            ) : agent.isCertified ? (
               <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs px-2 py-0 flex items-center gap-1"
                 data-testid={`badge-bersertifikat-${agent.id}`} title="Kreator telah lulus workshop & sertifikasi Gustafta.">
                 <ShieldCheck className="h-2.5 w-2.5" />Bersertifikat
