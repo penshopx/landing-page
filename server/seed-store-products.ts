@@ -6,11 +6,16 @@
  *
  * Harga default: Rp 299.000 (lisensi hak pakai, sesuai model bisnis Gustafta).
  * Produk jasa premium / platform: Rp 999.000.
+ *
+ * agentSlug / agentName: dipakai untuk lookup agentId di tabel agents.
+ * Bila agent ditemukan, agentId di-set sehingga harga bisa dihitung dinamis
+ * berdasarkan jumlah sub-agen live. Bila tidak ditemukan, harga seed tetap
+ * dipakai sebagai fallback.
  */
 
 import { db } from "./db";
-import { storeProducts } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { storeProducts, agents } from "@shared/schema";
+import { eq, or, isNull } from "drizzle-orm";
 
 function log(msg: string) {
   console.log(`${new Date().toLocaleTimeString()} [express] ${msg}`);
@@ -28,6 +33,10 @@ interface ProductDef {
   color: string;
   isGustafta: boolean;
   sortOrder: number;
+  /** Slug of the linked orchestrator agent. Preferred over agentName. */
+  agentSlug?: string;
+  /** Agent name fallback when no slug is set on the agent row. */
+  agentName?: string;
 }
 
 const FLAGSHIP_PRODUCTS: ProductDef[] = [
@@ -50,6 +59,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#f59e0b",
     isGustafta: true,
     sortOrder: 1,
+    agentSlug: "hub-sbu-pekerjaan-konstruksi",
   },
 
   // ── 2. SBU Konsultan Coach ─────────────────────────────────────────────────
@@ -71,6 +81,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#3b82f6",
     isGustafta: true,
     sortOrder: 2,
+    agentSlug: "hub-sbu-konsultan-coach",
   },
 
   // ── 3. TENDERA ─────────────────────────────────────────────────────────────
@@ -92,6 +103,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#10b981",
     isGustafta: true,
     sortOrder: 3,
+    agentSlug: "tendera-orchestrator",
   },
 
   // ── 4. LexCom — AI Hukum Konstruksi ───────────────────────────────────────
@@ -113,6 +125,8 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#6366f1",
     isGustafta: true,
     sortOrder: 4,
+    // LexCom orchestrator has no slug set — look up by name instead
+    agentName: "LEX-ORCHESTRATOR",
   },
 
   // ── 5. ISO 9001 Suite ──────────────────────────────────────────────────────
@@ -134,6 +148,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#0ea5e9",
     isGustafta: true,
     sortOrder: 5,
+    agentSlug: "hub-iso-9001-jasa-konstruksi",
   },
 
   // ── 6. ASKOM Coach — Asesor Kompetensi ────────────────────────────────────
@@ -155,6 +170,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#8b5cf6",
     isGustafta: true,
     sortOrder: 6,
+    agentSlug: "hub-asesor-sertifikasi-konstruksi",
   },
 
   // ── 7. CivIlPro — BUJK Management Suite ───────────────────────────────────
@@ -176,6 +192,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#ef4444",
     isGustafta: true,
     sortOrder: 7,
+    agentSlug: "hub-civilpro",
   },
 
   // ── 8. SBUClaw — Konsultan Cerdas SBU ─────────────────────────────────────
@@ -197,6 +214,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#f97316",
     isGustafta: true,
     sortOrder: 8,
+    agentSlug: "sbuclaw-orchestrator",
   },
 
   // ── 9. Gustafta Pro — Akses Platform Penuh ────────────────────────────────
@@ -218,6 +236,7 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#d946ef",
     isGustafta: true,
     sortOrder: 0,
+    // No single agent represents the full platform bundle
   },
 
   // ── 10. AI Organization Builder — Tim AI Konstruksi ───────────────────────
@@ -239,42 +258,116 @@ const FLAGSHIP_PRODUCTS: ProductDef[] = [
     color: "#0284c7",
     isGustafta: true,
     sortOrder: 9,
+    // No single orchestrator agent represents the Builder service yet
   },
 ];
 
 export async function seedStoreProducts(): Promise<void> {
   log(`${LOG} Checking existing store products...`);
 
-  // Fetch existing product names for idempotency check
-  const existing = await db.select({ name: storeProducts.name }).from(storeProducts);
-  const existingNames = new Set(existing.map((r) => r.name));
+  // ── 1. Resolve agent IDs from slugs and names ──────────────────────────────
+  // Collect all slugs and names we need to look up
+  const slugsToLookup = FLAGSHIP_PRODUCTS
+    .map((p) => p.agentSlug)
+    .filter((s): s is string => !!s);
+  const namesToLookup = FLAGSHIP_PRODUCTS
+    .map((p) => p.agentName)
+    .filter((n): n is string => !!n);
+
+  // Maps: slug → agentId, name → agentId
+  const slugToAgentId = new Map<string, number>();
+  const nameToAgentId = new Map<string, number>();
+
+  if (slugsToLookup.length > 0) {
+    const bySlug = await db
+      .select({ id: agents.id, slug: agents.slug })
+      .from(agents)
+      .where(
+        slugsToLookup.length === 1
+          ? eq(agents.slug, slugsToLookup[0])
+          : or(...slugsToLookup.map((s) => eq(agents.slug, s)))!
+      );
+    for (const row of bySlug) {
+      if (row.slug) slugToAgentId.set(row.slug, row.id);
+    }
+  }
+
+  if (namesToLookup.length > 0) {
+    const byName = await db
+      .select({ id: agents.id, name: agents.name })
+      .from(agents)
+      .where(
+        namesToLookup.length === 1
+          ? eq(agents.name, namesToLookup[0])
+          : or(...namesToLookup.map((n) => eq(agents.name, n)))!
+      );
+    for (const row of byName) {
+      nameToAgentId.set(row.name, row.id);
+    }
+  }
+
+  /** Resolve the agentId for a product definition (null if no match). */
+  function resolveAgentId(p: ProductDef): number | null {
+    if (p.agentSlug) {
+      const id = slugToAgentId.get(p.agentSlug);
+      if (id !== undefined) return id;
+    }
+    if (p.agentName) {
+      const id = nameToAgentId.get(p.agentName);
+      if (id !== undefined) return id;
+    }
+    return null;
+  }
+
+  // ── 2. Fetch existing products (name + agentId) for idempotency ────────────
+  const existing = await db
+    .select({ id: storeProducts.id, name: storeProducts.name, agentId: storeProducts.agentId })
+    .from(storeProducts);
+  const existingByName = new Map(existing.map((r) => [r.name, r]));
 
   let inserted = 0;
+  let updated = 0;
   let skipped = 0;
 
   for (const product of FLAGSHIP_PRODUCTS) {
-    if (existingNames.has(product.name)) {
-      skipped++;
-      continue;
-    }
+    const agentId = resolveAgentId(product);
+    const existingRow = existingByName.get(product.name);
 
-    await db.insert(storeProducts).values({
-      name: product.name,
-      description: product.description,
-      category: product.category,
-      price: product.price,
-      features: product.features,
-      emoji: product.emoji,
-      color: product.color,
-      isGustafta: product.isGustafta,
-      isActive: true,
-      sortOrder: product.sortOrder,
-    });
-    inserted++;
-    log(`${LOG} ✅ Created: ${product.name}`);
+    if (!existingRow) {
+      // ── Insert new product with resolved agentId ───────────────────────────
+      await db.insert(storeProducts).values({
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        price: product.price,
+        features: product.features,
+        emoji: product.emoji,
+        color: product.color,
+        isGustafta: product.isGustafta,
+        isActive: true,
+        sortOrder: product.sortOrder,
+        ...(agentId !== null ? { agentId } : {}),
+      });
+      inserted++;
+      log(
+        `${LOG} ✅ Created: ${product.name}${agentId ? ` (agentId=${agentId})` : ""}`
+      );
+    } else if (agentId !== null && existingRow.agentId !== agentId) {
+      // ── Reconcile: link missing or points to a different agent — fix it ────
+      await db
+        .update(storeProducts)
+        .set({ agentId })
+        .where(eq(storeProducts.id, existingRow.id));
+      updated++;
+      log(
+        `${LOG} 🔗 ${existingRow.agentId == null ? "Linked" : "Re-linked"}: ${product.name} → agentId=${agentId}${existingRow.agentId != null ? ` (was ${existingRow.agentId})` : ""}`
+      );
+    } else {
+      skipped++;
+    }
   }
 
   log(
-    `${LOG} Done — inserted ${inserted} new product(s), skipped ${skipped} already-existing product(s).`
+    `${LOG} Done — inserted ${inserted}, linked ${updated}, skipped ${skipped} product(s).`
   );
 }
