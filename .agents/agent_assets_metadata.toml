@@ -203,3 +203,9 @@ id = "kjPCv7HzTltbtZb33-OJz"
 uri = "file://backup/migrasi/PANDUAN-PINDAH-AKUN.md"
 type = "text"
 title = "Panduan Pindah Akun (bisa dibaca langsung)"
+
+[[outputs]]
+id = "EyJJXmKRcvcT1xFPx5yrU"
+uri = "file://daftar-link-chatbot-gustafta.md"
+type = "text"
+title = "Daftar Link Chatbot Gustafta (312 chatbot)"
