@@ -33,7 +33,7 @@ const FEATURE_ICONS: Record<string, typeof Check> = {
 };
 
 const FEATURE_NAMES: Record<string, string> = {
-  chatbot: "AI Chatbot",
+  chatbot: "Asisten AI",
   modul_pembelajaran: "Modul Pembelajaran",
   mini_apps: "Mini Apps",
   ecourse: "E-Course",

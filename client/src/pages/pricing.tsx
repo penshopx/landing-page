@@ -34,13 +34,13 @@ const subscriptionTiers: PricingTier[] = [
   {
     name: HOSTING_PERIODS[0].name,
     planKey: HOSTING_PERIODS[0].key,
-    description: "Berlangganan bulanan untuk 1 chatbot",
+    description: "Berlangganan bulanan untuk 1 Asisten AI",
     price: HOSTING_PERIODS[0].price,
     priceNote: HOSTING_PERIODS[0].period,
     duration: HOSTING_PERIODS[0].duration,
     icon: Sparkles,
     features: [
-      { text: "1 Chatbot", included: true },
+      { text: "1 Asisten AI", included: true },
       { text: "5.000 pesan/bulan", included: true },
       { text: "Knowledge Base: 20 dokumen", included: true },
       { text: "Web Widget (No Branding)", included: true },
@@ -64,7 +64,7 @@ const subscriptionTiers: PricingTier[] = [
     icon: Sparkles,
     popular: true,
     features: [
-      { text: "1 Chatbot", included: true },
+      { text: "1 Asisten AI", included: true },
       { text: "5.000 pesan/bulan", included: true },
       { text: "Knowledge Base: 20 dokumen", included: true },
       { text: "Web Widget (No Branding)", included: true },
@@ -87,7 +87,7 @@ const subscriptionTiers: PricingTier[] = [
     savings: HOSTING_PERIODS[2].savings,
     icon: Crown,
     features: [
-      { text: "1 Chatbot", included: true },
+      { text: "1 Asisten AI", included: true },
       { text: "5.000 pesan/bulan", included: true },
       { text: "Knowledge Base: 30 dokumen", included: true },
       { text: "Web Widget (No Branding)", included: true },
@@ -111,7 +111,7 @@ const subscriptionTiers: PricingTier[] = [
     savings: HOSTING_PERIODS[3].savings,
     icon: Crown,
     features: [
-      { text: "1 Chatbot", included: true },
+      { text: "1 Asisten AI", included: true },
       { text: "5.000 pesan/bulan", included: true },
       { text: "Knowledge Base: 50 dokumen", included: true },
       { text: "Web Widget (Custom Branding)", included: true },
@@ -316,8 +316,8 @@ const addOns = [
     price: "Rp 99.000",
   },
   {
-    name: "Chatbot Tambahan",
-    description: "Per chatbot/bulan",
+    name: "Asisten AI Tambahan",
+    description: "Per Asisten AI/bulan",
     price: "Rp 149.000",
   },
   {
@@ -354,7 +354,7 @@ const faqs = [
   },
   {
     question: "Bagaimana jika pesan melebihi kuota?",
-    answer: "Anda akan mendapat notifikasi saat mendekati limit. Anda bisa membeli paket pesan tambahan atau upgrade ke paket chatbot yang lebih besar.",
+    answer: "Anda akan mendapat notifikasi saat mendekati limit. Anda bisa membeli paket pesan tambahan atau upgrade ke paket yang lebih besar.",
   },
   {
     question: "Apakah bisa upgrade atau downgrade paket?",
@@ -370,7 +370,7 @@ const faqs = [
   },
   {
     question: "Apa itu Mini Apps 45 tipe?",
-    answer: "Mini Apps adalah tools interaktif yang bisa dipasang di dalam chatbot — rubrik penilaian, risk register, notulis rapat, drafter kontrak, RAB estimator, KPI report, editorial calendar, script YouTube/Podcast, proposal brand deal, laporan performa konten, konten medsos, sales script, cashflow, NPS tracker, work mode selector, brief intake, studio kompetensi, docgen, e-course, dan banyak lagi. Semua 45 tipe sudah tersedia dan bisa diaktifkan tanpa coding.",
+    answer: "Mini Apps adalah tools interaktif yang bisa dipasang di dalam Asisten AI — rubrik penilaian, risk register, notulis rapat, drafter kontrak, RAB estimator, KPI report, editorial calendar, script YouTube/Podcast, proposal brand deal, laporan performa konten, konten medsos, sales script, cashflow, NPS tracker, work mode selector, brief intake, studio kompetensi, docgen, e-course, dan banyak lagi. Semua 45 tipe sudah tersedia dan bisa diaktifkan tanpa coding.",
   },
   {
     question: "Apa itu Master Standar v2.0?",
@@ -493,7 +493,7 @@ export default function Pricing() {
           <Badge className="mb-4">Paket Bisnis AI</Badge>
           <h1 className="text-4xl font-bold mb-4">Anda yang Build, Anda yang Kelola</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Paket Bisnis AI adalah platform builder — Anda berperan sebagai <strong>Admin</strong> yang membuat, mengkonfigurasi, dan mengelola chatbot sendiri. Tidak perlu coding, cukup atur lewat dashboard.
+            Paket Bisnis AI adalah platform builder — Anda berperan sebagai <strong>Admin</strong> yang membuat, mengkonfigurasi, dan mengelola Asisten AI sendiri. Tidak perlu coding, cukup atur lewat dashboard.
           </p>
 
           {/* Dua Jalur */}
@@ -504,7 +504,7 @@ export default function Pricing() {
                 <span className="font-bold text-sm text-violet-700 dark:text-violet-300">Paket Bisnis AI — DIY</span>
                 <Badge className="text-[10px] bg-violet-600 text-white ml-auto">Halaman ini</Badge>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">Anda sebagai <strong>admin</strong>. Beli chatbot di Store, pasang sendiri di dashboard, konfigurasi sesuai kebutuhan bisnis Anda. Cocok untuk yang ingin kontrol penuh.</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Anda sebagai <strong>admin</strong>. Beli Asisten AI di Store, pasang sendiri di dashboard, konfigurasi sesuai kebutuhan bisnis Anda. Cocok untuk yang ingin kontrol penuh.</p>
             </div>
             <div className="rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20 p-5">
               <div className="flex items-center gap-2 mb-2">
@@ -522,14 +522,14 @@ export default function Pricing() {
                 <span className="text-base">🏷️</span>
                 <span className="font-semibold text-sm text-orange-700 dark:text-orange-300">Produk = Domain Anda</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">Beli sekali di <a href="/store" className="text-orange-600 dark:text-orange-400 underline underline-offset-2 hover:opacity-80">Store</a>. Ini chatbot yang Anda "miliki" dan konfigurasi sendiri.</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Beli sekali di <a href="/store" className="text-orange-600 dark:text-orange-400 underline underline-offset-2 hover:opacity-80">Store</a>. Ini Asisten AI yang Anda "miliki" dan konfigurasi sendiri.</p>
             </div>
             <div className="rounded-xl border border-green-200 dark:border-green-800/60 bg-green-50 dark:bg-green-950/20 p-4">
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="text-base">⚡</span>
                 <span className="font-semibold text-sm text-green-700 dark:text-green-300">Berlangganan = Hosting-nya</span>
               </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">Bayar rutin agar chatbot Anda tetap berjalan di platform Gustafta. Berlaku untuk semua produk — Paket Bisnis maupun Series Modul.</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Bayar rutin agar Asisten AI Anda tetap berjalan di platform Gustafta. Berlaku untuk semua produk — Paket Bisnis maupun Series Modul.</p>
             </div>
           </div>
           <p className="mt-4 text-xs text-muted-foreground">
@@ -559,7 +559,7 @@ export default function Pricing() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Zap className="h-4 w-4 text-yellow-300" />
-                <span className="text-xs font-bold uppercase tracking-widest text-violet-200">46 Chatbot Siap Pakai</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-violet-200">46 AI Specialist Siap Pakai</span>
               </div>
               <h3 className="text-2xl font-bold mb-1">Langsung Pakai Hari Ini</h3>
               <p className="text-sm text-violet-100 max-w-lg">

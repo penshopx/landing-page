@@ -670,7 +670,7 @@ export default function Landing() {
               },
               {
                 emoji: "🤖",
-                label: "Chatbot Premium SBU/SKK",
+                label: "AI Specialist SBU/SKK",
                 accent: "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20",
                 badge: "text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900/40",
                 badgeLabel: "Akses Tanpa Batas",
@@ -1117,7 +1117,7 @@ export default function Landing() {
               Satu Platform. Semua Kebutuhan Profesional.
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-              Gustafta bukan sekadar chatbot — ini ekosistem penyelesaian masalah. Setiap menu adalah layanan nyata yang dirancang untuk tantangan profesional konstruksi Indonesia.
+              Gustafta bukan sekadar alat AI — ini ekosistem penyelesaian masalah. Setiap menu adalah layanan nyata yang dirancang untuk tantangan profesional konstruksi Indonesia.
             </p>
           </div>
 
@@ -1217,10 +1217,10 @@ export default function Landing() {
           <div className="text-center mb-10">
             <p className="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-widest mb-2">✨ Baru di Gustafta</p>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-              Kini Gustafta Membantu Anda Memiliki Tim AI, Bukan Sekadar Satu Chatbot
+              Kini Gustafta Membantu Anda Memiliki Tim AI Specialist, Bukan Sekadar Satu Asisten AI
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
-              Susun satu tim agen AI yang saling bekerja sama, rancang lewat dialog, kerja bareng rekan, dan bangun kepercayaan lewat chatbot bersertifikat — semuanya dalam satu platform.
+              Susun satu tim agen AI yang saling bekerja sama, rancang lewat dialog, kerja bareng rekan, dan bangun kepercayaan lewat Asisten AI bersertifikat — semuanya dalam satu platform.
             </p>
           </div>
 
@@ -1230,35 +1230,35 @@ export default function Landing() {
                 emoji: "🧩",
                 accent: "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/20",
                 title: "Rakit Tim AI",
-                desc: "Cukup ceritakan satu misi — Gustafta menyusunkan satu tim agen AI lengkap yang saling bekerja sama, bukan hanya satu chatbot.",
+                desc: "Cukup ceritakan satu misi — Gustafta menyusunkan satu tim agen AI lengkap yang saling bekerja sama, bukan hanya satu Asisten AI.",
                 cta: "Coba Rakit Tim AI", href: "/organization-builder",
               },
               {
                 emoji: "💬",
                 accent: "border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/20",
                 title: "Blueprint Builder",
-                desc: "Rancang chatbot Anda lewat dialog terpandu. Jawab beberapa pertanyaan, dan konfigurasi siap pakai langsung terbentuk — tanpa teknis.",
+                desc: "Rancang Asisten AI Anda lewat dialog terpandu. Jawab beberapa pertanyaan, dan konfigurasi siap pakai langsung terbentuk — tanpa teknis.",
                 cta: "Mulai Blueprint", href: "/blueprint-builder",
               },
               {
                 emoji: "🤝",
                 accent: "border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/20",
                 title: "Kolaborasi Tim",
-                desc: "Bagikan chatbot ke rekan lewat email dan atur perannya. Undangan otomatis aktif saat mereka mendaftar, lengkap dengan notifikasi di dalam aplikasi.",
+                desc: "Bagikan Asisten AI ke rekan lewat email dan atur perannya. Undangan otomatis aktif saat mereka mendaftar, lengkap dengan notifikasi di dalam aplikasi.",
                 cta: "Kelola di Dashboard", href: builderUrl,
               },
               {
                 emoji: "✅",
                 accent: "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/20",
-                title: "Chatbot Bersertifikat",
-                desc: "Chatbot tepercaya di GUSTAFTA Store kini punya badge \"Bersertifikat\" — jaminan kualitas agar pembeli lebih yakin memilih.",
+                title: "Asisten AI Bersertifikat",
+                desc: "Asisten AI tepercaya di GUSTAFTA Store kini punya badge \"Bersertifikat\" — jaminan kualitas agar pembeli lebih yakin memilih.",
                 cta: "Lihat di Store", href: "/store",
               },
               {
                 emoji: "🐾",
                 accent: "border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/20",
                 title: "MultiClaw Suite",
-                desc: "80 chatbot AI premium siap pakai lintas bidang — tiap \"claw\" menurunkan beberapa spesialis paralel untuk analisis, desain, dan perhitungan.",
+                desc: "80+ AI Specialist premium siap pakai lintas bidang — tiap \"claw\" menurunkan beberapa spesialis paralel untuk analisis, desain, dan perhitungan.",
                 cta: "Jelajahi MultiClaw", href: "/multiclaw",
               },
               {
@@ -1491,7 +1491,7 @@ export default function Landing() {
             />
           </div>
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-3">
-            Contoh chatbot dan ekosistem AI yang sudah dirakit oleh pengguna Gustafta.
+            Contoh Asisten AI dan ekosistem yang sudah dirakit oleh pengguna Gustafta.
           </p>
         </div>
       </section>
@@ -1524,7 +1524,7 @@ export default function Landing() {
               },
               {
                 emoji: "🤖", label: "Gunakan Produk AI",
-                desc: "Pilih chatbot AI siap pakai dari Gustafta Store. Langsung aktif untuk keperluan konstruksi Anda.",
+                desc: "Pilih AI Specialist siap pakai dari Gustafta Store. Langsung aktif untuk keperluan konstruksi Anda.",
                 cta: "Lihat Produk AI", href: "/store",
                 color: "border-emerald-200 dark:border-emerald-800 hover:border-emerald-400",
                 badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
@@ -1756,10 +1756,10 @@ export default function Landing() {
               <div className="text-3xl">🏗️</div>
               <h3 className="text-lg font-bold text-white">Saya Butuh Solusi Konstruksi</h3>
               <p className="text-sm text-blue-200 leading-relaxed">
-                Tanya jawab SBU/SKK/Tender, bedah dokumen, pendampingan proyek, atau akses chatbot premium — semua tersedia sekarang.
+                Tanya jawab SBU/SKK/Tender, bedah dokumen, pendampingan proyek, atau akses AI Specialist premium — semua tersedia sekarang.
               </p>
               <ul className="space-y-2 text-xs text-blue-200">
-                {["Klinik Konsultasi (gratis & premium)", "Bedah Dokumen Rp 149.000/kasus", "Pendampingan Proyek mulai Rp 499.000", "Chatbot Premium Rp 99.000/bln"].map((i) => (
+                {["Klinik Konsultasi (gratis & premium)", "Bedah Dokumen Rp 149.000/kasus", "Pendampingan Proyek mulai Rp 499.000", "AI Specialist mulai Rp 99.000/bln"].map((i) => (
                   <li key={i} className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-green-400 shrink-0" />{i}</li>
                 ))}
               </ul>
@@ -1807,7 +1807,7 @@ export default function Landing() {
                 a: "Tidak sama sekali. Semua konfigurasi di Gustafta Builder dilakukan lewat form. Tidak ada satu baris kode pun yang perlu Anda tulis.",
               },
               {
-                q: "Apa bedanya Gustafta dengan ChatGPT atau platform chatbot lain?",
+                q: "Apa bedanya Gustafta dengan ChatGPT atau platform AI lain?",
                 a: "ChatGPT menjawab pertanyaan lalu selesai di situ. Gustafta mengawal seluruh alurnya: masalah Anda → Dialog (memahami) → Blueprint (cetak biru solusi) → Workroom (dikerjakan bertahap per bidang, dengan gerbang persetujuan ◆) → hasil nyata berupa dokumen, proposal, atau produk — bukan cuma jawaban di layar.",
               },
               {
@@ -1859,7 +1859,7 @@ export default function Landing() {
                 {[
                   { label: "Gustafta Builder", href: builderUrl },
                   { label: "MultiClaw Suite", href: "/ai-tools" },
-                  { label: "Chatbot Store", href: "/store" },
+                  { label: "AI Specialist Store", href: "/store" },
                   { label: "Layanan Jasa", href: "/packs" },
                 ].map((l) => (
                   <li key={l.label}><Link href={l.href} className="text-xs text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">{l.label}</Link></li>
