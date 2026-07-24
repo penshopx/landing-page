@@ -381,7 +381,33 @@ for (const envVar of requiredEnvVars) {
   await setupAuth(app);
   registerAuthRoutes(app);
   registerAudioRoutes(app);
-  
+
+  // ── Blueprint Submissions table (idempotent DDL) ──────────────────────────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS blueprint_submissions (
+        id          SERIAL PRIMARY KEY,
+        session_id  TEXT,
+        user_id     TEXT,
+        nama_ai     TEXT NOT NULL,
+        domain      TEXT NOT NULL,
+        persona     TEXT,
+        sasaran_pengguna TEXT,
+        fitur_utama JSONB DEFAULT '[]',
+        system_prompt_hint TEXT,
+        langkah_selanjutnya JSONB DEFAULT '[]',
+        status      TEXT NOT NULL DEFAULT 'pending',
+        admin_notes TEXT,
+        contacted_at TIMESTAMPTZ,
+        contacted_by TEXT,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    console.log(`${new Date().toLocaleTimeString()} [express] blueprint_submissions table ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] blueprint_submissions DDL error:`, e);
+  }
+
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {

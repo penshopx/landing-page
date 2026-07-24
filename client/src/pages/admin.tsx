@@ -95,6 +95,24 @@ interface TrialRequest {
   createdAt: string;
 }
 
+interface BlueprintSubmission {
+  id: number;
+  session_id: string | null;
+  user_id: string | null;
+  nama_ai: string;
+  domain: string;
+  persona: string | null;
+  sasaran_pengguna: string | null;
+  fitur_utama: string[];
+  system_prompt_hint: string | null;
+  langkah_selanjutnya: string[];
+  status: string;
+  admin_notes: string | null;
+  contacted_at: string | null;
+  contacted_by: string | null;
+  created_at: string;
+}
+
 // ---- Helpers ----
 function formatDate(d: string | null) {
   if (!d) return "-";
@@ -423,6 +441,21 @@ export default function AdminPage() {
     enabled: isAdmin && activeTab === "scalev",
   });
 
+  const { data: blueprintSubs = [], isLoading: blueprintSubsLoading, refetch: refetchBlueprintSubs } = useQuery<BlueprintSubmission[]>({
+    queryKey: ["/api/admin/blueprint-submissions"],
+    enabled: isAdmin && activeTab === "blueprint",
+  });
+
+  const markBlueprintContactedMutation = useMutation({
+    mutationFn: ({ id, status, adminNotes }: { id: number; status: string; adminNotes?: string }) =>
+      apiRequest("PATCH", `/api/admin/blueprint-submissions/${id}`, { status, adminNotes }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/blueprint-submissions"] });
+      toast({ title: "Status diperbarui." });
+    },
+    onError: () => toast({ title: "Gagal update status.", variant: "destructive" }),
+  });
+
   const createScalevMutation = useMutation({
     mutationFn: (data: any) => apiRequest("POST", "/api/admin/scalev-mappings", data),
     onSuccess: () => {
@@ -690,7 +723,7 @@ export default function AdminPage() {
     toast({ title: "Kode voucher disalin!" });
   };
 
-  const tabCount = isSuperAdmin ? 7 : 6;
+  const tabCount = isSuperAdmin ? 8 : 7;
   const isDevUrl = appUrl.includes(".replit.dev") || appUrl.includes("localhost");
 
   return (
@@ -855,6 +888,14 @@ export default function AdminPage() {
             </TabsTrigger>
             <TabsTrigger value="scalev" className="gap-1.5 text-xs" data-testid="tab-scalev">
               <Zap className="h-3.5 w-3.5" /> Scalev
+            </TabsTrigger>
+            <TabsTrigger value="blueprint" className="gap-1.5 text-xs" data-testid="tab-blueprint">
+              <FileText className="h-3.5 w-3.5" /> Blueprint
+              {blueprintSubs.filter(b => b.status === "pending").length > 0 && (
+                <span className="ml-1 bg-amber-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {blueprintSubs.filter(b => b.status === "pending").length}
+                </span>
+              )}
             </TabsTrigger>
             <TabsTrigger value="tools" className="gap-1.5 text-xs" data-testid="tab-tools">
               <Wrench className="h-3.5 w-3.5" /> Tools
@@ -2092,6 +2133,102 @@ export default function AdminPage() {
                       <p>Order masuk di tab Store. Gunakan tombol WA untuk kirim link akses ke customer. (Auto-delivery coming soon)</p>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* ========== BLUEPRINT SUBMISSIONS TAB ========== */}
+          <TabsContent value="blueprint" className="mt-4">
+            <div className="space-y-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-amber-500" />
+                      <CardTitle className="text-base">Leads Blueprint Dialog</CardTitle>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => refetchBlueprintSubs()} className="h-7 text-xs gap-1">
+                      <RefreshCw className="h-3.5 w-3.5" /> Refresh
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Setiap orang yang menyelesaikan Dialog Gustafta dan mendapat Blueprint AI akan muncul di sini.
+                    Tandai <strong>Sudah Dihubungi</strong> setelah kamu follow-up via WhatsApp.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  {blueprintSubsLoading ? (
+                    <div className="text-center py-8 text-muted-foreground text-sm">Memuat data...</div>
+                  ) : blueprintSubs.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      Belum ada leads Blueprint. Leads akan muncul setelah ada yang menyelesaikan Dialog Gustafta di landing page.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {blueprintSubs.map((sub) => {
+                        const isPending = sub.status === "pending";
+                        const isContacted = sub.status === "contacted";
+                        const isConverted = sub.status === "converted";
+                        return (
+                          <div key={sub.id} className={`rounded-lg border p-4 space-y-2 ${isPending ? "border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/20" : isConverted ? "border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/20" : "border-border"}`}>
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-semibold text-sm">{sub.nama_ai}</span>
+                                  <span className="text-xs text-muted-foreground">·</span>
+                                  <span className="text-xs text-muted-foreground">{sub.domain}</span>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${isPending ? "bg-amber-200 text-amber-800 dark:bg-amber-800/40 dark:text-amber-200" : isContacted ? "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200" : "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200"}`}>
+                                    {isPending ? "🔔 Belum dihubungi" : isContacted ? "📞 Sudah dihubungi" : "✅ Konversi"}
+                                  </span>
+                                </div>
+                                {sub.persona && <p className="text-xs text-muted-foreground mt-1">{sub.persona}</p>}
+                                {sub.sasaran_pengguna && <p className="text-xs text-muted-foreground">Target: {sub.sasaran_pengguna}</p>}
+                                {Array.isArray(sub.fitur_utama) && sub.fitur_utama.length > 0 && (
+                                  <div className="flex flex-wrap gap-1 mt-1.5">
+                                    {sub.fitur_utama.slice(0, 4).map((f, i) => (
+                                      <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{f}</span>
+                                    ))}
+                                    {sub.fitur_utama.length > 4 && <span className="text-[10px] text-muted-foreground">+{sub.fitur_utama.length - 4}</span>}
+                                  </div>
+                                )}
+                                {sub.system_prompt_hint && (
+                                  <details className="mt-2">
+                                    <summary className="text-[10px] text-muted-foreground cursor-pointer hover:text-foreground">Lihat System Prompt Hint</summary>
+                                    <p className="text-[10px] text-muted-foreground mt-1 p-2 rounded bg-muted whitespace-pre-wrap">{sub.system_prompt_hint}</p>
+                                  </details>
+                                )}
+                                <p className="text-[10px] text-muted-foreground mt-1.5">
+                                  {formatDate(sub.created_at)}
+                                  {sub.user_id && <span> · User ID: {sub.user_id.slice(0, 8)}…</span>}
+                                  {sub.contacted_at && <span> · Dihubungi: {formatDate(sub.contacted_at)}</span>}
+                                </p>
+                                {sub.admin_notes && (
+                                  <p className="text-xs italic text-muted-foreground mt-1 border-l-2 border-muted pl-2">{sub.admin_notes}</p>
+                                )}
+                              </div>
+                              <div className="flex flex-col gap-1 shrink-0">
+                                {!isConverted && (
+                                  <Button
+                                    size="sm"
+                                    variant={isPending ? "default" : "outline"}
+                                    className={`h-7 text-xs gap-1 ${isPending ? "bg-amber-500 hover:bg-amber-600 text-white" : ""}`}
+                                    onClick={() => markBlueprintContactedMutation.mutate({
+                                      id: sub.id,
+                                      status: isPending ? "contacted" : "converted",
+                                    })}
+                                    disabled={markBlueprintContactedMutation.isPending}
+                                  >
+                                    {isPending ? <><CheckCircle2 className="h-3 w-3" /> Sudah Dihubungi</> : <><CheckCircle2 className="h-3 w-3" /> Tandai Konversi</>}
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

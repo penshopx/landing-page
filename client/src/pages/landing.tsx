@@ -323,6 +323,14 @@ function GustaftaFloatingChat({ isOpen, onClose }: { isOpen: boolean; onClose: (
           createdAt: new Date().toISOString(),
           status: "pending_payment",
         }));
+        // Simpan ke DB agar admin bisa pantau & bantu user gaptek
+        try {
+          await fetch("/api/blueprint-submissions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId, ...parsed }),
+          });
+        } catch { /* fire-and-forget, jangan blokir flow */ }
         setBlueprint(parsed);
         setMessages(prev => [...prev, {
           role: "assistant",

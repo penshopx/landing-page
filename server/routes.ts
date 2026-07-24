@@ -19806,6 +19806,80 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
 
   // Endpoint Mayar dihapus — gunakan Scalev untuk semua payment link.
 
+  // ── BLUEPRINT SUBMISSIONS (Dialog Gustafta → DB) ─────────────────────────
+
+  // Public — simpan hasil dialog Blueprint ke DB
+  app.post("/api/blueprint-submissions", async (req: any, res: any) => {
+    try {
+      const { sessionId, namaAI, domain, persona, sasaranPengguna, fiturUtama, systemPromptHint, langkahSelanjutnya } = req.body;
+      if (!namaAI || !domain) return res.status(400).json({ error: "namaAI dan domain wajib diisi" });
+      const userId = req.user?.id || req.user?.claims?.sub || null;
+      await pool.query(
+        `INSERT INTO blueprint_submissions
+          (session_id, user_id, nama_ai, domain, persona, sasaran_pengguna, fitur_utama, system_prompt_hint, langkah_selanjutnya)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+        [
+          sessionId || null,
+          userId,
+          namaAI,
+          domain,
+          persona || null,
+          sasaranPengguna || null,
+          JSON.stringify(fiturUtama || []),
+          systemPromptHint || null,
+          JSON.stringify(langkahSelanjutnya || []),
+        ]
+      );
+      return res.json({ ok: true });
+    } catch (e: any) {
+      console.error("[blueprint-submissions] save error:", e.message);
+      return res.status(500).json({ error: "Gagal menyimpan" });
+    }
+  });
+
+  // Admin — list semua submissions
+  app.get("/api/admin/blueprint-submissions", isAuthenticated, async (req: any, res: any) => {
+    try {
+      const userId = req.user?.id || req.user?.claims?.sub;
+      const adminUser = await pool.query(`SELECT role FROM users WHERE id=$1`, [userId]);
+      const role = adminUser.rows[0]?.role;
+      if (role !== "admin" && role !== "superadmin") return res.status(403).json({ error: "Forbidden" });
+      const { rows } = await pool.query(
+        `SELECT id, session_id, user_id, nama_ai, domain, persona, sasaran_pengguna,
+                fitur_utama, system_prompt_hint, langkah_selanjutnya,
+                status, admin_notes, contacted_at, contacted_by, created_at
+         FROM blueprint_submissions
+         ORDER BY created_at DESC
+         LIMIT 500`
+      );
+      return res.json(rows);
+    } catch (e: any) {
+      console.error("[blueprint-submissions] list error:", e.message);
+      return res.status(500).json({ error: "Gagal memuat" });
+    }
+  });
+
+  // Admin — tandai sudah dihubungi / update status
+  app.patch("/api/admin/blueprint-submissions/:id", isAuthenticated, async (req: any, res: any) => {
+    try {
+      const userId = req.user?.id || req.user?.claims?.sub;
+      const adminUser = await pool.query(`SELECT role FROM users WHERE id=$1`, [userId]);
+      const role = adminUser.rows[0]?.role;
+      if (role !== "admin" && role !== "superadmin") return res.status(403).json({ error: "Forbidden" });
+      const { status, adminNotes } = req.body;
+      await pool.query(
+        `UPDATE blueprint_submissions
+         SET status=$1, admin_notes=$2, contacted_at=NOW(), contacted_by=$3
+         WHERE id=$4`,
+        [status || "contacted", adminNotes || null, userId, req.params.id]
+      );
+      return res.json({ ok: true });
+    } catch (e: any) {
+      console.error("[blueprint-submissions] update error:", e.message);
+      return res.status(500).json({ error: "Gagal update" });
+    }
+  });
+
   // ── User: Seed LexCom ecosystem into an existing Series ────────────────────
   app.post("/api/lexcom/seed", isAuthenticated, async (req: any, res: any) => {
     try {
