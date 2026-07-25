@@ -6871,10 +6871,11 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         productFeatures: (p.features as string[]) || [],
         emoji: p.emoji || "🤖",
         color: p.color || "#6366f1",
-        price: calcPrice,
+        price: p.price ?? calcPrice,
         originalPrice: calcOriginal,
         isGustafta: p.isGustafta ?? false,
         paymentUrl: (p as any).paymentUrl || (p.agentId ? (linkedPaymentUrlMap.get(p.agentId) || null) : null),
+        scalevVariantId: (p as any).scalevVariantId ?? null,
         type: "product",
       });
 
@@ -7091,11 +7092,32 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       const waUrl = `https://wa.me/6282299417818?text=${waMsg}`;
 
       // ── Scalev checkout otomatis ───────────────────────────────────────────
-      // Per-agent: gunakan slug dari scalev_mappings (khusus per-agen).
-      // Tidak ada fallback ke slug global — slug generik biasanya 404 di Scalev
-      // karena produk belum tentu sesuai dengan agen yang dipesan.
+      // Prioritas 1: store_products.scalev_variant_id → /c/checkout?variant_ids=
+      // Prioritas 2: scalev_mappings per-agent (fallback lama, slug /p/ — jarang ada)
       let scalevUrl: string | null = null;
-      if (resolvedAgentId) {
+
+      // Cek scalev_variant_id dari store product (cara baru, paling andal)
+      if (resolvedProductId) {
+        try {
+          const { db } = await import("./db");
+          const { storeProducts } = await import("@shared/schema");
+          const { eq } = await import("drizzle-orm");
+          const spRows = await db.select().from(storeProducts).where(eq(storeProducts.id, resolvedProductId)).limit(1);
+          const sp = spRows[0] as any;
+          if (sp?.scalevVariantId) {
+            const qs = new URLSearchParams();
+            qs.set("variant_ids", String(sp.scalevVariantId));
+            qs.set("qty", "1");
+            if (name)  qs.set("pre_fill[name]",  String(name));
+            if (email) qs.set("pre_fill[email]", String(email));
+            if (phone) qs.set("pre_fill[phone]", String(phone));
+            scalevUrl = `https://bayar.gustafta.my.id/c/checkout?${qs.toString()}`;
+          }
+        } catch {}
+      }
+
+      // Fallback: per-agent scalev_mappings (slug /p/) — hanya jika belum ada URL
+      if (!scalevUrl && resolvedAgentId) {
         let effectiveSlug: string | null = null;
         try {
           const agentMapping = await storage.getScalevMappingByAgentId(resolvedAgentId);
@@ -7103,8 +7125,8 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         } catch {}
         if (effectiveSlug) {
           const qs = new URLSearchParams();
-          qs.set("pre_fill[name]", String(name));
-          qs.set("pre_fill[email]", String(email));
+          if (name)  qs.set("pre_fill[name]",  String(name));
+          if (email) qs.set("pre_fill[email]", String(email));
           if (phone) qs.set("pre_fill[phone]", String(phone));
           qs.set("agent_id", String(resolvedAgentId));
           qs.set("order_ref", orderId);

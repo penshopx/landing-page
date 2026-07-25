@@ -49,6 +49,7 @@ interface AgentProduct {
   agentId?: number | null;
   agentCount?: number;
   paymentUrl?: string | null;
+  scalevVariantId?: number | null;
   type?: string;
 }
 
@@ -433,12 +434,18 @@ export default function StoreFeatured() {
   });
 
   const handleBuy = (agent: AgentProduct) => {
-    // Jika produk sudah punya link pembayaran langsung → redirect ke sana
+    // Prioritas 1: produk punya Scalev variant ID → langsung checkout online
+    if (agent.scalevVariantId) {
+      const url = `https://bayar.gustafta.my.id/c/checkout?variant_ids=${agent.scalevVariantId}&qty=1`;
+      window.open(url, "_blank");
+      return;
+    }
+    // Prioritas 2: ada paymentUrl langsung
     if (agent.paymentUrl) {
       window.open(agent.paymentUrl, "_blank");
       return;
     }
-    // Jika ada agentId → internal checkout
+    // Prioritas 3: ada agentId → halaman checkout internal (isi form)
     if (agent.agentId) {
       const qs = new URLSearchParams({
         agent: String(agent.agentId),
@@ -448,7 +455,7 @@ export default function StoreFeatured() {
       navigate(`/checkout?${qs.toString()}`);
       return;
     }
-    // Fallback: produk tanpa agentId dan tanpa paymentUrl → WA
+    // Fallback: WA inquiry
     const waMsg = encodeURIComponent(`Halo, saya tertarik membeli produk: *${agent.name}*. Mohon informasi cara pembelian.`);
     window.open(`https://wa.me/6282299417818?text=${waMsg}`, "_blank");
   };
