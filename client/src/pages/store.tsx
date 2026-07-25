@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Loader2, Bot, ShoppingCart, Smartphone, Search,
   ChevronLeft, ChevronRight, Layers, CheckCircle2, Info, X, MessageCircle,
-  Wrench, Sparkles, ShieldAlert, ShieldCheck, FileText, Plus,
+  Wrench, Sparkles, ShieldAlert, ShieldCheck, FileText, Plus, Phone,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { trackLead, trackViewContent, trackInitiateCheckout } from "@/lib/meta-pixel";
@@ -942,10 +942,14 @@ function AgentCard({
           {/* Price row */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-col">
-              {agent.originalPrice && agent.originalPrice > agent.price && (
+              {/* Only show crossed-out price for products with direct checkout */}
+              {agent.scalevVariantId && agent.originalPrice && agent.originalPrice > agent.price && (
                 <span className="text-xs text-gray-400 line-through leading-none mb-0.5">{formatPrice(agent.originalPrice)}</span>
               )}
               <span className="font-bold text-gray-900 text-base">{formatPrice(agent.price)}</span>
+              {!agent.scalevVariantId && (
+                <span className="text-[10px] text-amber-600 mt-0.5">Pembelian via konsultasi</span>
+              )}
             </div>
             {hasDetail && (
               agent.agentId ? (
@@ -963,19 +967,27 @@ function AgentCard({
               )
             )}
           </div>
-          {/* Action buttons row */}
-          <div className="flex gap-1.5">
-            <Button size="sm" variant="outline" onClick={() => onAddToCart(agent)}
-              className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50 text-xs h-8 gap-1"
-              data-testid={`button-add-cart-${agent.id}`}>
-              <Plus className="h-3.5 w-3.5" />Keranjang
-            </Button>
+          {/* Action buttons — different for Scalev vs WA-only products */}
+          {agent.scalevVariantId ? (
+            <div className="flex gap-1.5">
+              <Button size="sm" variant="outline" onClick={() => onAddToCart(agent)}
+                className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50 text-xs h-8 gap-1"
+                data-testid={`button-add-cart-${agent.id}`}>
+                <Plus className="h-3.5 w-3.5" />Keranjang
+              </Button>
+              <Button size="sm" onClick={() => onBuy(agent)}
+                className="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1"
+                data-testid={`button-buy-${agent.id}`}>
+                <ShoppingCart className="h-3.5 w-3.5" />Beli
+              </Button>
+            </div>
+          ) : (
             <Button size="sm" onClick={() => onBuy(agent)}
-              className="flex-1 bg-violet-600 hover:bg-violet-700 text-white text-xs h-8 gap-1"
-              data-testid={`button-buy-${agent.id}`}>
-              <ShoppingCart className="h-3.5 w-3.5" />Beli
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-8 gap-1.5"
+              data-testid={`button-wa-${agent.id}`}>
+              <Phone className="h-3.5 w-3.5" />Hubungi via WA
             </Button>
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>
