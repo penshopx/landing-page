@@ -1,11 +1,30 @@
 import type { Express } from "express";
 import { db } from "./db";
 import { lmsCourses, lmsLessons, lmsEnrollments, lmsLessonProgress } from "@shared/schema";
-import { eq, and, asc, sql } from "drizzle-orm";
+import { eq, and, asc, sql, count } from "drizzle-orm";
 
 function isAuthenticated(req: any, res: any, next: any) {
   if (req.isAuthenticated?.() || req.user) return next();
   return res.status(401).json({ error: "Unauthorized" });
+}
+
+async function getDbRoleLms(req: any): Promise<string> {
+  try {
+    const userId = req.user?.claims?.sub || req.user?.id;
+    if (!userId) return "";
+    const rows = await db.execute(sql.raw(`SELECT role FROM users WHERE id = '${userId.replace(/'/g, "''")}'`));
+    const r = (rows.rows ?? rows) as any[];
+    return r[0]?.role ?? "";
+  } catch { return ""; }
+}
+
+async function requireAdminLms(req: any, res: any, next: any) {
+  if (!req.user) return res.status(401).json({ error: "Tidak terautentikasi" });
+  const role = await getDbRoleLms(req);
+  const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+  const userId = req.user?.claims?.sub || req.user?.id || "";
+  if (role === "admin" || role === "superadmin" || adminIds.includes(userId)) return next();
+  return res.status(403).json({ error: "Akses ditolak. Hanya admin." });
 }
 
 // ─── Seed data ────────────────────────────────────────────────────────────────
@@ -499,6 +518,181 @@ export function registerLmsRoutes(app: Express) {
       });
     } catch (e) {
       res.status(500).json({ error: "Gagal mengambil progress" });
+    }
+  });
+
+  // ─── Admin CRUD: Courses ──────────────────────────────────────────────────────
+
+  // POST /api/admin/lms/courses — create a new course
+  app.post("/api/admin/lms/courses", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const { title, slug, shortDesc, description, category, subcategory, color, emoji, instructor,
+        durationMinutes, price, level, isFeatured, isPublic, isActive, sortOrder } = req.body;
+      if (!title || !slug) return res.status(400).json({ error: "title dan slug wajib diisi" });
+      const [existing] = await db.select({ id: lmsCourses.id }).from(lmsCourses).where(eq(lmsCourses.slug, slug));
+      if (existing) return res.status(409).json({ error: "Slug sudah digunakan" });
+      const [course] = await db.insert(lmsCourses).values({
+        title, slug, shortDesc: shortDesc ?? "", description: description ?? "",
+        category: category ?? "onboarding", subcategory: subcategory ?? "",
+        color: color ?? "#6366f1", emoji: emoji ?? "📚", instructor: instructor ?? "Tim Gustafta",
+        durationMinutes: durationMinutes ?? 0, price: price ?? 0, level: level ?? "beginner",
+        isFeatured: isFeatured ?? false, isPublic: isPublic ?? true, isActive: isActive ?? true,
+        sortOrder: sortOrder ?? 0,
+      }).returning();
+      res.status(201).json(course);
+    } catch (e: any) {
+      console.error("[LMS-ADMIN] POST course:", e);
+      res.status(500).json({ error: "Gagal membuat kursus" });
+    }
+  });
+
+  // PATCH /api/admin/lms/courses/:id — update a course
+  app.patch("/api/admin/lms/courses/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
+      const { title, slug, shortDesc, description, category, subcategory, color, emoji, instructor,
+        durationMinutes, price, level, isFeatured, isPublic, isActive, sortOrder } = req.body;
+      if (slug) {
+        const [dup] = await db.select({ id: lmsCourses.id }).from(lmsCourses)
+          .where(and(eq(lmsCourses.slug, slug), eq(lmsCourses.id, id)));
+        // allow same slug for same course; block if another course has it
+        const [other] = await db.select({ id: lmsCourses.id }).from(lmsCourses).where(eq(lmsCourses.slug, slug));
+        if (other && other.id !== id) return res.status(409).json({ error: "Slug sudah digunakan kursus lain" });
+      }
+      const updates: Record<string, any> = {};
+      if (title !== undefined) updates.title = title;
+      if (slug !== undefined) updates.slug = slug;
+      if (shortDesc !== undefined) updates.shortDesc = shortDesc;
+      if (description !== undefined) updates.description = description;
+      if (category !== undefined) updates.category = category;
+      if (subcategory !== undefined) updates.subcategory = subcategory;
+      if (color !== undefined) updates.color = color;
+      if (emoji !== undefined) updates.emoji = emoji;
+      if (instructor !== undefined) updates.instructor = instructor;
+      if (durationMinutes !== undefined) updates.durationMinutes = durationMinutes;
+      if (price !== undefined) updates.price = price;
+      if (level !== undefined) updates.level = level;
+      if (isFeatured !== undefined) updates.isFeatured = isFeatured;
+      if (isPublic !== undefined) updates.isPublic = isPublic;
+      if (isActive !== undefined) updates.isActive = isActive;
+      if (sortOrder !== undefined) updates.sortOrder = sortOrder;
+      const [course] = await db.update(lmsCourses).set(updates).where(eq(lmsCourses.id, id)).returning();
+      if (!course) return res.status(404).json({ error: "Kursus tidak ditemukan" });
+      res.json(course);
+    } catch (e: any) {
+      console.error("[LMS-ADMIN] PATCH course:", e);
+      res.status(500).json({ error: "Gagal mengubah kursus" });
+    }
+  });
+
+  // DELETE /api/admin/lms/courses/:id — delete a course (and its lessons)
+  app.delete("/api/admin/lms/courses/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
+      await db.delete(lmsLessons).where(eq(lmsLessons.courseId, id));
+      await db.delete(lmsEnrollments).where(eq(lmsEnrollments.courseId, id));
+      const [deleted] = await db.delete(lmsCourses).where(eq(lmsCourses.id, id)).returning();
+      if (!deleted) return res.status(404).json({ error: "Kursus tidak ditemukan" });
+      res.json({ ok: true });
+    } catch (e: any) {
+      console.error("[LMS-ADMIN] DELETE course:", e);
+      res.status(500).json({ error: "Gagal menghapus kursus" });
+    }
+  });
+
+  // ─── Admin CRUD: Lessons ─────────────────────────────────────────────────────
+
+  // GET /api/admin/lms/courses/:courseId/lessons — list lessons for a course
+  app.get("/api/admin/lms/courses/:courseId/lessons", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const lessons = await db.select().from(lmsLessons)
+        .where(eq(lmsLessons.courseId, courseId))
+        .orderBy(asc(lmsLessons.sortOrder), asc(lmsLessons.id));
+      res.json(lessons);
+    } catch (e) {
+      res.status(500).json({ error: "Gagal mengambil lessons" });
+    }
+  });
+
+  // POST /api/admin/lms/courses/:courseId/lessons — create a lesson
+  app.post("/api/admin/lms/courses/:courseId/lessons", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      if (isNaN(courseId)) return res.status(400).json({ error: "courseId tidak valid" });
+      const { title, slug, content, videoUrl, type, durationMinutes, sortOrder, isPreview, isActive } = req.body;
+      if (!title || !slug) return res.status(400).json({ error: "title dan slug wajib diisi" });
+      const [existing] = await db.select({ id: lmsLessons.id }).from(lmsLessons)
+        .where(and(eq(lmsLessons.courseId, courseId), eq(lmsLessons.slug, slug)));
+      if (existing) return res.status(409).json({ error: "Slug sudah digunakan di kursus ini" });
+      const [lesson] = await db.insert(lmsLessons).values({
+        courseId, title, slug, content: content ?? "", videoUrl: videoUrl ?? "",
+        type: type ?? "article", durationMinutes: durationMinutes ?? 5,
+        sortOrder: sortOrder ?? 0, isPreview: isPreview ?? false, isActive: isActive ?? true,
+      }).returning();
+      res.status(201).json(lesson);
+    } catch (e: any) {
+      console.error("[LMS-ADMIN] POST lesson:", e);
+      res.status(500).json({ error: "Gagal membuat lesson" });
+    }
+  });
+
+  // PATCH /api/admin/lms/lessons/:id — update a lesson
+  app.patch("/api/admin/lms/lessons/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
+      const { title, slug, content, videoUrl, type, durationMinutes, sortOrder, isPreview, isActive } = req.body;
+      const updates: Record<string, any> = {};
+      if (title !== undefined) updates.title = title;
+      if (slug !== undefined) updates.slug = slug;
+      if (content !== undefined) updates.content = content;
+      if (videoUrl !== undefined) updates.videoUrl = videoUrl;
+      if (type !== undefined) updates.type = type;
+      if (durationMinutes !== undefined) updates.durationMinutes = durationMinutes;
+      if (sortOrder !== undefined) updates.sortOrder = sortOrder;
+      if (isPreview !== undefined) updates.isPreview = isPreview;
+      if (isActive !== undefined) updates.isActive = isActive;
+      const [lesson] = await db.update(lmsLessons).set(updates).where(eq(lmsLessons.id, id)).returning();
+      if (!lesson) return res.status(404).json({ error: "Lesson tidak ditemukan" });
+      res.json(lesson);
+    } catch (e: any) {
+      console.error("[LMS-ADMIN] PATCH lesson:", e);
+      res.status(500).json({ error: "Gagal mengubah lesson" });
+    }
+  });
+
+  // DELETE /api/admin/lms/lessons/:id — delete a lesson
+  app.delete("/api/admin/lms/lessons/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
+      const [deleted] = await db.delete(lmsLessons).where(eq(lmsLessons.id, id)).returning();
+      if (!deleted) return res.status(404).json({ error: "Lesson tidak ditemukan" });
+      res.json({ ok: true });
+    } catch (e: any) {
+      console.error("[LMS-ADMIN] DELETE lesson:", e);
+      res.status(500).json({ error: "Gagal menghapus lesson" });
+    }
+  });
+
+  // GET /api/admin/lms/courses — list all courses (admin view, includes inactive)
+  app.get("/api/admin/lms/courses", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const courses = await db.select().from(lmsCourses).orderBy(asc(lmsCourses.sortOrder), asc(lmsCourses.id));
+      // Attach lesson count using a single aggregation query
+      const lessonCounts = await db
+        .select({ courseId: lmsLessons.courseId, cnt: count() })
+        .from(lmsLessons)
+        .groupBy(lmsLessons.courseId);
+      const countMap = Object.fromEntries(lessonCounts.map((r) => [r.courseId, r.cnt]));
+      const withCounts = courses.map((c) => ({ ...c, lessonCount: countMap[c.id] ?? 0 }));
+      res.json(withCounts);
+    } catch (e) {
+      console.error("[LMS-ADMIN] GET courses:", e);
+      res.status(500).json({ error: "Gagal mengambil kursus" });
     }
   });
 

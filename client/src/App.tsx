@@ -21,6 +21,7 @@ import FlierKlinikKonsultasiPage from "@/pages/flier-klinik-konsultasi";
 import KodeAksesPage from "@/pages/kode-akses";
 import BergabungPage from "@/pages/bergabung";
 import AdminAccessCodesPage from "@/pages/admin-access-codes";
+import AdminAcademyPage from "@/pages/admin-academy";
 import AdminSystemLoadPage from "@/pages/admin-system-load";
 import AdminAiHealthPage from "@/pages/admin-ai-health";
 import ProductBible from "@/pages/admin/product-bible";
@@ -527,6 +528,7 @@ function Router() {
       <Route path="/flier-klinik-konsultasi" component={FlierKlinikKonsultasiPage} />
       <Route path="/kode-akses" component={KodeAksesPage} />
       <Route path="/admin/access-codes" component={AdminAccessCodesPage} />
+      <Route path="/admin/academy" component={AdminAcademyPage} />
       <Route path="/admin/system-load" component={AdminSystemLoadPage} />
       <Route path="/admin/ai-health" component={AdminAiHealthPage} />
       <Route path="/admin/product-bible" component={ProductBible} />
