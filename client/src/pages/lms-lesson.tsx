@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   ChevronLeft, ChevronRight, Check, BookOpen, Clock, Play,
-  CheckCircle2, Lock
+  CheckCircle2, Lock, Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -33,6 +33,8 @@ interface Progress {
   enrolled: boolean;
   progress: number;
   completedLessons: number[];
+  completedAt: string | null;
+  certificateCode: string | null;
 }
 
 function MarkdownContent({ content }: { content: string }) {
@@ -391,9 +393,13 @@ export default function LmsLesson() {
                 </button>
               ) : (
                 <Link href={`/lms/course/${id}`}>
-                  <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Kursus Selesai!
+                  <button
+                    onClick={() => { if (!isCompleted && !markingDone) progressMutation.mutate(); }}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition-colors"
+                    data-testid="button-finish-course"
+                  >
+                    <Award className="w-4 h-4" />
+                    Selesai & Lihat Sertifikat
                   </button>
                 </Link>
               )}

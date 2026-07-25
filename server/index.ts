@@ -382,6 +382,23 @@ for (const envVar of requiredEnvVars) {
   registerAuthRoutes(app);
   registerAudioRoutes(app);
 
+  // ── LMS Certificates table (idempotent DDL) ─────────────────────────────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS lms_certificates (
+        id               SERIAL PRIMARY KEY,
+        user_id          VARCHAR(255) NOT NULL,
+        course_id        INTEGER NOT NULL REFERENCES lms_courses(id) ON DELETE CASCADE,
+        certificate_code TEXT NOT NULL UNIQUE,
+        issued_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        UNIQUE (user_id, course_id)
+      );
+    `);
+    console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates table ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates DDL error:`, e);
+  }
+
   // ── Blueprint Submissions table (idempotent DDL) ──────────────────────────
   try {
     await pool.query(`

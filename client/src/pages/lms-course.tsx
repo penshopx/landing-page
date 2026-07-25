@@ -5,10 +5,118 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   ChevronLeft, Clock, BookOpen, Play, Lock, Check, ChevronRight,
-  Star, Users, GraduationCap, Zap, Rocket
+  Star, Users, GraduationCap, Zap, Rocket, Award, Download
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+async function downloadCertificatePdf(params: {
+  studentName: string;
+  courseTitle: string;
+  courseEmoji: string;
+  issuedAt: string;
+  certificateCode: string;
+  color: string;
+}) {
+  const { default: jsPDF } = await import("jspdf");
+  const { studentName, courseTitle, courseEmoji, issuedAt, certificateCode, color } = params;
+
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const W = 297;
+  const H = 210;
+
+  // Background gradient via rects
+  doc.setFillColor(248, 250, 252);
+  doc.rect(0, 0, W, H, "F");
+
+  // Decorative top stripe
+  const r = parseInt(color.slice(1, 3), 16) || 99;
+  const g = parseInt(color.slice(3, 5), 16) || 102;
+  const b = parseInt(color.slice(5, 7), 16) || 241;
+  doc.setFillColor(r, g, b);
+  doc.rect(0, 0, W, 8, "F");
+  doc.rect(0, H - 8, W, 8, "F");
+
+  // Border
+  doc.setDrawColor(r, g, b);
+  doc.setLineWidth(0.5);
+  doc.rect(10, 10, W - 20, H - 20, "S");
+
+  // Gustafta Academy brand
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(r, g, b);
+  doc.text("GUSTAFTA ACADEMY", W / 2, 24, { align: "center" });
+
+  // Certificate title
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  doc.text("SERTIFIKAT PENYELESAIAN KURSUS", W / 2, 32, { align: "center" });
+
+  // Divider
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.3);
+  doc.line(50, 37, W - 50, 37);
+
+  // "Diberikan kepada"
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(120, 120, 120);
+  doc.text("Diberikan kepada", W / 2, 50, { align: "center" });
+
+  // Student name
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(26);
+  doc.setTextColor(30, 30, 30);
+  doc.text(studentName, W / 2, 68, { align: "center" });
+
+  // "Telah menyelesaikan"
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(120, 120, 120);
+  doc.text("telah berhasil menyelesaikan kursus", W / 2, 80, { align: "center" });
+
+  // Course title
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(16);
+  doc.setTextColor(r, g, b);
+  const titleLines = doc.splitTextToSize(courseTitle, W - 80) as string[];
+  doc.text(titleLines, W / 2, 95, { align: "center" });
+
+  // Divider 2
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.3);
+  doc.line(50, H - 45, W - 50, H - 45);
+
+  // Issued date & code
+  const dateStr = new Date(issuedAt).toLocaleDateString("id-ID", {
+    day: "numeric", month: "long", year: "numeric",
+  });
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Diterbitkan: ${dateStr}`, 30, H - 35);
+  doc.text(`Kode Sertifikat: ${certificateCode}`, 30, H - 28);
+
+  // Platform URL
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(8);
+  doc.setTextColor(150, 150, 150);
+  doc.text("Dapat diverifikasi di gustafta.com/academy", W / 2, H - 28, { align: "center" });
+
+  // Seal placeholder (circle)
+  doc.setDrawColor(r, g, b);
+  doc.setLineWidth(0.8);
+  doc.circle(W - 45, H - 35, 12, "S");
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(5);
+  doc.setTextColor(r, g, b);
+  doc.text("GUSTAFTA", W - 45, H - 37, { align: "center" });
+  doc.text("ACADEMY", W - 45, H - 33, { align: "center" });
+
+  doc.save(`Sertifikat-${courseTitle.replace(/\s+/g, "-")}.pdf`);
+}
 
 interface Lesson {
   id: number;
@@ -42,6 +150,7 @@ interface Progress {
   progress: number;
   completedLessons: number[];
   completedAt: string | null;
+  certificateCode: string | null;
 }
 
 function formatDuration(minutes: number) {
@@ -180,6 +289,8 @@ export default function LmsCourse() {
     },
   });
 
+  const [downloadingCert, setDownloadingCert] = useState(false);
+
   const handleStartLesson = (lesson: Lesson) => {
     const canAccess = lesson.isPreview || (progress?.enrolled ?? false) || (course?.price === 0);
     if (!canAccess) {
@@ -217,6 +328,30 @@ export default function LmsCourse() {
   const totalLessons = course.lessons.length;
   const progressPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
   const firstLesson = course.lessons[0];
+  const isCourseCompleted = (progress?.progress ?? 0) === 100 && !!progress?.completedAt;
+  const certificateCode = progress?.certificateCode ?? null;
+
+  const handleDownloadCert = async () => {
+    if (!certificateCode) return;
+    setDownloadingCert(true);
+    try {
+      const certRes = await fetch(`/api/lms/certificate/${certificateCode}`);
+      if (!certRes.ok) throw new Error(`Gagal memuat data sertifikat (${certRes.status})`);
+      const certData = await certRes.json();
+      await downloadCertificatePdf({
+        studentName: certData.studentName || "Peserta",
+        courseTitle: course.title,
+        courseEmoji: course.emoji,
+        issuedAt: certData.issuedAt || new Date().toISOString(),
+        certificateCode,
+        color: course.color,
+      });
+    } catch {
+      toast({ title: "Gagal mengunduh sertifikat", variant: "destructive" });
+    } finally {
+      setDownloadingCert(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -422,6 +557,31 @@ export default function LmsCourse() {
                 ))}
               </div>
             </div>
+
+            {/* Certificate card — shown when course is 100% complete */}
+            {isCourseCompleted && (
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl border-2 border-amber-300 p-5 shadow-sm" data-testid="card-certificate">
+                <div className="flex items-center gap-2 mb-3">
+                  <Award className="w-5 h-5 text-amber-600" />
+                  <h3 className="font-bold text-slate-800">Sertifikat Selesai</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                  Selamat! Anda telah menyelesaikan kursus ini. Unduh sertifikat sebagai bukti kompetensi Anda.
+                </p>
+                {certificateCode && (
+                  <p className="text-xs text-slate-400 font-mono mb-3 break-all">{certificateCode}</p>
+                )}
+                <Button
+                  onClick={handleDownloadCert}
+                  disabled={downloadingCert || !certificateCode}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-2"
+                  data-testid="button-download-certificate"
+                >
+                  <Download className="w-4 h-4" />
+                  {downloadingCert ? "Membuat PDF…" : "Unduh Sertifikat (PDF)"}
+                </Button>
+              </div>
+            )}
 
             {/* Back to catalog */}
             <Link href="/lms">

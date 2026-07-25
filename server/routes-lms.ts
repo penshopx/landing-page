@@ -1,7 +1,15 @@
 import type { Express } from "express";
 import { db } from "./db";
-import { lmsCourses, lmsLessons, lmsEnrollments, lmsLessonProgress } from "@shared/schema";
+import { lmsCourses, lmsLessons, lmsEnrollments, lmsLessonProgress, lmsCertificates } from "@shared/schema";
 import { eq, and, asc, sql, count } from "drizzle-orm";
+
+function generateCertCode(): string {
+  const year = new Date().getFullYear();
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return `GUSTAFTA-${year}-${code}`;
+}
 
 function isAuthenticated(req: any, res: any, next: any) {
   if (req.isAuthenticated?.() || req.user) return next();
@@ -473,11 +481,28 @@ export function registerLmsRoutes(app: Express) {
         .where(and(eq(lmsLessonProgress.userId, userId), eq(lmsLessonProgress.courseId, courseId)));
       const progress = Math.round((completedLessons.length / allLessons.length) * 100);
 
+      const now = new Date();
       await db.update(lmsEnrollments)
-        .set({ progress, completedAt: progress === 100 ? new Date() : null })
+        .set({ progress, completedAt: progress === 100 ? now : null })
         .where(and(eq(lmsEnrollments.userId, userId), eq(lmsEnrollments.courseId, courseId)));
 
-      res.json({ progress, completed: completedLessons.map(l => l.lessonId) });
+      // Auto-issue certificate on first 100% completion
+      // ON CONFLICT DO NOTHING handles concurrent requests safely;
+      // the composite unique index (user_id, course_id) prevents duplicates.
+      let certificateCode: string | null = null;
+      if (progress === 100) {
+        const code = generateCertCode();
+        await db.execute(sql.raw(
+          `INSERT INTO lms_certificates (user_id, course_id, certificate_code)
+           VALUES ('${userId.replace(/'/g, "''")}', ${courseId}, '${code}')
+           ON CONFLICT (user_id, course_id) DO NOTHING`
+        ));
+        const [cert] = await db.select().from(lmsCertificates)
+          .where(and(eq(lmsCertificates.userId, userId), eq(lmsCertificates.courseId, courseId)));
+        certificateCode = cert?.certificateCode ?? null;
+      }
+
+      res.json({ progress, completed: completedLessons.map(l => l.lessonId), certificateCode });
     } catch (e) {
       res.status(500).json({ error: "Gagal update progress" });
     }
@@ -501,6 +526,48 @@ export function registerLmsRoutes(app: Express) {
     }
   });
 
+  // GET /api/lms/certificates — my earned certificates
+  app.get("/api/lms/certificates", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const certs = await db.select().from(lmsCertificates)
+        .where(eq(lmsCertificates.userId, userId));
+      const results = await Promise.all(certs.map(async (c) => {
+        const [course] = await db.select({
+          id: lmsCourses.id, title: lmsCourses.title, emoji: lmsCourses.emoji,
+          color: lmsCourses.color, category: lmsCourses.category,
+        }).from(lmsCourses).where(eq(lmsCourses.id, c.courseId));
+        return { ...c, course };
+      }));
+      res.json(results);
+    } catch (e) {
+      res.status(500).json({ error: "Gagal mengambil sertifikat" });
+    }
+  });
+
+  // GET /api/lms/certificate/:code — public verification endpoint
+  app.get("/api/lms/certificate/:code", async (req: any, res) => {
+    try {
+      const { code } = req.params;
+      const [cert] = await db.select().from(lmsCertificates)
+        .where(eq(lmsCertificates.certificateCode, code));
+      if (!cert) return res.status(404).json({ error: "Sertifikat tidak ditemukan" });
+      const [course] = await db.select({
+        id: lmsCourses.id, title: lmsCourses.title, emoji: lmsCourses.emoji,
+        color: lmsCourses.color, category: lmsCourses.category,
+      }).from(lmsCourses).where(eq(lmsCourses.id, cert.courseId));
+      // Get student display name
+      const nameRows = await db.execute(sql.raw(
+        `SELECT display_name FROM user_profiles WHERE user_id = '${cert.userId.replace(/'/g, "''")}' LIMIT 1`
+      ));
+      const nameArr = (nameRows.rows ?? nameRows) as any[];
+      const studentName = nameArr[0]?.display_name || "Peserta";
+      res.json({ ...cert, course, studentName });
+    } catch (e) {
+      res.status(500).json({ error: "Gagal verifikasi sertifikat" });
+    }
+  });
+
   // GET /api/lms/progress/:courseId — get my progress for a specific course
   app.get("/api/lms/progress/:courseId", isAuthenticated, async (req: any, res) => {
     try {
@@ -510,11 +577,14 @@ export function registerLmsRoutes(app: Express) {
         .where(and(eq(lmsEnrollments.userId, userId), eq(lmsEnrollments.courseId, courseId)));
       const completed = await db.select().from(lmsLessonProgress)
         .where(and(eq(lmsLessonProgress.userId, userId), eq(lmsLessonProgress.courseId, courseId)));
+      const [cert] = await db.select().from(lmsCertificates)
+        .where(and(eq(lmsCertificates.userId, userId), eq(lmsCertificates.courseId, courseId)));
       res.json({
         enrolled: !!enrollment,
         progress: enrollment?.progress ?? 0,
         completedLessons: completed.map(l => l.lessonId),
         completedAt: enrollment?.completedAt ?? null,
+        certificateCode: cert?.certificateCode ?? null,
       });
     } catch (e) {
       res.status(500).json({ error: "Gagal mengambil progress" });

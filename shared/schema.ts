@@ -2303,6 +2303,21 @@ export const insertLmsLessonProgressSchema = createInsertSchema(lmsLessonProgres
 export type InsertLmsLessonProgress = z.infer<typeof insertLmsLessonProgressSchema>;
 export type LmsLessonProgress = typeof lmsLessonProgress.$inferSelect;
 
+// ==================== LMS CERTIFICATES ====================
+export const lmsCertificates = pgTable("lms_certificates", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
+  courseId: integer("course_id").notNull(),
+  certificateCode: text("certificate_code").notNull().unique(),
+  issuedAt: timestamp("issued_at").defaultNow().notNull(),
+}, (t) => ({
+  userCourseUnique: uniqueIndex("lms_certificates_user_course_uidx").on(t.userId, t.courseId),
+}));
+
+export const insertLmsCertificateSchema = createInsertSchema(lmsCertificates).omit({ id: true, issuedAt: true });
+export type InsertLmsCertificate = z.infer<typeof insertLmsCertificateSchema>;
+export type LmsCertificate = typeof lmsCertificates.$inferSelect;
+
 // ==================== TENDER ALERT PROFILES ====================
 // Profil bisnis BUJK untuk notifikasi tender harian (WA/Email jam 08:00 WIB)
 export const tenderAlertProfiles = pgTable("tender_alert_profiles", {
