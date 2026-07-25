@@ -23,15 +23,15 @@ export function CartDrawer() {
       return;
     }
 
-    // Items with Scalev variant → checkout via Scalev
     const scalevItems = selected.filter(i => i.scalevVariantId);
+    const waItems = selected.filter(i => !i.scalevVariantId);
+
+    // Produk store → Wuryanto Store
     if (scalevItems.length > 0) {
-      const url = buildCheckoutUrl();
-      if (url) window.open(url, "_blank");
+      window.open("https://bayar.gustafta.my.id", "_blank");
     }
 
-    // Items without Scalev variant → WA inquiry
-    const waItems = selected.filter(i => !i.scalevVariantId);
+    // Produk non-store → WA inquiry
     if (waItems.length > 0) {
       const productList = waItems.map(i => `- ${i.name} (${formatPrice(i.price)})`).join("\n");
       const msg = encodeURIComponent(`Halo, saya ingin membeli:\n${productList}\n\nMohon info cara pembelian.`);

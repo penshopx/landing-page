@@ -434,28 +434,12 @@ export default function StoreFeatured() {
   });
 
   const handleBuy = (agent: AgentProduct) => {
-    // Prioritas 1: produk punya Scalev variant ID → langsung checkout online
+    // Semua produk store → Wuryanto Store
     if (agent.scalevVariantId) {
-      const url = `https://bayar.gustafta.my.id/c/checkout?variant_ids=${agent.scalevVariantId}&qty=1`;
-      window.open(url, "_blank");
+      window.open("https://bayar.gustafta.my.id", "_blank");
       return;
     }
-    // Prioritas 2: ada paymentUrl langsung
-    if (agent.paymentUrl) {
-      window.open(agent.paymentUrl, "_blank");
-      return;
-    }
-    // Prioritas 3: ada agentId → halaman checkout internal (isi form)
-    if (agent.agentId) {
-      const qs = new URLSearchParams({
-        agent: String(agent.agentId),
-        agentName: encodeURIComponent(agent.name),
-        agentPrice: String(Math.round(agent.price || 99000)),
-      });
-      navigate(`/checkout?${qs.toString()}`);
-      return;
-    }
-    // Fallback: WA inquiry
+    // Produk non-store (agent) → WA inquiry
     const waMsg = encodeURIComponent(`Halo, saya tertarik membeli produk: *${agent.name}*. Mohon informasi cara pembelian.`);
     window.open(`https://wa.me/6282299417818?text=${waMsg}`, "_blank");
   };
