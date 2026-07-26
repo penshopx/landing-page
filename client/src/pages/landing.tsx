@@ -909,7 +909,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── TRILOGI GUSTAFTA — ALUR PIKIR ── */}
+      {/* ── ALUR PIKIR: MEMORI BISNIS ── */}
       <section className="py-20 px-4 bg-gray-950 text-white overflow-hidden relative" id="trilogi">
         {/* subtle grid bg */}
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)", backgroundSize: "48px 48px" }} />
@@ -919,69 +919,66 @@ export default function Landing() {
           <div className="text-center mb-14">
             <span className="inline-block text-xs font-bold text-teal-400 uppercase tracking-widest mb-3">Alur Pikir Gustafta</span>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
-              Semua Dimulai<br className="sm:hidden" /> dari <span className="text-teal-400">Satu Dialog.</span>
+              Mulai dari <span className="text-teal-400">Satu Dokumen.</span><br className="sm:hidden" /> Tumbuh Jadi Memori Bisnis.
             </h2>
             <p className="text-gray-400 text-base max-w-xl mx-auto leading-relaxed">
-              Sebelum ada AI, sebelum ada chatbot — ada sebuah percakapan sederhana yang mengubah segalanya.
-              Inilah alur pikir di balik Gustafta.
+              Google Drive menyimpan file. Gustafta memahami isinya — dan mengubahnya menjadi pengetahuan
+              yang bisa dicari, ditanya, dan digunakan oleh seluruh fitur AI Anda.
             </p>
           </div>
 
           {/* 4 tahap */}
           <div className="grid gap-0 relative">
             {/* Connector line */}
-            <div className="hidden md:block absolute left-[calc(50%-1px)] top-12 bottom-12 w-0.5 bg-gradient-to-b from-gray-700 via-teal-600/40 to-gray-700" />
+            <div className="hidden md:block absolute left-[calc(50%-1px)] top-12 bottom-12 w-0.5 bg-gradient-to-b from-gray-700 via-teal-600/40 to-teal-500/60" />
 
             {[
               {
                 num: "01",
-                label: "Monolog",
-                color: "text-gray-400",
-                border: "border-gray-700",
-                bg: "bg-gray-800/50",
-                dot: "bg-gray-500",
-                desc: "Pengetahuan Anda hanya ada di dalam kepala. Anda yang berpikir, Anda yang memutuskan, Anda yang tahu — tetapi tidak ada yang mendengar, tidak ada yang bertanya. Pengetahuan itu diam.",
-                side: "right",
+                label: "Simpan",
+                color: "text-sky-400",
+                border: "border-sky-700/40",
+                bg: "bg-sky-950/30",
+                dot: "bg-sky-500",
+                desc: "Upload dokumen pertama Anda — proposal proyek, kontrak, SKK tenaga ahli, metode kerja, atau SOP perusahaan. Cukup satu file untuk memulai. Ruang Simpan tersedia gratis 15 MB.",
+                highlight: true,
+                badge: "Mulai di sini",
               },
               {
                 num: "02",
-                label: "Dialog",
-                color: "text-teal-400",
-                border: "border-teal-600/50",
-                bg: "bg-teal-950/40",
-                dot: "bg-teal-500",
-                desc: "Ketika pengetahuan itu dikeluarkan — lewat percakapan — ia mulai bergerak. Dipertanyakan. Diperjelas. Diuji. Dialog bukan sekadar tanya-jawab: ia adalah proses membuat pengetahuan Anda menjadi nyata dan berguna.",
-                side: "left",
-                highlight: true,
-              },
-              {
-                num: "03",
-                label: "Kolaborasi",
+                label: "AI Membaca",
                 color: "text-violet-400",
                 border: "border-violet-600/40",
                 bg: "bg-violet-950/30",
                 dot: "bg-violet-500",
-                desc: "Dialog yang berulang melahirkan ritme. Dua pihak tidak lagi bergantian — mereka mulai bergerak bersama. AI bukan alat yang Anda perintah; ia menjadi mitra yang membantu Anda berpikir dan bekerja lebih jauh dari yang bisa Anda lakukan sendiri.",
-                side: "right",
+                desc: "Gustafta tidak sekadar menyimpan nama file. AI membaca dan memahami isi setiap dokumen — lalu mengubahnya menjadi pengetahuan yang bisa diproses, dicari, dan dimanfaatkan.",
+              },
+              {
+                num: "03",
+                label: "Tanya & Cari",
+                color: "text-teal-400",
+                border: "border-teal-600/50",
+                bg: "bg-teal-950/40",
+                dot: "bg-teal-500",
+                desc: "Cari informasi spesifik di seluruh dokumen Anda dalam hitungan detik. Tanya pertanyaan, minta ringkasan, atau minta AI mengerjakan sesuatu berdasarkan dokumen nyata perusahaan Anda.",
               },
               {
                 num: "04",
-                label: "Kreasi",
+                label: "Memori Bisnis",
                 color: "text-amber-400",
                 border: "border-amber-600/40",
                 bg: "bg-amber-950/20",
                 dot: "bg-amber-500",
-                desc: "Dari kolaborasi yang konsisten, muncul sesuatu yang baru — produk, layanan, solusi — yang tidak bisa lahir dari monolog sendirian. Inilah titik di mana pengetahuan Anda berubah menjadi nilai yang dirasakan orang lain.",
-                side: "left",
+                desc: "Semakin banyak dokumen, semakin 'kenal' AI dengan bisnis Anda. Pengetahuan perusahaan tidak lagi tersimpan di kepala satu orang — ia hidup, bisa dicari, dan terus berkembang.",
               },
             ].map((tahap, i) => (
               <div key={tahap.num} className={`flex items-center gap-6 md:gap-10 py-6 ${i % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"} flex-col md:flex-row`}>
                 {/* Card */}
-                <div className={`flex-1 rounded-2xl border ${tahap.border} ${tahap.bg} p-6 backdrop-blur-sm ${tahap.highlight ? "ring-1 ring-teal-500/30" : ""}`}>
+                <div className={`flex-1 rounded-2xl border ${tahap.border} ${tahap.bg} p-6 backdrop-blur-sm ${tahap.highlight ? "ring-1 ring-sky-500/30" : ""}`}>
                   <div className="flex items-center gap-3 mb-3">
                     <span className={`text-xs font-black ${tahap.color} opacity-60`}>{tahap.num}</span>
                     <span className={`text-lg font-bold ${tahap.color}`}>{tahap.label}</span>
-                    {tahap.highlight && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-400 border border-teal-500/30">Titik Awal</span>}
+                    {tahap.badge && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">{tahap.badge}</span>}
                   </div>
                   <p className="text-sm text-gray-400 leading-relaxed">{tahap.desc}</p>
                 </div>
@@ -999,29 +996,29 @@ export default function Landing() {
           <div className="mt-10 mb-10 text-center">
             <div className="inline-block rounded-2xl border border-teal-500/20 bg-teal-950/20 px-6 py-5 max-w-2xl">
               <p className="text-sm text-teal-300 leading-relaxed">
-                <span className="font-bold text-white">Gustafta percaya:</span> transformasi terbesar dalam karier profesional tidak dimulai dari membeli tool atau belajar coding —{" "}
-                <span className="font-semibold text-teal-400">melainkan dari satu dialog yang jujur tentang siapa Anda dan apa yang Anda tahu.</span>
+                <span className="font-bold text-white">Gustafta percaya:</span> perusahaan yang bertahan bukan yang memiliki dokumen paling banyak —{" "}
+                <span className="font-semibold text-teal-400">melainkan yang mampu menemukan dan memanfaatkan kembali pengetahuan yang sudah dimilikinya.</span>
               </p>
             </div>
           </div>
 
-          {/* CTA — bukan floating chatbot */}
+          {/* CTA */}
           <div className="text-center">
-            <p className="text-gray-500 text-sm mb-4">Rasakan langsung alurnya — AI akan memandu Anda dari Dialog menuju Blueprint chatbot Anda sendiri.</p>
-            <button
-              onClick={() => setShowDialog(true)}
+            <p className="text-gray-500 text-sm mb-4">Mulai gratis — cukup upload satu dokumen dan lihat bagaimana AI memahami isinya.</p>
+            <a
+              href="/ruang-simpan"
               className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white font-bold text-base transition-all shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 hover:-translate-y-0.5"
               data-testid="button-trilogi-cta"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
               </svg>
-              Mulai Dialog Sekarang
+              Mulai dengan Ruang Simpan
               <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
-            </button>
-            <p className="text-xs text-gray-600 mt-3">Gratis · Tanpa daftar · Blueprint tersimpan otomatis</p>
+            </a>
+            <p className="text-xs text-gray-600 mt-3">Gratis 15 MB · Tanpa kartu kredit · AI siap dalam menit</p>
           </div>
         </div>
       </section>
@@ -1808,7 +1805,7 @@ export default function Landing() {
               },
               {
                 q: "Apa bedanya Gustafta dengan ChatGPT atau platform AI lain?",
-                a: "ChatGPT menjawab pertanyaan lalu selesai di situ. Gustafta mengawal seluruh alurnya: masalah Anda → Dialog (memahami) → Blueprint (cetak biru solusi) → Workroom (dikerjakan bertahap per bidang, dengan gerbang persetujuan ◆) → hasil nyata berupa dokumen, proposal, atau produk — bukan cuma jawaban di layar.",
+                a: "ChatGPT menjawab pertanyaan lalu selesai di situ. Gustafta membangun Memori Bisnis Anda: simpan dokumen → AI memahami isinya → cari & tanya berdasarkan dokumen nyata → pengetahuan perusahaan tumbuh terus. Hasilnya bukan sekadar jawaban di layar, melainkan organisasi AI yang benar-benar kenal bisnis Anda.",
               },
               {
                 q: "Saya sudah profesional tapi tidak tahu AI — bisa pakai Gustafta?",
@@ -1851,7 +1848,7 @@ export default function Landing() {
               <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                 Platform Penyelesaian Masalah Berbasis AI
               </p>
-              <p className="text-xs text-gray-400 mt-2 italic">Dialog · Blueprint · Kolaborasi · Workroom · Hasil</p>
+              <p className="text-xs text-gray-400 mt-2 italic">Simpan · AI Membaca · Tanya & Cari · Memori Bisnis</p>
             </div>
             <div>
               <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">Platform</p>
