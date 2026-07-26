@@ -152,6 +152,8 @@ function actionLabel(action: string): string {
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
+const ONBOARDING_KEY = "rs-onboarding-v1-dismissed";
+
 export default function RuangSimpanPage() {
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
@@ -163,7 +165,15 @@ export default function RuangSimpanPage() {
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<RSFile | null>(null);
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const [onboardingDismissed, setOnboardingDismissed] = useState<boolean>(() => {
+    try { return !!localStorage.getItem(ONBOARDING_KEY); } catch { return false; }
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const dismissOnboarding = () => {
+    try { localStorage.setItem(ONBOARDING_KEY, "1"); } catch {}
+    setOnboardingDismissed(true);
+  };
 
   // ── Queries ──────────────────────────────────────────────────────────────
   const { data: overview, isLoading: overviewLoading, refetch: refetchOverview } = useQuery<RSOverview>({
@@ -253,12 +263,16 @@ export default function RuangSimpanPage() {
       <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white px-4 py-7">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1.5">
               <HardDrive className="h-4 w-4 text-indigo-400" />
               <span className="text-indigo-400 text-xs font-bold uppercase tracking-widest">Ruang Simpan</span>
+              <span className="text-white/20 text-xs">·</span>
+              <span className="text-xs text-white/50 italic">Memori Bisnis</span>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold">Gudang Dokumen Cerdas</h1>
-            <p className="text-indigo-200 text-xs mt-0.5">Semua dokumen perusahaan — dapat dikurasi oleh seluruh fitur AI Gustafta.</p>
+            <h1 className="text-xl md:text-2xl font-bold">Dokumen Tersimpan. Pengetahuan Hidup.</h1>
+            <p className="text-indigo-200 text-xs mt-1 max-w-md">
+              Google Drive menyimpan file. Gustafta memahami isinya — lalu menjadikannya pengetahuan yang bisa dicari, ditanya, dan digunakan oleh semua AI Anda.
+            </p>
           </div>
           <div className="flex flex-col items-end gap-1.5 min-w-[180px]">
             <div className="flex items-center gap-2 text-xs text-indigo-200 w-full justify-between">
@@ -276,6 +290,51 @@ export default function RuangSimpanPage() {
           </div>
         </div>
       </div>
+
+      {/* ── Onboarding Banner ── */}
+      {!onboardingDismissed && (
+        <div className="bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/30 dark:to-indigo-950/30 border-b border-indigo-100 dark:border-indigo-900/40 px-4 py-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-start gap-4">
+              <div className="shrink-0 w-10 h-10 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center">
+                <BrainCircuit className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-sm font-bold text-foreground">Selamat datang di Memori Bisnis Anda</span>
+                  <Badge className="bg-violet-100 text-violet-700 dark:bg-violet-900/50 dark:text-violet-300 text-[10px] border-0">Baru</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mb-3 max-w-2xl">
+                  Selama ini dokumen perusahaan Anda tersimpan — tapi sulit <em>ditemukan</em> saat dibutuhkan.
+                  Gustafta tidak hanya menyimpan file, melainkan <strong>memahami isinya</strong> sehingga bisa dicari, ditanya, dan digunakan oleh semua AI Anda.
+                </p>
+                <div className="flex flex-wrap gap-3 mb-3">
+                  {[
+                    { icon: ScanSearch, text: "Cari isi dokumen, bukan cuma nama file" },
+                    { icon: BrainCircuit, text: "AI menjawab berdasarkan dokumen Anda" },
+                    { icon: DatabaseZap, text: "Semua file otomatis jadi konteks AI" },
+                  ].map(({ icon: Icon, text }) => (
+                    <div key={text} className="flex items-center gap-1.5 text-xs text-muted-foreground bg-white dark:bg-card rounded-lg px-2.5 py-1.5 border border-border shadow-sm">
+                      <Icon className="h-3.5 w-3.5 text-violet-500 shrink-0" />
+                      <span>{text}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">
+                  💡 Mulai dengan upload satu dokumen — misalnya portofolio proyek, SOP, atau SKK tenaga ahli.
+                </p>
+              </div>
+              <button
+                onClick={dismissOnboarding}
+                className="shrink-0 text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+                title="Tutup"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Main layout ── */}
       <div className="max-w-7xl mx-auto px-4 py-5 flex gap-5">

@@ -43,6 +43,7 @@
 - [Partner seat license (Model B)](partner-seat-license.md) — seat claim/revoke must be one atomic tx under pg_advisory_xact_lock (race+drift safe); signup provision stays best-effort by design; pooled mode (seatCapacity=0) must 400 on every partner-admin seat MUTATION.
 - [Gustafta AI OS — 5 Pilar direction](gustafta-os-vision.md) — evolve to AI OS via 5 pillars (Coach/Claw/Workroom/Academy/Competency); modular MONOLITH not microservices; map to existing tables (no duplicates); curation-first, Workroom(Tender) next.
 - [Business Memory OS Vision](business-memory-os-vision.md) — Ruang Simpan = OS, Workroom = Apps; "unlock" framing not "buy"; Single Source of Truth; flywheel = data → smarter AI → higher switching cost.
+- [Ruang Simpan WA Templates](ruang-simpan-wa-templates.md) — 4 template WA personal untuk marketing Memori Bisnis; urutan narasi PAS: Masalah → Perbandingan → Solusi → Nama konsep.
 - [Ruang Simpan Object Storage](ruang-simpan-object-storage.md) — file bytes pindah dari PostgreSQL bytea → Replit Object Storage; kolom storage_key di ruang_simpan_files; deployment → Autoscale.
 - [Subscription grant audit](subscription-grant-audit.md) — grantedBy must be stamped on EVERY admin-mediated active-sub insert (early-adopter AND trial-approval); keep it immutable in the PATCH.
 - [Sellable claw seed](sellable-claw-seed.md) — Store-listed hands-off product needs isListed+premiumClass:private (createAgent DROPS both → post-create updateAgent); use aiModel not model; seed must RECONCILE not early-return.
