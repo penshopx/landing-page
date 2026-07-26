@@ -159,7 +159,7 @@ export default function Smk3ClawChat() {
     try {
       const res = await fetch("/api/messages/stream", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentId: String(agentId), role: "user", content: text, conversationHistory: history }, ...(files.length ? { attachments: files } : {})),
+        body: JSON.stringify({ agentId: String(agentId), role: "user", content: text, conversationHistory: history, ...(files.length ? { attachments: files } : {}) }),
       });
       if (!res.body) throw new Error("No stream");
       const reader = res.body.getReader();

@@ -131,7 +131,7 @@ export default function PjbuClawChat() {
     const history = messages.map(m => ({ role: m.role, content: m.content }));
     const orchStart = Date.now();
     try {
-      const res = await fetch("/api/messages/stream", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ agentId: String(agentId), role: "user", content: text, conversationHistory: history }, ...(files.length ? { attachments: files } : {})) });
+      const res = await fetch("/api/messages/stream", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ agentId: String(agentId), role: "user", content: text, conversationHistory: history, ...(files.length ? { attachments: files } : {}) }) });
       if (!res.body) throw new Error("No stream");
       const reader = res.body.getReader(); const decoder = new TextDecoder();
       let buffer = "", fullContent = "";
