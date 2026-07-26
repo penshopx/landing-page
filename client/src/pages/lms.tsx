@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { BookOpen, Clock, Users, Star, ChevronRight, GraduationCap, Wrench, Zap, Search, Bot, ExternalLink, Play } from "lucide-react";
+import { BookOpen, Clock, Users, Star, ChevronRight, GraduationCap, Wrench, Zap, Search, Bot, ExternalLink, Play, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
@@ -196,15 +196,33 @@ function EcourseAgentCard({ agent }: { agent: AgentEcourse }) {
   );
 }
 
+interface LmsStatus {
+  seeding: boolean;
+  seedStatus: "pending" | "done" | "error";
+  courseCount: number;
+}
+
 export default function LmsPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [ecourseSearch, setEcourseSearch] = useState("");
 
+  const { data: lmsStatus } = useQuery<LmsStatus>({
+    queryKey: ["/api/lms/status"],
+    queryFn: () => fetch("/api/lms/status").then(r => r.json()),
+    // Poll every 3 seconds while seeding is in progress
+    refetchInterval: (query) => {
+      const data = query.state.data as LmsStatus | undefined;
+      return data?.seeding ? 3000 : false;
+    },
+  });
+
   const { data: courses = [], isLoading } = useQuery<Course[]>({
     queryKey: ["/api/lms/courses", activeCategory],
     queryFn: () =>
       fetch(`/api/lms/courses?category=${activeCategory}`).then(r => r.json()),
+    // Refetch when seeding completes
+    refetchInterval: lmsStatus?.seeding ? 3000 : false,
   });
 
   const { data: agentEcourses = [], isLoading: ecLoading } = useQuery<AgentEcourse[]>({
@@ -288,8 +306,26 @@ export default function LmsPage() {
               <div key={i} className="bg-white rounded-2xl h-64 animate-pulse border border-slate-200" />
             ))}
           </div>
+        ) : filtered.length === 0 && lmsStatus?.seeding ? (
+          <div className="text-center py-16 text-slate-500" data-testid="catalog-seeding">
+            <Loader2 className="w-12 h-12 mx-auto mb-3 text-indigo-400 animate-spin" />
+            <p className="font-semibold text-slate-700 mb-1">Katalog sedang disiapkan…</p>
+            <p className="text-sm text-slate-400">Kursus akan muncul sebentar lagi. Halaman ini otomatis diperbarui.</p>
+          </div>
+        ) : filtered.length === 0 && lmsStatus?.seedStatus === "error" ? (
+          <div className="text-center py-16 text-slate-500" data-testid="catalog-seed-error">
+            <BookOpen className="w-12 h-12 mx-auto mb-3 text-red-300" />
+            <p className="font-semibold text-slate-700 mb-1">Gagal memuat katalog</p>
+            <p className="text-sm text-slate-400">Terjadi masalah saat menyiapkan kursus. Silakan refresh halaman.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Muat Ulang
+            </button>
+          </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-slate-500">
+          <div className="text-center py-16 text-slate-500" data-testid="catalog-empty">
             <BookOpen className="w-12 h-12 mx-auto mb-3 text-slate-300" />
             <p>Tidak ada kursus yang ditemukan.</p>
           </div>

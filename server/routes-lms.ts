@@ -367,12 +367,41 @@ async function seedLmsData() {
     }
   } catch (e) {
     console.error("[LMS] Seed error:", e);
+    throw e; // propagate so seedLmsDataTracked can set error status
+  }
+}
+
+// ─── Seed status tracker ─────────────────────────────────────────────────────
+type SeedStatus = "pending" | "done" | "error";
+let lmsSeedStatus: SeedStatus = "pending";
+
+async function seedLmsDataTracked() {
+  try {
+    await seedLmsData();
+    lmsSeedStatus = "done";
+  } catch (e) {
+    lmsSeedStatus = "error";
+    console.error("[LMS] Seed fatal:", e);
   }
 }
 
 // ─── Route registration ───────────────────────────────────────────────────────
 export function registerLmsRoutes(app: Express) {
-  seedLmsData();
+  seedLmsDataTracked();
+
+  // GET /api/lms/status — seeding status + course count (public, lightweight)
+  app.get("/api/lms/status", async (_req, res) => {
+    try {
+      const [{ total }] = await db
+        .select({ total: count() })
+        .from(lmsCourses)
+        .where(and(eq(lmsCourses.isActive, true), eq(lmsCourses.isPublic, true)));
+      res.json({ seeding: lmsSeedStatus === "pending", seedStatus: lmsSeedStatus, courseCount: Number(total) });
+    } catch (e) {
+      console.error("[LMS] GET status:", e);
+      res.json({ seeding: lmsSeedStatus === "pending", seedStatus: lmsSeedStatus, courseCount: 0 });
+    }
+  });
 
   // GET /api/lms/courses — list all public courses (optionally filter by category)
   app.get("/api/lms/courses", async (req, res) => {
@@ -745,6 +774,38 @@ export function registerLmsRoutes(app: Express) {
     } catch (e: any) {
       console.error("[LMS-ADMIN] DELETE lesson:", e);
       res.status(500).json({ error: "Gagal menghapus lesson" });
+    }
+  });
+
+  // GET /api/admin/lms/health — health check: counts and seed status (admin only)
+  app.get("/api/admin/lms/health", isAuthenticated, requireAdminLms, async (_req, res) => {
+    try {
+      const [{ totalCourses }] = await db
+        .select({ totalCourses: count() })
+        .from(lmsCourses);
+      const [{ activeCourses }] = await db
+        .select({ activeCourses: count() })
+        .from(lmsCourses)
+        .where(and(eq(lmsCourses.isActive, true), eq(lmsCourses.isPublic, true)));
+      const [{ totalLessons }] = await db
+        .select({ totalLessons: count() })
+        .from(lmsLessons);
+      const [{ totalEnrollments }] = await db
+        .select({ totalEnrollments: count() })
+        .from(lmsEnrollments);
+      res.json({
+        seedStatus: lmsSeedStatus,
+        seeding: lmsSeedStatus === "pending",
+        counts: {
+          totalCourses: Number(totalCourses),
+          activeCourses: Number(activeCourses),
+          totalLessons: Number(totalLessons),
+          totalEnrollments: Number(totalEnrollments),
+        },
+      });
+    } catch (e) {
+      console.error("[LMS-ADMIN] GET health:", e);
+      res.status(500).json({ error: "Gagal mengambil status LMS" });
     }
   });
 
