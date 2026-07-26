@@ -10665,7 +10665,7 @@ Balas dengan JSON dengan struktur PERSIS ini:
         { route: "/tatalingkungan-claw", id: 1895, keywords: ["TataLingkungan", "Tata Lingkungan"] },
         { route: "/elektrikal-claw", id: 1903, keywords: ["Elektrikal"] },
         { route: "/mep-claw", id: 1831, keywords: ["MEP", "Mekanikal"] },
-        { route: "/sipil-claw", id: 1823, keywords: ["SipilClaw", "Teknik Sipil"] },
+        { route: "/sipil-claw", id: 698, keywords: ["SipilClaw", "Teknik Sipil"] },
         { route: "/lingkungan-claw", id: 1847, keywords: ["Lingkungan"] },
         { route: "/qs-claw", id: 1911, keywords: ["QS", "Quantity Surveying"] },
         { route: "/pengawas-claw", id: 1919, keywords: ["Pengawas"] },
