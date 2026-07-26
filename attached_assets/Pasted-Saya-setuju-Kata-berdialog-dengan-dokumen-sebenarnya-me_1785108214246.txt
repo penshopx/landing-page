@@ -1,0 +1,99 @@
+Saya setuju. Kata **"berdialog dengan dokumen"** sebenarnya menarik karena unik, tetapi itu adalah **konsep baru**. Di dunia marketing, setiap kata yang membuat orang berhenti untuk berpikir justru bisa menurunkan konversi. Terutama target Anda (kontraktor, konsultan, biro jasa) cenderung berpikir praktis: *"Apa manfaatnya buat saya?"*
+
+Sebaiknya gunakan kalimat yang manfaatnya langsung dipahami tanpa perlu penjelasan.
+
+Berikut beberapa alternatif.
+
+### Opsi 1 (Paling mudah dipahami)
+
+**Simpan semua dokumen perusahaan dalam satu tempat yang mudah dicari dan langsung siap digunakan.**
+
+---
+
+### Opsi 2
+
+**Semua dokumen proyek, sertifikasi, dan administrasi perusahaan tersusun rapi dalam satu platform.**
+
+---
+
+### Opsi 3
+
+**Cari dokumen dalam hitungan detik, bukan lagi membuka banyak folder satu per satu.**
+
+---
+
+### Opsi 4
+
+**Semua informasi perusahaan siap digunakan kapan pun dibutuhkan.**
+
+---
+
+### Opsi 5
+
+**Dokumen tidak hanya tersimpan, tetapi siap membantu pekerjaan Anda setiap hari.**
+
+---
+
+### Opsi 6
+
+**Temukan jawaban dari seluruh dokumen perusahaan hanya dalam hitungan detik.**
+
+Kalimat ini lebih mudah dipahami daripada "berdialog dengan dokumen", tetapi tetap menggambarkan kemampuan AI.
+
+---
+
+### Opsi 7
+
+**AI yang memahami seluruh dokumen perusahaan Anda.**
+
+Singkat dan langsung.
+
+---
+
+### Opsi 8
+
+**Ubah ribuan dokumen menjadi pengetahuan yang mudah dicari dan digunakan.**
+
+---
+
+### Opsi 9
+
+**Semua pengalaman, SOP, dan dokumen perusahaan selalu siap digunakan oleh seluruh tim.**
+
+---
+
+### Opsi 10
+
+**Satu tempat untuk menyimpan, mencari, dan memanfaatkan seluruh pengetahuan perusahaan.**
+
+---
+
+## Kalau melihat arah Gustafta sekarang, saya justru akan menghindari kata-kata teknis seperti:
+
+* Berdialog
+* Chat dengan dokumen
+* Knowledge Base
+* RAG
+* AI Agent
+* Business Memory (untuk iklan awal)
+
+Karena itu adalah **fitur**, bukan **bahasa pelanggan**.
+
+Yang ada di pikiran pelanggan biasanya adalah:
+
+* "Dokumennya di mana ya?"
+* "SKK siapa yang masih berlaku?"
+* "Proposal tahun lalu masih ada nggak?"
+* "Tender kemarin pakai dokumen apa?"
+* "SOP pekerjaan ini yang terbaru yang mana?"
+* "Laptop admin rusak, datanya masih ada nggak?"
+
+Menurut saya, Gustafta akan lebih mudah diterima jika memakai bahasa yang menggambarkan hasil, misalnya:
+
+* **Semua dokumen selalu siap saat dibutuhkan.**
+* **Tidak perlu lagi mencari file berjam-jam.**
+* **Tidak ada lagi pengetahuan perusahaan yang hilang.**
+* **Seluruh data perusahaan siap digunakan kapan saja.**
+* **AI yang langsung menemukan informasi dari dokumen perusahaan Anda.**
+
+Kalimat terakhir itu sangat kuat karena pengguna langsung memahami manfaatnya: AI bukan sekadar menyimpan dokumen, tetapi **menemukan informasi yang mereka butuhkan**. Ini lebih konkret daripada mengatakan AI bisa "berdialog" dengan dokumen.

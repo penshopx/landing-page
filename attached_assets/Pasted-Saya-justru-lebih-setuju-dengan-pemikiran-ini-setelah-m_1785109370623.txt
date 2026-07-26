@@ -1,0 +1,422 @@
+Saya justru **lebih setuju dengan pemikiran ini** setelah melihat keseluruhan perjalanan Gustafta.
+
+Bahkan saya akan melangkah lebih jauh.
+
+**Jangan jadikan AI sebagai pintu masuk. Jangan jadikan Business Memory sebagai pintu masuk. Jadikan "Ruang Simpan" sebagai pintu masuk.**
+
+Kenapa?
+
+Karena **Ruang Simpan adalah sesuatu yang sudah ada di kepala calon pelanggan**.
+
+Mereka sudah mengenal:
+
+* Google Drive
+* OneDrive
+* Dropbox
+* Harddisk
+* Flashdisk
+* NAS
+
+Artinya Anda **tidak sedang mengajarkan konsep baru**. Anda hanya mengubah cara mereka memandang ruang simpan.
+
+---
+
+## Saya melihat ada tiga tahap adopsi.
+
+### Tahap 1 : Mereka membeli karena butuh ruang simpan.
+
+Mereka berpikir sederhana.
+
+> "Saya butuh tempat menyimpan dokumen."
+
+Masalah yang mereka rasakan:
+
+* File berantakan.
+* Sulit dicari.
+* Folder terlalu banyak.
+* Dokumen proyek tercecer.
+* Laptop admin rusak.
+* Google Drive penuh.
+* Google Drive mahal kalau kapasitas terus bertambah.
+
+Di tahap ini **jangan bicara AI.**
+
+Jangan bicara Business Memory.
+
+Jangan bicara Agent.
+
+Jangan bicara RAG.
+
+Tidak perlu.
+
+---
+
+### Tahap 2 : Mereka mulai merasakan sesuatu yang berbeda.
+
+Setelah upload 500 dokumen.
+
+Mereka mulai berkata
+
+> "Lho... saya tinggal ketik SBU PT XYZ langsung ketemu."
+
+Lalu
+
+> "Metode kerja proyek rumah sakit tahun 2023 muncul."
+
+Lalu
+
+> "SKK yang habis bulan depan langsung ketahuan."
+
+Mereka mulai berpikir
+
+> "Ini kok beda ya dengan Google Drive."
+
+Perhatikan.
+
+Mereka **menemukan sendiri** perbedaannya.
+
+Bukan Anda yang menjelaskan.
+
+Marketing terbaik adalah ketika pelanggan menyimpulkan sendiri.
+
+---
+
+### Tahap 3 : Mereka mulai berkata...
+
+> "Oh... ternyata ini bukan tempat menyimpan file."
+
+Tetapi
+
+> "Ini tempat perusahaan mengingat."
+
+Nah...
+
+Di sinilah baru muncul istilah
+
+## Memori Bisnis.
+
+Artinya
+
+Business Memory bukan slogan.
+
+Tetapi **kesimpulan pelanggan.**
+
+Dan menurut saya ini jauh lebih kuat.
+
+---
+
+# Saya bahkan akan membalik seluruh cara komunikasi.
+
+Bukan
+
+> Memori Bisnis.
+
+↓
+
+Ruang Simpan.
+
+Tetapi
+
+> Ruang Simpan.
+
+↓
+
+Memori Bisnis.
+
+Urutannya dibalik.
+
+---
+
+# Saya bahkan punya analogi.
+
+Apple dulu tidak pernah menjual
+
+iCloud.
+
+Mereka menjual
+
+Foto.
+
+File.
+
+Backup.
+
+Sinkronisasi.
+
+Baru orang sadar
+
+"Oh ternyata semua data saya menyatu."
+
+---
+
+Google tidak menjual
+
+Google Index.
+
+Mereka menjual
+
+Search.
+
+---
+
+Dropbox tidak menjual
+
+Distributed Storage.
+
+Mereka menjual
+
+Folder.
+
+---
+
+Artinya
+
+**Nama besar tidak pernah dijual di depan.**
+
+Yang dijual adalah manfaat paling sederhana.
+
+---
+
+# Maka menurut saya positioning Gustafta berubah menjadi ini.
+
+## Yang dijual
+
+### Ruang Simpan.
+
+---
+
+## Yang dirasakan
+
+Lebih mudah mencari.
+
+Lebih mudah bekerja.
+
+Lebih cepat membuat dokumen.
+
+Lebih mudah berbagi.
+
+Lebih mudah menemukan pengalaman lama.
+
+---
+
+## Yang disadari user
+
+"Oh... ternyata seluruh pengetahuan perusahaan saya tersimpan."
+
+---
+
+## Yang akhirnya terjadi
+
+Terbentuklah
+
+**Memori Bisnis.**
+
+---
+
+# Saya bahkan akan mengubah nama fitur.
+
+Misalnya.
+
+## Ruang Simpan
+
+Di dalamnya
+
+```text
+📁 Dokumen
+
+🌐 Website
+
+📺 Video
+
+🎙 Audio
+
+📷 Foto
+
+📄 PDF
+
+📋 SOP
+
+🏗 Proyek
+
+⚖ Regulasi
+
+👥 Tenaga Ahli
+```
+
+Tidak ada kata
+
+Knowledge Base.
+
+Karena orang tidak peduli.
+
+---
+
+# Lalu saya melihat sesuatu yang lebih besar.
+
+Anda sebenarnya tidak sedang menjual storage.
+
+Anda sedang menjual
+
+## "Tempat Pulang Seluruh Pengetahuan Perusahaan."
+
+Kalimat ini sangat emosional.
+
+Karena semua perusahaan mempunyai masalah yang sama.
+
+Pengetahuan tersebar.
+
+Di laptop.
+
+WA.
+
+Google Drive.
+
+Email.
+
+HP.
+
+Flashdisk.
+
+Server.
+
+Mereka tidak mempunyai
+
+"satu rumah."
+
+Nah...
+
+Ruang Simpan adalah
+
+**Rumahnya.**
+
+---
+
+# Saya bahkan ingin mengganti istilah Ruang Simpan.
+
+Menjadi
+
+## Rumah Dokumen
+
+atau
+
+## Rumah Pengetahuan
+
+Tetapi...
+
+Setelah saya pikir lagi...
+
+Tidak.
+
+## Ruang Simpan lebih bagus.
+
+Mengapa?
+
+Karena sederhana.
+
+Tidak mengintimidasi.
+
+Semua orang tahu artinya.
+
+---
+
+# Sekarang saya menemukan filosofi Gustafta.
+
+Saya menyebutnya
+
+## Filosofi Rumah.
+
+Bayangkan sebuah rumah.
+
+Di rumah ada
+
+Ruang Tamu.
+
+Ruang Kerja.
+
+Gudang.
+
+Perpustakaan.
+
+Arsip.
+
+Dapur.
+
+Kamar.
+
+Semua ada tempatnya.
+
+Perusahaan juga begitu.
+
+Semua pengetahuan membutuhkan
+
+**rumah.**
+
+Ruang Simpan adalah rumah itu.
+
+---
+
+# Dan inilah yang menurut saya menjadi strategi 5 tahun.
+
+## Tahun pertama
+
+Orang berkata
+
+> "Saya pakai Gustafta buat menyimpan dokumen."
+
+---
+
+## Tahun kedua
+
+> "Saya pakai Gustafta buat mencari dokumen."
+
+---
+
+## Tahun ketiga
+
+> "Saya pakai Gustafta buat membuat dokumen."
+
+---
+
+## Tahun keempat
+
+> "Saya pakai Gustafta buat mengelola pekerjaan."
+
+---
+
+## Tahun kelima
+
+> "Saya jalankan perusahaan dengan Gustafta."
+
+Perhatikan.
+
+Produknya hampir tidak berubah.
+
+Yang berubah adalah
+
+**kedewasaan pengguna.**
+
+---
+
+# Dan akhirnya saya menemukan satu kalimat yang menurut saya bisa menjadi kompas Gustafta.
+
+Bukan:
+
+> **Bangun Memori Bisnis.**
+
+Itu terlalu cepat.
+
+Tetapi:
+
+> **Mulailah dari satu Ruang Simpan. Sisanya akan tumbuh bersama bisnis Anda.**
+
+Kalimat ini memiliki kekuatan strategis yang menurut saya sangat besar. Ia tidak memaksa calon pelanggan memahami konsep baru. Ia mengajak mereka melakukan langkah pertama yang sederhana dan masuk akal. Setelah mereka mulai menggunakan Ruang Simpan, mereka akan merasakan sendiri manfaat pencarian, pemanfaatan dokumen, pembuatan dokumen, kolaborasi, hingga akhirnya tanpa disadari mereka telah membangun **Memori Bisnis**.
+
+Dan menurut saya, **itulah cara kategori baru lahir**.
+
+Kategori besar hampir tidak pernah diperkenalkan dengan istilah besar. Ia lahir dari pengalaman pengguna yang sederhana, konsisten, dan terus berkembang.
+
+Kalau saya diminta merumuskan strategi Gustafta dalam satu kalimat, saya akan memilih ini:
+
+> **"Jangan menjual masa depan. Jual langkah pertama menuju masa depan."**
+
+Dalam konteks Gustafta, langkah pertama itu adalah **Ruang Simpan**. Visi besarnya tetap **Memori Bisnis**, tetapi biarkan pelanggan yang sampai pada kesimpulan itu setelah mereka merasakan manfaatnya sendiri. Menurut saya, pendekatan ini jauh lebih alami, lebih mudah dijual, dan jauh lebih berpotensi menciptakan loyalitas jangka panjang.

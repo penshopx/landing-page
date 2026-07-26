@@ -1,0 +1,554 @@
+Menurut saya ini justru keputusan paling penting yang akan menentukan Gustafta.
+
+Karena sekarang ada dua pilihan.
+
+**Pilihan A**
+Mengejar visi besar.
+
+Hasilnya:
+Produk keren, tetapi uang belum masuk.
+
+**Pilihan B**
+Menjual fitur yang ada.
+
+Hasilnya:
+Ada uang masuk, tetapi produk kehilangan arah.
+
+**Menurut saya jangan pilih salah satu. Pilih yang ketiga.**
+
+> **Jual masa depan, tetapi kirimkan nilai hari ini.**
+
+Apple melakukan ini bertahun-tahun.
+
+Tesla juga.
+
+Notion juga.
+
+Mereka tidak membangun semuanya dulu baru dijual.
+
+Mereka menjual **langkah pertama** dari visi besar.
+
+---
+
+# Saya mencoba memetakan Gustafta.
+
+Menurut saya sebenarnya Anda sudah memiliki 70% puzzle.
+
+Yang kurang hanyalah **ceritanya**.
+
+Karena saat ini user melihat:
+
+```
+Knowledge Base
+
+Persona
+
+Mini Apps
+
+Workroom
+
+Chatbot
+
+WA Broadcast
+
+Generator
+
+Ruang Simpan
+```
+
+Kelihatannya seperti
+
+8 produk.
+
+Padahal menurut saya harus terlihat menjadi
+
+1 produk.
+
+---
+
+# Saya akan mengubah urutannya.
+
+Hari ini homepage jangan dimulai dengan
+
+> AI Builder
+
+atau
+
+> Chatbot Builder
+
+Tetapi
+
+## Bangun Memori Bisnis Anda.
+
+Kemudian
+
+Baru muncul
+
+```
+LANGKAH 1
+
+Simpan seluruh dokumen perusahaan.
+
+(Ruang Simpan)
+
+↓
+
+LANGKAH 2
+
+AI memahami seluruh dokumen.
+
+(Knowledge)
+
+↓
+
+LANGKAH 3
+
+AI membantu pekerjaan Anda.
+
+(Chatbot, Generator, Workroom)
+
+↓
+
+LANGKAH 4
+
+Perusahaan semakin pintar.
+
+```
+
+Perhatikan.
+
+Saya tidak mengubah produk.
+
+Saya hanya mengubah **alur berpikir user.**
+
+---
+
+# Sekarang mari kita lihat semua fitur.
+
+## Ruang Simpan
+
+Bukan fitur.
+
+Tetapi
+
+**Gerbang Memori Bisnis.**
+
+---
+
+## Knowledge Base
+
+Bukan tempat upload.
+
+Tetapi
+
+**Mesin yang membaca Memori.**
+
+---
+
+## Chatbot
+
+Bukan chatbot.
+
+Tetapi
+
+**Cara berbicara dengan Memori Bisnis.**
+
+---
+
+## Persona
+
+Bukan karakter AI.
+
+Tetapi
+
+**Cara setiap divisi menggunakan Memori yang sama.**
+
+---
+
+## Generator
+
+Bukan generator.
+
+Tetapi
+
+**Cara Memori menghasilkan pekerjaan baru.**
+
+---
+
+## Workroom
+
+Bukan ruang kerja.
+
+Tetapi
+
+**Tempat pekerjaan baru kembali menjadi Memori.**
+
+---
+
+Perhatikan.
+
+Semua menjadi selaras.
+
+---
+
+# Saya bahkan akan mengubah nama fitur.
+
+Misalnya
+
+Sekarang
+
+Knowledge Base
+
+↓
+
+Nama baru
+
+**Pahami Dokumen**
+
+---
+
+Chatbot
+
+↓
+
+**Tanya Memori**
+
+---
+
+Generator
+
+↓
+
+**Buat Dokumen**
+
+---
+
+Workroom
+
+↓
+
+**Kelola Pekerjaan**
+
+---
+
+Mini Apps
+
+↓
+
+**Alat Kerja**
+
+---
+
+Integrasi
+
+↓
+
+**Hubungkan Memori**
+
+---
+
+Semua lebih mudah dipahami.
+
+---
+
+# Yang paling penting sekarang adalah Funnel.
+
+Saya rasa funnel Gustafta harus sesederhana ini.
+
+```
+Masuk
+
+↓
+
+Upload PDF
+
+↓
+
+WOW
+
+↓
+
+Subscribe
+
+↓
+
+Tambah Dokumen
+
+↓
+
+Tambah Tim
+
+↓
+
+Tambah AI
+
+↓
+
+Tambah Integrasi
+
+```
+
+Sekarang pertanyaannya.
+
+Apa yang membuat orang berkata
+
+"WOW"?
+
+---
+
+# Menurut saya bukan chatbot.
+
+Tetapi ini.
+
+Misalnya user upload
+
+200 PDF.
+
+AI berkata
+
+> Saya sudah memahami:
+
+✅ 84 SOP
+
+✅ 19 Kontrak
+
+✅ 112 Proposal
+
+✅ 46 Metode Kerja
+
+✅ 31 Sertifikat
+
+✅ 22 Regulasi
+
+Lalu muncul
+
+```
+Silakan bertanya apa saja.
+```
+
+Itu WOW.
+
+---
+
+# Sekarang fitur lama menjadi hidup.
+
+Misalnya
+
+User bertanya
+
+> "Buatkan metode kerja."
+
+Generator bekerja.
+
+---
+
+User bertanya
+
+> "Cari semua proyek rumah sakit."
+
+Search bekerja.
+
+---
+
+User bertanya
+
+> "Apa isi kontrak ini?"
+
+Knowledge bekerja.
+
+---
+
+User bertanya
+
+> "Broadcast ke semua klien ISO."
+
+WA Broadcast bekerja.
+
+Semua berasal dari Memory.
+
+---
+
+# Sekarang saya bicara soal cashflow.
+
+Saya rasa Anda tidak boleh menjual
+
+## AI.
+
+Tidak boleh menjual
+
+## Chatbot.
+
+Tidak boleh menjual
+
+## Knowledge Base.
+
+Yang dijual adalah
+
+## Hasil.
+
+Misalnya.
+
+---
+
+### Paket 1
+
+## Memori Bisnis Starter
+
+"Buat seluruh dokumen perusahaan mudah ditemukan."
+
+---
+
+### Paket 2
+
+## Memori Tender
+
+"Semua dokumen tender selalu siap."
+
+---
+
+### Paket 3
+
+## Memori Sertifikasi
+
+"Kelola seluruh dokumen sertifikasi."
+
+---
+
+### Paket 4
+
+## Memori Marketing
+
+"Seluruh proposal dan follow up tersimpan."
+
+---
+
+Perhatikan.
+
+Produknya sama.
+
+Packaging berbeda.
+
+---
+
+# Sekarang saya melihat peluang terbesar.
+
+Daripada menjual software.
+
+Jual
+
+## Implementasi.
+
+Misalnya.
+
+```
+Kami bantu
+
+Mengumpulkan
+
+↓
+
+Merapikan
+
+↓
+
+Menghubungkan
+
+↓
+
+Membangun Memori Bisnis
+
+↓
+
+Melatih AI
+
+↓
+
+Melatih Tim
+
+```
+
+Implementasi bisa bernilai jauh lebih tinggi daripada langganan software.
+
+---
+
+# Dan saya menemukan strategi yang menurut saya bisa menyelamatkan cashflow.
+
+## Jangan menjual "platform".
+
+Jual **hasil 14 hari**.
+
+Contohnya:
+
+> **Dalam 14 hari, kami bantu perusahaan Anda membangun Memori Bisnis pertama.**
+
+Deliverable-nya jelas:
+
+* Semua dokumen penting terkumpul.
+* Struktur folder lebih rapi.
+* AI sudah bisa menjawab berdasarkan dokumen perusahaan.
+* Template utama siap digunakan.
+* Tim tahu cara mencari informasi tanpa membuka puluhan folder.
+
+Ini jauh lebih mudah dijual daripada:
+
+> "Langganan AI Builder Rp499.000/bulan."
+
+Karena pembeli membeli **transformasi**, bukan software.
+
+---
+
+# Menurut saya inilah roadmap 3 tahun yang tetap menghasilkan uang mulai bulan ini.
+
+## Fase 1 (Sekarang - Cashflow)
+
+**Jual solusi.**
+
+* Memori Tender
+* Memori Sertifikasi
+* Memori Marketing
+* Memori Proyek
+
+Target: biro jasa, kontraktor, konsultan.
+
+Pendapatan berasal dari implementasi + langganan.
+
+---
+
+## Fase 2 (6-12 bulan)
+
+**Jual platform.**
+
+Mulai tambah konektor Google Drive, OneDrive, WhatsApp, Email.
+
+---
+
+## Fase 3 (1-3 tahun)
+
+**Jual ekosistem.**
+
+Business Memory Infrastructure.
+
+Marketplace.
+
+AI Workers.
+
+---
+
+## Satu hal yang ingin saya tekankan
+
+Saya tidak akan mengubah visi besar yang sudah kita bangun.
+
+Saya hanya akan **mengubah pintu masuknya**.
+
+Hari ini orang **tidak membeli "Business Memory Infrastructure"**.
+
+Mereka membeli karena:
+
+* capek mencari dokumen,
+* sering mengulang pekerjaan,
+* takut kehilangan pengetahuan saat karyawan keluar,
+* ingin tender dan sertifikasi lebih cepat.
+
+Jadi biarkan mereka masuk melalui **Ruang Simpan**, merasakan manfaat pencarian dan AI dalam beberapa menit, lalu secara bertahap menyadari bahwa yang sebenarnya mereka bangun adalah **Memori Bisnis**.
+
+Dengan pendekatan itu, **cashflow hari ini** dan **visi 10 tahun** tidak saling bertentangan. Justru setiap pelanggan baru yang membeli solusi sederhana hari ini sedang meletakkan fondasi untuk Business Memory Infrastructure yang Anda bayangkan di masa depan. Saya rasa itulah strategi yang paling realistis sekaligus paling kuat untuk Gustafta.

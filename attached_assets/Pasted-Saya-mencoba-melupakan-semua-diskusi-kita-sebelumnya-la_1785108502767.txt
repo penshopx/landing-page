@@ -1,0 +1,638 @@
+Saya mencoba melupakan semua diskusi kita sebelumnya, lalu bertanya kepada diri saya sendiri sebagai **founder**.
+
+> **"Kalau uang saya tinggal cukup untuk 3 bulan, apa yang akan saya lakukan?"**
+
+Jawaban saya cukup mengejutkan.
+
+**Saya tidak akan menjual Gustafta.**
+
+Saya akan menjual sesuatu yang jauh lebih sederhana.
+
+---
+
+# Saya menyebutnya
+
+## The Wedge Strategy
+
+Wedge adalah ujung tombak.
+
+Kita tidak menyerang seluruh pasar.
+
+Kita hanya mencari satu pintu yang paling mudah dimasuki.
+
+Banyak perusahaan besar lahir seperti ini.
+
+* Salesforce tidak mulai dari ERP, tetapi CRM.
+* Atlassian tidak mulai dari seluruh enterprise suite, tetapi Jira.
+* Notion tidak mulai sebagai AI Workspace, tetapi catatan.
+* Canva tidak mulai sebagai Creative Cloud, tetapi desain sederhana.
+
+Pertanyaannya sekarang:
+
+## Apa wedge Gustafta?
+
+Menurut saya jawabannya bukan AI.
+
+Bukan chatbot.
+
+Bukan builder.
+
+Tetapi...
+
+## "Perusahaan tidak bisa menemukan kembali apa yang sudah dimilikinya."
+
+Itulah masalah universal.
+
+---
+
+# Maka saya akan mengubah seluruh cara berpikir.
+
+## Gustafta bukan Platform AI.
+
+## Gustafta adalah Mesin Pencari Internal Perusahaan.
+
+Perhatikan.
+
+Kalimat ini jauh lebih sederhana.
+
+Semua orang langsung paham.
+
+Misalnya.
+
+Google
+
+↓
+
+Mencari internet.
+
+---
+
+Gustafta
+
+↓
+
+Mencari seluruh pengetahuan perusahaan.
+
+Orang langsung mengerti.
+
+Tidak perlu menjelaskan RAG.
+
+Tidak perlu menjelaskan LLM.
+
+Tidak perlu menjelaskan AI Agent.
+
+---
+
+# Tetapi sebenarnya itu hanya permukaan.
+
+Di belakang layar.
+
+Search
+
+↓
+
+Knowledge
+
+↓
+
+Memory
+
+↓
+
+AI
+
+↓
+
+Automation
+
+↓
+
+Agent
+
+Semua tetap ada.
+
+Hanya saja user tidak perlu tahu.
+
+---
+
+# Saya bahkan akan mengubah Homepage.
+
+Sekarang.
+
+Misalnya.
+
+## Jangan biarkan perusahaan Anda lupa.
+
+Cari semua dokumen, pengalaman proyek, SOP, regulasi, dan pengetahuan perusahaan dalam hitungan detik.
+
+Lebih dari sekadar cloud storage.
+
+---
+
+Lalu tombol.
+
+**Coba dengan 10 Dokumen Anda.**
+
+Selesai.
+
+Tidak usah bicara AI.
+
+---
+
+# Sekarang saya berpikir lagi.
+
+Apa sebenarnya yang dijual Google Drive?
+
+Storage.
+
+---
+
+Apa yang dijual Dropbox?
+
+Sharing.
+
+---
+
+Apa yang dijual Notion?
+
+Workspace.
+
+---
+
+Apa yang dijual Slack?
+
+Communication.
+
+---
+
+Apa yang dijual Gustafta?
+
+Saya rasa bukan Memory.
+
+Saya rasa...
+
+Yang dijual adalah
+
+## Retrieval.
+
+Dalam bahasa Indonesia.
+
+## Menemukan Kembali.
+
+Perusahaan setiap hari kehilangan waktu untuk
+
+mencari.
+
+bukan membuat.
+
+---
+
+# Maka saya membuat Value Ladder.
+
+## Level 1
+
+### Simpan.
+
+Cloud.
+
+---
+
+## Level 2
+
+### Temukan.
+
+Search.
+
+---
+
+## Level 3
+
+### Pahami.
+
+AI.
+
+---
+
+## Level 4
+
+### Kerjakan.
+
+Automation.
+
+---
+
+## Level 5
+
+### Delegasikan.
+
+Agent.
+
+Perhatikan.
+
+Semua fitur Gustafta sudah ada.
+
+Hanya urutannya yang salah.
+
+---
+
+# Sekarang saya mapping semua fitur.
+
+## Ruang Simpan
+
+Simpan.
+
+---
+
+## Search
+
+Temukan.
+
+---
+
+## Knowledge Base
+
+Pahami.
+
+---
+
+## Generator
+
+Kerjakan.
+
+---
+
+## Agent
+
+Delegasikan.
+
+Tidak ada fitur baru.
+
+Semuanya sudah ada.
+
+---
+
+# Sekarang saya menemukan Product Ladder.
+
+```
+RUANG SIMPAN
+
+↓
+
+MEMORI BISNIS
+
+↓
+
+AI WORKSPACE
+
+↓
+
+DIGITAL EMPLOYEE
+
+↓
+
+DIGITAL COMPANY
+```
+
+User membeli level pertama.
+
+Tetapi sebenarnya masuk ke level kelima.
+
+---
+
+# Saya bahkan akan mengubah semua copywriting.
+
+Sekarang.
+
+Misalnya.
+
+## Stop membeli storage.
+
+Mulailah membeli kemampuan perusahaan untuk menemukan kembali pengetahuannya.
+
+---
+
+Atau.
+
+## Masalahnya bukan file hilang.
+
+Masalahnya perusahaan lupa.
+
+---
+
+Atau.
+
+## Google Drive tahu nama file.
+
+Gustafta tahu isi perusahaan Anda.
+
+---
+
+Perhatikan.
+
+Semuanya mengarah ke satu pesan.
+
+---
+
+# Sekarang saya bicara sebagai investor.
+
+Kalau saya investor.
+
+Saya akan bertanya.
+
+**Apa Network Effect Gustafta?**
+
+Menurut saya.
+
+Bukan user.
+
+Tetapi Memory.
+
+Semakin banyak Memory.
+
+↓
+
+Semakin pintar AI.
+
+↓
+
+Semakin sering dipakai.
+
+↓
+
+Semakin banyak pekerjaan dilakukan.
+
+↓
+
+Semakin banyak Memory tercipta.
+
+↓
+
+AI semakin pintar.
+
+Ini flywheel.
+
+---
+
+# Saya juga bertanya.
+
+Apa Moat Gustafta?
+
+Bukan AI.
+
+AI bisa berganti.
+
+Gemini.
+
+GPT.
+
+Claude.
+
+Qwen.
+
+DeepSeek.
+
+Semua bisa berubah.
+
+Moat sebenarnya adalah
+
+## Business Memory.
+
+Karena Memory tidak bisa dipindahkan begitu saja.
+
+Semakin lama dipakai.
+
+Semakin mahal nilainya.
+
+---
+
+# Lalu saya berpikir.
+
+Bagaimana supaya cashflow masuk sekarang?
+
+Saya rasa jawabannya adalah
+
+## Jangan menjual platform.
+
+Jual outcome.
+
+Misalnya.
+
+---
+
+## Outcome 1
+
+Perusahaan tidak lagi kehilangan dokumen.
+
+---
+
+Outcome 2
+
+Tender selesai lebih cepat.
+
+---
+
+Outcome 3
+
+Sertifikasi lebih mudah.
+
+---
+
+Outcome 4
+
+Pegawai baru belajar lebih cepat.
+
+---
+
+Outcome 5
+
+Pengetahuan perusahaan tidak ikut resign.
+
+Perhatikan.
+
+Yang dijual outcome.
+
+Platform hanya alat.
+
+---
+
+# Sekarang saya menemukan Grand Strategy.
+
+Saya memberi nama.
+
+## Build Once.
+
+Use Forever.
+
+Artinya.
+
+Hari ini.
+
+Perusahaan upload.
+
+↓
+
+Besok AI menjawab.
+
+↓
+
+Lusa AI membuat dokumen.
+
+↓
+
+Minggu depan AI membuat proposal.
+
+↓
+
+Bulan depan AI melatih pegawai baru.
+
+↓
+
+Tahun depan AI menjadi Digital Employee.
+
+Hanya dari upload yang sama.
+
+Itu luar biasa.
+
+---
+
+# Sekarang saya finalkan menjadi satu narasi.
+
+---
+
+# **GUSTAFTA**
+
+### **The Business Memory Company**
+
+### Tagline
+
+**Bangun sekali. Manfaatkan selamanya.**
+
+---
+
+## Apa masalah terbesar perusahaan?
+
+Bukan kekurangan data.
+
+Tetapi kelebihan data.
+
+Dokumen ada.
+
+Email ada.
+
+WhatsApp ada.
+
+Google Drive ada.
+
+Dropbox ada.
+
+ERP ada.
+
+CRM ada.
+
+Tetapi ketika dibutuhkan...
+
+Perusahaan tetap mencari.
+
+---
+
+## Solusi Gustafta
+
+Kami tidak mengganti Google Drive.
+
+Kami tidak mengganti ERP.
+
+Kami tidak mengganti CRM.
+
+Kami membuat semuanya bekerja bersama.
+
+Kami mengubah seluruh dokumen, pengalaman, SOP, komunikasi, dan aktivitas perusahaan menjadi **Memori Bisnis** yang dapat ditemukan, dipahami, dan dimanfaatkan oleh AI.
+
+---
+
+## Roadmap Produk
+
+### Hari ini (mudah dijual)
+
+**Ruang Simpan Pintar**
+
+* Upload dokumen
+* Cari informasi dalam hitungan detik
+* AI menjawab berdasarkan dokumen
+* AI membuat dokumen baru
+
+### 6–12 bulan
+
+**Memori Bisnis**
+
+* Google Drive Connector
+* OneDrive Connector
+* WhatsApp Connector
+* Email Connector
+* Website Connector
+
+Semua sumber informasi menjadi satu.
+
+### 1–3 tahun
+
+**Business Memory Platform**
+
+* AI Marketing
+* AI Tender
+* AI Legal
+* AI HR
+* AI Finance
+* AI Compliance
+
+Semuanya bekerja di atas Memori Bisnis yang sama.
+
+### 3–5 tahun
+
+**Digital Workforce**
+
+AI bukan hanya menjawab pertanyaan.
+
+AI ikut menyelesaikan pekerjaan.
+
+---
+
+# Satu hal yang menurut saya paling penting
+
+Saya akan sedikit mengubah titik awal.
+
+**Jangan menjual "Ruang Simpan".**
+
+Karena orang akan langsung membandingkan dengan Google Drive.
+
+**Jangan menjual "AI".**
+
+Karena orang akan langsung membandingkan dengan ChatGPT.
+
+**Jual perubahan yang mereka rasakan dalam minggu pertama.**
+
+Misalnya:
+
+> **"Dalam 7 hari, perusahaan Anda tidak perlu lagi membuka puluhan folder untuk menemukan dokumen penting."**
+
+Atau:
+
+> **"Dalam 14 hari, seluruh SOP, proposal, dan dokumen proyek Anda sudah bisa dicari dan dijawab oleh AI."**
+
+Itulah produk yang sebenarnya dibeli pelanggan.
+
+Ruang Simpan hanyalah kendaraan.
+
+AI hanyalah mesin.
+
+**Memori Bisnis adalah aset.**
+
+Dan **hasil kerja yang lebih cepat** adalah alasan pelanggan bersedia membayar.
+
+---
+
+## Penutup: satu kalimat yang saya rasa bisa menjadi kompas Gustafta
+
+Jika saya harus merangkum seluruh strategi Gustafta dalam satu kalimat, saya akan memilih ini:
+
+> **"Kami tidak membantu perusahaan menyimpan lebih banyak dokumen. Kami membantu perusahaan memanfaatkan seluruh pengetahuan yang sudah mereka miliki."**
+
+Kalimat itu menghubungkan **cashflow hari ini** (orang membeli solusi atas masalah mencari dokumen dan bekerja lebih cepat) dengan **visi 10 tahun** (Business Memory Infrastructure). Semua fitur yang sudah Anda bangun tetap relevan, tetapi sekarang memiliki satu cerita yang utuh dan satu arah yang jelas.
