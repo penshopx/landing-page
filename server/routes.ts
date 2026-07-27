@@ -3771,15 +3771,33 @@ Hasilkan analisis JSON:
       const { message } = req.body;
       if (!message?.trim()) return res.status(400).json({ error: "Pesan tidak boleh kosong" });
 
-      const textCtx = (doc.extracted_text || "").substring(0, 10000);
-      const sysPrompt = `Kamu adalah analis dokumen konstruksi Indonesia yang ahli. Jawab pertanyaan berdasarkan dokumen berikut.
+      const fullText = doc.extracted_text || "";
+      const textCtx = fullText.substring(0, 28000);
+      const noText = !fullText.trim();
 
-NAMA: ${doc.original_name} | JENIS: ${doc.doc_type}
+      const sysPrompt = noText
+        ? `Kamu adalah AI Assistant untuk dokumen "${doc.original_name}".
+
+PERINGATAN: Isi dokumen ini belum berhasil diekstrak saat ini. Beritahu pengguna bahwa kamu tidak dapat membaca konten dokumen ini, dan sarankan mereka untuk:
+1. Kembali ke Ruang Simpan dan pastikan file sudah berstatus "AI Siap"
+2. Coba buka ulang dokumen ini di Bedah Dokumen
+3. Jika masalah berlanjut, upload ulang file-nya
+
+Jawab dengan ramah dan profesional dalam bahasa Indonesia.`
+        : `Kamu adalah AI Analyst yang membantu pengguna memahami dokumen mereka.
+
+DOKUMEN: ${doc.original_name}
+JENIS: ${doc.doc_type}
 
 ISI DOKUMEN:
-${textCtx}${(doc.extracted_text || "").length > 10000 ? "\n[... dipotong ...]" : ""}
+${textCtx}${fullText.length > 28000 ? "\n\n[... konten lanjutan dipotong untuk efisiensi ...]" : ""}
 
-Jawab berdasarkan isi dokumen. Jika tidak ada di dokumen, katakan dengan jelas. Gunakan bahasa Indonesia profesional.`;
+INSTRUKSI:
+- Jawab pertanyaan berdasarkan isi dokumen di atas
+- Jika informasi tidak ada di dokumen, katakan dengan jelas dan jangan mengarang
+- Gunakan bahasa Indonesia yang profesional dan mudah dipahami
+- Untuk pertanyaan ringkasan/analisis, berikan jawaban terstruktur dengan poin-poin
+- Kamu boleh memberi konteks umum bila relevan, tapi selalu bedakan mana dari dokumen dan mana pengetahuan umum`;
 
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
@@ -3846,7 +3864,7 @@ Jawab berdasarkan isi dokumen. Jika tidak ada di dokumen, katakan dengan jelas. 
         return res.status(400).json({ error: "File belum selesai diproses AI. Tunggu status 'AI Siap' lalu coba lagi." });
       }
 
-      // Ambil semua chunks kalau extracted_text kosong
+      // Ambil semua chunks kalau extracted_text kosong (layer-1 fallback)
       let extractedText = rsFile.extracted_text || "";
       if (!extractedText.trim()) {
         const chunkRes = await pool.query(
@@ -3856,24 +3874,92 @@ Jawab berdasarkan isi dokumen. Jika tidak ada di dokumen, katakan dengan jelas. 
         extractedText = chunkRes.rows.map((r: any) => r.content).join("\n\n");
       }
 
+      // Layer-2 fallback: re-extract langsung dari bytes (untuk file lama yang extractionnya gagal)
+      if (!extractedText.trim()) {
+        console.log(`[BedahDokumen/from-rs] extracted_text kosong — coba re-extract dari bytes file ${rsFile.id}`);
+        try {
+          const bytesRes = await pool.query(
+            `SELECT storage_key, file_content FROM ruang_simpan_files WHERE id = $1`,
+            [rsFile.id]
+          );
+          const bytesRow = bytesRes.rows[0];
+          let buffer: Buffer | null = null;
+
+          if (bytesRow?.storage_key) {
+            try {
+              const { downloadFile: dlFile } = await import("./lib/object-storage");
+              buffer = await dlFile(bytesRow.storage_key);
+            } catch (dlErr) {
+              console.warn("[BedahDokumen/from-rs] Object Storage download gagal:", dlErr);
+            }
+          }
+          if (!buffer && bytesRow?.file_content) {
+            buffer = Buffer.from(bytesRow.file_content);
+          }
+
+          if (buffer) {
+            const nodePath = await import("path");
+            const fs = await import("fs/promises");
+            const uploadsDir = nodePath.resolve(process.cwd(), "uploads", "tmp");
+            await fs.mkdir(uploadsDir, { recursive: true });
+            const safeFilename = rsFile.original_name.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const tmp = nodePath.join(uploadsDir, `rs-bd-${Date.now()}-${safeFilename}`);
+            await fs.writeFile(tmp, buffer);
+            try {
+              const result = await extractDocumentContent(tmp);
+              extractedText = (result.content || "").slice(0, 80000);
+              console.log(`[BedahDokumen/from-rs] Re-extracted ${extractedText.length} chars dari bytes`);
+              // Simpan balik ke RS agar from-rs berikutnya langsung ada
+              if (extractedText.trim()) {
+                await pool.query(
+                  `UPDATE ruang_simpan_files SET extracted_text = $1, updated_at = now() WHERE id = $2`,
+                  [extractedText.substring(0, 50000), rsFile.id]
+                );
+              }
+            } finally {
+              await fs.unlink(tmp).catch(() => {});
+            }
+          }
+        } catch (reExtractErr) {
+          console.warn("[BedahDokumen/from-rs] Re-extract gagal:", reExtractErr);
+        }
+      }
+
       // Deteksi jenis dokumen dari nama + konten
       const textLow = (extractedText + rsFile.original_name).toLowerCase();
       let docType = "lainnya";
       if (/tender|lelang|rks|hps|pengadaan|pokja/.test(textLow)) docType = "tender";
       else if (/\bsbu\b|skk|lpjk|sertifikat kompetensi|kualifikasi badan usaha/.test(textLow)) docType = "skk_sbu";
       else if (/kontrak|perjanjian|\bspk\b|surat perintah kerja/.test(textLow)) docType = "kontrak";
+      else if (/laporan|report|risalah|berita acara/.test(textLow)) docType = "laporan";
+      else if (/panduan|petunjuk|manual|sop|prosedur/.test(textLow)) docType = "panduan";
+      else if (/ebook|buku|trilogi|bab\s+\d|chapter/.test(textLow)) docType = "referensi";
 
-      // Cek apakah sudah pernah dibedah (avoid duplicate)
+      // Cek apakah sudah pernah dibedah — hanya return existing jika ada extracted_text
       const existingRes = await pool.query(
-        `SELECT id FROM document_analyses WHERE user_id = $1 AND original_name = $2 AND status = 'done' LIMIT 1`,
-        [userId, rsFile.original_name]
+        `SELECT id, extracted_text FROM document_analyses
+         WHERE user_id = $1 AND filename = $2 AND status = 'done' LIMIT 1`,
+        [userId, "rs_" + rsFile.id]
       );
+      const { sql: sqlRS } = await import("drizzle-orm");
+
       if (existingRes.rows.length > 0) {
-        return res.json({ id: existingRes.rows[0].id, status: "done", existing: true });
+        const existingDoc = existingRes.rows[0];
+        if ((existingDoc.extracted_text || "").trim()) {
+          // Entry existing punya text → langsung pakai, update text jika ada yang lebih baru
+          if (extractedText.trim() && extractedText.length > (existingDoc.extracted_text || "").length) {
+            await pool.query(
+              `UPDATE document_analyses SET extracted_text = $1, updated_at = now() WHERE id = $2`,
+              [extractedText.substring(0, 80000), existingDoc.id]
+            );
+          }
+          return res.json({ id: existingDoc.id, status: "done", existing: true });
+        }
+        // Entry existing tapi extracted_text kosong → hapus dan buat baru dengan text yang baru diambil
+        await pool.query(`DELETE FROM document_analyses WHERE id = $1`, [existingDoc.id]);
       }
 
       // Buat entry document_analyses — langsung 'done' karena sudah diproses RS
-      const { sql: sqlRS } = await import("drizzle-orm");
       const [docRow] = (await db.execute(sqlRS`
         INSERT INTO document_analyses (user_id, filename, original_name, file_size, doc_type, extracted_text, status, summary)
         VALUES (
@@ -3882,14 +3968,15 @@ Jawab berdasarkan isi dokumen. Jika tidak ada di dokumen, katakan dengan jelas. 
           ${rsFile.original_name},
           ${rsFile.size_bytes || 0},
           ${docType},
-          ${extractedText.substring(0, 50000)},
+          ${extractedText.substring(0, 80000)},
           'done',
-          ${"[Dari Ruang Simpan] " + rsFile.original_name + " — klik Chat untuk mulai tanya AI."}
+          ${"[Dari Ruang Simpan] " + rsFile.original_name}
         )
         RETURNING id
       `)).rows as any[];
 
-      res.json({ id: docRow.id, status: "done", existing: false });
+      console.log(`[BedahDokumen/from-rs] Created doc ${docRow.id} for ${rsFile.original_name}, text=${extractedText.length} chars`);
+      res.json({ id: docRow.id, status: "done", existing: false, has_text: extractedText.trim().length > 0 });
     } catch (err: any) {
       console.error("[BedahDokumen/from-rs]", err?.message);
       res.status(500).json({ error: "Gagal membuka file di Bedah Dokumen" });
