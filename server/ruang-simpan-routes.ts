@@ -318,6 +318,14 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
     `);
   } catch { /* already exists — table created above has it */ }
 
+  // Fallback storage column — dipakai ketika Object Storage tidak tersedia
+  try {
+    await pool.query(`
+      ALTER TABLE ruang_simpan_files
+        ADD COLUMN IF NOT EXISTS file_content BYTEA
+    `);
+  } catch { /* already exists */ }
+
   // Tabel permintaan akses dari biro jasa
   await pool.query(`
     CREATE TABLE IF NOT EXISTS ruang_simpan_access_requests (
@@ -495,12 +503,22 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
          req.file.size, description?.slice(0, 500) || null]
       );
 
-      // 2. Store binary content di Object Storage
-      const storageKey = await uploadFile(userId, file.id, req.file.originalname, req.file.buffer, req.file.mimetype);
-      await pool.query(
-        `UPDATE ruang_simpan_files SET storage_key = $1 WHERE id = $2`,
-        [storageKey, file.id]
-      );
+      // 2. Store binary content — Object Storage dengan fallback ke DB
+      let storageKey: string | null = null;
+      try {
+        storageKey = await uploadFile(userId, file.id, req.file.originalname, req.file.buffer, req.file.mimetype);
+        await pool.query(
+          `UPDATE ruang_simpan_files SET storage_key = $1 WHERE id = $2`,
+          [storageKey, file.id]
+        );
+      } catch (storageErr) {
+        console.warn("[RuangSimpan] Object Storage tidak tersedia, fallback ke DB bytea:", (storageErr as Error).message);
+        // Simpan langsung di kolom file_content (bytea) sebagai fallback
+        await pool.query(
+          `UPDATE ruang_simpan_files SET file_content = $1 WHERE id = $2`,
+          [req.file.buffer, file.id]
+        );
+      }
 
       // 3. Extract text + chunk (async — don't block response)
       processFileAsync(file.id, userId, req.file.buffer, req.file.mimetype, req.file.originalname).catch(console.error);
@@ -578,9 +596,14 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
          description?.slice(0, 500) || `Diimpor dari: ${parsedUrl.hostname}`]
       );
 
-      // 7. Upload teks ke Object Storage
-      const storageKey = await uploadFile(userId, file.id, fileName, textBuffer, "text/plain");
-      await pool.query(`UPDATE ruang_simpan_files SET storage_key=$1 WHERE id=$2`, [storageKey, file.id]);
+      // 7. Upload teks ke Object Storage, dengan fallback ke DB
+      try {
+        const storageKey = await uploadFile(userId, file.id, fileName, textBuffer, "text/plain");
+        await pool.query(`UPDATE ruang_simpan_files SET storage_key=$1 WHERE id=$2`, [storageKey, file.id]);
+      } catch (storageErr) {
+        console.warn("[RuangSimpan] Object Storage tidak tersedia (import-url), fallback ke DB:", (storageErr as Error).message);
+        await pool.query(`UPDATE ruang_simpan_files SET file_content=$1 WHERE id=$2`, [textBuffer, file.id]);
+      }
 
       // 8. Chunk + index untuk RAG (async — tidak block response)
       processFileAsync(file.id, userId, textBuffer, "text/plain", fileName).catch(console.error);
@@ -681,15 +704,28 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
     if (!guardUUID(req.params.id, res)) return;
     try {
       const { rows } = await pool.query(
-        `SELECT f.original_name, f.mime_type, f.storage_key
+        `SELECT f.original_name, f.mime_type, f.storage_key, f.file_content
          FROM ruang_simpan_files f
          WHERE f.id = $1 AND f.user_id = $2`,
         [req.params.id, userId]
       );
       if (!rows.length) return res.status(404).json({ error: "File tidak ditemukan" });
-      const { original_name, mime_type, storage_key } = rows[0];
-      if (!storage_key) return res.status(410).json({ error: "File tidak tersedia (storage_key kosong)" });
-      const buffer = await downloadFile(storage_key);
+      const { original_name, mime_type, storage_key, file_content } = rows[0];
+
+      let buffer: Buffer;
+      if (storage_key) {
+        try {
+          buffer = await downloadFile(storage_key);
+        } catch {
+          if (file_content) { buffer = Buffer.from(file_content); }
+          else return res.status(410).json({ error: "File tidak tersedia sementara. Coba lagi nanti." });
+        }
+      } else if (file_content) {
+        buffer = Buffer.from(file_content);
+      } else {
+        return res.status(410).json({ error: "File tidak tersedia (belum selesai diproses)" });
+      }
+
       // Log access (fire-and-forget)
       const actorName = (req as any).user?.name || (req as any).user?.claims?.name || "Pemilik";
       pool.query(
@@ -712,15 +748,28 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
     if (!guardUUID(req.params.id, res)) return;
     try {
       const { rows } = await pool.query(
-        `SELECT f.original_name, f.mime_type, f.storage_key
+        `SELECT f.original_name, f.mime_type, f.storage_key, f.file_content
          FROM ruang_simpan_files f
          WHERE f.id = $1 AND f.user_id = $2`,
         [req.params.id, userId]
       );
       if (!rows.length) return res.status(404).json({ error: "File tidak ditemukan" });
-      const { original_name, mime_type, storage_key } = rows[0];
-      if (!storage_key) return res.status(410).json({ error: "File tidak tersedia (storage_key kosong)" });
-      const buffer = await downloadFile(storage_key);
+      const { original_name, mime_type, storage_key, file_content } = rows[0];
+
+      let buffer: Buffer;
+      if (storage_key) {
+        try {
+          buffer = await downloadFile(storage_key);
+        } catch {
+          if (file_content) { buffer = Buffer.from(file_content); }
+          else return res.status(410).json({ error: "File tidak tersedia sementara." });
+        }
+      } else if (file_content) {
+        buffer = Buffer.from(file_content);
+      } else {
+        return res.status(410).json({ error: "File tidak tersedia" });
+      }
+
       res.setHeader("Content-Type", mime_type);
       res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(original_name)}"`);
       res.setHeader("Cache-Control", "private, max-age=300");
