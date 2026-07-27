@@ -72,7 +72,6 @@ export async function extractDocumentContent(filePath: string): Promise<Extracte
     if (ext === ".pdf") {
       // Gunakan PyMuPDF (fitz) via python3 — lebih stabil dari pdf-parse di env ini
       rawText = await new Promise<string>((resolve) => {
-        const { exec } = require("child_process");
         const script = [
           "import fitz, sys",
           `doc = fitz.open(${JSON.stringify(absolutePath)})`,
