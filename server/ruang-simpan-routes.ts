@@ -509,6 +509,86 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
     } catch (e) { safeErr(res, e, "POST upload"); }
   });
 
+  // ── POST /api/ruang-simpan/import-from-url ───────────────────────────────
+  // Import dokumen dari Google Drive, OneDrive, SharePoint, atau URL publik lain.
+  // Teks dokumen diekstrak, disimpan ke Object Storage, dan diproses jadi AI chunks.
+  app.post("/api/ruang-simpan/import-from-url", isAuthenticated, rsUploadLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+
+    const { url, folder_id, description } = req.body ?? {};
+    if (!url || typeof url !== "string") return res.status(400).json({ error: "URL tidak boleh kosong" });
+    if (folder_id && !UUID_RE.test(folder_id)) return res.status(400).json({ error: "folder_id tidak valid" });
+
+    let parsedUrl: URL;
+    try { parsedUrl = new URL(url.trim()); } catch {
+      return res.status(400).json({ error: "URL tidak valid. Pastikan diawali https://" });
+    }
+    if (!["http:", "https:"].includes(parsedUrl.protocol)) {
+      return res.status(400).json({ error: "Hanya URL http/https yang didukung" });
+    }
+
+    try {
+      // 1. Ekstrak teks dari URL (Google Drive, OneDrive, atau URL publik lain)
+      const { extractCloudDriveContent } = await import("./lib/file-processing");
+      const extracted = await extractCloudDriveContent(url.trim());
+
+      if (!extracted.content || extracted.content.length < 20) {
+        return res.status(422).json({
+          error: "Tidak ada teks yang bisa diekstrak dari URL ini. Pastikan link publik (bukan memerlukan login) dan berisi konten teks.",
+        });
+      }
+
+      // 2. Tentukan nama file dari URL atau judul yang diekstrak
+      const rawTitle = extracted.title?.replace(/^Cloud:\s*/i, "").trim() || "";
+      const pathSegment = parsedUrl.pathname.split("/").filter(Boolean).pop() || "";
+      const guessedName = rawTitle || pathSegment || "dokumen-impor";
+      const fileName = guessedName.endsWith(".txt") ? guessedName : `${guessedName.slice(0, 80)}.txt`;
+
+      // 3. Buat buffer dari teks yang diekstrak
+      const textBuffer = Buffer.from(extracted.content, "utf-8");
+      const sizeBytes = textBuffer.length;
+
+      // 4. Quota check
+      const used = await getUsedBytes(userId);
+      const quotaBytes = await getQuotaForUser(userId);
+      if (used + sizeBytes > quotaBytes) {
+        const remaining = Math.max(0, quotaBytes - used);
+        return res.status(402).json({
+          error: `Kuota storage penuh. Tersisa ${(remaining / 1024 / 1024).toFixed(1)} MB.`,
+          quota_exceeded: true,
+        });
+      }
+
+      // 5. Validasi kepemilikan folder (jika diberikan)
+      if (folder_id) {
+        const { rows } = await pool.query(
+          `SELECT id FROM ruang_simpan_folders WHERE id = $1 AND user_id = $2`, [folder_id, userId]
+        );
+        if (!rows.length) return res.status(403).json({ error: "Folder tidak ditemukan" });
+      }
+
+      // 6. Simpan metadata ke DB
+      const { rows: [file] } = await pool.query(
+        `INSERT INTO ruang_simpan_files
+           (user_id, folder_id, original_name, mime_type, size_bytes, description, kb_status)
+         VALUES ($1,$2,$3,'text/plain',$4,$5,'pending')
+         RETURNING id, original_name, mime_type, size_bytes, kb_status, folder_id, created_at`,
+        [userId, folder_id || null, fileName, sizeBytes,
+         description?.slice(0, 500) || `Diimpor dari: ${parsedUrl.hostname}`]
+      );
+
+      // 7. Upload teks ke Object Storage
+      const storageKey = await uploadFile(userId, file.id, fileName, textBuffer, "text/plain");
+      await pool.query(`UPDATE ruang_simpan_files SET storage_key=$1 WHERE id=$2`, [storageKey, file.id]);
+
+      // 8. Chunk + index untuk RAG (async — tidak block response)
+      processFileAsync(file.id, userId, textBuffer, "text/plain", fileName).catch(console.error);
+
+      res.status(201).json({ ...file, imported_from: parsedUrl.hostname });
+    } catch (e) { safeErr(res, e, "POST import-from-url"); }
+  });
+
   // ── PATCH /api/ruang-simpan/files/:id ────────────────────────────────────
   app.patch("/api/ruang-simpan/files/:id", isAuthenticated, rsWriteLimit, async (req: any, res) => {
     const userId = extractUid(req, res);

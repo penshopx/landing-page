@@ -164,6 +164,10 @@ export default function RuangSimpanPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [importingUrl, setImportingUrl] = useState(false);
+  const [showImportUrl, setShowImportUrl] = useState(false);
+  const [importUrl, setImportUrl] = useState("");
+  const [importDesc, setImportDesc] = useState("");
   const [selectedFile, setSelectedFile] = useState<RSFile | null>(null);
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [onboardingDismissed, setOnboardingDismissed] = useState<boolean>(() => {
@@ -224,6 +228,36 @@ export default function RuangSimpanPage() {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }, [activeFolder, toast, qc]);
+
+  // ── Import dari URL handler ───────────────────────────────────────────────
+  const handleImportFromUrl = useCallback(async () => {
+    if (!importUrl.trim()) return;
+    setImportingUrl(true);
+    try {
+      const res = await fetch("/api/ruang-simpan/import-from-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: importUrl.trim(),
+          folder_id: activeFolder !== "all" ? activeFolder : undefined,
+          description: importDesc.trim() || undefined,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        toast({ title: "Import gagal", description: json.error || "Coba lagi", variant: "destructive" });
+        return;
+      }
+      toast({ title: "Dokumen berhasil diimpor", description: "AI sedang memproses isi dokumen…" });
+      setShowImportUrl(false);
+      setImportUrl("");
+      setImportDesc("");
+      qc.invalidateQueries({ queryKey: ["/api/ruang-simpan/files"] });
+      qc.invalidateQueries({ queryKey: ["/api/ruang-simpan/overview"] });
+    } finally {
+      setImportingUrl(false);
+    }
+  }, [importUrl, importDesc, activeFolder, toast, qc]);
 
   const deleteFile = useMutation({
     mutationFn: (id: string) => apiRequest("DELETE", `/api/ruang-simpan/files/${id}`).then(r => r.json()),
@@ -343,8 +377,8 @@ export default function RuangSimpanPage() {
         {/* ── Sidebar ── */}
         <div className="w-56 shrink-0 hidden lg:block">
           <div className="bg-white dark:bg-card border border-border rounded-2xl overflow-hidden">
-            {/* Upload button */}
-            <div className="p-3 border-b border-border">
+            {/* Upload + Import buttons */}
+            <div className="p-3 border-b border-border space-y-1.5">
               <Button
                 size="sm" className="w-full gap-1.5"
                 onClick={() => fileInputRef.current?.click()}
@@ -352,6 +386,14 @@ export default function RuangSimpanPage() {
               >
                 {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
                 {uploading ? "Mengunggah…" : "Upload File"}
+              </Button>
+              <Button
+                size="sm" variant="outline" className="w-full gap-1.5"
+                onClick={() => setShowImportUrl(true)}
+                disabled={importingUrl}
+              >
+                <Link2 className="h-3.5 w-3.5" />
+                Import dari Link
               </Button>
               <input ref={fileInputRef} type="file" className="hidden"
                 accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.md,.csv,.jpg,.jpeg,.png,.webp"
@@ -438,9 +480,12 @@ export default function RuangSimpanPage() {
             <Button variant="outline" size="sm" onClick={() => { refetchFiles(); refetchOverview(); }}>
               <RefreshCw className="h-3.5 w-3.5" />
             </Button>
-            {/* Mobile upload */}
+            {/* Mobile upload + import */}
             <Button size="sm" className="lg:hidden gap-1.5" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
               <Upload className="h-3.5 w-3.5" />
+            </Button>
+            <Button size="sm" variant="outline" className="lg:hidden gap-1.5" onClick={() => setShowImportUrl(true)}>
+              <Link2 className="h-3.5 w-3.5" />
             </Button>
           </div>
 
@@ -504,6 +549,69 @@ export default function RuangSimpanPage() {
           onCreated={() => { qc.invalidateQueries({ queryKey: ["/api/ruang-simpan/overview"] }); setShowNewFolder(false); }}
         />
       )}
+
+      {/* ── Import dari URL dialog ── */}
+      <Dialog open={showImportUrl} onOpenChange={v => { if (!importingUrl) setShowImportUrl(v); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Link2 className="h-4 w-4 text-indigo-500" />
+              Import dari Link
+            </DialogTitle>
+          </DialogHeader>
+
+          {/* Supported sources */}
+          <div className="flex items-center gap-2 flex-wrap">
+            {[
+              { label: "Google Drive", color: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800" },
+              { label: "Google Docs", color: "bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800" },
+              { label: "OneDrive", color: "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800" },
+              { label: "SharePoint", color: "bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800" },
+              { label: "URL Publik", color: "bg-gray-50 dark:bg-gray-900/40 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700" },
+            ].map(s => (
+              <span key={s.label} className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${s.color}`}>
+                {s.label}
+              </span>
+            ))}
+          </div>
+
+          <div className="space-y-3 py-1">
+            <div>
+              <Label className="text-xs mb-1.5 block">Link dokumen <span className="text-red-500">*</span></Label>
+              <Input
+                placeholder="https://drive.google.com/file/d/… atau link publik lain"
+                value={importUrl}
+                onChange={e => setImportUrl(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && importUrl.trim()) handleImportFromUrl(); }}
+                disabled={importingUrl}
+                autoFocus
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Pastikan link bisa diakses siapapun tanpa login (mode "Siapapun dengan link dapat melihat").
+              </p>
+            </div>
+            <div>
+              <Label className="text-xs mb-1.5 block">Deskripsi <span className="text-muted-foreground">(opsional)</span></Label>
+              <Input
+                placeholder="cth: Kontrak proyek Gedung X tahun 2024"
+                value={importDesc}
+                onChange={e => setImportDesc(e.target.value)}
+                disabled={importingUrl}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowImportUrl(false)} disabled={importingUrl}>
+              Batal
+            </Button>
+            <Button onClick={handleImportFromUrl} disabled={!importUrl.trim() || importingUrl} className="gap-1.5">
+              {importingUrl ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Link2 className="h-3.5 w-3.5" />}
+              {importingUrl ? "Mengimpor…" : "Import Dokumen"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
