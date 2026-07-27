@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -48,7 +48,27 @@ import {
   Eye,
   EyeOff,
   Star,
+  GripVertical,
 } from "lucide-react";
+
+// ─── DnD Kit imports ──────────────────────────────────────────────────────────
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Course = {
   id: number;
@@ -305,16 +325,6 @@ function CourseDialog({
             />
           </div>
 
-          <div className="space-y-1">
-            <Label>Urutan (sort order)</Label>
-            <Input
-              type="number"
-              value={form.sortOrder}
-              onChange={(e) => set("sortOrder", parseInt(e.target.value) || 0)}
-              className="w-32"
-            />
-          </div>
-
           <div className="flex gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -425,7 +435,7 @@ function LessonDialog({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <Label>Tipe</Label>
               <Select value={form.type} onValueChange={(v) => set("type", v)}>
@@ -444,14 +454,6 @@ function LessonDialog({
                 type="number"
                 value={form.durationMinutes}
                 onChange={(e) => set("durationMinutes", parseInt(e.target.value) || 0)}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label>Urutan</Label>
-              <Input
-                type="number"
-                value={form.sortOrder}
-                onChange={(e) => set("sortOrder", parseInt(e.target.value) || 0)}
               />
             </div>
           </div>
@@ -511,6 +513,76 @@ function LessonDialog({
   );
 }
 
+// ─── Sortable Lesson Row ───────────────────────────────────────────────────────
+function SortableLessonRow({
+  lesson,
+  index,
+  onEdit,
+  onDelete,
+}: {
+  lesson: Lesson;
+  index: number;
+  onEdit: (l: Lesson) => void;
+  onDelete: (l: Lesson) => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: lesson.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-3 bg-muted/40 rounded-lg px-3 py-2 text-sm"
+    >
+      {/* Drag handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="text-muted-foreground/50 hover:text-muted-foreground cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+        aria-label="Seret untuk mengubah urutan"
+      >
+        <GripVertical className="w-4 h-4" />
+      </button>
+
+      <span className="text-muted-foreground w-5 text-right flex-shrink-0">{index + 1}.</span>
+      <span className="flex-1 font-medium truncate">{lesson.title}</span>
+      <span className="text-muted-foreground text-xs">{lesson.type}</span>
+      <span className="text-muted-foreground text-xs">{lesson.durationMinutes}m</span>
+      {lesson.isPreview && (
+        <Badge variant="secondary" className="text-xs py-0">preview</Badge>
+      )}
+      {!lesson.isActive && (
+        <Badge variant="outline" className="text-xs py-0 text-muted-foreground">
+          nonaktif
+        </Badge>
+      )}
+      <Button
+        size="icon"
+        variant="ghost"
+        className="h-7 w-7 flex-shrink-0"
+        onClick={() => onEdit(lesson)}
+      >
+        <Pencil className="w-3.5 h-3.5" />
+      </Button>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="h-7 w-7 flex-shrink-0 text-destructive"
+        onClick={() => onDelete(lesson)}
+      >
+        <Trash2 className="w-3.5 h-3.5" />
+      </Button>
+    </div>
+  );
+}
+
 // ─── Lessons Panel (inline, per-course) ───────────────────────────────────────
 function LessonsPanel({ course }: { course: Course }) {
   const { toast } = useToast();
@@ -518,11 +590,36 @@ function LessonsPanel({ course }: { course: Course }) {
     open: false,
   });
   const [deleteLesson, setDeleteLesson] = useState<Lesson | null>(null);
+  const [localLessons, setLocalLessons] = useState<Lesson[]>([]);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
 
   const { data: lessons = [], isLoading, isError: lessonsError } = useQuery<Lesson[]>({
     queryKey: ["/api/admin/lms/courses", course.id, "lessons"],
     queryFn: () => apiRequest("GET", `/api/admin/lms/courses/${course.id}/lessons`),
   });
+
+  // Sync local state with server data:
+  // - Same IDs → update data fields (title, active, etc.) while preserving local drag order
+  // - IDs changed (add/remove) → reset fully to server order
+  useEffect(() => {
+    setLocalLessons((prev) => {
+      const serverMap = new Map(lessons.map((l) => [l.id, l]));
+      const prevIds = new Set(prev.map((l) => l.id));
+      const nextIds = new Set(lessons.map((l) => l.id));
+      const sameSet =
+        prevIds.size === nextIds.size && [...prevIds].every((id) => nextIds.has(id));
+      if (sameSet) {
+        // Keep local drag order, but refresh every item's data from server
+        return prev.map((l) => serverMap.get(l.id) ?? l);
+      }
+      return lessons;
+    });
+  }, [lessons]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
 
   const delMut = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/admin/lms/lessons/${id}`),
@@ -536,11 +633,43 @@ function LessonsPanel({ course }: { course: Course }) {
       toast({ title: "Gagal hapus", description: e?.message, variant: "destructive" }),
   });
 
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const oldIndex = localLessons.findIndex((l) => l.id === active.id);
+      const newIndex = localLessons.findIndex((l) => l.id === over.id);
+      const reordered = arrayMove(localLessons, oldIndex, newIndex);
+
+      // Optimistic update
+      setLocalLessons(reordered);
+      setIsSavingOrder(true);
+
+      try {
+        // Persist each lesson's new sortOrder
+        await Promise.all(
+          reordered.map((lesson, idx) =>
+            apiRequest("PATCH", `/api/admin/lms/lessons/${lesson.id}`, { sortOrder: idx + 1 })
+          )
+        );
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses", course.id, "lessons"] });
+      } catch {
+        toast({ title: "Gagal menyimpan urutan", variant: "destructive" });
+        setLocalLessons(lessons); // revert
+      } finally {
+        setIsSavingOrder(false);
+      }
+    },
+    [localLessons, lessons, course.id, toast]
+  );
+
   return (
     <div className="pl-6 pb-4">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-sm font-medium text-muted-foreground">
-          {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
+        <p className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          {localLessons.length} lesson{localLessons.length !== 1 ? "s" : ""}
+          {isSavingOrder && <Loader2 className="w-3 h-3 animate-spin" />}
         </p>
         <Button
           size="sm"
@@ -555,46 +684,31 @@ function LessonsPanel({ course }: { course: Course }) {
         <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
       ) : lessonsError ? (
         <p className="text-sm text-destructive">Gagal memuat lessons. Coba muat ulang.</p>
-      ) : lessons.length === 0 ? (
+      ) : localLessons.length === 0 ? (
         <p className="text-sm text-muted-foreground italic">Belum ada lesson.</p>
       ) : (
-        <div className="space-y-2">
-          {lessons.map((l, idx) => (
-            <div
-              key={l.id}
-              className="flex items-center gap-3 bg-muted/40 rounded-lg px-3 py-2 text-sm"
-            >
-              <span className="text-muted-foreground w-5 text-right">{idx + 1}.</span>
-              <span className="flex-1 font-medium">{l.title}</span>
-              <span className="text-muted-foreground text-xs">{l.type}</span>
-              <span className="text-muted-foreground text-xs">{l.durationMinutes}m</span>
-              {l.isPreview && (
-                <Badge variant="secondary" className="text-xs py-0">preview</Badge>
-              )}
-              {!l.isActive && (
-                <Badge variant="outline" className="text-xs py-0 text-muted-foreground">
-                  nonaktif
-                </Badge>
-              )}
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7"
-                onClick={() => setLessonDialog({ open: true, initial: l })}
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7 text-destructive"
-                onClick={() => setDeleteLesson(l)}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={localLessons.map((l) => l.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-2">
+              {localLessons.map((l, idx) => (
+                <SortableLessonRow
+                  key={l.id}
+                  lesson={l}
+                  index={idx}
+                  onEdit={(lesson) => setLessonDialog({ open: true, initial: lesson })}
+                  onDelete={setDeleteLesson}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
       )}
 
       <LessonDialog
@@ -628,6 +742,120 @@ function LessonsPanel({ course }: { course: Course }) {
   );
 }
 
+// ─── Sortable Course Card ─────────────────────────────────────────────────────
+function SortableCourseCard({
+  course,
+  expanded,
+  onToggle,
+  onEdit,
+  onDelete,
+}: {
+  course: Course;
+  expanded: boolean;
+  onToggle: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: course.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <Card className={!course.isActive ? "opacity-60" : undefined}>
+        {/* Course row */}
+        <div className="flex items-center gap-3 p-4">
+          {/* Drag handle */}
+          <button
+            {...attributes}
+            {...listeners}
+            className="text-muted-foreground/50 hover:text-muted-foreground cursor-grab active:cursor-grabbing flex-shrink-0 touch-none"
+            aria-label="Seret untuk mengubah urutan"
+          >
+            <GripVertical className="w-4 h-4" />
+          </button>
+
+          {/* Expand toggle */}
+          <button
+            className="text-muted-foreground flex-shrink-0"
+            onClick={onToggle}
+          >
+            {expanded ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </button>
+
+          {/* Color dot + emoji */}
+          <span
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-lg flex-shrink-0 cursor-pointer"
+            style={{ backgroundColor: course.color + "22", border: `2px solid ${course.color}44` }}
+            onClick={onToggle}
+          >
+            {course.emoji}
+          </span>
+
+          <div className="flex-1 min-w-0 cursor-pointer" onClick={onToggle}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold truncate">{course.title}</span>
+              {course.isFeatured && (
+                <Star className="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" />
+              )}
+              {!course.isActive && (
+                <Badge variant="outline" className="text-xs py-0">nonaktif</Badge>
+              )}
+              {!course.isPublic && (
+                <EyeOff className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
+              <span className="capitalize">{course.category}</span>
+              {course.subcategory && <span>· {course.subcategory}</span>}
+              <span>· {course.level}</span>
+              <span>· {course.durationMinutes}m</span>
+              <span>· {course.lessonCount} lesson</span>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-1 flex-shrink-0">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8"
+              onClick={onEdit}
+            >
+              <Pencil className="w-4 h-4" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8 text-destructive"
+              onClick={onDelete}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Expanded: lessons */}
+        {expanded && (
+          <div className="border-t">
+            <LessonsPanel course={course} />
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AdminAcademyPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -637,6 +865,8 @@ export default function AdminAcademyPage() {
     open: false,
   });
   const [deleteCourse, setDeleteCourse] = useState<Course | null>(null);
+  const [localCourses, setLocalCourses] = useState<Course[]>([]);
+  const [isSavingOrder, setIsSavingOrder] = useState(false);
 
   useEffect(() => {
     const prev = document.title;
@@ -652,6 +882,29 @@ export default function AdminAcademyPage() {
     enabled: isAdmin,
   });
 
+  // Sync local state with server data:
+  // - Same IDs → update data fields (title, active, lessonCount, etc.) while preserving local drag order
+  // - IDs changed (add/remove) → reset fully to server order
+  useEffect(() => {
+    setLocalCourses((prev) => {
+      const serverMap = new Map(courses.map((c) => [c.id, c]));
+      const prevIds = new Set(prev.map((c) => c.id));
+      const nextIds = new Set(courses.map((c) => c.id));
+      const sameSet =
+        prevIds.size === nextIds.size && [...prevIds].every((id) => nextIds.has(id));
+      if (sameSet) {
+        // Keep local drag order, but refresh every item's data from server
+        return prev.map((c) => serverMap.get(c.id) ?? c);
+      }
+      return courses;
+    });
+  }, [courses]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
   const delMut = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/admin/lms/courses/${id}`),
     onSuccess: () => {
@@ -662,6 +915,36 @@ export default function AdminAcademyPage() {
     onError: (e: any) =>
       toast({ title: "Gagal hapus", description: e?.message, variant: "destructive" }),
   });
+
+  const handleCourseDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const oldIndex = localCourses.findIndex((c) => c.id === active.id);
+      const newIndex = localCourses.findIndex((c) => c.id === over.id);
+      const reordered = arrayMove(localCourses, oldIndex, newIndex);
+
+      // Optimistic update
+      setLocalCourses(reordered);
+      setIsSavingOrder(true);
+
+      try {
+        await Promise.all(
+          reordered.map((course, idx) =>
+            apiRequest("PATCH", `/api/admin/lms/courses/${course.id}`, { sortOrder: idx + 1 })
+          )
+        );
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      } catch {
+        toast({ title: "Gagal menyimpan urutan", variant: "destructive" });
+        setLocalCourses(courses); // revert
+      } finally {
+        setIsSavingOrder(false);
+      }
+    },
+    [localCourses, courses, toast]
+  );
 
   const toggleExpand = (id: number) => {
     setExpanded((prev) => {
@@ -710,7 +993,10 @@ export default function AdminAcademyPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold">Kelola Academy</h1>
-              <p className="text-sm text-muted-foreground">{courses.length} kursus terdaftar</p>
+              <p className="text-sm text-muted-foreground flex items-center gap-2">
+                {localCourses.length} kursus terdaftar
+                {isSavingOrder && <Loader2 className="w-3 h-3 animate-spin" />}
+              </p>
             </div>
           </div>
           <Button onClick={() => setCourseDialog({ open: true })}>
@@ -730,7 +1016,7 @@ export default function AdminAcademyPage() {
               <p className="text-sm text-muted-foreground">Coba muat ulang halaman.</p>
             </CardContent>
           </Card>
-        ) : courses.length === 0 ? (
+        ) : localCourses.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
               <BookOpen className="w-12 h-12 text-muted-foreground" />
@@ -741,86 +1027,29 @@ export default function AdminAcademyPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {courses.map((course) => (
-              <Card key={course.id} className={!course.isActive ? "opacity-60" : undefined}>
-                {/* Course row */}
-                <div
-                  className="flex items-center gap-3 p-4 cursor-pointer select-none"
-                  onClick={() => toggleExpand(course.id)}
-                >
-                  <button className="text-muted-foreground flex-shrink-0">
-                    {expanded.has(course.id) ? (
-                      <ChevronDown className="w-4 h-4" />
-                    ) : (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </button>
-
-                  {/* Color dot + emoji */}
-                  <span
-                    className="w-9 h-9 rounded-lg flex items-center justify-center text-lg flex-shrink-0"
-                    style={{ backgroundColor: course.color + "22", border: `2px solid ${course.color}44` }}
-                  >
-                    {course.emoji}
-                  </span>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold truncate">{course.title}</span>
-                      {course.isFeatured && (
-                        <Star className="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" />
-                      )}
-                      {!course.isActive && (
-                        <Badge variant="outline" className="text-xs py-0">nonaktif</Badge>
-                      )}
-                      {!course.isPublic && (
-                        <EyeOff className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
-                      <span className="capitalize">{course.category}</span>
-                      {course.subcategory && <span>· {course.subcategory}</span>}
-                      <span>· {course.level}</span>
-                      <span>· {course.durationMinutes}m</span>
-                      <span>· {course.lessonCount} lesson</span>
-                      <span>· sort: {course.sortOrder}</span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div
-                    className="flex gap-1 flex-shrink-0"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => setCourseDialog({ open: true, initial: course })}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-destructive"
-                      onClick={() => setDeleteCourse(course)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Expanded: lessons */}
-                {expanded.has(course.id) && (
-                  <div className="border-t">
-                    <LessonsPanel course={course} />
-                  </div>
-                )}
-              </Card>
-            ))}
-          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleCourseDragEnd}
+          >
+            <SortableContext
+              items={localCourses.map((c) => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-3">
+                {localCourses.map((course) => (
+                  <SortableCourseCard
+                    key={course.id}
+                    course={course}
+                    expanded={expanded.has(course.id)}
+                    onToggle={() => toggleExpand(course.id)}
+                    onEdit={() => setCourseDialog({ open: true, initial: course })}
+                    onDelete={() => setDeleteCourse(course)}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 
