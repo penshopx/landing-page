@@ -2097,7 +2097,7 @@ function AIAssistantWizard({ folderId, folderName, onClose, onCreated }: {
                   <MessageSquare className="h-4 w-4" /> Mulai Chat Sekarang
                 </Button>
               </a>
-              <a href={`/dashboard?agent=${result.agent_id}`} target="_blank" rel="noopener noreferrer" className="block">
+              <a href={`/builder/${result.slug}`} target="_blank" rel="noopener noreferrer" className="block">
                 <Button variant="outline" className="w-full gap-2 text-xs">
                   <Wand2 className="h-3.5 w-3.5" /> Kustomisasi di Dashboard
                 </Button>

@@ -542,6 +542,23 @@ function Router() {
       <Route path="/mitra-biro-jasa" component={MitraBiroJasaPage} />
       <Route path="/legacy" component={LegacyPage} />
       <Route path="/blueprint" component={BlueprintPage} />
+      {/* /builder/:agentId — redirect ke Dashboard dengan agent dipilih */}
+      <Route path="/builder/:agentId" component={() => {
+        const [, setLocation] = useLocation();
+        const params = useParams<{ agentId: string }>();
+        useEffect(() => {
+          const id = params.agentId || "";
+          // Resolusi slug ke id numerik via API, lalu redirect
+          fetch(`/api/chat/config/${encodeURIComponent(id)}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+              const numId = data?.agentId || id;
+              setLocation(`/dashboard?agent=${numId}`);
+            })
+            .catch(() => setLocation("/dashboard"));
+        }, []);
+        return null;
+      }} />
       <Route path="/blueprint-builder" component={BlueprintBuilderPage} />
       <Route path="/sertifikat/:token" component={SharedCertificatePage} />
       <Route path="/organization-builder" component={OrganizationBuilderPage} />

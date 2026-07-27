@@ -1555,7 +1555,7 @@ app.get("/api/ruang-simpan/my-assistants", isAuthenticated, async (req: any, res
       isPublic: r.is_public,
       createdAt: r.created_at,
       chatUrl: `/chat/${r.slug}`,
-      configUrl: `/dashboard?agent=${r.id}`,
+      configUrl: `/builder/${r.slug}`,
     })));
   } catch (e) { safeErr(res, e, "GET my-assistants"); }
 });
