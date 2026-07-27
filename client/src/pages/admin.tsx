@@ -823,6 +823,12 @@ export default function AdminPage() {
     retry: false,
   });
 
+  const { data: emailConnectivity, isLoading: connectivityLoading, refetch: refetchConnectivity } = useQuery<any>({
+    queryKey: ["/api/admin/email-health"],
+    enabled: isAdmin && activeTab === "tools",
+    retry: false,
+  });
+
   const sendTestEmailMutation = useMutation({
     mutationFn: async (to: string) => {
       const res = await apiRequest("POST", "/api/admin/email/send-test", { to });
@@ -2492,8 +2498,8 @@ export default function AdminPage() {
                       <CheckCircle2 className="h-5 w-5 text-blue-500" />
                       <CardTitle className="text-base">Email Health — Brevo Sender Domain</CardTitle>
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => { refetchDomainStatus(); refetchBrevoStats(); }} disabled={domainStatusLoading} className="gap-1.5">
-                      <RefreshCw className={`h-3.5 w-3.5 ${domainStatusLoading ? "animate-spin" : ""}`} />
+                    <Button size="sm" variant="outline" onClick={() => { refetchDomainStatus(); refetchBrevoStats(); refetchConnectivity(); }} disabled={domainStatusLoading || connectivityLoading} className="gap-1.5">
+                      <RefreshCw className={`h-3.5 w-3.5 ${(domainStatusLoading || connectivityLoading) ? "animate-spin" : ""}`} />
                       Refresh
                     </Button>
                   </div>
@@ -2502,6 +2508,34 @@ export default function AdminPage() {
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-5">
+
+                  {/* ── Brevo API connectivity banner ───────────────────── */}
+                  {emailConnectivity && emailConnectivity.status === "ip_blocked" && (
+                    <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-sm space-y-2">
+                      <p className="font-semibold text-red-700 dark:text-red-300">🚫 Server IP tidak diizinkan di Brevo</p>
+                      <p className="text-xs text-red-600 dark:text-red-400">
+                        Brevo memblokir IP server saat ini (<code className="bg-red-100 dark:bg-red-900/40 px-1 rounded font-mono">{emailConnectivity.serverIp}</code>).
+                        Email <strong>tidak dapat terkirim</strong> sampai IP ini ditambahkan ke whitelist.
+                      </p>
+                      <ol className="text-xs text-red-700 dark:text-red-300 list-decimal list-inside space-y-1">
+                        <li>Buka <a href="https://app.brevo.com/security/authorised_ips" target="_blank" rel="noreferrer" className="underline font-semibold">app.brevo.com/security/authorised_ips</a></li>
+                        <li>Klik <strong>Add an IP address</strong> → masukkan <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded font-mono">{emailConnectivity.serverIp}</code></li>
+                        <li>Simpan → klik tombol <strong>Refresh</strong> di atas untuk verifikasi</li>
+                      </ol>
+                    </div>
+                  )}
+                  {emailConnectivity && emailConnectivity.status === "not_configured" && (
+                    <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 text-sm text-amber-700 dark:text-amber-200">
+                      <p className="font-semibold mb-1">⚠️ BREVO_API_KEY belum dikonfigurasi</p>
+                      <p className="text-xs">Set secret <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">BREVO_API_KEY</code> di Replit Secrets, lalu restart server.</p>
+                    </div>
+                  )}
+                  {emailConnectivity && emailConnectivity.status === "ok" && (
+                    <div className="rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-3 text-xs text-green-700 dark:text-green-300 flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 shrink-0" />
+                      <span>Brevo API key valid dan dapat terhubung — email dapat dikirim.</span>
+                    </div>
+                  )}
 
                   {/* Domain auth status */}
                   {!emailDomainStatus ? (
