@@ -21,6 +21,7 @@ import {
   DatabaseZap, ScanSearch, BrainCircuit, ClipboardList, Star,
   KeyRound, History, UserCheck, CalendarClock, UserX, ChevronDown, ChevronUp,
   Activity, Handshake, Building2, CheckCheck, XCircle, ToggleLeft, ToggleRight,
+  Bot, Wand2, MessageSquare, ExternalLink,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { RUANG_SIMPAN_PLANS } from "@/data/pricing";
@@ -170,6 +171,8 @@ export default function RuangSimpanPage() {
   const [importDesc, setImportDesc] = useState("");
   const [selectedFile, setSelectedFile] = useState<RSFile | null>(null);
   const [showNewFolder, setShowNewFolder] = useState(false);
+  const [showWizard, setShowWizard] = useState(false);
+  const [wizardFolderId, setWizardFolderId] = useState<string>("all");
   const [onboardingDismissed, setOnboardingDismissed] = useState<boolean>(() => {
     try { return !!localStorage.getItem(ONBOARDING_KEY); } catch { return false; }
   });
@@ -439,6 +442,21 @@ export default function RuangSimpanPage() {
               </button>
             </div>
 
+            {/* Buat AI Asisten */}
+            <div className="px-3 pb-3">
+              <button
+                onClick={() => { setWizardFolderId(activeFolder); setShowWizard(true); }}
+                className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 transition-all shadow-sm"
+              >
+                <Bot className="h-3.5 w-3.5 shrink-0" />
+                <span className="flex-1 text-left truncate">Buat AI Asisten</span>
+                <Wand2 className="h-3 w-3 opacity-80" />
+              </button>
+              <p className="text-[10px] text-muted-foreground mt-1.5 px-1 leading-relaxed">
+                Ubah dokumen di folder ini menjadi AI Asisten siap pakai.
+              </p>
+            </div>
+
             {/* AI info box */}
             <div className="m-3 mt-1 bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30 rounded-xl p-3 border border-indigo-100 dark:border-indigo-900/30">
               <div className="flex items-center gap-1.5 mb-1">
@@ -547,6 +565,15 @@ export default function RuangSimpanPage() {
         <NewFolderDialog
           onClose={() => setShowNewFolder(false)}
           onCreated={() => { qc.invalidateQueries({ queryKey: ["/api/ruang-simpan/overview"] }); setShowNewFolder(false); }}
+        />
+      )}
+
+      {/* ── AI Asisten Wizard ── */}
+      {showWizard && (
+        <AIAssistantWizard
+          folderId={wizardFolderId}
+          folderName={wizardFolderId === "all" ? "Semua File" : (overview?.folders.find(f => f.id === wizardFolderId)?.name ?? "Folder")}
+          onClose={() => setShowWizard(false)}
         />
       )}
 
@@ -709,7 +736,7 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
   const { toast } = useToast();
   const qc = useQueryClient();
   const [, navigate] = useLocation();
-  const [tab, setTab] = useState<"info" | "paspor">("info");
+  const [tab, setTab] = useState<"info" | "preview" | "paspor">("info");
   const [editing, setEditing] = useState(false);
   const [desc, setDesc] = useState(file.description || "");
   const [folderId, setFolderId] = useState(file.folder_id || "");
@@ -826,12 +853,12 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
 
           {/* Tabs */}
           <div className="flex gap-1 border-b border-border pb-2">
-            {(["info", "paspor"] as const).map(t => (
+            {(["info", "preview", "paspor"] as const).map(t => (
               <button key={t} onClick={() => setTab(t)}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
                   tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted"
                 }`}>
-                {t === "info" ? "📄 Info" : "🛡️ Paspor Dokumen"}
+                {t === "info" ? "📄 Info" : t === "preview" ? "👁️ Preview" : "🛡️ Paspor Dokumen"}
               </button>
             ))}
           </div>
@@ -964,6 +991,40 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
                   </p>
                 </div>
               )}
+            </div>
+          )}
+
+          {tab === "preview" && (
+            <div className="space-y-3">
+              {file.mime_type.startsWith("image/") ? (
+                <div className="rounded-xl overflow-hidden bg-muted border border-border">
+                  <img
+                    src={`/api/ruang-simpan/files/${file.id}/preview`}
+                    alt={file.original_name}
+                    className="w-full max-h-[60vh] object-contain"
+                  />
+                </div>
+              ) : file.mime_type === "application/pdf" ? (
+                <div className="rounded-xl overflow-hidden border border-border">
+                  <iframe
+                    src={`/api/ruang-simpan/files/${file.id}/preview`}
+                    title={file.original_name}
+                    className="w-full"
+                    style={{ height: "65vh" }}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-muted/30 rounded-xl border border-border">
+                  <FileText className="h-10 w-10 mb-3 opacity-40" />
+                  <p className="text-sm font-semibold mb-1">Preview tidak tersedia</p>
+                  <p className="text-xs text-center max-w-xs leading-relaxed">
+                    Tipe file <span className="font-mono bg-muted px-1.5 py-0.5 rounded">{file.mime_type}</span> tidak mendukung preview langsung. Gunakan tombol Download.
+                  </p>
+                </div>
+              )}
+              <p className="text-[10px] text-muted-foreground text-center">
+                Konten ditampilkan langsung dari server — tidak perlu download.
+              </p>
             </div>
           )}
 
@@ -1668,5 +1729,216 @@ function RuangSimpanLandingPage() {
       {/* footer gap */}
       <div className="h-12 bg-background" />
     </div>
+  );
+}
+
+// ── AI Assistant Wizard ────────────────────────────────────────────────────────
+
+const ASSISTANT_TYPES = [
+  { value: "umum",    label: "Asisten Umum Perusahaan", icon: "🏢", desc: "Untuk pertanyaan umum seputar dokumen perusahaan" },
+  { value: "cs",      label: "Customer Service",        icon: "🎧", desc: "Membantu pelanggan dengan produk & layanan" },
+  { value: "legal",   label: "Legal Assistant",          icon: "⚖️", desc: "Kontrak, peraturan, dan dokumen hukum" },
+  { value: "hr",      label: "HR Assistant",             icon: "👥", desc: "Kebijakan SDM, tunjangan, dan prosedur" },
+  { value: "tender",  label: "Tender Assistant",         icon: "📋", desc: "RKS, pengadaan, dan persyaratan tender" },
+  { value: "project", label: "Project Assistant",        icon: "🏗️", desc: "Dokumen proyek, spesifikasi, dan jadwal" },
+  { value: "iso",     label: "ISO / Quality Assistant",  icon: "✅", desc: "Standar mutu, audit, dan SOP" },
+  { value: "sales",   label: "Sales Assistant",          icon: "💼", desc: "Produk, proposal, dan strategi penjualan" },
+  { value: "finance", label: "Finance Assistant",        icon: "💰", desc: "Laporan keuangan dan kebijakan keuangan" },
+  { value: "custom",  label: "Custom",                   icon: "⚡", desc: "Asisten umum berbasis dokumen Anda" },
+];
+
+interface WizardResult { agent_id: string; slug: string; name: string; file_count: number; chunk_count: number; chat_url: string; }
+
+function AIAssistantWizard({ folderId, folderName, onClose }: {
+  folderId: string; folderName: string; onClose: () => void;
+}) {
+  const { toast } = useToast();
+  const [step, setStep] = useState<1 | 2 | 3 | "done">(1);
+  const [name, setName] = useState(folderName !== "Semua File" ? `${folderName} Assistant` : "AI Assistant Saya");
+  const [type, setType] = useState("umum");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<WizardResult | null>(null);
+
+  const generate = async () => {
+    if (!name.trim()) { toast({ title: "Nama asisten diperlukan", variant: "destructive" }); return; }
+    setLoading(true);
+    try {
+      const data = await apiRequest("POST", "/api/ruang-simpan/generate-assistant", {
+        folder_id: folderId === "all" ? undefined : folderId,
+        name: name.trim(),
+        assistant_type: type,
+      });
+      setResult(data);
+      setStep("done");
+    } catch (err: any) {
+      toast({ title: "Gagal membuat AI Asisten", description: err?.message || "Coba lagi", variant: "destructive" });
+    } finally { setLoading(false); }
+  };
+
+  const selectedType = ASSISTANT_TYPES.find(t => t.value === type) || ASSISTANT_TYPES[0];
+
+  return (
+    <Dialog open onOpenChange={v => !v && !loading && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0">
+              <Bot className="h-4 w-4 text-white" />
+            </div>
+            {step === "done" ? "AI Asisten Siap! 🎉" : "Buat AI Asisten"}
+          </DialogTitle>
+        </DialogHeader>
+
+        {/* Progress indicator */}
+        {step !== "done" && (
+          <div className="flex items-center gap-2 mb-1">
+            {([1, 2, 3] as const).map(s => (
+              <div key={s} className="flex items-center gap-2 flex-1">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors ${
+                  step === s ? "bg-primary text-primary-foreground" : step > s ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
+                }`}>
+                  {step > s ? <Check className="h-3 w-3" /> : s}
+                </div>
+                {s < 3 && <div className={`h-0.5 flex-1 rounded transition-colors ${step > s ? "bg-emerald-400" : "bg-muted"}`} />}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Step 1: Name */}
+        {step === 1 && (
+          <div className="space-y-4 py-1">
+            <div>
+              <p className="text-sm text-muted-foreground mb-3">
+                Beri nama AI Asisten yang akan dibuat dari dokumen di <span className="font-semibold text-foreground">{folderName}</span>.
+              </p>
+              <Label className="text-xs mb-1.5 block font-semibold">Nama AI Asisten</Label>
+              <Input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="cth: HR Assistant, Tender Helper, Legal AI…"
+                autoFocus
+                onKeyDown={e => e.key === "Enter" && name.trim() && setStep(2)}
+              />
+              <p className="text-[10px] text-muted-foreground mt-1.5">
+                Nama ini yang akan tampil saat Anda membuka chat.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Type */}
+        {step === 2 && (
+          <div className="space-y-3 py-1">
+            <p className="text-sm text-muted-foreground">Pilih jenis asisten sesuai fungsi dokumen Anda.</p>
+            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+              {ASSISTANT_TYPES.map(t => (
+                <button
+                  key={t.value}
+                  onClick={() => setType(t.value)}
+                  className={`text-left p-2.5 rounded-xl border transition-all ${
+                    type === t.value
+                      ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                      : "border-border hover:border-primary/40 hover:bg-muted/50"
+                  }`}
+                >
+                  <div className="text-base mb-1">{t.icon}</div>
+                  <p className="text-xs font-semibold leading-tight text-foreground">{t.label}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{t.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Confirm */}
+        {step === 3 && (
+          <div className="space-y-3 py-1">
+            <div className="bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 rounded-xl border border-violet-100 dark:border-violet-900/30 p-4 space-y-3">
+              <div className="flex items-center gap-2.5">
+                <div className="text-2xl">{selectedType.icon}</div>
+                <div>
+                  <p className="font-bold text-foreground">{name}</p>
+                  <p className="text-xs text-muted-foreground">{selectedType.label}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-white dark:bg-card rounded-lg p-2 border border-border">
+                  <p className="text-[10px] text-muted-foreground mb-0.5">Sumber Dokumen</p>
+                  <p className="font-bold text-foreground">{folderName}</p>
+                </div>
+                <div className="bg-white dark:bg-card rounded-lg p-2 border border-border">
+                  <p className="text-[10px] text-muted-foreground mb-0.5">Model AI</p>
+                  <p className="font-bold text-foreground">GPT-4o</p>
+                </div>
+              </div>
+              <div className="text-[11px] text-muted-foreground bg-white/70 dark:bg-card/70 rounded-lg p-2.5 border border-border leading-relaxed">
+                <span className="text-violet-600 font-semibold">Proses otomatis:</span> AI akan membaca semua dokumen berstatus "AI Siap" di {folderName}, membangun knowledge base, dan mengaktifkan chatbot siap pakai.
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Done */}
+        {step === "done" && result && (
+          <div className="space-y-4 py-1">
+            <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-4 border border-emerald-100 dark:border-emerald-900/30">
+              <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="font-bold text-emerald-700 dark:text-emerald-400">{result.name}</p>
+                <p className="text-xs text-muted-foreground">{result.file_count} dokumen · {result.chunk_count} potongan teks diproses</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <a href={result.chat_url} target="_blank" rel="noopener noreferrer" className="block">
+                <Button className="w-full gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700">
+                  <MessageSquare className="h-4 w-4" /> Mulai Chat Sekarang
+                </Button>
+              </a>
+              <a href={`/builder/${result.slug}`} target="_blank" rel="noopener noreferrer" className="block">
+                <Button variant="outline" className="w-full gap-2 text-xs">
+                  <Wand2 className="h-3.5 w-3.5" /> Buka di Builder (kustomisasi lebih lanjut)
+                </Button>
+              </a>
+            </div>
+            <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+              AI Asisten ini sepenuhnya dapat diedit — persona, prompt, knowledge, mini apps — semuanya bisa disesuaikan di Builder.
+            </p>
+          </div>
+        )}
+
+        <DialogFooter className="gap-2">
+          {step !== "done" && (
+            <Button variant="outline" size="sm" onClick={onClose} disabled={loading}>Batal</Button>
+          )}
+          {step === 1 && (
+            <Button size="sm" onClick={() => setStep(2)} disabled={!name.trim()} className="gap-1.5">
+              Lanjut <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          {step === 2 && (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => setStep(1)}>← Kembali</Button>
+              <Button size="sm" onClick={() => setStep(3)} className="gap-1.5">
+                Lanjut <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <Button variant="ghost" size="sm" onClick={() => setStep(2)} disabled={loading}>← Kembali</Button>
+              <Button size="sm" onClick={generate} disabled={loading} className="gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0">
+                {loading ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Membuat…</> : <><Wand2 className="h-3.5 w-3.5" /> Generate Sekarang</>}
+              </Button>
+            </>
+          )}
+          {step === "done" && (
+            <Button variant="outline" size="sm" onClick={onClose}>Tutup</Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

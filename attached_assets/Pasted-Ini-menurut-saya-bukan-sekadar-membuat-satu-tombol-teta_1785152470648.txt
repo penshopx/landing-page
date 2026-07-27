@@ -1,0 +1,399 @@
+Ini menurut saya bukan sekadar membuat satu tombol, tetapi **membangun fitur unggulan Gustafta**. Saya menyarankan ke Replit bukan hanya meminta "buat tombol", tetapi menjelaskan **tujuan bisnis, alur pengguna, dan arsitektur** agar hasilnya sesuai visi Gustafta.
+
+Berikut spesifikasi yang bisa langsung Anda berikan.
+
+---
+
+# Feature Request: Auto AI Assistant Generator
+
+## Objective
+
+Create a new feature called **"Auto AI Assistant Generator"** that allows users to transform documents stored in **Ruang Simpan** into a ready-to-use AI Assistant (Chatbot) with just a few clicks.
+
+This feature is intended for users who do not want to manually build chatbots using the Builder.
+
+The Builder will remain available for advanced customization.
+
+---
+
+# User Flow
+
+```
+Ruang Simpan
+      ↓
+Select Folder
+      ↓
+Click "Create AI Assistant"
+      ↓
+Wizard
+      ↓
+Automatic Generation
+      ↓
+Ready to Chat
+```
+
+---
+
+# Add New Button
+
+Inside every folder in Ruang Simpan add a new primary action:
+
+🤖 Create AI Assistant
+
+---
+
+# AI Assistant Wizard
+
+When the button is clicked, open a wizard.
+
+## Step 1
+
+Assistant Name
+
+Example:
+
+ERP Assistant
+
+Company Assistant
+
+Legal Assistant
+
+HR Assistant
+
+Sales Assistant
+
+Custom Name
+
+---
+
+## Step 2
+
+Assistant Type
+
+Options
+
+* General Company Assistant
+* Customer Service
+* ERP Assistant
+* Legal Assistant
+* Sales Assistant
+* Internal Knowledge Assistant
+* Project Assistant
+* Custom
+
+Each type loads a default system prompt.
+
+---
+
+## Step 3
+
+Knowledge Source
+
+Automatically use
+
+Current Folder
+
+User can optionally include
+
+☐ Subfolders
+
+---
+
+## Step 4
+
+Confirmation
+
+Display
+
+Number of files
+
+Estimated knowledge size
+
+Supported file types
+
+PDF
+
+DOCX
+
+TXT
+
+Markdown
+
+CSV
+
+Images with OCR (if enabled)
+
+Audio Transcript
+
+Video Transcript
+
+Website
+
+YouTube Transcript
+
+---
+
+# Automatic Generation Process
+
+When user clicks Generate
+
+Backend should automatically
+
+1. Create Knowledge Base
+
+2. Import every supported document
+
+3. Extract text
+
+4. Generate embeddings
+
+5. Build vector index
+
+6. Create default Persona
+
+7. Create default System Prompt
+
+8. Create Chatbot
+
+9. Connect Chatbot with Knowledge Base
+
+10. Enable citation mode
+
+11. Publish chatbot internally
+
+12. Return chatbot URL
+
+Everything should happen automatically.
+
+User should never need to manually create these components.
+
+---
+
+# Default Persona
+
+Example
+
+Name
+
+ERP Assistant
+
+Role
+
+Professional AI Assistant
+
+Tone
+
+Professional
+
+Helpful
+
+Accurate
+
+Language
+
+Follow user's language
+
+Restrictions
+
+Answer only using available knowledge whenever possible.
+
+If information is unavailable, clearly say so instead of inventing facts.
+
+---
+
+# Default Prompt
+
+You are an AI Assistant for this organization.
+
+Your primary responsibility is to answer questions using the documents stored in the connected Knowledge Base.
+
+Always prioritize information from uploaded documents.
+
+If the answer cannot be found, explain that the information is unavailable instead of making assumptions.
+
+Respond professionally, clearly, and with structured formatting.
+
+---
+
+# Generated Objects
+
+The wizard automatically creates
+
+Knowledge Base
+
+Persona
+
+Chatbot
+
+Default Prompt
+
+Default Settings
+
+Connection
+
+Publish Configuration
+
+Everything is editable later from Builder.
+
+---
+
+# Chatbot Configuration
+
+Automatically enable
+
+Conversation Memory
+
+Citation
+
+Streaming
+
+Markdown Response
+
+Source Reference
+
+Suggested Questions
+
+Follow-up Questions
+
+---
+
+# After Generation
+
+Show
+
+✅ AI Assistant Created Successfully
+
+Display
+
+Assistant Name
+
+Knowledge Size
+
+Number of Documents
+
+Chat URL
+
+Preview Button
+
+Open Builder Button
+
+---
+
+# Builder Integration
+
+The generated assistant must remain fully compatible with the existing Builder.
+
+Users can later edit
+
+Persona
+
+Prompt
+
+Knowledge
+
+Mini Apps
+
+Workflow
+
+Multi Agent
+
+Integrations
+
+Publishing
+
+Nothing should be locked.
+
+---
+
+# Architecture
+
+Do NOT create a separate chatbot engine.
+
+Reuse existing Gustafta modules whenever possible.
+
+Knowledge Base
+
+Persona
+
+Builder
+
+Chatbot
+
+Publishing
+
+Integrations
+
+Only automate the orchestration process.
+
+---
+
+# Future Enhancements (Do Not Build Yet)
+
+Multiple Knowledge Bases
+
+Multiple Personas
+
+Department Assistants
+
+Auto Tagging
+
+Auto Folder Classification
+
+Multi-Agent Generation
+
+Workflow Suggestions
+
+WhatsApp Deployment
+
+API Deployment
+
+Marketplace Publishing
+
+---
+
+# Success Criteria
+
+A non-technical user should be able to
+
+1. Upload documents into Ruang Simpan.
+
+2. Click "Create AI Assistant."
+
+3. Wait less than one minute.
+
+4. Receive a fully functional AI Assistant.
+
+Without understanding prompts, embeddings, vector databases, or chatbot building.
+
+This feature should position Gustafta as the easiest platform for transforming business knowledge into AI Assistants while preserving the full power of the Builder for advanced users.
+
+## Satu tambahan yang menurut saya sangat penting
+
+Saya akan meminta Replit **tidak membuat AI Assistant sebagai entitas yang terpisah dari Chatbot**.
+
+Sebaliknya, AI Assistant adalah **template otomatis yang menghasilkan Chatbot**.
+
+Secara arsitektur:
+
+```text
+Ruang Simpan
+      │
+      ▼
+Auto AI Assistant Wizard
+      │
+      ▼
+Automation Engine
+      │
+      ├── Create Knowledge Base
+      ├── Create Persona
+      ├── Create Prompt
+      ├── Create Chatbot
+      ├── Link Knowledge
+      ├── Configure Defaults
+      └── Publish
+            │
+            ▼
+Existing Chatbot Engine
+```
+
+Dengan pendekatan ini, Anda **tidak perlu memelihara dua sistem berbeda** (AI Assistant dan Chatbot). AI Assistant hanyalah **cara otomatis membuat chatbot** menggunakan engine Builder yang sudah ada. Ini menjaga kode tetap sederhana, mengurangi duplikasi, dan semua peningkatan pada Chatbot Builder akan otomatis dinikmati oleh AI Assistant juga.

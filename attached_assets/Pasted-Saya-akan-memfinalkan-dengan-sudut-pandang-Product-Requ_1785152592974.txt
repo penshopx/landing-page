@@ -1,0 +1,688 @@
+Saya akan memfinalkan dengan sudut pandang **Product Requirement Document (PRD)**, bukan sekadar "buat fitur". Tujuannya agar Replit memahami **visi produk**, bukan hanya implementasi teknis.
+
+Menurut saya, fitur ini bisa menjadi **killer feature** Gustafta karena mengubah positioning dari **AI Chatbot Builder** menjadi **Business Memory Platform yang dapat menghasilkan AI Assistant secara otomatis**.
+
+Yang penting, **Builder tetap menjadi inti platform**. Fitur baru ini hanya mengotomatisasi proses yang sebelumnya dilakukan manual.
+
+---
+
+# Gustafta Product Enhancement Request
+
+# Feature: Auto AI Assistant Generator
+
+## Vision
+
+Transform Gustafta from an AI Chatbot Builder into a Business Memory Platform where every collection of business knowledge can be turned into an AI Assistant automatically.
+
+Users should not be required to understand AI, prompts, RAG, embeddings, vector databases, or chatbot building.
+
+Instead, they simply store their business knowledge inside **Ruang Simpan**, then click one button to generate an AI Assistant.
+
+The existing Builder remains the advanced workspace for creators and consultants.
+
+This new feature is an automation layer built on top of the existing Builder.
+
+---
+
+# Product Philosophy
+
+Today, most AI platforms ask users to build chatbots.
+
+Gustafta should instead allow users to build Business Memory.
+
+Once Business Memory exists, Gustafta automatically transforms it into an AI Assistant.
+
+The chatbot is no longer the starting point.
+
+It becomes the output.
+
+Business Memory becomes the core product.
+
+---
+
+# New User Journey
+
+Old Journey
+
+Upload Documents
+
+↓
+
+Create Knowledge Base
+
+↓
+
+Create Persona
+
+↓
+
+Create Prompt
+
+↓
+
+Create Chatbot
+
+↓
+
+Connect Knowledge
+
+↓
+
+Publish
+
+---
+
+New Journey
+
+Store Documents in Ruang Simpan
+
+↓
+
+Select Folder
+
+↓
+
+Click
+
+✨ Generate AI Assistant
+
+↓
+
+Automatic Processing
+
+↓
+
+AI Assistant Ready
+
+No technical knowledge required.
+
+---
+
+# Business Goals
+
+This feature should allow anyone to create an AI Assistant within one minute.
+
+Target users include
+
+Small Business
+
+Enterprise
+
+Consultants
+
+ERP Consultants
+
+Law Firms
+
+Construction Companies
+
+Hospitals
+
+Schools
+
+Government
+
+Manufacturing
+
+Associations
+
+Universities
+
+Any organization that owns business knowledge.
+
+This feature must NOT be limited to ERP.
+
+ERP is only one template.
+
+---
+
+# Core Concept
+
+Every folder inside Ruang Simpan can become an AI Assistant.
+
+Example
+
+HR Folder
+
+↓
+
+HR Assistant
+
+Legal Folder
+
+↓
+
+Legal Assistant
+
+ERP Folder
+
+↓
+
+ERP Assistant
+
+Construction Folder
+
+↓
+
+Tender Assistant
+
+ISO Folder
+
+↓
+
+ISO Assistant
+
+Project Folder
+
+↓
+
+Project Assistant
+
+Sales Folder
+
+↓
+
+Sales Assistant
+
+The engine is identical.
+
+Only templates and prompts differ.
+
+---
+
+# New Button
+
+Inside every folder in Ruang Simpan add a primary action.
+
+🤖 Generate AI Assistant
+
+This button appears only if the folder contains supported knowledge files.
+
+---
+
+# Supported Knowledge
+
+PDF
+
+DOCX
+
+TXT
+
+Markdown
+
+CSV
+
+Images (OCR)
+
+Audio Transcript
+
+Video Transcript
+
+Website
+
+YouTube Transcript
+
+Future support
+
+Email
+
+Database
+
+API
+
+Cloud Storage
+
+---
+
+# AI Assistant Wizard
+
+Step 1
+
+Assistant Name
+
+Default
+
+Folder Name + Assistant
+
+Examples
+
+HR Assistant
+
+Finance Assistant
+
+ERP Assistant
+
+Company Assistant
+
+Users may change the name.
+
+---
+
+Step 2
+
+Assistant Purpose
+
+Options
+
+General Company Assistant
+
+Customer Service
+
+Internal Knowledge
+
+HR
+
+Finance
+
+Sales
+
+Marketing
+
+Legal
+
+ERP
+
+Construction
+
+ISO
+
+Project
+
+Education
+
+Healthcare
+
+Custom
+
+Each template loads a default prompt.
+
+---
+
+Step 3
+
+Knowledge Source
+
+Automatically use
+
+Current Folder
+
+Optional
+
+Include Subfolders
+
+---
+
+Step 4
+
+Review
+
+Display
+
+Number of documents
+
+Knowledge size
+
+Supported file count
+
+Estimated processing time
+
+---
+
+# Automatic AI Classification
+
+Before generation, analyze document contents.
+
+Suggest the best assistant type.
+
+Examples
+
+If documents contain
+
+Purchase Order
+
+Warehouse
+
+Inventory
+
+SAP
+
+Odoo
+
+Dynamics
+
+Suggest
+
+ERP Assistant
+
+If documents contain
+
+ISO 9001
+
+Internal Audit
+
+CAPA
+
+Suggest
+
+ISO Assistant
+
+If documents contain
+
+Contract
+
+Agreement
+
+Law
+
+Regulation
+
+Suggest
+
+Legal Assistant
+
+Users can accept or override the suggestion.
+
+---
+
+# Automatic Generation Pipeline
+
+When Generate is clicked
+
+Run the following pipeline automatically.
+
+1
+
+Create Knowledge Base
+
+2
+
+Import Documents
+
+3
+
+Extract Text
+
+4
+
+Generate Embeddings
+
+5
+
+Create Vector Index
+
+6
+
+Generate Metadata
+
+7
+
+Create Persona
+
+8
+
+Generate Default System Prompt
+
+9
+
+Create AI Assistant (Chatbot)
+
+10
+
+Connect Knowledge Base
+
+11
+
+Enable Citations
+
+12
+
+Enable Conversation Memory
+
+13
+
+Enable Markdown Responses
+
+14
+
+Enable Suggested Questions
+
+15
+
+Publish
+
+Everything happens automatically.
+
+---
+
+# Generated Persona
+
+Automatically create
+
+Name
+
+Assistant Name
+
+Role
+
+Professional AI Assistant
+
+Tone
+
+Professional
+
+Helpful
+
+Clear
+
+Reliable
+
+Response Language
+
+Automatically follows user's language.
+
+Rules
+
+Always prioritize uploaded knowledge.
+
+Never invent information.
+
+Clearly state when information is unavailable.
+
+Always cite supporting documents when possible.
+
+---
+
+# Generated Prompt
+
+You are an AI Assistant for this organization.
+
+Your responsibility is to answer questions using the connected Business Memory.
+
+Always prioritize uploaded knowledge.
+
+If information cannot be found, clearly state that it is unavailable instead of making assumptions.
+
+Respond professionally using structured formatting.
+
+---
+
+# After Generation
+
+Display
+
+AI Assistant Successfully Created
+
+Information
+
+Assistant Name
+
+Knowledge Size
+
+Document Count
+
+Status
+
+Chat URL
+
+Buttons
+
+Open AI Assistant
+
+Open Builder
+
+Share
+
+Deploy
+
+---
+
+# Builder Integration
+
+This feature MUST NOT create a separate chatbot engine.
+
+Reuse existing modules.
+
+Knowledge Base
+
+Persona
+
+Prompt
+
+Chatbot
+
+Publishing
+
+Mini Apps
+
+Workflow
+
+Integrations
+
+The Builder becomes the advanced editor.
+
+Users may customize everything after automatic generation.
+
+---
+
+# Architecture
+
+Ruang Simpan
+
+↓
+
+Business Memory
+
+↓
+
+Auto AI Assistant Generator
+
+↓
+
+Existing Builder Engine
+
+↓
+
+Published AI Assistant
+
+The automation layer only orchestrates existing components.
+
+No duplicate chatbot architecture should be introduced.
+
+---
+
+# Future Roadmap (Not Included in This Release)
+
+Department AI
+
+Multi-Agent Generation
+
+Automatic Mini App Recommendation
+
+Workflow Recommendation
+
+Automatic Tool Selection
+
+WhatsApp Deployment
+
+Telegram Deployment
+
+API Deployment
+
+Marketplace Publishing
+
+Shared Business Memory
+
+Cross Folder Knowledge
+
+---
+
+# Success Criteria
+
+A new user should be able to
+
+Upload business documents.
+
+Store them inside Ruang Simpan.
+
+Click Generate AI Assistant.
+
+Receive a working AI Assistant within one minute.
+
+Without understanding
+
+Prompt Engineering
+
+RAG
+
+Embeddings
+
+Vector Databases
+
+Knowledge Base Configuration
+
+Persona Design
+
+Chatbot Builder
+
+The Builder remains available for creators who need advanced customization.
+
+The generated AI Assistant must be fully editable inside the existing Builder.
+
+No duplicated chatbot engine should be created.
+
+---
+
+# Product Positioning
+
+Old Positioning
+
+"Build AI Chatbots."
+
+New Positioning
+
+"Transform Business Knowledge into AI Assistants."
+
+Marketing Message
+
+Store your business knowledge in Ruang Simpan.
+
+With one click, Gustafta transforms it into an AI Assistant that is ready to answer questions, preserve organizational knowledge, and help your team work smarter.
+
+Business Memory first.
+
+AI Assistant automatically follows.
+
+This is the core experience that differentiates Gustafta from traditional AI chatbot builders.
+
+### Catatan terakhir (sangat penting)
+
+Saya juga akan menambahkan satu arahan eksplisit kepada tim Replit:
+
+> **Do not remove or simplify the existing AI Builder.** The Auto AI Assistant Generator is an onboarding and productivity feature built on top of the current Builder. Every AI Assistant created automatically must remain fully editable using the existing Builder, including Persona, Knowledge Base, Prompts, Mini Apps, Workflows, Multi-Agent configuration, Integrations, and Publishing settings.
+
+Dengan keputusan ini, Gustafta memiliki **dua jalur pengguna** yang saling melengkapi:
+
+* **Jalur Instan** untuk pengguna umum: *Ruang Simpan → Generate AI Assistant → Langsung digunakan*.
+* **Jalur Profesional** untuk creator dan konsultan: *Builder → Kustomisasi penuh → Solusi AI yang kompleks*.
+
+Menurut saya, arsitektur ini menjaga visi awal Gustafta sebagai **platform AI Builder**, sekaligus membuat produk jauh lebih mudah diadopsi oleh pengguna yang tidak memiliki latar belakang teknis.

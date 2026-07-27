@@ -1308,6 +1308,104 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
   });
 }
 
+// ── POST /api/ruang-simpan/generate-assistant ────────────────────────────────
+// Wizard: otomatis buat AI Agent dari dokumen Ruang Simpan
+const ASSISTANT_PROMPTS: Record<string, string> = {
+  "umum":    `Kamu adalah AI Assistant untuk perusahaan ini. Tugasmu adalah menjawab pertanyaan berdasarkan dokumen perusahaan yang tersedia. Selalu prioritaskan informasi dari dokumen yang sudah diunggah. Jika informasi tidak tersedia, katakan dengan jelas dan jangan mengarang jawaban. Jawab secara profesional, ramah, dan terstruktur dalam bahasa yang sama dengan pertanyaan pengguna.`,
+  "cs":      `Kamu adalah AI Customer Service yang membantu pelanggan dengan pertanyaan tentang produk, layanan, dan kebijakan. Gunakan dokumen yang tersedia sebagai sumber utama. Bersikaplah ramah, empatik, dan profesional. Jika pertanyaan di luar cakupan dokumen, arahkan ke tim manusia.`,
+  "legal":   `Kamu adalah AI Legal Assistant yang membantu menjawab pertanyaan terkait dokumen hukum, kontrak, dan peraturan. Gunakan dokumen yang tersedia sebagai referensi. Tegaskan bahwa jawabanmu adalah referensi informasi, bukan nasihat hukum resmi.`,
+  "hr":      `Kamu adalah AI HR Assistant yang membantu karyawan dengan pertanyaan seputar kebijakan SDM, tunjangan, dan prosedur perusahaan. Gunakan dokumen HR yang tersedia. Jawab dengan empati dan profesionalisme.`,
+  "tender":  `Kamu adalah AI Tender Assistant yang membantu tim pengadaan dengan pertanyaan tentang RKS, persyaratan, dan prosedur pengadaan. Gunakan dokumen tender yang tersedia. Berikan jawaban akurat dan terstruktur sesuai persyaratan teknis.`,
+  "project": `Kamu adalah AI Project Assistant yang membantu tim proyek dengan informasi dari dokumen proyek, spesifikasi, jadwal, dan prosedur. Gunakan dokumen yang tersedia. Jawab secara teknis dan terstruktur.`,
+  "iso":     `Kamu adalah AI Quality Assistant yang membantu dengan pertanyaan tentang standar ISO, prosedur mutu, dan audit. Gunakan dokumen ISO dan SOP yang tersedia. Berikan jawaban yang presisi dan sesuai standar kualitas.`,
+  "sales":   `Kamu adalah AI Sales Assistant yang membantu tim penjualan dengan informasi produk, proposal, dan strategi. Gunakan dokumen sales yang tersedia. Jawab secara informatif dan berorientasi pada kebutuhan pelanggan.`,
+  "finance": `Kamu adalah AI Finance Assistant yang membantu tim keuangan dengan pertanyaan tentang laporan keuangan, anggaran, dan kebijakan keuangan. Gunakan dokumen yang tersedia. Jawab secara akurat dan profesional.`,
+  "custom":  `Kamu adalah AI Assistant yang menjawab pertanyaan berdasarkan dokumen yang tersedia. Prioritaskan informasi dari dokumen. Jika tidak tersedia, katakan dengan jelas. Jawab secara profesional.`,
+};
+
+app.post("/api/ruang-simpan/generate-assistant", isAuthenticated, async (req: any, res) => {
+  const userId = extractUid(req, res);
+  if (!userId) return;
+  try {
+    const { folder_id, name, assistant_type = "umum" } = req.body;
+    if (!name?.trim()) return res.status(422).json({ error: "Nama asisten diperlukan" });
+
+    // Get AI-ready files
+    let fileQuery = `SELECT id, original_name, size_bytes FROM ruang_simpan_files WHERE user_id = $1 AND kb_status = 'ready'`;
+    const params: any[] = [userId];
+    if (folder_id && folder_id !== "all") {
+      fileQuery += ` AND folder_id = $2`;
+      params.push(folder_id);
+    }
+    const filesRes = await pool.query(fileQuery, params);
+    const files = filesRes.rows;
+    if (files.length === 0) {
+      return res.status(400).json({ error: "Tidak ada dokumen AI Siap di folder ini. Upload dokumen dan tunggu status 'AI Siap' terlebih dahulu." });
+    }
+
+    // Get chunks for those files (max 300)
+    const fileIds = files.map((f: any) => f.id);
+    const chunksRes = await pool.query(
+      `SELECT file_id, chunk_index, content FROM ruang_simpan_chunks
+       WHERE user_id = $1 AND file_id = ANY($2::uuid[])
+       ORDER BY file_id, chunk_index LIMIT 300`,
+      [userId, fileIds]
+    );
+    const chunks = chunksRes.rows;
+
+    const systemPrompt = ASSISTANT_PROMPTS[assistant_type] || ASSISTANT_PROMPTS["umum"];
+    const agentId = crypto.randomUUID();
+    const kbId    = crypto.randomUUID();
+    const slug    = `rs-asst-${agentId.substring(0, 8)}`;
+    const token   = `gus_${agentId.replace(/-/g, "")}`;
+    const safeName = name.trim();
+    const greeting = `Halo! Saya **${safeName}**, AI Assistant Anda. Saya siap menjawab pertanyaan berdasarkan ${files.length} dokumen yang sudah diunggah. Apa yang ingin Anda tanyakan?`;
+
+    // Create agent
+    await pool.query(`
+      INSERT INTO agents (
+        id, name, description, tagline, system_prompt, temperature, max_tokens, ai_model,
+        is_public, is_listed, language, category, slug, access_token,
+        user_id, greeting_message, conversation_starters
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+    `, [
+      agentId, safeName,
+      `AI Assistant dari ${files.length} dokumen Ruang Simpan`,
+      `Tanya apa saja tentang ${safeName}`,
+      systemPrompt, 0.3, 1024, "gpt-4o",
+      false, false, "id", "ruang-simpan",
+      slug, token, userId, greeting,
+      JSON.stringify(["Apa saja isi dokumen ini?", "Bantu saya memahami isi dokumen", "Apa poin penting yang perlu saya ketahui?"]),
+    ]);
+
+    // Create knowledge_base entry
+    const kbContent = files.map((f: any) => f.original_name).join(", ");
+    const extractedPreview = chunks.slice(0, 30).map((c: any) => c.content).join("\n\n").substring(0, 30_000);
+    await pool.query(`
+      INSERT INTO knowledge_bases (id, agent_id, name, type, content, description, file_name, processing_status, extracted_text)
+      VALUES ($1,$2,$3,'text',$4,$5,$6,'completed',$7)
+    `, [kbId, agentId, `Pengetahuan dari Ruang Simpan`, kbContent,
+        `${files.length} dokumen dari Ruang Simpan Anda`, `ruang_simpan_${folder_id || "all"}`, extractedPreview]);
+
+    // Batch-insert chunks into knowledge_chunks (groups of 50)
+    for (let i = 0; i < chunks.length; i += 50) {
+      const batch = chunks.slice(i, i + 50);
+      const vals  = batch.map((_: any, j: number) => `(gen_random_uuid(),$1,$2,${i + j},$${j + 3},0)`).join(",");
+      const bParams = [kbId, agentId, ...batch.map((c: any) => c.content)];
+      await pool.query(
+        `INSERT INTO knowledge_chunks (id,knowledge_base_id,agent_id,chunk_index,content,token_count) VALUES ${vals}`,
+        bParams
+      );
+    }
+
+    console.log(`[RS/generate-assistant] Created agent ${agentId} (${safeName}) with ${files.length} files, ${chunks.length} chunks`);
+    res.json({ agent_id: agentId, slug, name: safeName, file_count: files.length, chunk_count: chunks.length, chat_url: `/chat/${slug}` });
+  } catch (err: any) {
+    console.error("[RS/generate-assistant]", err?.message);
+    res.status(500).json({ error: "Gagal membuat AI Asisten: " + (err?.message || "error") });
+  }
+});
+
 // ── Background file processor ─────────────────────────────────────────────
 
 async function processFileAsync(
