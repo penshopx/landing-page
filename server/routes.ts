@@ -181,10 +181,26 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
   const spWhere = spConditions.length > 1 ? and(...spConditions) : spConditions[0];
   const spRows = await db.select().from(storeProducts).where(spWhere).orderBy(storeProducts.sortOrder, storeProducts.id);
 
-  // Biaya Lisensi: flat Rp 299.000 (hak pakai, install mandiri)
-  // Biaya Setup oleh tim Gustafta: Rp 999.000 (terpisah, opsional)
-  const calcStorePrice = (_agenticSubAgents: any): number => 299000;
-  const calcOriginalPrice = (_total: number): number => 450000;
+  // Biaya Lisensi: tiered berdasarkan jumlah anggota tim (sub-agents + 1 orchestrator).
+  // Biaya Setup oleh tim Gustafta: Rp 999.000 (terpisah, opsional).
+  // Tier harga (hak pakai, sekali bayar):
+  //   1 agen   solo     → DEFAULT_LICENSE_PRICE (299.000)
+  //   2–3 agen tim kecil → 499.000
+  //   4–6 agen tim sedang → 799.000
+  //   7+  agen tim besar  → 1.299.000
+  const calcStorePrice = (agenticSubAgents: any): number => {
+    const subCount = Array.isArray(agenticSubAgents) ? agenticSubAgents.length : 0;
+    const total = subCount + 1; // include the orchestrator itself
+    if (total >= 7) return 1_299_000;
+    if (total >= 4) return 799_000;
+    if (total >= 2) return 499_000;
+    return DEFAULT_LICENSE_PRICE; // 299.000 — solo agent
+  };
+  // Harga coret ≈ 1,5× harga final (pembulatan ke ratusan ribu terdekat)
+  const calcOriginalPrice = (total: number): number => {
+    const base = calcStorePrice(Array(Math.max(0, total - 1)).fill(null));
+    return Math.ceil((base * 1.5) / 100_000) * 100_000;
+  };
 
   // Pre-fetch agenticSubAgents for store_products that link to an agent
   const spLinkedAgentIds = spRows.map(p => p.agentId).filter(Boolean) as number[];
