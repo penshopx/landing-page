@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { BookOpen, Clock, Users, Star, ChevronRight, GraduationCap, Wrench, Zap, Search, Bot, ExternalLink, Play, Loader2 } from "lucide-react";
+import { BookOpen, Clock, Users, Star, ChevronRight, GraduationCap, Wrench, Zap, Search, Bot, ExternalLink, Play, Loader2, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
@@ -196,6 +196,11 @@ function EcourseAgentCard({ agent }: { agent: AgentEcourse }) {
   );
 }
 
+interface Certificate {
+  id: number;
+  certificateCode: string;
+}
+
 interface LmsStatus {
   seeding: boolean;
   seedStatus: "pending" | "done" | "error";
@@ -206,6 +211,12 @@ export default function LmsPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [ecourseSearch, setEcourseSearch] = useState("");
+
+  const { data: myCerts = [] } = useQuery<Certificate[]>({
+    queryKey: ["/api/lms/certificates"],
+    queryFn: () => fetch("/api/lms/certificates").then(r => r.ok ? r.json() : []),
+    retry: false,
+  });
 
   const { data: lmsStatus } = useQuery<LmsStatus>({
     queryKey: ["/api/lms/status"],
@@ -277,6 +288,19 @@ export default function LmsPage() {
               data-testid="input-search-courses"
             />
           </div>
+          {myCerts.length > 0 && (
+            <div className="mt-4">
+              <Link href="/lms/certificates">
+                <button
+                  className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-amber-900 font-semibold px-5 py-2 rounded-full text-sm transition-colors shadow-sm"
+                  data-testid="button-my-certificates"
+                >
+                  <Award className="w-4 h-4" />
+                  Sertifikat Saya ({myCerts.length})
+                </button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 
