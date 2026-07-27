@@ -1369,6 +1369,46 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
     } catch (e) { safeErr(res, e, "PATCH access-requests/:reqId/reject"); }
   });
 
+  // ── POST /api/ruang-simpan/files/:id/reprocess ───────────────────────────
+  // Download dari Object Storage dan jalankan ulang ekstraksi teks + chunking
+  app.post("/api/ruang-simpan/files/:id/reprocess", isAuthenticated, rsWriteLimit, async (req: any, res) => {
+    const userId = extractUid(req, res);
+    if (!userId) return;
+    if (!guardUUID(req.params.id, res)) return;
+    try {
+      const { rows } = await pool.query(
+        `SELECT id, original_name, mime_type, storage_key, file_content, kb_status
+         FROM ruang_simpan_files WHERE id = $1 AND user_id = $2`,
+        [req.params.id, userId]
+      );
+      if (!rows.length) return res.status(404).json({ error: "File tidak ditemukan" });
+      const file = rows[0];
+
+      // Set ke 'processing' segera agar UI bisa update
+      await pool.query(`UPDATE ruang_simpan_files SET kb_status='processing' WHERE id=$1`, [file.id]);
+      res.json({ ok: true, status: "processing" });
+
+      // Jalankan async di background
+      (async () => {
+        try {
+          let buffer: Buffer;
+          if (file.storage_key) {
+            buffer = await downloadFile(file.storage_key);
+          } else if (file.file_content) {
+            buffer = Buffer.from(file.file_content);
+          } else {
+            await pool.query(`UPDATE ruang_simpan_files SET kb_status='failed' WHERE id=$1`, [file.id]);
+            return;
+          }
+          await processFileAsync(file.id, userId, buffer, file.mime_type, file.original_name);
+        } catch (e) {
+          console.error("[RS/reprocess] bg error:", e);
+          await pool.query(`UPDATE ruang_simpan_files SET kb_status='failed' WHERE id=$1`, [file.id]).catch(() => {});
+        }
+      })();
+    } catch (e) { safeErr(res, e, "POST files/:id/reprocess"); }
+  });
+
   // ── POST /api/ruang-simpan/generate-assistant ──────────────────────────────
   // Wizard: otomatis buat AI Agent dari dokumen Ruang Simpan
   const ASSISTANT_PROMPT_TEMPLATES: Record<string, (name: string) => string> = {
@@ -1418,10 +1458,15 @@ app.post("/api/ruang-simpan/generate-assistant", isAuthenticated, async (req: an
     const chunksRes = await pool.query(
       `SELECT file_id, chunk_index, content FROM ruang_simpan_chunks
        WHERE user_id = $1 AND file_id = ANY($2::uuid[])
+         AND content != 'Gagal mengekstrak konten dokumen.'
+         AND length(trim(content)) > 20
        ORDER BY file_id, chunk_index LIMIT 300`,
       [userId, fileIds]
     );
     const chunks = chunksRes.rows;
+    if (chunks.length === 0) {
+      return res.status(400).json({ error: "Dokumen yang dipilih belum berhasil diekstrak. Buka detail file dan klik 'Proses Ulang', lalu coba lagi." });
+    }
 
     const systemPrompt = (ASSISTANT_PROMPT_TEMPLATES[assistant_type] || ASSISTANT_PROMPT_TEMPLATES["umum"])(name.trim());
     const { randomUUID } = await import("crypto");

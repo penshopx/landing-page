@@ -747,7 +747,33 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
   const [showPassportLog, setShowPassportLog] = useState(false);
   const [processingReqId, setProcessingReqId] = useState<string | null>(null);
   const [bedahLoading, setBedahLoading] = useState(false);
+  const [reprocessing, setReprocessing] = useState(false);
   const isImage = file.mime_type.startsWith("image/");
+
+  // Proses ulang ekstraksi dari Object Storage
+  const handleReprocess = async () => {
+    setReprocessing(true);
+    try {
+      const res = await fetch(`/api/ruang-simpan/files/${file.id}/reprocess`, {
+        method: "POST", credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal memproses ulang");
+      toast({ title: "Sedang diproses ulang…", description: "Status akan berubah ke 'AI Siap' dalam beberapa detik." });
+      // Poll sampai selesai
+      let tries = 0;
+      const poll = setInterval(async () => {
+        tries++;
+        onUpdated(); // refetch daftar file
+        if (tries >= 20) clearInterval(poll); // max 40 detik
+      }, 2000);
+      setTimeout(() => clearInterval(poll), 42000);
+    } catch (err: any) {
+      toast({ title: "Gagal proses ulang", description: err.message, variant: "destructive" });
+    } finally {
+      setReprocessing(false);
+    }
+  };
 
   // Buka file RS di Bedah Dokumen
   const openInBedahDokumen = async () => {
@@ -885,8 +911,19 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
                 </div>
                 <div className="bg-muted/40 rounded-lg p-3">
                   <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Status AI</p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     {kbBadge(file.kb_status, file.kb_chunk_count)}
+                    {(file.kb_status === "failed" || file.kb_status === "ready" || file.kb_status === "pending") && (
+                      <button
+                        onClick={handleReprocess}
+                        disabled={reprocessing || file.kb_status === "processing"}
+                        className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 disabled:opacity-50 transition-colors dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/40"
+                        title="Proses ulang ekstraksi teks dari file asli"
+                      >
+                        <RefreshCw className={`h-2.5 w-2.5 ${reprocessing ? "animate-spin" : ""}`} />
+                        {reprocessing ? "Memproses…" : "Proses Ulang"}
+                      </button>
+                    )}
                   </div>
                 </div>
                 <div className="bg-muted/40 rounded-lg p-3">
@@ -1958,9 +1995,9 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
                   <MessageSquare className="h-4 w-4" /> Mulai Chat Sekarang
                 </Button>
               </a>
-              <a href={`/builder/${result.slug}`} target="_blank" rel="noopener noreferrer" className="block">
+              <a href={`/dashboard?agent=${result.agent_id}`} target="_blank" rel="noopener noreferrer" className="block">
                 <Button variant="outline" className="w-full gap-2 text-xs">
-                  <Wand2 className="h-3.5 w-3.5" /> Buka di Builder (kustomisasi lebih lanjut)
+                  <Wand2 className="h-3.5 w-3.5" /> Kustomisasi di Dashboard
                 </Button>
               </a>
             </div>
