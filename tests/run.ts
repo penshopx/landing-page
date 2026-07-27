@@ -19,6 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const files = [
   resolve(__dirname, "build-final-system-prompt.test.ts"),
   resolve(__dirname, "routes-helper-usage.test.ts"),
+  resolve(__dirname, "wa-cta-integrity.test.ts"),
 ];
 
 let hadFailure = false;
