@@ -189,14 +189,14 @@ export default function RuangSimpanPage() {
 
   const { data: files = [], isLoading: filesLoading, refetch: refetchFiles } = useQuery<RSFile[]>({
     queryKey: ["/api/ruang-simpan/files", activeFolder],
-    queryFn: () => apiRequest("GET", `/api/ruang-simpan/files${activeFolder !== "all" ? `?folder_id=${activeFolder}` : ""}`).then(r => r.json()),
+    queryFn: () => apiRequest("GET", `/api/ruang-simpan/files${activeFolder !== "all" ? `?folder_id=${activeFolder}` : ""}`),
     enabled: !!user && !searchQuery,
     refetchInterval: 8000,
   });
 
   const { data: searchResults, isLoading: searching } = useQuery<{ results: RSFile[]; query: string }>({
     queryKey: ["/api/ruang-simpan/search", searchQuery],
-    queryFn: () => apiRequest("GET", `/api/ruang-simpan/search?q=${encodeURIComponent(searchQuery)}`).then(r => r.json()),
+    queryFn: () => apiRequest("GET", `/api/ruang-simpan/search?q=${encodeURIComponent(searchQuery)}`),
     enabled: !!user && searchQuery.length >= 2,
   });
 
@@ -260,7 +260,7 @@ export default function RuangSimpanPage() {
   }, [importUrl, importDesc, activeFolder, toast, qc]);
 
   const deleteFile = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/ruang-simpan/files/${id}`).then(r => r.json()),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/ruang-simpan/files/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/ruang-simpan/files"] });
       qc.invalidateQueries({ queryKey: ["/api/ruang-simpan/overview"] });
@@ -741,12 +741,12 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
   // Passport (access log + grants)
   const { data: passport, isLoading: passportLoading, refetch: refetchPassport } = useQuery<RSPassport>({
     queryKey: [`/api/ruang-simpan/files/${file.id}/passport`],
-    queryFn: () => apiRequest("GET", `/api/ruang-simpan/files/${file.id}/passport`).then(r => r.json()),
+    queryFn: () => apiRequest("GET", `/api/ruang-simpan/files/${file.id}/passport`),
     enabled: tab === "paspor",
   });
 
   const revokeGrant = useMutation({
-    mutationFn: (grantId: string) => apiRequest("DELETE", `/api/ruang-simpan/files/${file.id}/grants/${grantId}`).then(r => r.json()),
+    mutationFn: (grantId: string) => apiRequest("DELETE", `/api/ruang-simpan/files/${file.id}/grants/${grantId}`),
     onSuccess: () => { toast({ title: "Kuasa berhasil dicabut" }); refetchPassport(); },
     onError: () => toast({ title: "Gagal mencabut kuasa", variant: "destructive" }),
   });
