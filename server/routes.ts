@@ -19989,6 +19989,106 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     });
   });
 
+  // ── Admin: Check Brevo sender domain authentication status ───────────────────
+  // Calls Brevo's /v3/senders/domains API to fetch SPF/DKIM/DMARC status for
+  // the configured sender domain (default: gustafta.com).
+  app.get("/api/admin/email/domain-status", isAuthenticated, requireAdmin, async (_req: any, res: any) => {
+    const brevoApiKey = process.env.BREVO_API_KEY;
+    if (!brevoApiKey) {
+      return res.json({ configured: false, message: "BREVO_API_KEY is not set." });
+    }
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.com";
+    const domainName = senderEmail.split("@")[1] || "gustafta.com";
+    try {
+      // Fetch all domains first, then get detail for our domain
+      const listResp = await fetch("https://api.brevo.com/v3/senders/domains", {
+        headers: { "accept": "application/json", "api-key": brevoApiKey },
+      });
+      if (!listResp.ok) {
+        const errBody = await listResp.text();
+        return res.json({ configured: true, error: `Brevo API error: HTTP ${listResp.status} — ${errBody.slice(0, 300)}` });
+      }
+      const listData: any = await listResp.json();
+      const domains: any[] = listData.domains || [];
+      const domainEntry = domains.find((d: any) =>
+        (d.domain_name || d.domainName || "").toLowerCase() === domainName.toLowerCase()
+      );
+
+      if (!domainEntry) {
+        return res.json({
+          configured: true,
+          domainName,
+          found: false,
+          message: `Domain "${domainName}" not found in Brevo. Add it at: app.brevo.com → Senders & IPs → Domains`,
+          allDomains: domains.map((d: any) => d.domain_name || d.domainName),
+        });
+      }
+
+      // Fetch detailed status for the specific domain
+      const detailResp = await fetch(`https://api.brevo.com/v3/senders/domains/${encodeURIComponent(domainName)}`, {
+        headers: { "accept": "application/json", "api-key": brevoApiKey },
+      });
+      let detail: any = domainEntry;
+      if (detailResp.ok) {
+        detail = await detailResp.json();
+      }
+
+      return res.json({
+        configured: true,
+        domainName,
+        found: true,
+        authenticated: !!(detail.authenticated ?? detail.isAuthenticated),
+        dkim: detail.dkim_record || detail.dkimRecord || detail.dkim || null,
+        spf: detail.spf_record || detail.spfRecord || detail.spf || null,
+        dmarc: detail.dmarc_record || detail.dmarcRecord || detail.dmarc || null,
+        raw: detail,
+      });
+    } catch (err: any) {
+      return res.json({ configured: true, error: `Network error: ${err?.message || String(err)}` });
+    }
+  });
+
+  // ── Admin: Send a test email to verify Brevo delivery ────────────────────────
+  app.post("/api/admin/email/send-test", isAuthenticated, requireAdmin, async (req: any, res: any) => {
+    const { to } = req.body;
+    if (!to || typeof to !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to.trim())) {
+      return res.status(400).json({ error: "Alamat email tujuan tidak valid." });
+    }
+    const { sendEmail } = await import("./lib/email");
+    const senderDomain = (process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.com").split("@")[1] || "gustafta.com";
+    const result = await sendEmail({
+      to: to.trim(),
+      toName: "Gustafta Admin",
+      subject: `✅ Test Email dari Gustafta — ${new Date().toLocaleString("id-ID")}`,
+      htmlContent: `<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:24px;background:#f3f4f6;font-family:Arial,sans-serif">
+  <div style="max-width:480px;margin:auto;background:#fff;border-radius:12px;padding:32px">
+    <p style="font-size:22px;font-weight:700;color:#6366f1;margin:0 0 16px">Gustafta</p>
+    <p style="font-size:16px;font-weight:600;margin:0 0 8px">✅ Email berhasil terkirim!</p>
+    <p style="font-size:14px;color:#374151;margin:0 0 16px">
+      Ini adalah email uji coba dari admin panel Gustafta.<br>
+      Jika email ini masuk ke <strong>inbox</strong> (bukan spam), berarti konfigurasi Brevo dan autentikasi domain <code>${senderDomain}</code> sudah benar.
+    </p>
+    <div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:16px;font-size:13px;color:#6b7280">
+      <strong>Dikirim:</strong> ${new Date().toLocaleString("id-ID")}<br>
+      <strong>Domain pengirim:</strong> ${senderDomain}
+    </div>
+    <p style="font-size:12px;color:#9ca3af;margin:16px 0 0">© ${new Date().getFullYear()} Gustafta. Email ini dikirim dari admin panel.</p>
+  </div>
+</body>
+</html>`,
+      textContent: `Gustafta — Email Uji Coba\n\nEmail ini berhasil terkirim dari admin panel Gustafta.\nJika email ini masuk ke inbox (bukan spam), konfigurasi Brevo sudah benar.\n\nDikirim: ${new Date().toLocaleString("id-ID")}\nDomain pengirim: ${senderDomain}\n\n© ${new Date().getFullYear()} Gustafta.`,
+      tags: ["admin-test", "transactional"],
+    });
+    if (result.sent) {
+      console.log(`[Admin] Test email sent to ${to.trim()} by admin ${req.user?.claims?.sub || req.user?.id || "unknown"}`);
+      return res.json({ ok: true, message: `Email uji coba berhasil dikirim ke ${to.trim()}. Cek inbox (dan folder spam) penerima.` });
+    }
+    return res.status(502).json({ ok: false, reason: result.reason, detail: (result as any).detail });
+  });
+
   // Endpoint Mayar dihapus — gunakan Scalev untuk semua payment link.
 
   // ── BLUEPRINT SUBMISSIONS (Dialog Gustafta → DB) ─────────────────────────

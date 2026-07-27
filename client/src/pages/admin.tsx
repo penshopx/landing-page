@@ -762,6 +762,36 @@ export default function AdminPage() {
     onError: () => toast({ title: "Gagal seed LexCom", description: "Coba lagi atau cek log server.", variant: "destructive" }),
   });
 
+  // ---- Email Health ----
+  const [testEmailTo, setTestEmailTo] = useState("");
+  const [testEmailResult, setTestEmailResult] = useState<{ ok: boolean; message?: string; reason?: string } | null>(null);
+
+  const { data: brevoStats, refetch: refetchBrevoStats } = useQuery<any>({
+    queryKey: ["/api/admin/brevo-stats"],
+    enabled: isAdmin && activeTab === "tools",
+  });
+
+  const { data: emailDomainStatus, isLoading: domainStatusLoading, refetch: refetchDomainStatus } = useQuery<any>({
+    queryKey: ["/api/admin/email/domain-status"],
+    enabled: isAdmin && activeTab === "tools",
+    retry: false,
+  });
+
+  const sendTestEmailMutation = useMutation({
+    mutationFn: async (to: string) => {
+      const res = await apiRequest("POST", "/api/admin/email/send-test", { to });
+      return res.json ? res.json() : res;
+    },
+    onSuccess: (data: any) => {
+      setTestEmailResult({ ok: true, message: data.message });
+      toast({ title: "✅ Email uji coba terkirim!", description: data.message });
+    },
+    onError: (err: any) => {
+      setTestEmailResult({ ok: false, reason: err?.message || "Gagal mengirim email." });
+      toast({ title: "Gagal kirim test email", description: err?.message || "Cek BREVO_API_KEY dan konfigurasi domain.", variant: "destructive" });
+    },
+  });
+
   // ---- Guards ----
   if (meError) {
     return (
@@ -2407,6 +2437,200 @@ export default function AdminPage() {
           {/* ========== TOOLS TAB ========== */}
           <TabsContent value="tools" className="mt-4">
             <div className="space-y-4">
+
+              {/* ── Email Health ── */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-5 w-5 text-blue-500" />
+                      <CardTitle className="text-base">Email Health — Brevo Sender Domain</CardTitle>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => { refetchDomainStatus(); refetchBrevoStats(); }} disabled={domainStatusLoading} className="gap-1.5">
+                      <RefreshCw className={`h-3.5 w-3.5 ${domainStatusLoading ? "animate-spin" : ""}`} />
+                      Refresh
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Verifikasi autentikasi domain pengirim email agar tidak masuk spam. SPF + DKIM + DMARC harus aktif.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-5">
+
+                  {/* Domain auth status */}
+                  {!emailDomainStatus ? (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <RefreshCw className="h-4 w-4 animate-spin" /> Memeriksa status domain...
+                    </div>
+                  ) : emailDomainStatus.error ? (
+                    <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-sm text-red-700 dark:text-red-300">
+                      <p className="font-semibold mb-1">⚠️ Gagal cek status domain</p>
+                      <p className="text-xs font-mono">{emailDomainStatus.error}</p>
+                    </div>
+                  ) : !emailDomainStatus.configured ? (
+                    <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 text-sm text-amber-700 dark:text-amber-200">
+                      <p className="font-semibold mb-1">⚠️ BREVO_API_KEY belum dikonfigurasi</p>
+                      <p className="text-xs">Set secret <code className="bg-amber-100 dark:bg-amber-900/40 px-1 rounded">BREVO_API_KEY</code> di Replit Secrets, lalu restart server.</p>
+                    </div>
+                  ) : !emailDomainStatus.found ? (
+                    <div className="space-y-3">
+                      <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-sm">
+                        <p className="font-semibold text-red-700 dark:text-red-300 mb-1">❌ Domain <code>{emailDomainStatus.domainName}</code> belum terdaftar di Brevo</p>
+                        <p className="text-red-600 dark:text-red-400 text-xs">{emailDomainStatus.message}</p>
+                      </div>
+                      <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-4 text-sm space-y-2">
+                        <p className="font-semibold text-blue-700 dark:text-blue-300">📋 Langkah setup domain di Brevo:</p>
+                        <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-1.5 list-decimal list-inside">
+                          <li>Login ke <a href="https://app.brevo.com" target="_blank" rel="noreferrer" className="underline">app.brevo.com</a> → Senders &amp; IPs → Domains</li>
+                          <li>Klik <strong>Add a new domain</strong> → masukkan <code className="bg-blue-100 dark:bg-blue-900/40 px-1 rounded">gustafta.com</code></li>
+                          <li>Brevo akan tampilkan 3 DNS records: SPF, DKIM, dan DMARC</li>
+                          <li>Tambahkan records tersebut ke DNS manager domain (Namecheap/Cloudflare/dll)</li>
+                          <li>Kembali ke Brevo → klik <strong>Authenticate</strong> → tunggu propagasi (5–30 menit)</li>
+                          <li>Refresh halaman ini untuk verifikasi status</li>
+                        </ol>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Authentication status badge */}
+                      <div className={`flex items-center gap-3 rounded-lg p-4 border ${emailDomainStatus.authenticated ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800" : "bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800"}`}>
+                        <div className={`text-2xl ${emailDomainStatus.authenticated ? "text-green-600" : "text-amber-500"}`}>
+                          {emailDomainStatus.authenticated ? "✅" : "⚠️"}
+                        </div>
+                        <div>
+                          <p className={`font-semibold text-sm ${emailDomainStatus.authenticated ? "text-green-700 dark:text-green-300" : "text-amber-700 dark:text-amber-300"}`}>
+                            {emailDomainStatus.authenticated
+                              ? `Domain ${emailDomainStatus.domainName} — Authenticated ✓`
+                              : `Domain ${emailDomainStatus.domainName} — Belum sepenuhnya terautentikasi`}
+                          </p>
+                          <p className={`text-xs mt-0.5 ${emailDomainStatus.authenticated ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400"}`}>
+                            {emailDomainStatus.authenticated
+                              ? "SPF, DKIM, dan DMARC aktif. Email akan terkirim ke inbox, bukan spam."
+                              : "Beberapa DNS records belum propagasi. Cek DNS manager dan tunggu 5–30 menit."}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* DNS record details */}
+                      <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">DNS Records Status</p>
+                        {[
+                          { label: "SPF", value: emailDomainStatus.spf },
+                          { label: "DKIM", value: emailDomainStatus.dkim },
+                          { label: "DMARC", value: emailDomainStatus.dmarc },
+                        ].map(({ label, value }) => (
+                          <div key={label} className="flex items-start gap-3">
+                            <span className="text-xs font-mono font-bold w-12 shrink-0 mt-0.5">{label}</span>
+                            {value ? (
+                              <span className="text-xs text-green-600 dark:text-green-400 break-all">✓ {typeof value === "object" ? JSON.stringify(value) : String(value)}</span>
+                            ) : (
+                              <span className="text-xs text-amber-500">— Belum terdeteksi (mungkin masih propagasi)</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      {!emailDomainStatus.authenticated && (
+                        <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-4 text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                          <p className="font-semibold">📋 Belum terautentikasi? Ikuti langkah ini:</p>
+                          <ol className="list-decimal list-inside space-y-1">
+                            <li>Login ke <a href="https://app.brevo.com" target="_blank" rel="noreferrer" className="underline">app.brevo.com</a> → Senders &amp; IPs → Domains</li>
+                            <li>Klik domain <code>{emailDomainStatus.domainName}</code> → salin DNS records yang ditampilkan</li>
+                            <li>Tambahkan ke DNS manager domain Anda (Namecheap/Cloudflare/dll)</li>
+                            <li>Tunggu 5–30 menit → klik <strong>Authenticate</strong> di Brevo → Refresh halaman ini</li>
+                          </ol>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Required DNS Records Reference */}
+                  <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">DNS Records yang Diperlukan (referensi)</p>
+                    <div className="space-y-2 text-xs font-mono">
+                      <div className="bg-background rounded p-2 border">
+                        <span className="text-muted-foreground">SPF (TXT @ gustafta.com):</span><br />
+                        <span className="text-green-600 dark:text-green-400 break-all">v=spf1 include:spf.brevo.com mx ~all</span>
+                      </div>
+                      <div className="bg-background rounded p-2 border">
+                        <span className="text-muted-foreground">DKIM (TXT mail._domainkey.gustafta.com):</span><br />
+                        <span className="text-muted-foreground text-[10px]">→ Salin nilai DKIM dari dashboard Brevo (unik per akun)</span>
+                      </div>
+                      <div className="bg-background rounded p-2 border">
+                        <span className="text-muted-foreground">DMARC (TXT _dmarc.gustafta.com):</span><br />
+                        <span className="text-green-600 dark:text-green-400 break-all">v=DMARC1; p=none; rua=mailto:admin@gustafta.com</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Delivery stats */}
+                  {brevoStats && (
+                    <div className="rounded-lg border bg-muted/30 p-4">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Delivery Stats (sesi ini)</p>
+                      <div className="grid grid-cols-4 gap-3 text-center">
+                        <div>
+                          <p className="text-lg font-bold text-green-600">{brevoStats.delivered}</p>
+                          <p className="text-xs text-muted-foreground">Delivered</p>
+                        </div>
+                        <div>
+                          <p className="text-lg font-bold text-red-500">{brevoStats.bounced}</p>
+                          <p className="text-xs text-muted-foreground">Bounced</p>
+                        </div>
+                        <div>
+                          <p className="text-lg font-bold text-amber-500">{brevoStats.spam}</p>
+                          <p className="text-xs text-muted-foreground">Spam</p>
+                        </div>
+                        <div>
+                          <p className={`text-lg font-bold ${brevoStats.bounceRatePct > 5 ? "text-red-500" : "text-green-600"}`}>{brevoStats.bounceRatePct}%</p>
+                          <p className="text-xs text-muted-foreground">Bounce rate</p>
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">{brevoStats.note}</p>
+                    </div>
+                  )}
+
+                  {/* Send test email */}
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Kirim Email Uji Coba</p>
+                    <p className="text-xs text-muted-foreground">
+                      Kirim test email ke Gmail untuk memverifikasi bahwa email masuk ke <strong>inbox</strong> (bukan folder spam).
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        type="email"
+                        placeholder="contoh@gmail.com"
+                        value={testEmailTo}
+                        onChange={(e) => { setTestEmailTo(e.target.value); setTestEmailResult(null); }}
+                        className="text-sm"
+                        data-testid="input-test-email-to"
+                      />
+                      <Button
+                        size="sm"
+                        className="gap-1.5 shrink-0"
+                        disabled={sendTestEmailMutation.isPending || !testEmailTo.trim()}
+                        onClick={() => sendTestEmailMutation.mutate(testEmailTo.trim())}
+                        data-testid="button-send-test-email"
+                      >
+                        {sendTestEmailMutation.isPending ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Mengirim...</> : "Kirim Test"}
+                      </Button>
+                    </div>
+                    {testEmailResult && (
+                      <div className={`rounded-lg p-3 text-sm border ${testEmailResult.ok ? "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300" : "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300"}`}>
+                        {testEmailResult.ok ? `✅ ${testEmailResult.message}` : `❌ ${testEmailResult.reason}`}
+                      </div>
+                    )}
+                    <div className="rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/40 p-3 text-xs text-amber-700 dark:text-amber-300 space-y-1">
+                      <p className="font-semibold">✅ Checklist setelah kirim:</p>
+                      <ul className="list-disc list-inside space-y-0.5">
+                        <li>Email masuk ke <strong>Inbox</strong> (bukan Spam) → konfigurasi sudah benar</li>
+                        <li>Email masuk ke <strong>Spam</strong> → domain belum terautentikasi penuh; cek DNS</li>
+                        <li>Email tidak terkirim → cek BREVO_API_KEY, status akun Brevo, dan quota harian</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                </CardContent>
+              </Card>
 
               {/* ── MultiClaw Admin Shortcut ── */}
               <Card className="border-violet-500/30 bg-violet-500/5">
