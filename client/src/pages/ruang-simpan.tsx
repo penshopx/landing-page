@@ -728,6 +728,55 @@ function EmptyState({ isDragging, onUploadClick, isSearch }: { isDragging: boole
   );
 }
 
+// ── Preview Helpers ────────────────────────────────────────────────────────────
+
+function PreviewImage({ fileId, alt }: { fileId: string; alt: string }) {
+  const [err, setErr] = useState(false);
+  if (err) return (
+    <div className="flex flex-col items-center justify-center py-14 bg-muted/30 rounded-xl border border-border text-muted-foreground">
+      <FileText className="h-8 w-8 mb-2 opacity-40" />
+      <p className="text-sm">Gambar tidak dapat dimuat</p>
+    </div>
+  );
+  return (
+    <div className="rounded-xl overflow-hidden bg-muted border border-border">
+      <img src={`/api/ruang-simpan/files/${fileId}/preview`} alt={alt}
+        className="w-full max-h-[60vh] object-contain"
+        onError={() => setErr(true)} />
+    </div>
+  );
+}
+
+function PreviewPdf({ fileId, name }: { fileId: string; name: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const [err, setErr] = useState(false);
+  return (
+    <div className="relative rounded-xl overflow-hidden border border-border" style={{ minHeight: "65vh" }}>
+      {!loaded && !err && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      )}
+      {err ? (
+        <div className="flex flex-col items-center justify-center py-14 bg-muted/30 text-muted-foreground">
+          <FileText className="h-8 w-8 mb-2 opacity-40" />
+          <p className="text-sm font-semibold mb-1">Preview tidak tersedia</p>
+          <p className="text-xs text-center max-w-xs">File mungkin belum diproses atau tidak tersedia. Gunakan tombol Download, atau klik Proses Ulang di tab Info.</p>
+        </div>
+      ) : (
+        <iframe
+          src={`/api/ruang-simpan/files/${fileId}/preview`}
+          title={name}
+          className="w-full"
+          style={{ height: "65vh" }}
+          onLoad={() => setLoaded(true)}
+          onError={() => setErr(true)}
+        />
+      )}
+    </div>
+  );
+}
+
 // ── File Detail Dialog ─────────────────────────────────────────────────────────
 
 function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
@@ -1033,23 +1082,24 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
 
           {tab === "preview" && (
             <div className="space-y-3">
-              {file.mime_type.startsWith("image/") ? (
-                <div className="rounded-xl overflow-hidden bg-muted border border-border">
-                  <img
-                    src={`/api/ruang-simpan/files/${file.id}/preview`}
-                    alt={file.original_name}
-                    className="w-full max-h-[60vh] object-contain"
-                  />
+              {file.kb_status === "pending" || file.kb_status === "failed" ? (
+                <div className="flex flex-col items-center justify-center py-14 text-muted-foreground bg-amber-50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/40">
+                  <RefreshCw className="h-8 w-8 mb-3 text-amber-500 opacity-80" />
+                  <p className="text-sm font-semibold text-amber-700 dark:text-amber-400 mb-1">File belum diproses</p>
+                  <p className="text-xs text-center max-w-xs leading-relaxed text-amber-600 dark:text-amber-500">
+                    Buka tab <strong>Info</strong> dan klik tombol <strong>Proses Ulang</strong> untuk mengekstrak konten file ini.
+                  </p>
+                  <button
+                    onClick={() => setTab("info")}
+                    className="mt-3 text-xs font-semibold text-amber-700 dark:text-amber-400 underline"
+                  >
+                    → Ke tab Info
+                  </button>
                 </div>
+              ) : file.mime_type.startsWith("image/") ? (
+                <PreviewImage fileId={file.id} alt={file.original_name} />
               ) : file.mime_type === "application/pdf" ? (
-                <div className="rounded-xl overflow-hidden border border-border">
-                  <iframe
-                    src={`/api/ruang-simpan/files/${file.id}/preview`}
-                    title={file.original_name}
-                    className="w-full"
-                    style={{ height: "65vh" }}
-                  />
-                </div>
+                <PreviewPdf fileId={file.id} name={file.original_name} />
               ) : (
                 <div className="flex flex-col items-center justify-center py-16 text-muted-foreground bg-muted/30 rounded-xl border border-border">
                   <FileText className="h-10 w-10 mb-3 opacity-40" />
@@ -1059,9 +1109,11 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
                   </p>
                 </div>
               )}
-              <p className="text-[10px] text-muted-foreground text-center">
-                Konten ditampilkan langsung dari server — tidak perlu download.
-              </p>
+              {file.kb_status === "ready" && (
+                <p className="text-[10px] text-muted-foreground text-center">
+                  Konten ditampilkan langsung dari server — tidak perlu download.
+                </p>
+              )}
             </div>
           )}
 
