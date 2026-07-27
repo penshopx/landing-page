@@ -202,20 +202,27 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
     return Math.ceil((base * 1.5) / 100_000) * 100_000;
   };
 
-  // Pre-fetch agenticSubAgents for store_products that link to an agent
+  // Pre-fetch agenticSubAgents and paymentUrl for store_products that link to an agent
   const spLinkedAgentIds = spRows.map(p => p.agentId).filter(Boolean) as number[];
   const agentSubMap = new Map<number, any>();
+  const agentPaymentUrlMap = new Map<number, string>();
   if (spLinkedAgentIds.length > 0) {
     const linkedAgentRows = await db.select({
       id: agentsTable.id,
       agenticSubAgents: agentsTable.agenticSubAgents,
+      paymentUrl: agentsTable.paymentUrl,
     }).from(agentsTable).where(inArray(agentsTable.id, spLinkedAgentIds));
-    for (const r of linkedAgentRows) agentSubMap.set(r.id, parseSubAgentsValue(r.agenticSubAgents));
+    for (const r of linkedAgentRows) {
+      agentSubMap.set(r.id, parseSubAgentsValue(r.agenticSubAgents));
+      if (r.paymentUrl) agentPaymentUrlMap.set(r.id, r.paymentUrl);
+    }
   }
 
   const storeProductItems = spRows.map((p) => {
     const linkedSubAgents = p.agentId != null ? agentSubMap.get(p.agentId) : undefined;
     const price = linkedSubAgents !== undefined ? calcStorePrice(linkedSubAgents) : p.price;
+    const paymentUrl = (p as any).paymentUrl ||
+      (p.agentId != null ? (agentPaymentUrlMap.get(p.agentId) || null) : null);
     return {
       id: `sp-${p.id}`,
       productId: p.id,
@@ -230,7 +237,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
       color: p.color || "#6366f1",
       price,
       isGustafta: p.isGustafta ?? false,
-      paymentUrl: (p as any).paymentUrl || null,
+      paymentUrl,
       scalevVariantId: (p as any).scalevVariantId ?? null,
       type: "product",
     };
