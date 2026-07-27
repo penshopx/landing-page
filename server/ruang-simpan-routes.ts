@@ -429,14 +429,21 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
           [userId]
         ),
       ]);
-      res.setHeader("Cache-Control", "no-store");
-      res.json({
+      const overviewData = {
         folders:     foldersRes.rows,
         usage:       { used: parseInt(usageRes.rows[0].used), quota: await getQuotaForUser(userId),
                        total_files: usageRes.rows[0].total_files, ai_ready: usageRes.rows[0].ai_ready },
         recent_files: recentRes.rows,
         stats:       statsRes.rows[0],
+      };
+      console.log(`[RuangSimpan] GET overview uid=${userId} total_files=${overviewData.usage.total_files}`);
+      // Bypass Express ETag/freshness check — must always return 200 with fresh data
+      const json = JSON.stringify(overviewData);
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
       });
+      res.end(json);
     } catch (e) { safeErr(res, e, "GET overview"); }
   });
 
@@ -460,8 +467,14 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
       if (folderId && folderId !== "all") { q += ` AND f.folder_id = $2`; params.push(folderId); }
       q += ` ORDER BY f.created_at DESC`;
       const { rows } = await pool.query(q, params);
-      res.setHeader("Cache-Control", "no-store");
-      res.json(rows);
+      console.log(`[RuangSimpan] GET files uid=${userId} count=${rows.length}`);
+      // Bypass Express ETag/freshness check — must always return 200 with fresh data
+      const json = JSON.stringify(rows);
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+      });
+      res.end(json);
     } catch (e) { safeErr(res, e, "GET files"); }
   });
 
