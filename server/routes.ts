@@ -18368,6 +18368,77 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     }
   });
 
+  // ==================== ADMIN: EMAIL (BREVO) HEALTH CHECK ====================
+  // Tests live connectivity to Brevo's API using the configured key.
+  // Returns the server's outbound IP (from the Brevo error body when blocked) so
+  // admins know exactly which IP to add to https://app.brevo.com/security/authorised_ips
+  app.get("/api/admin/email-health", requireAdmin, async (_req: any, res: any) => {
+    const brevoApiKey = process.env.BREVO_API_KEY;
+    if (!brevoApiKey) {
+      return res.json({
+        configured: false,
+        reachable: false,
+        status: "not_configured",
+        detail: "BREVO_API_KEY is not set in Replit Secrets.",
+        serverIp: null,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    try {
+      const resp = await fetch("https://api.brevo.com/v3/account", {
+        headers: { "api-key": brevoApiKey, "accept": "application/json" },
+      });
+      const body: any = await resp.json().catch(() => ({}));
+
+      if (resp.ok) {
+        return res.json({
+          configured: true,
+          reachable: true,
+          status: "ok",
+          senderName: body?.companyName || body?.email || null,
+          detail: "Brevo API key valid and reachable.",
+          serverIp: null,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Attempt to extract the server's outbound IP from Brevo's "unrecognised IP" error message
+      const rawMsg: string = body?.message || "";
+      const ipMatch = rawMsg.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
+      const serverIp = ipMatch ? ipMatch[1] : null;
+
+      if (resp.status === 401 && serverIp) {
+        return res.json({
+          configured: true,
+          reachable: false,
+          status: "ip_blocked",
+          detail: `Server IP ${serverIp} is not in Brevo's authorized IP list. Go to https://app.brevo.com/security/authorised_ips and add this IP.`,
+          serverIp,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      return res.json({
+        configured: true,
+        reachable: false,
+        status: "api_error",
+        detail: `Brevo returned HTTP ${resp.status}: ${rawMsg.slice(0, 300)}`,
+        serverIp,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      return res.json({
+        configured: true,
+        reachable: false,
+        status: "network_error",
+        detail: err?.message || "Network error reaching Brevo.",
+        serverIp: null,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+
   // ==================== USER: MY ACCOUNT ====================
   app.get("/api/my/account", isAuthenticated, async (req: any, res: any) => {
     try {

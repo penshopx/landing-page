@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
-import { Activity, Lock, ArrowRight, Loader2, CheckCircle2, XCircle, AlertCircle, Cpu } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Activity, Lock, ArrowRight, Loader2, CheckCircle2, XCircle, AlertCircle, Cpu, Mail, RefreshCw } from "lucide-react";
 
 type ProviderHealthEntry = {
   lastSuccess: string | null;
@@ -105,8 +105,19 @@ function StatCell({ label, value, testid, highlight }: { label: string; value: n
   );
 }
 
+type EmailHealthData = {
+  configured: boolean;
+  reachable: boolean;
+  status: "ok" | "ip_blocked" | "api_error" | "network_error" | "not_configured";
+  detail: string;
+  serverIp: string | null;
+  senderName?: string | null;
+  timestamp: string;
+};
+
 export default function AdminAiHealthPage() {
   const { user, isLoading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const prev = document.title;
@@ -120,6 +131,17 @@ export default function AdminAiHealthPage() {
     queryKey: ["/api/admin/ai-health"],
     enabled: isAdmin,
     refetchInterval: 10000,
+    refetchIntervalInBackground: false,
+  });
+
+  const {
+    data: emailHealth,
+    isLoading: emailLoading,
+    isFetching: emailFetching,
+  } = useQuery<EmailHealthData>({
+    queryKey: ["/api/admin/email-health"],
+    enabled: isAdmin,
+    refetchInterval: 30000,
     refetchIntervalInBackground: false,
   });
 
@@ -184,6 +206,94 @@ export default function AdminAiHealthPage() {
           <span className="flex items-center gap-1"><span className="inline-block w-2.5 h-2.5 rounded-full bg-gray-300" /> Belum ada panggilan sejak restart</span>
         </div>
 
+        {/* ── Email / Brevo Health ── */}
+        <div className="space-y-3" data-testid="section-email-health">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Mail className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Email Transaksional (Brevo)</h2>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-xs"
+              onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/admin/email-health"] })}
+              disabled={emailFetching}
+              data-testid="btn-refresh-email-health"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${emailFetching ? "animate-spin" : ""}`} />
+              Cek ulang
+            </Button>
+          </div>
+
+          {emailLoading && !emailHealth ? (
+            <Card><CardContent className="pt-5 flex items-center gap-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /> Memeriksa koneksi Brevo…</CardContent></Card>
+          ) : emailHealth ? (
+            <Card data-testid="card-email-health">
+              <CardContent className="pt-5 space-y-4">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-gray-500" />
+                    <span className="font-bold text-gray-900 dark:text-white">Brevo SMTP API</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {emailHealth.configured ? (
+                      <Badge className="bg-emerald-500 text-white text-xs" data-testid="badge-brevo-key">Kunci ✓</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="text-xs" data-testid="badge-brevo-key">Tanpa Kunci</Badge>
+                    )}
+                    {emailHealth.status === "ok" ? (
+                      <Badge className="bg-emerald-500 text-white text-xs gap-1" data-testid="badge-brevo-status">
+                        <CheckCircle2 className="h-3 w-3" /> Terhubung
+                      </Badge>
+                    ) : emailHealth.status === "ip_blocked" ? (
+                      <Badge className="bg-red-500 text-white text-xs gap-1" data-testid="badge-brevo-status">
+                        <XCircle className="h-3 w-3" /> IP Diblokir
+                      </Badge>
+                    ) : emailHealth.status === "not_configured" ? (
+                      <Badge variant="secondary" className="text-xs gap-1" data-testid="badge-brevo-status">
+                        <AlertCircle className="h-3 w-3" /> Belum Dikonfigurasi
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-amber-500 text-white text-xs gap-1" data-testid="badge-brevo-status">
+                        <AlertCircle className="h-3 w-3" /> Error
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-md px-3 py-2.5 text-sm border bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300" data-testid="text-brevo-detail">
+                  {emailHealth.detail}
+                </div>
+
+                {emailHealth.status === "ip_blocked" && emailHealth.serverIp && (
+                  <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-3 space-y-2" data-testid="panel-ip-fix">
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">⚠️ Tindakan yang diperlukan</p>
+                    <ol className="text-sm text-amber-700 dark:text-amber-400 list-decimal list-inside space-y-1">
+                      <li>Buka <a href="https://app.brevo.com/security/authorised_ips" target="_blank" rel="noopener noreferrer" className="underline font-mono">app.brevo.com/security/authorised_ips</a></li>
+                      <li>Tambahkan IP server ini: <span className="font-mono font-bold bg-amber-100 dark:bg-amber-900/40 px-1 rounded">{emailHealth.serverIp}</span></li>
+                      <li>Klik "Cek ulang" di atas untuk konfirmasi</li>
+                    </ol>
+                  </div>
+                )}
+
+                {emailHealth.status === "ok" && emailHealth.senderName && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Akun Brevo: <span className="font-medium">{emailHealth.senderName}</span></p>
+                )}
+
+                <p className="text-xs text-gray-400">Dicek pada {new Date(emailHealth.timestamp).toLocaleTimeString("id-ID")}</p>
+              </CardContent>
+            </Card>
+          ) : null}
+        </div>
+
+        {/* ── AI Provider Health ── */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Cpu className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">AI Provider</h2>
+          </div>
+
         {isLoading && !data ? (
           <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-indigo-600" /></div>
         ) : isError ? (
@@ -204,6 +314,7 @@ export default function AdminAiHealthPage() {
             ))}
           </div>
         ) : null}
+        </div>
 
         <div className="flex gap-2 pt-2">
           <Link href="/admin">
