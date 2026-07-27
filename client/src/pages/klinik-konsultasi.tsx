@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
+import { RuangSimpanFlowHint } from "@/components/ruang-simpan-flow-hint";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -259,6 +260,7 @@ export default function KlinikKonsultasiPage() {
             <span className="font-semibold text-white"> Operator manusia hanya turun tangan</span> untuk
             hal yang tidak bisa dijawab AI — jadi Anda tak perlu antre untuk pertanyaan umum.
           </p>
+          <RuangSimpanFlowHint variant="dark" className="mb-4" />
           <div className="flex flex-wrap gap-3 pt-1">
             <Button asChild size="lg" className="bg-white text-teal-800 hover:bg-teal-50 gap-2" data-testid="button-masuk-loket">
               <a href="#loket"><Sparkles className="h-4 w-4" /> Masuk & Pilih Loket</a>

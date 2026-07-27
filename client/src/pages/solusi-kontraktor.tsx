@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
 import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { RuangSimpanFlowHint } from "@/components/ruang-simpan-flow-hint";
 import {
   Check, ArrowRight, HardHat, FileText, TrendingUp, ShieldCheck,
   Users, Zap, Star, MessageCircle, ChevronRight, Award, Building2,
@@ -133,6 +134,7 @@ export default function SolusiKontraktorPage() {
             AI yang sudah dilatih khusus regulasi PUPR, SBU, SKK, dan tender konstruksi Indonesia —
             siap membantu tim Anda kerja lebih cepat, lebih akurat, dan tidak bergantung pada satu orang.
           </p>
+          <RuangSimpanFlowHint variant="dark" className="mb-6" />
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/store">
               <Button size="lg" className="bg-white text-orange-700 hover:bg-amber-50 font-bold gap-2 px-8">

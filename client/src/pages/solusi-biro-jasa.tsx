@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
 import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { RuangSimpanFlowHint } from "@/components/ruang-simpan-flow-hint";
 import {
   Check, ArrowRight, Briefcase, MessageCircle, Users, Clock,
   Zap, Star, ChevronRight, FileText, Phone, RefreshCw, Building2,
@@ -132,6 +133,7 @@ export default function SolusiBiroJasaPage() {
             AI Specialist yang menjawab pertanyaan klien Anda 24/7 — persyaratan SBU, SKK, OSS, dan perizinan konstruksi —
             sehingga tim Anda bisa fokus pada pekerjaan yang benar-benar butuh keahlian manusia.
           </p>
+          <RuangSimpanFlowHint variant="dark" className="mb-6" />
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/store">
               <Button size="lg" className="bg-white text-violet-700 hover:bg-violet-50 font-bold gap-2 px-8">

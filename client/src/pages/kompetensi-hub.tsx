@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { useState } from "react";
+import { RuangSimpanFlowHint } from "@/components/ruang-simpan-flow-hint";
 import { Award, Brain, Target, TrendingUp, ChevronRight, Sparkles, GraduationCap, Shield, BarChart3, Zap, BookOpen, Users, Building2, CheckCircle2, ClipboardList, Search, FileText, DollarSign, RefreshCw, MessageSquare, Briefcase, LayoutList, MapPin, Calculator, FileCheck, Layers, Monitor, CheckSquare, Building, ScrollText, FileBadge, HardHat, ArrowRightLeft, ShieldAlert, Clock, Gavel, BadgeCheck, FileSignature, FileEdit, ClipboardCheck, AlertOctagon, Umbrella, X, FileBarChart, Users2, ArrowUpFromLine, ClipboardSignature, Handshake, TrendingDown, ShieldCheck, Flame, AlertTriangle, Scale, Gauge, Activity, Calendar, Cylinder, Mic, Grid3x3, Layers2, Paintbrush, Globe, Recycle, FileBarChart2, Columns, ShoppingCart, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -1869,6 +1870,7 @@ export default function KompetensiHub() {
             <p className="text-slate-400 text-base max-w-xl mx-auto mb-8 leading-relaxed">
               Dari diagnostik gap hingga sertifikat digital terverifikasi — tools AI untuk mempersiapkan, menilai, dan mendokumentasikan kompetensi tenaga konstruksi Indonesia.
             </p>
+            <RuangSimpanFlowHint variant="dark" className="mb-6" />
             <div className="flex flex-wrap justify-center gap-3">
               <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-700">
                 <Link href="/diagnostik-kompetensi"><Brain className="h-4 w-4 mr-2" /> Mulai Diagnostik</Link>

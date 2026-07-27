@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { RuangSimpanFlowHint } from "@/components/ruang-simpan-flow-hint";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { SharedHeader } from "@/components/shared-header";
 import { PremiumPageGuard } from "@/components/premium-page-guard";
@@ -913,6 +914,9 @@ function BedahDokumenContent() {
           <div>
             <h1 className="text-xl font-bold">Bedah Dokumen</h1>
             <p className="text-sm text-muted-foreground">Upload dokumen konstruksi — AI analisis otomatis dalam detik</p>
+          </div>
+          <div className="ml-auto">
+            <RuangSimpanFlowHint variant="light" className="hidden md:flex" />
           </div>
           {isFree && (
             <Badge variant="outline" className="ml-auto text-xs bg-amber-500/10 text-amber-600 border-amber-500/30">

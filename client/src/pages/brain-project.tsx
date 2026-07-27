@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { SharedHeader } from "@/components/shared-header";
+import { RuangSimpanFlowHint } from "@/components/ruang-simpan-flow-hint";
 import { useAuth } from "@/hooks/use-auth";
 import { useTrialCTA } from "@/hooks/use-trial-cta";
 import {
@@ -66,6 +67,7 @@ export default function BrainProjectPage() {
                 Risiko muncul di laporan, tapi tidak ada yang menghitungnya secara sistematis.
                 Keputusan dibuat berdasarkan gut feeling — bukan data.
               </p>
+              <RuangSimpanFlowHint variant="dark" className="mb-4" />
               <div className="bg-white/10 border border-white/20 rounded-xl px-4 py-3 mb-6 text-sm text-cyan-100">
                 <span className="font-bold text-white">BrainClaw</span> mengintegrasikan 6 sub-agen analisis proyek yang bekerja paralel — dari risiko, EVM, forecast, hingga stakeholder intelligence. Semua dalam satu laporan.
               </div>
