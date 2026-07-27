@@ -145,26 +145,88 @@ function safeErr(res: Response, e: unknown, ctx: string): void {
   }
 }
 
-/** Ekstrak teks plain dari buffer. Hanya untuk text/* dan PDF sederhana. */
+/** Render satu halaman PDF ke base64 PNG via PyMuPDF (python3 fitz). */
+async function renderPdfPageBase64RS(pdfPath: string, pageIdx: number): Promise<string | null> {
+  return new Promise(resolve => {
+    const { exec } = require("child_process");
+    const script = [
+      "import fitz, base64, sys",
+      `doc = fitz.open(${JSON.stringify(pdfPath)})`,
+      `page = doc[${pageIdx}] if doc.page_count > ${pageIdx} else None`,
+      "if page:",
+      "    pix = page.get_pixmap(matrix=fitz.Matrix(2,2))",
+      "    sys.stdout.buffer.write(base64.b64encode(pix.tobytes('png')))",
+      "doc.close()",
+    ].join("\n");
+    exec(`python3 -c ${JSON.stringify(script)}`, { maxBuffer: 30 * 1024 * 1024 },
+      (err: any, stdout: string) => resolve((!err && stdout?.trim()) ? stdout.trim() : null)
+    );
+  });
+}
+
+/** Ekstrak teks plain dari buffer. PDF scan didukung via PyMuPDF + Vision. */
 async function extractText(buffer: Buffer, mime: string, filename: string): Promise<string | null> {
   // Plain text / markdown / CSV — langsung decode
   if (mime.startsWith("text/")) {
     return buffer.toString("utf-8").slice(0, 200_000);
   }
-  // PDF — coba gunakan extractDocumentContent jika tersedia
+  // PDF — coba pdf-parse dulu, lalu fallback Vision untuk scanned PDF
   if (mime === "application/pdf") {
     try {
       const nodePath = await import("path");
       const fs       = await import("fs/promises");
-      // Tulis ke UPLOADS_DIR/tmp agar lolos path-security check di extractDocumentContent
       const uploadsDir = nodePath.resolve(process.cwd(), "uploads", "tmp");
       await fs.mkdir(uploadsDir, { recursive: true });
-      const tmp = nodePath.join(uploadsDir, `rs-${Date.now()}-${filename}`);
+      const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const tmp = nodePath.join(uploadsDir, `rs-${Date.now()}-${safeFilename}`);
       await fs.writeFile(tmp, buffer);
       try {
         const { extractDocumentContent } = await import("./lib/file-processing");
         const result = await extractDocumentContent(tmp);
-        return result.content?.slice(0, 200_000) ?? null;
+        const pdfText = (result.content ?? "").trim();
+
+        // Jika teks cukup banyak → langsung pakai
+        if (pdfText.length >= 300) return pdfText.slice(0, 200_000);
+
+        // PDF scan / berbasis gambar: gunakan PyMuPDF + GPT-4o Vision
+        console.log(`[RuangSimpan] PDF "${filename}" hanya ${pdfText.length} chars → coba Vision scan`);
+        const { default: OpenAI } = await import("openai");
+        const oai = new OpenAI({
+          apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY,
+          baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+        });
+        const pageParts: string[] = [];
+        const MAX_VISION_PAGES = 8;
+        for (let i = 0; i < MAX_VISION_PAGES; i++) {
+          const b64 = await renderPdfPageBase64RS(tmp, i);
+          if (!b64) break; // halaman tidak ada → stop
+          try {
+            const resp = await oai.chat.completions.create({
+              model: "gpt-4o",
+              messages: [{
+                role: "user",
+                content: [
+                  { type: "text", text: `Ekstrak SELURUH teks dari halaman ${i + 1} dokumen PDF ini secara verbatim. Sertakan semua teks yang terlihat: judul, isi, tanda tangan, cap, nomor pasal, tabel, dan catatan kaki. Jangan ringkas. Format teks biasa.` },
+                  { type: "image_url", image_url: { url: `data:image/png;base64,${b64}`, detail: "high" } },
+                ],
+              }],
+              max_tokens: 3000,
+              temperature: 0.1,
+            });
+            const pageText = resp.choices[0]?.message?.content?.trim();
+            if (pageText) pageParts.push(`--- HALAMAN ${i + 1} ---\n${pageText}`);
+          } catch (vErr) {
+            console.warn(`[RuangSimpan] Vision halaman ${i + 1} gagal:`, (vErr as any)?.message);
+            break;
+          }
+        }
+        if (pageParts.length > 0) {
+          const combined = pageParts.join("\n\n");
+          console.log(`[RuangSimpan] Vision scanned ${pageParts.length} pages, ${combined.length} chars for "${filename}"`);
+          return combined.slice(0, 200_000);
+        }
+        // Jika Vision juga gagal, tetap kembalikan teks parsial (mungkin kosong)
+        return pdfText || null;
       } finally {
         await fs.unlink(tmp).catch(() => {});
       }
@@ -1306,11 +1368,10 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
       res.json({ ok: true });
     } catch (e) { safeErr(res, e, "PATCH access-requests/:reqId/reject"); }
   });
-}
 
-// ── POST /api/ruang-simpan/generate-assistant ────────────────────────────────
-// Wizard: otomatis buat AI Agent dari dokumen Ruang Simpan
-const ASSISTANT_PROMPTS: Record<string, string> = {
+  // ── POST /api/ruang-simpan/generate-assistant ──────────────────────────────
+  // Wizard: otomatis buat AI Agent dari dokumen Ruang Simpan
+  const ASSISTANT_PROMPTS: Record<string, string> = {
   "umum":    `Kamu adalah AI Assistant untuk perusahaan ini. Tugasmu adalah menjawab pertanyaan berdasarkan dokumen perusahaan yang tersedia. Selalu prioritaskan informasi dari dokumen yang sudah diunggah. Jika informasi tidak tersedia, katakan dengan jelas dan jangan mengarang jawaban. Jawab secara profesional, ramah, dan terstruktur dalam bahasa yang sama dengan pertanyaan pengguna.`,
   "cs":      `Kamu adalah AI Customer Service yang membantu pelanggan dengan pertanyaan tentang produk, layanan, dan kebijakan. Gunakan dokumen yang tersedia sebagai sumber utama. Bersikaplah ramah, empatik, dan profesional. Jika pertanyaan di luar cakupan dokumen, arahkan ke tim manusia.`,
   "legal":   `Kamu adalah AI Legal Assistant yang membantu menjawab pertanyaan terkait dokumen hukum, kontrak, dan peraturan. Gunakan dokumen yang tersedia sebagai referensi. Tegaskan bahwa jawabanmu adalah referensi informasi, bukan nasihat hukum resmi.`,
@@ -1415,10 +1476,12 @@ async function processFileAsync(
   try {
     await pool.query(`UPDATE ruang_simpan_files SET kb_status='processing' WHERE id=$1`, [fileId]);
     const text = await extractText(buffer, mime, filename);
-    if (!text || text.trim().length < 10) {
+    if (!text || text.trim().length < 20) {
+      // failed = gagal ekstrak (scanned PDF tanpa Vision, office format belum didukung, dll.)
       await pool.query(
-        `UPDATE ruang_simpan_files SET kb_status='skipped', extracted_text=NULL WHERE id=$1`, [fileId]
+        `UPDATE ruang_simpan_files SET kb_status='failed', extracted_text=NULL WHERE id=$1`, [fileId]
       );
+      console.log(`[RuangSimpan] processFileAsync: teks kosong untuk file ${fileId} ("${filename}") → kb_status=failed`);
       return;
     }
     // Store chunks
@@ -1442,3 +1505,4 @@ async function processFileAsync(
     await pool.query(`UPDATE ruang_simpan_files SET kb_status='failed' WHERE id=$1`, [fileId]).catch(() => {});
   }
 }
+} // end registerRuangSimpanRoutes

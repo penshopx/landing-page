@@ -3626,19 +3626,43 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
         } else if (ext === ".pdf") {
           const fileBuffer = fs.readFileSync(req.file.path);
           extractedText = await parsePdfBuffer(fileBuffer);
-          // PDF gambar/scan: teks sangat sedikit → coba Vision pada halaman 1 & 2
+          // PDF gambar/scan: teks sangat sedikit → coba Vision via PyMuPDF pada beberapa halaman
           const meaningfulChars = extractedText.replace(/\s+/g, " ").trim().length;
           if (meaningfulChars < 400) {
-            const pageBase64 = await renderPdfPageBase64(req.file.path, 0);
-            if (pageBase64) {
-              extractedText = await analyzeDrawingVision(`data:image/png;base64,${pageBase64}`, req.file.originalname);
-              isVisionDoc = true;
-              // Coba halaman 2 juga (gambar teknis sering multi-halaman)
-              const page2Base64 = await renderPdfPageBase64(req.file.path, 1);
-              if (page2Base64) {
-                const pg2Text = await analyzeDrawingVision(`data:image/png;base64,${page2Base64}`, req.file.originalname + " (hal.2)");
-                extractedText += "\n\n--- HALAMAN 2 ---\n\n" + pg2Text;
+            const page0 = await renderPdfPageBase64(req.file.path, 0);
+            if (page0) {
+              // Ini PDF scan/gambar → ekstrak teks verbatim per halaman
+              isVisionDoc = false; // bukan gambar teknis, tapi dokumen scan
+              const pageTexts: string[] = [];
+              // Untuk gambar teknis (drawing), pakai analyzeDrawingVision; untuk dokumen teks scan pakai prompt verbatim
+              const isLikelyDrawing = /gambar|drawing|denah|tampak|potongan|detail|as.built|isometric|shop.drawing/i.test(req.file.originalname);
+              const MAX_BD_VISION_PAGES = isLikelyDrawing ? 3 : 8;
+              for (let pi = 0; pi < MAX_BD_VISION_PAGES; pi++) {
+                const b64 = pi === 0 ? page0 : await renderPdfPageBase64(req.file.path, pi);
+                if (!b64) break;
+                if (isLikelyDrawing) {
+                  const t = await analyzeDrawingVision(`data:image/png;base64,${b64}`, req.file.originalname + (pi > 0 ? ` (hal.${pi + 1})` : ""));
+                  pageTexts.push(`--- HALAMAN ${pi + 1} ---\n${t}`);
+                  isVisionDoc = true;
+                } else {
+                  try {
+                    const resp = await openai.chat.completions.create({
+                      model: "gpt-4o",
+                      messages: [{
+                        role: "user",
+                        content: [
+                          { type: "text", text: `Ekstrak SELURUH teks dari halaman ${pi + 1} dokumen ini secara verbatim. Sertakan semua teks: judul, isi, pasal, tabel, tanda tangan, cap, nomor, catatan kaki. Jangan ringkas atau terjemahkan. Format teks biasa.` },
+                          { type: "image_url", image_url: { url: `data:image/png;base64,${b64}`, detail: "high" } },
+                        ],
+                      }],
+                      max_tokens: 3000, temperature: 0.1,
+                    });
+                    const t = resp.choices[0]?.message?.content?.trim();
+                    if (t) pageTexts.push(`--- HALAMAN ${pi + 1} ---\n${t}`);
+                  } catch { break; }
+                }
               }
+              if (pageTexts.length > 0) extractedText = pageTexts.join("\n\n");
             }
           }
         } else {
@@ -3841,6 +3865,151 @@ INSTRUKSI:
       res.json({ success: true });
     } catch {
       res.status(500).json({ error: "Gagal menghapus dokumen" });
+    }
+  });
+
+  // ── POST /api/bedah-dokumen/:id/reprocess ─────────────────────────────────
+  // Re-extract teks dari file yang sudah ada di disk (untuk scanned PDF yang gagal diekstrak)
+  app.post("/api/bedah-dokumen/:id/reprocess", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      const docId = parseInt(req.params.id);
+      const { sql: sqlBD } = await import("drizzle-orm");
+      const [doc] = (await db.execute(sqlBD`
+        SELECT * FROM document_analyses WHERE id = ${docId} AND user_id = ${userId}
+      `)).rows as any[];
+      if (!doc) return res.status(404).json({ error: "Dokumen tidak ditemukan" });
+
+      // File harus ada di disk (upload normal, bukan from-rs)
+      if (!doc.filename || doc.filename.startsWith("rs_")) {
+        return res.status(400).json({ error: "Reprocess hanya untuk dokumen yang diunggah langsung. Untuk file dari Ruang Simpan, buka kembali via 'Bedah & Tanya AI'." });
+      }
+
+      const filePath = path.join(process.cwd(), "uploads", "bedah-dokumen", doc.filename);
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "File asli tidak ditemukan di server. Silakan upload ulang dokumen." });
+      }
+
+      res.json({ status: "processing", message: "Re-ekstraksi dimulai" });
+
+      // Background reprocess
+      (async () => {
+        try {
+          await db.execute(sqlBD`UPDATE document_analyses SET status='analyzing', updated_at=NOW() WHERE id=${docId}`);
+
+          const ext = path.extname(doc.original_name).toLowerCase();
+          const IMAGE_EXTS = [".jpg", ".jpeg", ".png", ".webp"];
+          const fileBuffer = fs.readFileSync(filePath);
+          let extractedText = "";
+          let isVisionDoc = false;
+
+          if (IMAGE_EXTS.includes(ext)) {
+            const mime = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+            const resp = await openai.chat.completions.create({
+              model: "gpt-4o",
+              messages: [{ role: "user", content: [
+                { type: "text", text: "Ekstrak SELURUH teks dari gambar ini secara verbatim. Jika gambar teknis, analisis komprehensif. Format teks biasa." },
+                { type: "image_url", image_url: { url: `data:${mime};base64,${fileBuffer.toString("base64")}`, detail: "high" } },
+              ]}],
+              max_tokens: 4000, temperature: 0.1,
+            });
+            extractedText = resp.choices[0]?.message?.content ?? "";
+            isVisionDoc = true;
+          } else if (ext === ".pdf") {
+            // Layer 1: pdf-parse
+            extractedText = await parsePdfBuffer(fileBuffer);
+            const meaningfulChars = extractedText.replace(/\s+/g, " ").trim().length;
+            if (meaningfulChars < 400) {
+              // Layer 2: PyMuPDF + Vision per halaman
+              const renderPdfPage = (pdfPath: string, pageIdx: number): Promise<string | null> =>
+                new Promise(resolve => {
+                  const { exec } = require("child_process");
+                  const script = [
+                    "import fitz, base64, sys",
+                    `doc = fitz.open(${JSON.stringify(pdfPath)})`,
+                    `page = doc[${pageIdx}] if doc.page_count > ${pageIdx} else None`,
+                    "if page:",
+                    "    pix = page.get_pixmap(matrix=fitz.Matrix(2,2))",
+                    "    sys.stdout.buffer.write(base64.b64encode(pix.tobytes('png')))",
+                    "doc.close()",
+                  ].join("\n");
+                  exec(`python3 -c ${JSON.stringify(script)}`, { maxBuffer: 30 * 1024 * 1024 },
+                    (err: any, stdout: string) => resolve((!err && stdout?.trim()) ? stdout.trim() : null));
+                });
+              const isLikelyDrawing = /gambar|drawing|denah|tampak|potongan|detail/i.test(doc.original_name);
+              const MAX_PAGES = isLikelyDrawing ? 3 : 8;
+              const pageTexts: string[] = [];
+              for (let pi = 0; pi < MAX_PAGES; pi++) {
+                const b64 = await renderPdfPage(filePath, pi);
+                if (!b64) break;
+                try {
+                  const resp = await openai.chat.completions.create({
+                    model: "gpt-4o",
+                    messages: [{ role: "user", content: [
+                      { type: "text", text: isLikelyDrawing
+                        ? `Analisis gambar teknis halaman ${pi + 1} secara komprehensif. Ekstrak semua informasi: judul, skala, dimensi, label, spesifikasi material, catatan teknis.`
+                        : `Ekstrak SELURUH teks dari halaman ${pi + 1} secara verbatim. Sertakan semua teks: judul, isi, pasal, tabel, tanda tangan, cap, catatan kaki. Jangan ringkas.` },
+                      { type: "image_url", image_url: { url: `data:image/png;base64,${b64}`, detail: "high" } },
+                    ]}],
+                    max_tokens: 3000, temperature: 0.1,
+                  });
+                  const t = resp.choices[0]?.message?.content?.trim();
+                  if (t) pageTexts.push(`--- HALAMAN ${pi + 1} ---\n${t}`);
+                } catch { break; }
+              }
+              if (pageTexts.length > 0) { extractedText = pageTexts.join("\n\n"); isVisionDoc = isLikelyDrawing; }
+            }
+          } else {
+            extractedText = fs.readFileSync(filePath, "utf-8");
+          }
+
+          if (!extractedText.trim()) {
+            await db.execute(sqlBD`UPDATE document_analyses SET status='error', error_msg='Tidak dapat mengekstrak teks dari file ini. File mungkin terproteksi atau tidak mengandung teks yang dapat dibaca.', updated_at=NOW() WHERE id=${docId}`);
+            return;
+          }
+
+          // Re-run analysis
+          const textLow = (extractedText + doc.original_name).toLowerCase();
+          let docType = isVisionDoc ? "gambar_teknis" : "lainnya";
+          if (!isVisionDoc) {
+            if (/tender|lelang|rks|hps|pengadaan|pokja/.test(textLow)) docType = "tender";
+            else if (/\bsbu\b|skk|lpjk|sertifikat kompetensi/.test(textLow)) docType = "skk_sbu";
+            else if (/kontrak|perjanjian|\bspk\b/.test(textLow)) docType = "kontrak";
+          }
+          const snippet = extractedText.substring(0, 12000);
+          const analysisPrompt = `Kamu adalah analis dokumen Indonesia senior. Analisis dokumen berikut.
+
+JENIS: ${docType} | NAMA: ${doc.original_name}
+
+ISI:
+${snippet}${extractedText.length > 12000 ? "\n[dipotong...]" : ""}
+
+Hasilkan JSON:
+{"summary":"Ringkasan 3-5 paragraf","doc_type_detail":"Jenis spesifik","key_points":["poin"],"checklist":[{"kategori":"Kelengkapan","items":[{"item":"...","status":"ada|tidak_ada|perlu_dicek","catatan":"..."}]}],"risiko":["risiko"],"rekomendasi":["rekomendasi"]}`;
+
+          let parsed: any = null;
+          try {
+            const r = await openai.chat.completions.create({ model: SMART_MODEL, messages: [{ role: "user", content: analysisPrompt }], temperature: 0.3, max_tokens: 2500, response_format: { type: "json_object" } });
+            parsed = JSON.parse(r.choices[0]?.message?.content ?? "{}");
+          } catch { parsed = { summary: `[Dari Reprocess] ${doc.original_name}`, key_points: [] }; }
+
+          await db.execute(sqlBD`
+            UPDATE document_analyses SET
+              status='done', doc_type=${docType},
+              extracted_text=${extractedText.substring(0, 80000)},
+              summary=${parsed?.summary ?? null},
+              checklist=${JSON.stringify(parsed?.checklist ?? []) as any}::jsonb,
+              error_msg=NULL, updated_at=NOW()
+            WHERE id=${docId}
+          `);
+          console.log(`[BedahDokumen/reprocess] Doc ${docId} re-extracted: ${extractedText.length} chars, type=${docType}`);
+        } catch (err: any) {
+          console.error("[BedahDokumen/reprocess] bg error:", err?.message);
+          await db.execute(sqlBD`UPDATE document_analyses SET status='error', error_msg=${"Reprocess gagal: " + (err?.message || "error")}, updated_at=NOW() WHERE id=${docId}`).catch(() => {});
+        }
+      })();
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || "Gagal memulai reprocess" });
     }
   });
 

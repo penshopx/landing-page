@@ -707,11 +707,60 @@ function DocChecklist({ doc, isPremium }: { doc: DocAnalysis; isPremium: boolean
 
 // ── Summary Component ─────────────────────────────────────────────────────────
 function DocSummary({ doc }: { doc: DocAnalysis }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [reprocessing, setReprocessing] = useState(false);
+
+  const handleReprocess = async () => {
+    setReprocessing(true);
+    try {
+      await apiRequest("POST", `/api/bedah-dokumen/${doc.id}/reprocess`, {});
+      toast({ title: "⚙️ Re-ekstraksi dimulai", description: "AI sedang memindai ulang dokumen. Halaman akan diperbarui otomatis dalam 15-30 detik." });
+      // Poll sampai done
+      let tries = 0;
+      const poll = setInterval(async () => {
+        tries++;
+        queryClient.invalidateQueries({ queryKey: ["/api/bedah-dokumen", doc.id] });
+        if (tries > 20) clearInterval(poll);
+      }, 3000);
+    } catch (err: any) {
+      toast({ title: "Gagal memulai re-ekstraksi", description: err?.message, variant: "destructive" });
+    } finally {
+      setReprocessing(false);
+    }
+  };
+
   let meta: { key_points?: string[] } = {};
   try { meta = doc.error_msg ? JSON.parse(doc.error_msg) : {}; } catch {}
 
+  const noContent = !doc.summary;
+
   return (
     <div className="space-y-5">
+      {noContent && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-foreground">Konten dokumen tidak dapat diekstrak</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Ini terjadi pada PDF hasil scan, PDF terproteksi, atau file berbasis gambar. Klik <strong>Proses Ulang</strong> untuk mencoba ekstraksi via AI Vision (GPT-4o akan membaca setiap halaman secara visual).
+              </p>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            onClick={handleReprocess}
+            disabled={reprocessing || doc.status === "analyzing"}
+            className="gap-2 bg-amber-500 hover:bg-amber-600 text-white border-0"
+          >
+            {reprocessing || doc.status === "analyzing"
+              ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Memproses…</>
+              : <><RefreshCw className="h-3.5 w-3.5" /> Proses Ulang dengan AI Vision</>
+            }
+          </Button>
+        </div>
+      )}
       {doc.summary ? (
         <>
           <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -732,9 +781,9 @@ function DocSummary({ doc }: { doc: DocAnalysis }) {
             </div>
           )}
         </>
-      ) : (
+      ) : !noContent ? (
         <p className="text-sm text-muted-foreground">Ringkasan belum tersedia.</p>
-      )}
+      ) : null}
     </div>
   );
 }
