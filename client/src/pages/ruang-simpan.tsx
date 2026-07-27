@@ -50,6 +50,11 @@ interface RSOverview {
   recent_files: RSFile[];
   stats: { pending: number; failed: number };
 }
+interface RSAssistant {
+  id: number; name: string; slug: string; description: string;
+  isActive: boolean; isPublic: boolean; createdAt: string;
+  chatUrl: string; configUrl: string;
+}
 interface RSGrant {
   id: string; grantee_name: string; grantee_email?: string;
   permissions: string[]; purpose: string;
@@ -201,6 +206,11 @@ export default function RuangSimpanPage() {
     queryKey: ["/api/ruang-simpan/search", searchQuery],
     queryFn: () => apiRequest("GET", `/api/ruang-simpan/search?q=${encodeURIComponent(searchQuery)}`),
     enabled: !!user && searchQuery.length >= 2,
+  });
+
+  const { data: myAssistants = [], refetch: refetchAssistants } = useQuery<RSAssistant[]>({
+    queryKey: ["/api/ruang-simpan/my-assistants"],
+    enabled: !!user,
   });
 
   // ── Upload handler ────────────────────────────────────────────────────────
@@ -443,7 +453,7 @@ export default function RuangSimpanPage() {
             </div>
 
             {/* Buat AI Asisten */}
-            <div className="px-3 pb-3">
+            <div className="px-3 pb-2">
               <button
                 onClick={() => { setWizardFolderId(activeFolder); setShowWizard(true); }}
                 className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 text-white hover:from-violet-700 hover:to-indigo-700 transition-all shadow-sm"
@@ -452,10 +462,48 @@ export default function RuangSimpanPage() {
                 <span className="flex-1 text-left truncate">Buat AI Asisten</span>
                 <Wand2 className="h-3 w-3 opacity-80" />
               </button>
-              <p className="text-[10px] text-muted-foreground mt-1.5 px-1 leading-relaxed">
-                Ubah dokumen di folder ini menjadi AI Asisten siap pakai.
-              </p>
             </div>
+
+            {/* AI Asisten Saya */}
+            {myAssistants.length > 0 && (
+              <div className="px-3 pb-3">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 px-1">AI Asisten Saya</p>
+                <div className="space-y-1">
+                  {myAssistants.map(asst => (
+                    <div key={asst.id} className="rounded-xl border border-border bg-muted/30 px-2.5 py-2 space-y-1.5">
+                      <div className="flex items-start gap-1.5 min-w-0">
+                        <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
+                          <Bot className="h-3 w-3 text-white" />
+                        </div>
+                        <p className="text-[11px] font-semibold text-foreground leading-tight truncate flex-1">{asst.name}</p>
+                      </div>
+                      <div className="flex gap-1">
+                        <a href={asst.chatUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
+                          <button className="w-full flex items-center justify-center gap-1 text-[10px] font-medium px-2 py-1 rounded-lg bg-violet-600 hover:bg-violet-700 text-white transition-colors">
+                            <MessageSquare className="h-2.5 w-2.5" /> Chat
+                          </button>
+                        </a>
+                        <a href={asst.configUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
+                          <button className="w-full flex items-center justify-center gap-1 text-[10px] font-medium px-2 py-1 rounded-lg border border-border bg-background hover:bg-muted text-foreground transition-colors">
+                            <ExternalLink className="h-2.5 w-2.5" /> Kelola
+                          </button>
+                        </a>
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`Hapus "${asst.name}"?`)) return;
+                            await apiRequest("DELETE", `/api/ruang-simpan/assistants/${asst.id}`);
+                            refetchAssistants();
+                          }}
+                          className="flex items-center justify-center px-2 py-1 rounded-lg border border-border hover:bg-destructive/10 hover:border-destructive/30 text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <Trash2 className="h-2.5 w-2.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* AI info box */}
             <div className="m-3 mt-1 bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30 rounded-xl p-3 border border-indigo-100 dark:border-indigo-900/30">
@@ -574,6 +622,7 @@ export default function RuangSimpanPage() {
           folderId={wizardFolderId}
           folderName={wizardFolderId === "all" ? "Semua File" : (overview?.folders.find(f => f.id === wizardFolderId)?.name ?? "Folder")}
           onClose={() => setShowWizard(false)}
+          onCreated={() => { qc.invalidateQueries({ queryKey: ["/api/ruang-simpan/my-assistants"] }); }}
         />
       )}
 
@@ -1838,8 +1887,8 @@ const ASSISTANT_TYPES = [
 
 interface WizardResult { agent_id: string; slug: string; name: string; file_count: number; chunk_count: number; chat_url: string; }
 
-function AIAssistantWizard({ folderId, folderName, onClose }: {
-  folderId: string; folderName: string; onClose: () => void;
+function AIAssistantWizard({ folderId, folderName, onClose, onCreated }: {
+  folderId: string; folderName: string; onClose: () => void; onCreated?: () => void;
 }) {
   const { toast } = useToast();
   const [step, setStep] = useState<1 | 2 | 3 | "done">(1);
@@ -1893,6 +1942,7 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
       });
       setResult(data);
       setStep("done");
+      onCreated?.();
     } catch (err: any) {
       toast({ title: "Gagal membuat AI Asisten", description: err?.message || "Coba lagi", variant: "destructive" });
     } finally { setLoading(false); }

@@ -1533,6 +1533,47 @@ app.post("/api/ruang-simpan/generate-assistant", isAuthenticated, async (req: an
   }
 });
 
+// ── GET /api/ruang-simpan/my-assistants ───────────────────────────────────
+app.get("/api/ruang-simpan/my-assistants", isAuthenticated, async (req: any, res) => {
+  const userId = extractUid(req, res);
+  if (!userId) return;
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, name, slug, description, is_active, is_public, created_at,
+              greeting_message, avatar
+       FROM agents
+       WHERE user_id = $1 AND category = 'ruang-simpan'
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+    res.json(rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      slug: r.slug,
+      description: r.description || "",
+      isActive: r.is_active,
+      isPublic: r.is_public,
+      createdAt: r.created_at,
+      chatUrl: `/chat/${r.slug}`,
+      configUrl: `/dashboard?agent=${r.id}`,
+    })));
+  } catch (e) { safeErr(res, e, "GET my-assistants"); }
+});
+
+// ── DELETE /api/ruang-simpan/assistants/:id ───────────────────────────────
+app.delete("/api/ruang-simpan/assistants/:id", isAuthenticated, rsWriteLimit, async (req: any, res) => {
+  const userId = extractUid(req, res);
+  if (!userId) return;
+  try {
+    const { rowCount } = await pool.query(
+      `DELETE FROM agents WHERE id = $1 AND user_id = $2 AND category = 'ruang-simpan' RETURNING id`,
+      [req.params.id, userId]
+    );
+    if (!rowCount) return res.status(404).json({ error: "Asisten tidak ditemukan" });
+    res.json({ ok: true });
+  } catch (e) { safeErr(res, e, "DELETE assistant"); }
+});
+
 // ── Background file processor ─────────────────────────────────────────────
 
 async function processFileAsync(
