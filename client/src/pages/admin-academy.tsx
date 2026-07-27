@@ -49,6 +49,8 @@ import {
   EyeOff,
   Star,
   GripVertical,
+  Activity,
+  RefreshCw,
 } from "lucide-react";
 
 // ─── DnD Kit imports ──────────────────────────────────────────────────────────
@@ -856,6 +858,143 @@ function SortableCourseCard({
   );
 }
 
+// ─── LMS Health Card ──────────────────────────────────────────────────────────
+type LmsHealth = {
+  seedStatus: string;
+  seeding: boolean;
+  counts: {
+    totalCourses: number;
+    activeCourses: number;
+    totalLessons: number;
+    totalEnrollments: number;
+  };
+};
+
+function SeedStatusBadge({ status, seeding }: { status: string; seeding: boolean }) {
+  if (seeding || status === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">
+        <Loader2 className="w-3 h-3 animate-spin" />
+        Seeding…
+      </span>
+    );
+  }
+  if (status === "done") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">
+        <span className="w-2 h-2 rounded-full bg-green-500" />
+        Seed selesai
+      </span>
+    );
+  }
+  if (status === "error") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
+        <span className="w-2 h-2 rounded-full bg-red-500" />
+        Seed error
+      </span>
+    );
+  }
+  if (status === "skipped") {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300">
+        <span className="w-2 h-2 rounded-full bg-blue-500" />
+        Seed dilewati (sudah ada)
+      </span>
+    );
+  }
+  // idle or unknown
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+      <span className="w-2 h-2 rounded-full bg-muted-foreground" />
+      {status || "Tidak diketahui"}
+    </span>
+  );
+}
+
+function LmsHealthCard({
+  health,
+  isLoading,
+  onRefresh,
+  updatedAt,
+}: {
+  health: LmsHealth | undefined;
+  isLoading: boolean;
+  onRefresh: () => void;
+  updatedAt: number;
+}) {
+  const lastUpdated = updatedAt
+    ? new Date(updatedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+    : null;
+
+  return (
+    <Card className="mb-6 border-2">
+      <CardContent className="pt-4 pb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Activity className="w-4 h-4 text-indigo-500" />
+            <span className="font-semibold text-sm">Status LMS</span>
+            {health && (
+              <SeedStatusBadge status={health.seedStatus} seeding={health.seeding} />
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {lastUpdated && (
+              <span className="text-xs text-muted-foreground">Diperbarui {lastUpdated}</span>
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={onRefresh}
+              disabled={isLoading}
+              title="Refresh status"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
+        </div>
+
+        {isLoading && !health ? (
+          <div className="flex items-center gap-2 text-muted-foreground text-sm py-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Memuat status…
+          </div>
+        ) : health ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                {health.counts.totalCourses}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Total Kursus</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                {health.counts.activeCourses}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Kursus Aktif & Publik</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {health.counts.totalLessons}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Total Pelajaran</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                {health.counts.totalEnrollments}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">Total Pendaftaran</p>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-destructive">Gagal memuat status LMS.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AdminAcademyPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -869,6 +1008,7 @@ export default function AdminAcademyPage() {
   const [forceDeleteConfirm, setForceDeleteConfirm] = useState(false);
   const [localCourses, setLocalCourses] = useState<Course[]>([]);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
     const prev = document.title;
@@ -883,6 +1023,34 @@ export default function AdminAcademyPage() {
     queryFn: () => apiRequest("GET", "/api/admin/lms/courses"),
     enabled: isAdmin,
   });
+
+  const {
+    data: health,
+    isLoading: healthLoading,
+    refetch: refetchHealth,
+    dataUpdatedAt: healthUpdatedAt,
+  } = useQuery<{
+    seedStatus: string;
+    seeding: boolean;
+    counts: {
+      totalCourses: number;
+      activeCourses: number;
+      totalLessons: number;
+      totalEnrollments: number;
+    };
+  }>({
+    queryKey: ["/api/admin/lms/health"],
+    queryFn: () => apiRequest("GET", "/api/admin/lms/health"),
+    enabled: isAdmin,
+    // Poll every 5 s while seeding; otherwise don't auto-refetch
+    refetchInterval: isSeeding ? 5000 : false,
+    staleTime: 30_000,
+  });
+
+  // Sync isSeeding flag from health data to enable/disable polling
+  useEffect(() => {
+    if (health) setIsSeeding(health.seeding);
+  }, [health]);
 
   // Sync local state with server data:
   // - Same IDs → update data fields (title, active, lessonCount, etc.) while preserving local drag order
@@ -1032,6 +1200,14 @@ export default function AdminAcademyPage() {
             <Plus className="w-4 h-4 mr-2" /> Tambah Kursus
           </Button>
         </div>
+
+        {/* LMS Health Dashboard */}
+        <LmsHealthCard
+          health={health}
+          isLoading={healthLoading}
+          onRefresh={() => refetchHealth()}
+          updatedAt={healthUpdatedAt}
+        />
 
         {/* Courses list */}
         {isLoading ? (
