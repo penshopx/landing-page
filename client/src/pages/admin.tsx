@@ -705,7 +705,26 @@ export default function AdminPage() {
       setEditProductDialog({ open: false, product: null });
       toast({ title: "Produk berhasil diperbarui!" });
     },
-    onError: () => toast({ title: "Gagal memperbarui produk.", variant: "destructive" }),
+    onError: (err: any) => {
+      const is401 = err instanceof Error && err.message.startsWith("401");
+      if (is401) {
+        toast({
+          title: "Sesi habis — silakan login ulang",
+          description: (
+            <span>
+              Edit Anda masih tersimpan di form.{" "}
+              <a href="/login" className="underline font-medium">
+                Login ulang
+              </a>{" "}
+              lalu simpan kembali.
+            </span>
+          ) as any,
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "Gagal memperbarui produk.", variant: "destructive" });
+      }
+    },
   });
 
   const updateModulSubMutation = useMutation({
