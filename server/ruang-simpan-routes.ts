@@ -154,11 +154,12 @@ async function extractText(buffer: Buffer, mime: string, filename: string): Prom
   // PDF — coba gunakan extractDocumentContent jika tersedia
   if (mime === "application/pdf") {
     try {
-      const path = await import("path");
-      const fs   = await import("fs/promises");
-      const os   = await import("os");
-      // Tulis ke temp file, proses, hapus
-      const tmp = path.join(os.tmpdir(), `rs-${Date.now()}-${filename}`);
+      const nodePath = await import("path");
+      const fs       = await import("fs/promises");
+      // Tulis ke UPLOADS_DIR/tmp agar lolos path-security check di extractDocumentContent
+      const uploadsDir = nodePath.resolve(process.cwd(), "uploads", "tmp");
+      await fs.mkdir(uploadsDir, { recursive: true });
+      const tmp = nodePath.join(uploadsDir, `rs-${Date.now()}-${filename}`);
       await fs.writeFile(tmp, buffer);
       try {
         const { extractDocumentContent } = await import("./lib/file-processing");
