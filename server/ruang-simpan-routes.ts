@@ -429,6 +429,7 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
           [userId]
         ),
       ]);
+      res.setHeader("Cache-Control", "no-store");
       res.json({
         folders:     foldersRes.rows,
         usage:       { used: parseInt(usageRes.rows[0].used), quota: await getQuotaForUser(userId),
@@ -459,6 +460,7 @@ export async function registerRuangSimpanRoutes(app: Express): Promise<void> {
       if (folderId && folderId !== "all") { q += ` AND f.folder_id = $2`; params.push(folderId); }
       q += ` ORDER BY f.created_at DESC`;
       const { rows } = await pool.query(q, params);
+      res.setHeader("Cache-Control", "no-store");
       res.json(rows);
     } catch (e) { safeErr(res, e, "GET files"); }
   });
