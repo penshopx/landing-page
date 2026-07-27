@@ -1415,51 +1415,55 @@ app.post("/api/ruang-simpan/generate-assistant", isAuthenticated, async (req: an
     const chunks = chunksRes.rows;
 
     const systemPrompt = ASSISTANT_PROMPTS[assistant_type] || ASSISTANT_PROMPTS["umum"];
-    const agentId = crypto.randomUUID();
-    const kbId    = crypto.randomUUID();
-    const slug    = `rs-asst-${agentId.substring(0, 8)}`;
-    const token   = `gus_${agentId.replace(/-/g, "")}`;
+    const { randomUUID } = await import("crypto");
+    const slugSuffix = randomUUID().substring(0, 8);
+    const slug    = `rs-asst-${slugSuffix}`;
+    const token   = `gus_${randomUUID().replace(/-/g, "")}`;
     const safeName = name.trim();
     const greeting = `Halo! Saya **${safeName}**, AI Assistant Anda. Saya siap menjawab pertanyaan berdasarkan ${files.length} dokumen yang sudah diunggah. Apa yang ingin Anda tanyakan?`;
 
-    // Create agent
-    await pool.query(`
+    // Create agent — let DB auto-assign serial integer id, use RETURNING id
+    const agentRes = await pool.query(`
       INSERT INTO agents (
-        id, name, description, tagline, system_prompt, temperature, max_tokens, ai_model,
-        is_public, is_listed, language, category, slug, access_token,
+        name, description, tagline, system_prompt, temperature, max_tokens, ai_model,
+        is_public, is_listed, is_enabled, is_active, language, category, slug, access_token,
         user_id, greeting_message, conversation_starters
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+      RETURNING id
     `, [
-      agentId, safeName,
+      safeName,
       `AI Assistant dari ${files.length} dokumen Ruang Simpan`,
       `Tanya apa saja tentang ${safeName}`,
       systemPrompt, 0.3, 1024, "gpt-4o",
-      false, false, "id", "ruang-simpan",
+      false, false, true, true, "id", "ruang-simpan",
       slug, token, userId, greeting,
       JSON.stringify(["Apa saja isi dokumen ini?", "Bantu saya memahami isi dokumen", "Apa poin penting yang perlu saya ketahui?"]),
     ]);
+    const agentId: number = agentRes.rows[0].id;
 
-    // Create knowledge_base entry
+    // Create knowledge_base entry — integer FK to agents.id
     const kbContent = files.map((f: any) => f.original_name).join(", ");
     const extractedPreview = chunks.slice(0, 30).map((c: any) => c.content).join("\n\n").substring(0, 30_000);
-    await pool.query(`
-      INSERT INTO knowledge_bases (id, agent_id, name, type, content, description, file_name, processing_status, extracted_text)
-      VALUES ($1,$2,$3,'text',$4,$5,$6,'completed',$7)
-    `, [kbId, agentId, `Pengetahuan dari Ruang Simpan`, kbContent,
+    const kbRes = await pool.query(`
+      INSERT INTO knowledge_bases (agent_id, name, type, content, description, file_name, processing_status, extracted_text)
+      VALUES ($1,$2,'text',$3,$4,$5,'completed',$6)
+      RETURNING id
+    `, [agentId, `Pengetahuan dari Ruang Simpan`, kbContent,
         `${files.length} dokumen dari Ruang Simpan Anda`, `ruang_simpan_${folder_id || "all"}`, extractedPreview]);
+    const kbId: number = kbRes.rows[0].id;
 
-    // Batch-insert chunks into knowledge_chunks (groups of 50)
+    // Batch-insert chunks into knowledge_chunks (groups of 50) — all integer FKs
     for (let i = 0; i < chunks.length; i += 50) {
       const batch = chunks.slice(i, i + 50);
-      const vals  = batch.map((_: any, j: number) => `(gen_random_uuid(),$1,$2,${i + j},$${j + 3},0)`).join(",");
+      const vals  = batch.map((_: any, j: number) => `($1,$2,${i + j},$${j + 3},0)`).join(",");
       const bParams = [kbId, agentId, ...batch.map((c: any) => c.content)];
       await pool.query(
-        `INSERT INTO knowledge_chunks (id,knowledge_base_id,agent_id,chunk_index,content,token_count) VALUES ${vals}`,
+        `INSERT INTO knowledge_chunks (knowledge_base_id,agent_id,chunk_index,content,token_count) VALUES ${vals}`,
         bParams
       );
     }
 
-    console.log(`[RS/generate-assistant] Created agent ${agentId} (${safeName}) with ${files.length} files, ${chunks.length} chunks`);
+    console.log(`[RS/generate-assistant] Created agent ${agentId} slug=${slug} (${safeName}) with ${files.length} files, ${chunks.length} chunks`);
     res.json({ agent_id: agentId, slug, name: safeName, file_count: files.length, chunk_count: chunks.length, chat_url: `/chat/${slug}` });
   } catch (err: any) {
     console.error("[RS/generate-assistant]", err?.message);
