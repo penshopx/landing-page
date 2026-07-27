@@ -247,6 +247,7 @@ import LmsPage from "@/pages/lms";
 import LmsCourse from "@/pages/lms-course";
 import LmsLesson from "@/pages/lms-lesson";
 import LmsCertificates from "@/pages/lms-certificates";
+import LmsVerify from "@/pages/lms-verify";
 import ProductTour from "@/pages/product-tour";
 import NotFound from "@/pages/not-found";
 import RabKalkulator from "@/pages/rab-kalkulator";
@@ -1740,6 +1741,7 @@ function Router() {
         <Route path="/demo/:agentId" component={WidgetDemo} />
         <Route path="/chatbot/:agentId" component={WidgetDemo} />
         <Route path="/lms" component={LmsPage} />
+        <Route path="/lms/verify/:code" component={LmsVerify} />
         <Route path="/lms/certificates" component={LmsCertificates} />
         <Route path="/lms/course/:id/lesson/:lessonId" component={LmsLesson} />
         <Route path="/lms/course/:id" component={LmsCourse} />

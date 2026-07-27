@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   ChevronLeft, Clock, BookOpen, Play, Lock, Check, ChevronRight,
-  Star, Users, GraduationCap, Zap, Rocket, Award, Download
+  Star, Users, GraduationCap, Zap, Rocket, Award, Download, Share2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -580,6 +580,17 @@ export default function LmsCourse() {
                   <Download className="w-4 h-4" />
                   {downloadingCert ? "Membuat PDF…" : "Unduh Sertifikat (PDF)"}
                 </Button>
+                {certificateCode && (
+                  <Link href={`/lms/verify/${certificateCode}`}>
+                    <button
+                      className="w-full mt-2 py-2 rounded-lg border border-amber-300 bg-amber-50 text-amber-700 text-sm font-medium hover:bg-amber-100 transition-colors flex items-center justify-center gap-2"
+                      data-testid="button-share-certificate"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Bagikan &amp; Verifikasi Sertifikat
+                    </button>
+                  </Link>
+                )}
               </div>
             )}
 
