@@ -438,6 +438,32 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill error:`, e);
   }
 
+  // ── Document Analyses table (idempotent DDL) ──────────────────────────────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS document_analyses (
+        id             SERIAL PRIMARY KEY,
+        user_id        TEXT NOT NULL,
+        filename       TEXT,
+        original_name  TEXT,
+        file_size      BIGINT,
+        doc_type       TEXT,
+        extracted_text TEXT,
+        status         TEXT NOT NULL DEFAULT 'analyzing',
+        summary        TEXT,
+        checklist      JSONB,
+        error_msg      TEXT,
+        chat_history   JSONB DEFAULT '[]',
+        regulasi_note  JSONB,
+        created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    console.log(`${new Date().toLocaleTimeString()} [express] document_analyses table ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] document_analyses DDL error:`, e);
+  }
+
   // ── Blueprint Submissions table (idempotent DDL) ──────────────────────────
   try {
     await pool.query(`
