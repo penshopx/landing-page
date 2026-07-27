@@ -16,7 +16,7 @@ import {
   ShoppingBag, Plus, ExternalLink, Package, Trash2, Pencil, MessageCircle, Loader2,
   Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical
 } from "lucide-react";
-import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
+import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2, useContactNumbers } from "@/lib/contact";
 
 // ---- Types ----
 interface AdminMeData {
@@ -266,7 +266,7 @@ const PLAN_LABEL_WA: Record<string, string> = {
   monthly: "1 Bulan", quarterly: "3 Bulan", semiannual: "6 Bulan", annual: "12 Bulan", free: "Free",
 };
 
-function makeWelcomeWA(sub: AdminSubscription, appUrl: string): string {
+function makeWelcomeWA(sub: AdminSubscription, appUrl: string, d1 = WA_CONTACT_DISPLAY, d2 = WA_CONTACT_DISPLAY_2): string {
   const name = [sub.user?.firstName, sub.user?.lastName].filter(Boolean).join(" ") || "Kak";
   const plan = PLAN_LABEL_WA[sub.plan] ?? sub.plan;
   return `Halo ${name}! 👋
@@ -288,7 +288,7 @@ Silakan langsung mulai:
 📖 Panduan langkah-demi-langkah: ${appUrl}/welcome
 
 Butuh bantuan? Hubungi kami:
-📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
+📱 WA: ${d1} / ${d2}
 
 Selamat berkreasi! 🚀
 — Tim Gustafta`;
@@ -319,6 +319,33 @@ export default function AdminPage() {
       .then((d) => { if (d.appUrl) setAppUrl(d.appUrl); })
       .catch(() => {});
   }, []);
+
+  // ── WA Contact Numbers (runtime, from /api/config/contact) ──
+  const contact = useContactNumbers();
+  const [waContactForm, setWaContactForm] = useState({ primary: "", secondary: "" });
+  const [waContactSaving, setWaContactSaving] = useState(false);
+
+  async function handleSaveWaContact() {
+    const primary = waContactForm.primary.trim();
+    const secondary = waContactForm.secondary.trim();
+    if (!primary || !secondary) return;
+    setWaContactSaving(true);
+    try {
+      const res = await fetch("/api/admin/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ primary, secondary }),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Gagal menyimpan");
+      queryClient.invalidateQueries({ queryKey: ["/api/config/contact"] });
+      setWaContactForm({ primary: "", secondary: "" });
+      toast({ title: "✅ Nomor WhatsApp diperbarui!", description: `${data.primary} / ${data.secondary}` });
+    } catch (e: any) {
+      toast({ title: "Error", description: e.message, variant: "destructive" });
+    } finally { setWaContactSaving(false); }
+  }
 
   // Store tab state
   const [manualForm, setManualForm] = useState({ name: "", email: "", phone: "", agentId: "" });
@@ -2651,6 +2678,80 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
 
+              {/* ── WA Contact Number Rotation ── */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="h-5 w-5 text-green-500" />
+                    <CardTitle className="text-base">Nomor WhatsApp Kontak</CardTitle>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Ganti nomor WA primer &amp; sekunder tanpa redeploy. Perubahan langsung aktif di semua halaman.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Current numbers */}
+                  <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Nomor Saat Ini</p>
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="text-muted-foreground w-20 shrink-0">Primer</span>
+                      <code className="font-mono bg-background px-2 py-0.5 rounded border">{contact.primary}</code>
+                      <span className="text-muted-foreground text-xs">({contact.display})</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <span className="text-muted-foreground w-20 shrink-0">Sekunder</span>
+                      <code className="font-mono bg-background px-2 py-0.5 rounded border">{contact.secondary}</code>
+                      <span className="text-muted-foreground text-xs">({contact.display2})</span>
+                    </div>
+                  </div>
+
+                  {/* Update form */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Perbarui Nomor</p>
+                    <p className="text-xs text-muted-foreground">
+                      Format internasional tanpa tanda +, contoh: <code className="bg-muted px-1 rounded">6281234567890</code>.
+                      Tanda +, spasi, dan strip dibuang otomatis.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex gap-2 items-center">
+                        <span className="text-xs w-20 shrink-0 text-muted-foreground">Primer</span>
+                        <Input
+                          placeholder={contact.primary}
+                          value={waContactForm.primary}
+                          onChange={(e) => setWaContactForm((f) => ({ ...f, primary: e.target.value }))}
+                          className="text-sm font-mono"
+                          data-testid="input-wa-primary"
+                        />
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <span className="text-xs w-20 shrink-0 text-muted-foreground">Sekunder</span>
+                        <Input
+                          placeholder={contact.secondary}
+                          value={waContactForm.secondary}
+                          onChange={(e) => setWaContactForm((f) => ({ ...f, secondary: e.target.value }))}
+                          className="text-sm font-mono"
+                          data-testid="input-wa-secondary"
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={handleSaveWaContact}
+                      disabled={waContactSaving || !waContactForm.primary.trim() || !waContactForm.secondary.trim()}
+                      data-testid="button-save-wa-contact"
+                      className="gap-1.5"
+                    >
+                      {waContactSaving ? <><RefreshCw className="h-3.5 w-3.5 animate-spin" /> Menyimpan...</> : "Simpan Nomor WA"}
+                    </Button>
+                  </div>
+
+                  <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 text-xs text-amber-800 dark:text-amber-200">
+                    <strong>Catatan:</strong> Nomor disimpan ke database dan dimuat ulang tanpa reload halaman.
+                    Jika nomor tidak berubah setelah simpan, refresh halaman (cache klien 1 jam).
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* ── MultiClaw Admin Shortcut ── */}
               <Card className="border-violet-500/30 bg-violet-500/5">
                 <CardContent className="py-4">
@@ -3127,7 +3228,7 @@ Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new 
 💡 Simpan link di atas agar mudah dibuka kapan saja!
 
 Butuh bantuan? Hubungi kami:
-📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
+📱 WA: ${contact.display} / ${contact.display2}
 
 Selamat menggunakan! 🚀
 — Tim Gustafta`
@@ -3143,7 +3244,7 @@ Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new 
 💡 Bookmark link di atas agar mudah dibuka kapan saja — bahkan dari HP berbeda sekalipun!
 
 Butuh bantuan? Hubungi kami:
-📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
+📱 WA: ${contact.display} / ${contact.display2}
 
 Selamat menggunakan! 🚀
 — Tim Gustafta`;
@@ -3214,7 +3315,7 @@ Selamat menggunakan! 🚀
             </DialogTitle>
           </DialogHeader>
           {waDialog.sub && (() => {
-            const msg = makeWelcomeWA(waDialog.sub, appUrl);
+            const msg = makeWelcomeWA(waDialog.sub, appUrl, contact.display, contact.display2);
             const phone = waDialog.sub.user?.email ?? "";
             const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
             return (
@@ -3292,7 +3393,7 @@ Link ini berisi:
 ⚠️ *Simpan link ini* — link Anda bersifat permanen dan bisa dibuka kapan saja dari browser manapun.
 
 Butuh bantuan? Hubungi kami:
-📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
+📱 WA: ${contact.display} / ${contact.display2}
 
 Selamat menggunakan! 🚀
 — Tim Gustafta`;

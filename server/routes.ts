@@ -778,6 +778,44 @@ async function saveProdUrlToDb(url: string): Promise<void> {
   } catch { /* non-critical */ }
 }
 
+// ── WhatsApp contact number runtime rotation ──────────────────────────────────
+// Admin can rotate primary/secondary WA numbers without a redeploy via
+// POST /api/admin/contact  →  saved to system_config
+// GET /api/config/contact  ←  served from in-memory cache (loaded at startup)
+const WA_CONTACT_DEFAULTS = {
+  primary: process.env.WA_CONTACT_PRIMARY || "6281287941900",
+  secondary: process.env.WA_CONTACT_SECONDARY || "6282299417818",
+};
+let _cachedWaContact: { primary: string; secondary: string } | null = null;
+
+async function loadWaContactFromDb(): Promise<{ primary: string; secondary: string } | null> {
+  try {
+    const rows = await db.select().from(systemConfig)
+      .where(inArray(systemConfig.key, ["wa_contact_primary", "wa_contact_secondary"]));
+    const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+    const primary = map["wa_contact_primary"];
+    const secondary = map["wa_contact_secondary"];
+    if (!primary && !secondary) return null;
+    return {
+      primary: primary || WA_CONTACT_DEFAULTS.primary,
+      secondary: secondary || WA_CONTACT_DEFAULTS.secondary,
+    };
+  } catch { return null; }
+}
+
+async function saveWaContactToDb(primary: string, secondary: string): Promise<void> {
+  // Let errors propagate — the caller (POST /api/admin/contact) must return non-2xx on failure.
+  await db.insert(systemConfig).values({ key: "wa_contact_primary", value: primary })
+    .onConflictDoUpdate({ target: systemConfig.key, set: { value: primary, updatedAt: new Date() } });
+  await db.insert(systemConfig).values({ key: "wa_contact_secondary", value: secondary })
+    .onConflictDoUpdate({ target: systemConfig.key, set: { value: secondary, updatedAt: new Date() } });
+  _cachedWaContact = { primary, secondary };
+}
+
+function getWaContact(): { primary: string; secondary: string } {
+  return _cachedWaContact || WA_CONTACT_DEFAULTS;
+}
+
 /**
  * Returns the canonical production base URL for building external-facing links.
  *
@@ -859,6 +897,12 @@ export async function registerRoutes(
           _cachedProdUrl = dbUrl;
           console.log(`[startup] Production URL loaded from DB: ${dbUrl}`);
         }
+      }
+      // Load WA contact numbers from DB (admin may have rotated them)
+      const waContact = await loadWaContactFromDb();
+      if (waContact) {
+        _cachedWaContact = waContact;
+        console.log(`[startup] WA contact numbers loaded from DB: ${waContact.primary} / ${waContact.secondary}`);
       }
     } catch { /* non-critical */ }
   })();
@@ -10826,6 +10870,14 @@ Balas dengan JSON dengan struktur PERSIS ini:
     return res.json({ appUrl: null, source: "none" });
   });
 
+  // Public: WA contact numbers — served from in-memory cache (loaded from DB at startup).
+  // No HTTP cache: admin updates must be visible to the next request without waiting.
+  // Client-side react-query stale-time handles the performance side (1 h in contact.ts).
+  app.get("/api/config/contact", (_req, res) => {
+    res.set("Cache-Control", "no-store");
+    return res.json(getWaContact());
+  });
+
   // Helper: cari agent orchestrator pakai multi-strategy (slug → ID → name keyword)
   // Mengembalikan agent valid (yang nama-nya mengandung keyword) bila ditemukan
   async function findOrchestratorAgent(opts: {
@@ -11134,6 +11186,25 @@ Balas dengan JSON dengan struktur PERSIS ini:
       console.error("[bootstrap-superadmin] error:", err);
       res.status(500).json({ error: err.message });
     }
+  });
+
+  // Admin: rotate WA contact numbers without redeploying
+  app.post("/api/admin/contact", isAuthenticated, requireAdmin, async (req: any, res: any) => {
+    const { primary, secondary } = req.body as { primary?: string; secondary?: string };
+    if (!primary || !secondary) return res.status(400).json({ error: "primary and secondary required" });
+    // Strip all non-digits so the admin can paste numbers with dashes/spaces/+
+    const cleanPrimary = String(primary).replace(/\D/g, "");
+    const cleanSecondary = String(secondary).replace(/\D/g, "");
+    if (cleanPrimary.length < 8 || cleanSecondary.length < 8) {
+      return res.status(400).json({ error: "Nomor tidak valid (minimal 8 digit)" });
+    }
+    try {
+      await saveWaContactToDb(cleanPrimary, cleanSecondary);
+    } catch (err: any) {
+      console.error("[admin/contact] DB write failed:", err);
+      return res.status(500).json({ error: "Gagal menyimpan nomor ke database. Coba lagi." });
+    }
+    return res.json({ ok: true, primary: cleanPrimary, secondary: cleanSecondary });
   });
 
   // Admin: manually set the production URL (saved to DB + in-memory cache)
