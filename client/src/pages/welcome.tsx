@@ -18,8 +18,9 @@ import {
 } from "lucide-react";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 
-const WA_NUMBER = "6282299417818";
+const WA_NUMBER = WA_CONTACT_NUMBER_2;
 
 function waMsg(topic: string) {
   trackLead({ content_name: "WhatsApp CTA" });

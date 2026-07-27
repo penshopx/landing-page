@@ -16,6 +16,7 @@ import {
   ShoppingBag, Plus, ExternalLink, Package, Trash2, Pencil, MessageCircle, Loader2,
   Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical
 } from "lucide-react";
+import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
 
 // ---- Types ----
 interface AdminMeData {
@@ -287,7 +288,7 @@ Silakan langsung mulai:
 📖 Panduan langkah-demi-langkah: ${appUrl}/welcome
 
 Butuh bantuan? Hubungi kami:
-📱 WA: 081287941900 / 082299417818
+📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
 
 Selamat berkreasi! 🚀
 — Tim Gustafta`;
@@ -2863,7 +2864,7 @@ Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new 
 💡 Simpan link di atas agar mudah dibuka kapan saja!
 
 Butuh bantuan? Hubungi kami:
-📱 WA: 081287941900 / 082299417818
+📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
 
 Selamat menggunakan! 🚀
 — Tim Gustafta`
@@ -2879,7 +2880,7 @@ Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new 
 💡 Bookmark link di atas agar mudah dibuka kapan saja — bahkan dari HP berbeda sekalipun!
 
 Butuh bantuan? Hubungi kami:
-📱 WA: 081287941900 / 082299417818
+📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
 
 Selamat menggunakan! 🚀
 — Tim Gustafta`;
@@ -3028,7 +3029,7 @@ Link ini berisi:
 ⚠️ *Simpan link ini* — link Anda bersifat permanen dan bisa dibuka kapan saja dari browser manapun.
 
 Butuh bantuan? Hubungi kami:
-📱 WA: 081287941900 / 082299417818
+📱 WA: ${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}
 
 Selamat menggunakan! 🚀
 — Tim Gustafta`;

@@ -8,6 +8,7 @@ import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import {
   Sparkles, Lock, Unlock, ShoppingBag, Wrench, MessageCircle,
   Check, Trash2, ArrowRight, Bot, FileDown, RefreshCw, BookOpen,
@@ -377,7 +378,7 @@ export default function BlueprintSayaPage() {
                   </a>
                   <p className="text-center text-[11px] text-gray-400">Sekali bayar · Termasuk lisensi + trial 7 hari</p>
                   <div className="flex gap-2 pt-1">
-                    <a href={`https://wa.me/6282299417818?text=${waText}`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex-1">
+                    <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=${waText}`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex-1">
                       <Button variant="outline" className="w-full h-9 text-sm gap-2 border-gray-200 text-gray-500 hover:bg-gray-50">
                         <MessageCircle className="h-4 w-4" /> Tanya via WA
                       </Button>

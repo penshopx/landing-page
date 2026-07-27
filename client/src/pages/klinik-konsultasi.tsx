@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
+import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import {
   Stethoscope, FileCheck2, Gavel, HardHat, Briefcase, Truck, Award, Building2,
   ArrowRight, MessageCircle, Headset, CheckCircle2, Clock, Sparkles, Bot,
@@ -27,7 +28,7 @@ import {
  */
 
 const OPERATOR_WA =
-  "https://wa.me/6282299417818?text=" +
+  `https://wa.me/${WA_CONTACT_NUMBER_2}?text=` +
   encodeURIComponent(
     "Halo Operator Gustafta, pertanyaan saya di Klinik Konstruksi belum terjawab AI. Mohon bantuannya.",
   );

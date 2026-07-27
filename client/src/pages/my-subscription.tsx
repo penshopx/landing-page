@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 
 const FEATURE_ICONS: Record<FeatureKey, typeof Check> = {
   chatbot: MessageSquare,
@@ -58,7 +59,7 @@ function formatLimit(val: number) {
 }
 
 const WA = (plan: string, email: string) =>
-  `https://wa.me/6282299417818?text=${encodeURIComponent(`Halo, saya ingin upgrade ke paket ${PLAN_CONFIGS[plan as keyof typeof PLAN_CONFIGS]?.name ?? plan}. Email: ${email}`)}`;
+  `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(`Halo, saya ingin upgrade ke paket ${PLAN_CONFIGS[plan as keyof typeof PLAN_CONFIGS]?.name ?? plan}. Email: ${email}`)}`;
 
 export default function MySubscriptionPage() {
   const { user, isAuthenticated } = useAuth();
@@ -397,7 +398,7 @@ export default function MySubscriptionPage() {
         {/* Support */}
         <div className="text-center text-sm text-muted-foreground py-4 border-t">
           Ada pertanyaan?{" "}
-          <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20butuh%20bantuan%20dengan%20langganan%20Gustafta%20Apps." onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
+          <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20butuh%20bantuan%20dengan%20langganan%20Gustafta%20Apps.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
             target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
             Hubungi support via WhatsApp
           </a>{" "}atau{" "}

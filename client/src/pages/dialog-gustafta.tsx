@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import { MessageContent } from "@/lib/format-message";
 import {
   Send, X, RefreshCw, Share2, Copy, MessageCircle,
@@ -82,7 +83,7 @@ Ceritakan padaku — kamu bekerja di bidang apa, atau ada tantangan apa yang ing
 
 const GREETING = greetingFor("Gustafta");
 
-const DEFAULT_WA = "6282299417818";
+const DEFAULT_WA = WA_CONTACT_NUMBER_2;
 
 const waUrl = (text: string, phone: string = DEFAULT_WA) => {
   trackLead({ content_name: "WhatsApp CTA" });

@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 
 import { trackLead } from "@/lib/meta-pixel";
-const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20tertarik%20jadi%20Affiliate%2FReseller%20Gustafta";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20tertarik%20jadi%20Affiliate%2FReseller%20Gustafta`;
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }
@@ -559,7 +560,7 @@ export default function AffiliatePage() {
                 <Star className="h-3.5 w-3.5" /> Info Program Kemitraan
               </button>
             </a>
-            <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tahu%20program%20Affiliate%20Gustafta" target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tahu%20program%20Affiliate%20Gustafta`} target="_blank" rel="noopener noreferrer">
               <button className="inline-flex items-center gap-2 border border-violet-400 text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/30 text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
                 <Share2 className="h-3.5 w-3.5" /> Info Affiliate Program
               </button>

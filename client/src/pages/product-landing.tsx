@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import DemoChat from "@/components/demo-chat";
+import { WA_CONTACT_NUMBER } from "@/lib/contact";
 import {
   AlertTriangle,
   CheckCircle,
@@ -76,7 +77,7 @@ function KBCustomSection({ agentName }: { agentName: string }) {
             </div>
             <p className="text-xs text-slate-400">Kustomisasi via dashboard<br />atau hubungi tim Gustafta</p>
             <a
-              href="https://wa.me/6281287941900?text=Halo%2C+saya+ingin+kustomisasi+KB+untuk+chatbot"
+              href={`https://wa.me/${WA_CONTACT_NUMBER}?text=Halo%2C+saya+ingin+kustomisasi+KB+untuk+chatbot`}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 mt-3 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-colors"
             >

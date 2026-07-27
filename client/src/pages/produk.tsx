@@ -18,6 +18,7 @@ import {
   AlertTriangle, TrendingUp, Lightbulb, ClipboardList, BadgePlus,
 } from "lucide-react";
 import { CREDIT_PACKS as KREDIT_EKSTRA, PRICING, LICENSE_INFO, SERVICE_TIERS } from "@/data/pricing";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 
 // ─── Types & Data ─────────────────────────────────────────────────────────────
 
@@ -411,7 +412,7 @@ function BisnisPaket() {
               ))}
             </div>
             <div className="mt-auto flex flex-col sm:flex-row gap-2 pt-2 border-t border-purple-200 dark:border-purple-800">
-              <a href="https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20ingin%20info%20paket%20Enterprise" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex-1">
+              <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20info%20paket%20Enterprise`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex-1">
                 <Button size="sm" className="w-full text-xs h-8 bg-purple-600 hover:bg-purple-500 text-white">
                   Hubungi Tim Enterprise <ChevronRight className="w-3.5 h-3.5 ml-1"/>
                 </Button>
@@ -710,7 +711,7 @@ export default function ProdukPage() {
                 <Zap className="h-3.5 w-3.5" /> Mulai Merakit AI
               </button>
             </Link>
-            <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Gustafta%20Builder" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Gustafta%20Builder`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
               <button className="inline-flex items-center gap-2 border border-indigo-400 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
                 <MessageSquare className="h-3.5 w-3.5" /> Tanya via WhatsApp
               </button>
@@ -794,7 +795,7 @@ export default function ProdukPage() {
         <div className="text-lg font-bold text-gray-900 dark:text-white mb-2">Masih bingung pilih paket yang mana?</div>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Konsultasi gratis dengan tim Gustafta — kami bantu pilihkan paket terbaik untuk bisnis Anda.</p>
         <div className="flex gap-3 justify-center flex-wrap">
-          <a href="https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20paket" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+          <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20paket`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
             <Button className="bg-green-600 hover:bg-green-500 text-white text-sm h-10 px-5">
               <Phone className="w-4 h-4 mr-2"/> Chat WhatsApp
             </Button>

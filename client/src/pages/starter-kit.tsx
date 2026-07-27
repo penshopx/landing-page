@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 
 import { trackLead } from "@/lib/meta-pixel";
-const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Starter%20Kit";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Starter%20Kit`;
 const SCALEV_STARTER_KIT = "https://bayar.gustafta.my.id/p/starter-kit-gustafta";
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
@@ -276,7 +277,7 @@ export default function StarterKitPage() {
                   </li>
                 ))}
               </ul>
-              <a href={`https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20mau%20info%20lisensi%20platform%20tanpa%20Starter%20Kit`} target="_blank" rel="noopener noreferrer">
+              <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20mau%20info%20lisensi%20platform%20tanpa%20Starter%20Kit`} target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" className="w-full h-11 font-semibold text-gray-600 dark:text-gray-300" data-testid="btn-pricing-lisensi">
                   Tanya via WhatsApp →
                 </Button>

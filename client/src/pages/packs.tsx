@@ -15,6 +15,7 @@ import {
   Send, Loader2, Bot
 } from "lucide-react";
 import { SERVICE_TIERS, HOSTING_SUMMARY, HOSTING_RANGE, PRICING } from "@/data/pricing";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 
 interface Pack {
   id: string;
@@ -173,7 +174,7 @@ const PACKS: Pack[] = [
   },
 ];
 
-const WA_NUMBER = "6282299417818";
+const WA_NUMBER = WA_CONTACT_NUMBER_2;
 const waLink = (msg: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
 
 const KONSUL_MAX = 5;
@@ -475,7 +476,7 @@ export default function PacksPage() {
                   </div>
                 ))}
               </div>
-              <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20naik%20level%20jadi%20Perakit%20AI%20Profesional%20di%20Gustafta" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors">
+              <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20naik%20level%20jadi%20Perakit%20AI%20Profesional%20di%20Gustafta`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors">
                 <Sparkles className="h-3 w-3" /> Naik Level Sekarang
               </a>
             </div>
@@ -494,7 +495,7 @@ export default function PacksPage() {
                   </div>
                 ))}
               </div>
-              <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20konsultasi%20AI%20Studio%20Gustafta%20untuk%20organisasi%20saya" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-orange-600 hover:bg-orange-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors">
+              <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20konsultasi%20AI%20Studio%20Gustafta%20untuk%20organisasi%20saya`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-orange-600 hover:bg-orange-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors">
                 <TrendingUp className="h-3 w-3" /> Konsultasi AI Studio
               </a>
             </div>
@@ -513,7 +514,7 @@ export default function PacksPage() {
                   </div>
                 ))}
               </div>
-              <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20bergabung%20Komunitas%20Perakit%20AI%20Gustafta" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors">
+              <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20bergabung%20Komunitas%20Perakit%20AI%20Gustafta`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-[11px] font-semibold px-3 py-1.5 rounded-lg transition-colors">
                 <Users className="h-3 w-3" /> Gabung Komunitas
               </a>
             </div>

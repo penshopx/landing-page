@@ -10,11 +10,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
 import { Bot, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2 } from "lucide-react";
 
 const WA_NUMBERS = [
-  { display: "081287941900", link: "6281287941900" },
-  { display: "082299417818", link: "6282299417818" },
+  { display: WA_CONTACT_DISPLAY, link: WA_CONTACT_NUMBER },
+  { display: WA_CONTACT_DISPLAY_2, link: WA_CONTACT_NUMBER_2 },
 ];
 
 const PLAN_BADGE_CONFIG: Record<string, { label: string; className: string }> = {

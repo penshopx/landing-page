@@ -14,6 +14,7 @@ import {
   Hotel, Factory, ChevronRight, Lightbulb, Wrench
 } from "lucide-react";
 import { HOSTING, HOSTING_PERIODS, HOSTING_RANGE, SERVICE_TIERS } from "@/data/pricing";
+import { WA_CONTACT_LINK, WA_CONTACT_LINK_2, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
 
 interface PricingTier {
   name: string;
@@ -279,7 +280,7 @@ const chatbotCatalog: ChatbotCategory[] = [
   },
 ];
 
-const WHATSAPP_NUMBER = "6282299417818";
+const WHATSAPP_NUMBER = WA_CONTACT_NUMBER_2;
 
 const paymentMethods = [
   {
@@ -999,7 +1000,7 @@ export default function Pricing() {
               <Zap className="h-4 w-4" />
               Lihat Paket
             </Button>
-            <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tanya%20tentang%20paket%20Gustafta" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tanya%20tentang%20paket%20Gustafta`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
               <Button size="lg" variant="outline" className="gap-2" data-testid="button-hubungi-sales">
                 <Headphones className="h-4 w-4" />
                 Hubungi Sales
@@ -1017,13 +1018,13 @@ export default function Pricing() {
               <span className="font-bold">Gustafta</span>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
-              <a href="https://wa.me/6281287941900" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-foreground transition-colors" data-testid="link-whatsapp-footer-1">
+              <a href={WA_CONTACT_LINK} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-foreground transition-colors" data-testid="link-whatsapp-footer-1">
                 <Smartphone className="h-3.5 w-3.5" />
-                081287941900
+                {WA_CONTACT_DISPLAY}
               </a>
               <span className="hidden sm:inline">·</span>
-              <a href="https://wa.me/6282299417818" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-foreground transition-colors" data-testid="link-whatsapp-footer-2">
-                082299417818
+              <a href={WA_CONTACT_LINK_2} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-foreground transition-colors" data-testid="link-whatsapp-footer-2">
+                {WA_CONTACT_DISPLAY_2}
               </a>
               <span className="hidden sm:inline">·</span>
               <span>© 2026 Gustafta. AI Project Intelligence Platform.</span>

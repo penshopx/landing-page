@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -326,7 +327,7 @@ export default function PlatformSalesPage() {
     return `Rp ${yearly.toLocaleString("id-ID")}`;
   };
 
-  const WA_BASE = "https://wa.me/6282299417818";
+  const WA_BASE = `https://wa.me/${WA_CONTACT_NUMBER_2}`;
   const waLink = (msg: string) => {
     trackLead({ content_name: "WhatsApp CTA" });
     return `${WA_BASE}?text=${encodeURIComponent(msg)}`;

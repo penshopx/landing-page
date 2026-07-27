@@ -1,4 +1,5 @@
 import { useLocation } from "wouter";
+import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
@@ -9,8 +10,7 @@ import {
   ClipboardCheck, Scale
 } from "lucide-react";
 
-const WA = "6282299417818";
-const waLink = (msg: string) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
+const waLink = (msg: string) => `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(msg)}`;
 
 const segments = [
   {

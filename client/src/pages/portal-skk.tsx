@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import {
   Check, ArrowRight, GraduationCap, MessageCircle, Users, Building2,
   Zap, Star, ChevronRight, FileText, Award, ClipboardList, Search,
   BookOpen, ShieldCheck, Layers,
 } from "lucide-react";
 
-const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20AI%20Specialist%20untuk%20ekosistem%20SKK";
+const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20AI%20Specialist%20untuk%20ekosistem%20SKK`;
 
 type Segment = "asesi" | "asesor" | "lsp" | "tuk" | "perusahaan";
 

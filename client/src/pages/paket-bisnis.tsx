@@ -3,7 +3,8 @@ import { Link } from "wouter";
 import { ChevronRight, CheckCircle2, MessageCircle, Building2, Zap, Pickaxe, Flame, GraduationCap, Users, Home, Globe } from "lucide-react";
 
 import { trackLead } from "@/lib/meta-pixel";
-const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20tertarik%20dengan%20Paket%20Bisnis%20AI%20per%20Segmen.%20Bisa%20info%20lebih%20lanjut%3F";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20tertarik%20dengan%20Paket%20Bisnis%20AI%20per%20Segmen.%20Bisa%20info%20lebih%20lanjut%3F`;
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }

@@ -11,6 +11,7 @@ import explainerVideo from "@assets/generated_videos/gustafta_promo_24s_web.mp4"
 import explainerPoster from "@assets/generated_videos/gustafta_promo_24s_poster.jpg";
 import overviewVideo from "@assets/generated_videos/gustafta_explainer.mp4";
 import overviewPoster from "@assets/generated_videos/gustafta_explainer_poster.jpg";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import {
   Rocket, ArrowRight, Check, BookOpen, Wrench, Zap, Lightbulb, TrendingUp,
   MessageCircle, ShieldCheck, Store, Bot, FileText, CreditCard,
@@ -182,7 +183,7 @@ function BlueprintLockedCard({ bp, onClose }: { bp: Blueprint; onClose: () => vo
         {/* Tautan sekunder kecil */}
         <div className="flex items-center justify-center gap-3 pt-0.5">
           <a
-            href={`https://wa.me/6282299417818?text=${waText}`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
+            href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=${waText}`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
             target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-1 text-[10px] text-gray-400 hover:text-green-600 transition-colors"
           >
@@ -553,7 +554,7 @@ export default function Landing() {
   const { isAuthenticated } = useAuth();
   const [showDialog, setShowDialog] = useState(false);
   const builderUrl = isAuthenticated ? "/dashboard" : "/login";
-  const waUrl = "https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Gustafta";
+  const waUrl = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Gustafta`;
 
   return (
     <div className="min-h-screen bg-background" data-testid="page-landing">
@@ -665,7 +666,7 @@ export default function Landing() {
                 desc: "Setelah dokumen dibedah, kami dampingi Anda hingga proyek selesai atau tender menang. Termasuk revisi dokumen, konsultasi lanjutan via WhatsApp, dan pendampingan saat negosiasi atau klarifikasi teknis.",
                 price: "Paket mulai Rp 499.000 – Rp 2.500.000",
                 cta: "Konsultasi Paket",
-                href: "https://wa.me/6281287941900",
+                href: `https://wa.me/${WA_CONTACT_NUMBER}`,
                 external: true,
               },
               {

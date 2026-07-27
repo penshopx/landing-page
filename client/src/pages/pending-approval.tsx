@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { trackLead } from "@/lib/meta-pixel";
 import { Bot, ShieldOff, MessageSquare, Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 
 export default function PendingApproval() {
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function PendingApproval() {
 
           <div className="flex flex-col gap-3">
             <a
-              href="https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20akun%20saya%20tidak%20bisa%20diakses.%20Mohon%20bantuannya." onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
+              href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20akun%20saya%20tidak%20bisa%20diakses.%20Mohon%20bantuannya.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
               target="_blank"
               rel="noopener noreferrer"
               data-testid="button-wa-blocked"

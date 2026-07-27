@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useRef } from "react";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type Category = "semua" | "legalitas" | "sbu" | "skk" | "perizinan" | "tender";
@@ -983,7 +984,7 @@ function BiroJasaDialog({ open, onClose, doc, companyName }: {
     (notes ? `💬 Catatan: ${notes}\n` : "") +
     `\nMohon info lebih lanjut. Terima kasih!`
   );
-  const waUrl = `https://wa.me/6282299417818?text=${waMessage}`;
+  const waUrl = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${waMessage}`;
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
@@ -1277,7 +1278,7 @@ function RuangKelolaLandingPage() {
               <LogIn className="h-4 w-4" /> Daftar & Mulai Gratis
             </Button>
           </Link>
-          <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Kelola%20Gustafta" target="_blank" rel="noopener noreferrer">
+          <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Kelola%20Gustafta`} target="_blank" rel="noopener noreferrer">
             <Button size="lg" variant="outline" className="gap-2 border-white/30 text-white hover:bg-white/10">
               <PhoneCall className="h-4 w-4" /> Tanya via WhatsApp
             </Button>

@@ -14,9 +14,10 @@ import { useClawPackages, packageForRoute } from "@/hooks/use-claw-packages";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { trackLead } from "@/lib/meta-pixel";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
 
-const WA_TRIAL_NUMBER = "6281287941900";
-const WA_TRIAL_NUMBER_2 = "6282299417818";
+const WA_TRIAL_NUMBER = WA_CONTACT_NUMBER;
+const WA_TRIAL_NUMBER_2 = WA_CONTACT_NUMBER_2;
 
 /** Statistik faktual kapasitas produk (BUKAN testimoni/angka pengguna fiktif) — mis. "10 Agen Spesialis". */
 export interface CapabilityStat {
@@ -436,7 +437,7 @@ function LockedScreen({ title, description, highlights, icon, reason, requiredPl
                     data-testid="button-wa-trial-1"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    081287941900
+                    {WA_CONTACT_DISPLAY}
                   </Button>
                 </a>
                 <a href={waUrl2} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
@@ -447,7 +448,7 @@ function LockedScreen({ title, description, highlights, icon, reason, requiredPl
                     data-testid="button-wa-trial-2"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    082299417818
+                    {WA_CONTACT_DISPLAY_2}
                   </Button>
                 </a>
               </div>

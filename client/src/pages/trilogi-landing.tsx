@@ -13,10 +13,11 @@ import { TRILOGI } from "@/data/pricing";
 import coverFlat from "@assets/Monolog-_cover_1781287565935.jpg";
 import cover3D from "@assets/Buku_3D_1781288556255.png";
 import mockupDevices from "@assets/1781288755_1781288818548.jpg";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 
 const SCALEV_BUNDLE = "https://bayar.gustafta.my.id";
 const SCALEV_BUKU1  = "https://bayar.gustafta.my.id";
-const WA_URL        = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Trilogi%20Dari%20Monolog%20ke%20Dialog";
+const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Trilogi%20Dari%20Monolog%20ke%20Dialog`;
 
 // Data riset/lembaga resmi (konteks umum, bukan janji hasil produk). Diverifikasi via sumber publik.
 const STATS_TRILOGI = [

@@ -10,7 +10,8 @@ import {
 } from "lucide-react";
 
 import { trackLead } from "@/lib/meta-pixel";
-const WA_URL = "https://wa.me/6282299417818?text=Halo%20Gustafta%2C%20saya%20tertarik%20jadi%20Mitra%20Gustafta%20Builder";
+import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20tertarik%20jadi%20Mitra%20Gustafta%20Builder`;
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }

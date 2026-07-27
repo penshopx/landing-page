@@ -5,6 +5,7 @@ import { SharedHeader } from "@/components/shared-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
 import {
   ShoppingBag, CreditCard, Package, Building2,
   CheckCircle2, AlertCircle, ArrowRight, Copy,
@@ -152,7 +153,7 @@ const PRODUCTS: Product[] = [
       {
         who: "customer",
         label: "Customer konfirmasi & bayar via WA",
-        detail: "Customer kirim bukti transfer ke nomor WA Gustafta (081287941900 / 082299417818) dengan menyebut nama, email, dan paket yang dipilih.",
+        detail: `Customer kirim bukti transfer ke nomor WA Gustafta (${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}) dengan menyebut nama, email, dan paket yang dipilih.`,
       },
       {
         who: "admin",
@@ -279,7 +280,7 @@ const PRODUCTS: Product[] = [
       {
         who: "customer",
         label: "Customer hubungi via WA / klik CTA di /platform",
-        detail: "Customer klik tombol \"Hubungi via WhatsApp\" di /platform → diarahkan ke WA 082299417818 dengan pesan awal berisi kebutuhan bisnis.",
+        detail: `Customer klik tombol "Hubungi via WhatsApp" di /platform → diarahkan ke WA ${WA_CONTACT_DISPLAY_2} dengan pesan awal berisi kebutuhan bisnis.`,
       },
       {
         who: "admin",
@@ -568,7 +569,7 @@ export default function PanduanDeliveryPage() {
                 Buka Admin Panel
               </Button>
             </Link>
-            <a href="https://wa.me/6282299417818?text=Halo%2C%20saya%20butuh%20bantuan%20delivery%20produk%20Gustafta." onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20butuh%20bantuan%20delivery%20produk%20Gustafta.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
               <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white">
                 <MessageCircle className="h-4 w-4" />
                 WA Tim Teknis

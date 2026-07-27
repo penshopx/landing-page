@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
+import { WA_CONTACT_LINK, WA_CONTACT_LINK_2, WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
 
 const CATEGORY_LABELS: Record<string, string> = {
   engineering: "Teknik & Engineering",
@@ -376,7 +377,7 @@ function GroupEmptyState({ isGustafta }: { isGustafta: boolean }) {
         {isGustafta ? "Produk Gustafta akan segera hadir." : "Produk mitra akan segera hadir."}
       </p>
       <a
-        href="https://wa.me/6281287941900" onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
+        href={WA_CONTACT_LINK} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 mt-3 px-4 py-2 rounded-lg bg-violet-600 text-white text-xs hover:bg-violet-700 transition-colors"
@@ -441,7 +442,7 @@ export default function StoreFeatured() {
     }
     // Produk non-store (agent) → WA inquiry
     const waMsg = encodeURIComponent(`Halo, saya tertarik membeli produk: *${agent.name}*. Mohon informasi cara pembelian.`);
-    window.open(`https://wa.me/6282299417818?text=${waMsg}`, "_blank");
+    window.open(`https://wa.me/${WA_CONTACT_NUMBER_2}?text=${waMsg}`, "_blank");
   };
 
   const handleDemo = (agent: AgentProduct) => {
@@ -487,14 +488,14 @@ export default function StoreFeatured() {
           </div>
           <div className="flex items-center gap-3">
             <a
-              href="https://wa.me/6281287941900"
+              href={WA_CONTACT_LINK}
               onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
               target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
               data-testid="link-wa-header"
             >
               <Smartphone className="h-4 w-4" />
-              <span className="hidden sm:inline">081287941900</span>
+              <span className="hidden sm:inline">{WA_CONTACT_DISPLAY}</span>
             </a>
             <Link href="/store/katalog">
               <Button variant="outline" size="sm" className="text-xs h-8" data-testid="link-katalog-header">
@@ -532,7 +533,7 @@ export default function StoreFeatured() {
               </Button>
             </Link>
             <a
-              href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20rekomendasi%20AI%20yang%20tepat%20untuk%20kebutuhan%20saya"
+              href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20rekomendasi%20AI%20yang%20tepat%20untuk%20kebutuhan%20saya`}
               onClick={() => trackLead({ content_name: "WhatsApp Hero CTA" })}
               target="_blank" rel="noopener noreferrer"
             >
@@ -836,7 +837,7 @@ export default function StoreFeatured() {
               </Button>
             </Link>
             <a
-              href="https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20konsultasi%20memilih%20AI%20yang%20tepat%20untuk%20saya"
+              href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20konsultasi%20memilih%20AI%20yang%20tepat%20untuk%20saya`}
               onClick={() => trackLead({ content_name: "WhatsApp Final CTA" })}
               target="_blank" rel="noopener noreferrer"
               data-testid="link-wa-final-cta"
@@ -852,14 +853,14 @@ export default function StoreFeatured() {
       {/* ── FOOTER ── */}
       <footer className="border-t border-gray-200 py-8 text-center text-sm text-gray-400 bg-white">
         <div className="flex items-center justify-center gap-4 mb-2">
-          <a href="https://wa.me/6281287941900" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
+          <a href={WA_CONTACT_LINK} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-1.5 hover:text-gray-700 transition-colors" data-testid="link-wa-footer-1">
-            <Smartphone className="h-3.5 w-3.5" />081287941900
+            <Smartphone className="h-3.5 w-3.5" />{WA_CONTACT_DISPLAY}
           </a>
           <span className="text-gray-300">·</span>
-          <a href="https://wa.me/6282299417818" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
+          <a href={WA_CONTACT_LINK_2} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-1.5 hover:text-gray-700 transition-colors" data-testid="link-wa-footer-2">
-            082299417818
+            {WA_CONTACT_DISPLAY_2}
           </a>
         </div>
         <p>© 2026 Gustafta. AI Platform Konstruksi Indonesia.</p>

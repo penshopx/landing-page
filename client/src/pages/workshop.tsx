@@ -2,6 +2,7 @@ import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { WA_CONTACT_LINK_2, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
 import {
   GraduationCap, BookOpen, Blocks, Zap, Check, MessageCircle,
   Clock, Users, Award, ChevronRight, Star, Lightbulb, Settings2,
@@ -84,7 +85,7 @@ const ALUR = [
 ];
 
 export default function WorkshopPage() {
-  const waUrl = "https://wa.me/6282299417818?text=Halo%2C%20saya%20ingin%20daftar%20tunggu%20Workshop%20Gustafta%20Builder";
+  const waUrl = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20daftar%20tunggu%20Workshop%20Gustafta%20Builder`;
 
   return (
     <div className="min-h-screen bg-background">
@@ -270,7 +271,7 @@ export default function WorkshopPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-xs text-gray-500 dark:text-gray-400 italic">Ekosistem ini sedang dikurasi — jadwal program menyusul.</span>
                 <a
-                  href={`https://wa.me/6282299417818?text=Halo%2C%20saya%20tertarik%20dengan%20Workshop%20Ekosistem%20Kompetensi%20Gustafta`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
+                  href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20tertarik%20dengan%20Workshop%20Ekosistem%20Kompetensi%20Gustafta`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
                   target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400 hover:underline underline-offset-2"
                 >
@@ -370,7 +371,7 @@ export default function WorkshopPage() {
             </a>
           </div>
           <p className="text-[11px] text-gray-400 mt-4">
-            Atau hubungi langsung: <a href="https://wa.me/6282299417818" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} className="underline underline-offset-2 hover:text-gray-600">082299417818</a>
+            Atau hubungi langsung: <a href={WA_CONTACT_LINK_2} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} className="underline underline-offset-2 hover:text-gray-600">{WA_CONTACT_DISPLAY_2}</a>
           </p>
         </div>
 
