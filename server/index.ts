@@ -399,6 +399,45 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates DDL error:`, e);
   }
 
+  // ── Backfill certificates for completions that pre-date the certificate feature ──
+  try {
+    // Find enrollments that are 100% complete but have no certificate yet
+    const pending = await pool.query(`
+      SELECT e.user_id, e.course_id
+      FROM lms_enrollments e
+      WHERE e.progress = 100
+        AND e.completed_at IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM lms_certificates c
+          WHERE c.user_id = e.user_id AND c.course_id = e.course_id
+        )
+    `);
+    if (pending.rows.length > 0) {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let backfilled = 0;
+      for (const row of pending.rows) {
+        const year = new Date().getFullYear();
+        let code = "";
+        for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+        const certCode = `GUSTAFTA-${year}-${code}`;
+        try {
+          await pool.query(
+            `INSERT INTO lms_certificates (user_id, course_id, certificate_code)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (user_id, course_id) DO NOTHING`,
+            [row.user_id, row.course_id, certCode]
+          );
+          backfilled++;
+        } catch (_) { /* skip individual failures */ }
+      }
+      console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill: ${backfilled}/${pending.rows.length} inserted`);
+    } else {
+      console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill: nothing to do`);
+    }
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill error:`, e);
+  }
+
   // ── Blueprint Submissions table (idempotent DDL) ──────────────────────────
   try {
     await pool.query(`
