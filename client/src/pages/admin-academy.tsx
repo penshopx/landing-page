@@ -865,6 +865,8 @@ export default function AdminAcademyPage() {
     open: false,
   });
   const [deleteCourse, setDeleteCourse] = useState<Course | null>(null);
+  const [deleteEnrollmentCount, setDeleteEnrollmentCount] = useState<number | null>(null);
+  const [forceDeleteConfirm, setForceDeleteConfirm] = useState(false);
   const [localCourses, setLocalCourses] = useState<Course[]>([]);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
 
@@ -905,15 +907,42 @@ export default function AdminAcademyPage() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  // Fetch enrollment count whenever a course is selected for deletion
+  useEffect(() => {
+    if (!deleteCourse) {
+      setDeleteEnrollmentCount(null);
+      setForceDeleteConfirm(false);
+      return;
+    }
+    apiRequest("GET", `/api/admin/lms/courses/${deleteCourse.id}/stats`)
+      .then((data: any) => setDeleteEnrollmentCount(data.enrollmentCount ?? 0))
+      // -1 signals fetch error — blocks delete until admin retries
+      .catch(() => setDeleteEnrollmentCount(-1));
+  }, [deleteCourse]);
+
   const delMut = useMutation({
-    mutationFn: (id: number) => apiRequest("DELETE", `/api/admin/lms/courses/${id}`),
+    mutationFn: ({ id, force }: { id: number; force?: boolean }) =>
+      apiRequest("DELETE", `/api/admin/lms/courses/${id}${force ? "?force=true" : ""}`),
     onSuccess: () => {
       toast({ title: "Kursus dihapus" });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
       setDeleteCourse(null);
+      setForceDeleteConfirm(false);
     },
     onError: (e: any) =>
       toast({ title: "Gagal hapus", description: e?.message, variant: "destructive" }),
+  });
+
+  const deactivateMut = useMutation({
+    mutationFn: (id: number) =>
+      apiRequest("PATCH", `/api/admin/lms/courses/${id}`, { isActive: false }),
+    onSuccess: () => {
+      toast({ title: "Kursus dinonaktifkan", description: "Data siswa tetap aman." });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      setDeleteCourse(null);
+    },
+    onError: (e: any) =>
+      toast({ title: "Gagal nonaktifkan", description: e?.message, variant: "destructive" }),
   });
 
   const handleCourseDragEnd = useCallback(
@@ -1065,20 +1094,115 @@ export default function AdminAcademyPage() {
       <AlertDialog open={!!deleteCourse} onOpenChange={(o) => !o && setDeleteCourse(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus kursus?</AlertDialogTitle>
-            <AlertDialogDescription>
-              "{deleteCourse?.title}" beserta semua lesson-nya akan dihapus permanen. Tindakan ini
-              tidak dapat dibatalkan.
+            <AlertDialogTitle>
+              {forceDeleteConfirm ? "Konfirmasi hapus paksa?" : "Hapus kursus?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2">
+                {forceDeleteConfirm ? (
+                  <>
+                    <p>
+                      Anda akan menghapus permanen{" "}
+                      <strong>"{deleteCourse?.title}"</strong> beserta{" "}
+                      <strong>{deleteEnrollmentCount} data siswa</strong>. Tindakan ini{" "}
+                      <strong>tidak dapat dibatalkan</strong>.
+                    </p>
+                    <p className="text-destructive font-medium">
+                      Semua progress dan sertifikat siswa akan ikut terhapus.
+                    </p>
+                  </>
+                ) : deleteEnrollmentCount === null ? (
+                  <p className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Memeriksa data siswa…
+                  </p>
+                ) : deleteEnrollmentCount === -1 ? (
+                  <div className="space-y-2">
+                    <p className="text-destructive">
+                      Gagal memeriksa jumlah siswa yang terdaftar. Hapus dibatalkan untuk
+                      keamanan.
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setDeleteEnrollmentCount(null);
+                        if (deleteCourse) {
+                          apiRequest("GET", `/api/admin/lms/courses/${deleteCourse.id}/stats`)
+                            .then((data: any) =>
+                              setDeleteEnrollmentCount(data.enrollmentCount ?? 0)
+                            )
+                            .catch(() => setDeleteEnrollmentCount(-1));
+                        }
+                      }}
+                    >
+                      Coba lagi
+                    </Button>
+                  </div>
+                ) : deleteEnrollmentCount > 0 ? (
+                  <>
+                    <p>
+                      Kursus <strong>"{deleteCourse?.title}"</strong> memiliki{" "}
+                      <strong>{deleteEnrollmentCount} siswa terdaftar</strong>.
+                    </p>
+                    <p>
+                      Disarankan untuk <strong>nonaktifkan</strong> kursus agar siswa tidak
+                      kehilangan progress mereka. Hapus paksa hanya jika Anda yakin data siswa
+                      boleh dihapus.
+                    </p>
+                  </>
+                ) : (
+                  <p>
+                    "{deleteCourse?.title}" beserta semua lesson-nya akan dihapus permanen.
+                    Tindakan ini tidak dapat dibatalkan.
+                  </p>
+                )}
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={() => deleteCourse && delMut.mutate(deleteCourse.id)}
-            >
-              {delMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Hapus"}
-            </AlertDialogAction>
+          <AlertDialogFooter className="flex-wrap gap-2">
+            <AlertDialogCancel onClick={() => setForceDeleteConfirm(false)}>
+              Batal
+            </AlertDialogCancel>
+            {!forceDeleteConfirm && deleteEnrollmentCount !== null && deleteEnrollmentCount > 0 ? (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => deleteCourse && deactivateMut.mutate(deleteCourse.id)}
+                  disabled={deactivateMut.isPending}
+                >
+                  {deactivateMut.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                  ) : null}
+                  Nonaktifkan saja
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setForceDeleteConfirm(true)}
+                >
+                  Hapus paksa…
+                </Button>
+              </>
+            ) : (
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={() =>
+                  deleteCourse &&
+                  delMut.mutate({
+                    id: deleteCourse.id,
+                    // Only send force=true when admin has explicitly gone through
+                    // the force-confirm step. Never infer from enrollment count.
+                    force: forceDeleteConfirm,
+                  })
+                }
+                disabled={
+                  delMut.isPending ||
+                  deleteEnrollmentCount === null ||
+                  deleteEnrollmentCount === -1
+                }
+              >
+                {delMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Hapus"}
+              </AlertDialogAction>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

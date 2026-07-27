@@ -685,11 +685,47 @@ export function registerLmsRoutes(app: Express) {
     }
   });
 
+  // GET /api/admin/lms/courses/:id/stats — enrollment count for a course
+  app.get("/api/admin/lms/courses/:id/stats", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
+      const [{ total }] = await db
+        .select({ total: count() })
+        .from(lmsEnrollments)
+        .where(eq(lmsEnrollments.courseId, id));
+      res.json({ enrollmentCount: Number(total) });
+    } catch (e: any) {
+      console.error("[LMS-ADMIN] GET course stats:", e);
+      res.status(500).json({ error: "Gagal mengambil statistik kursus" });
+    }
+  });
+
   // DELETE /api/admin/lms/courses/:id — delete a course (and its lessons)
+  // If students are enrolled, returns 409 unless ?force=true is passed.
+  // Prefer deactivating (PATCH isActive=false) when enrollments exist.
   app.delete("/api/admin/lms/courses/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
+      const force = req.query.force === "true";
+
+      // Check enrollment count before deleting
+      const [{ total }] = await db
+        .select({ total: count() })
+        .from(lmsEnrollments)
+        .where(eq(lmsEnrollments.courseId, id));
+      const enrollmentCount = Number(total);
+
+      if (enrollmentCount > 0 && !force) {
+        return res.status(409).json({
+          error: `Kursus ini memiliki ${enrollmentCount} siswa yang terdaftar. Gunakan force=true untuk menghapus paksa, atau nonaktifkan kursus.`,
+          enrollmentCount,
+        });
+      }
+
+      await db.delete(lmsLessonProgress).where(eq(lmsLessonProgress.courseId, id));
+      await db.delete(lmsCertificates).where(eq(lmsCertificates.courseId, id));
       await db.delete(lmsLessons).where(eq(lmsLessons.courseId, id));
       await db.delete(lmsEnrollments).where(eq(lmsEnrollments.courseId, id));
       const [deleted] = await db.delete(lmsCourses).where(eq(lmsCourses.id, id)).returning();
