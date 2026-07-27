@@ -10,7 +10,8 @@ import {
   Search, MessageCircle, Bot, Database, ShoppingBag, CreditCard,
   Settings, Zap, Users, Star, Clock, Play, LayoutDashboard,
   Layers, UploadCloud, Globe, Key, HelpCircle, AlertCircle,
-  ListChecks, Lightbulb, ArrowRight, Home, GraduationCap
+  ListChecks, Lightbulb, ArrowRight, Home, GraduationCap,
+  HardDrive, BrainCircuit, FileSearch, Share2
 } from "lucide-react";
 
 const WA_HELPDESK = "https://wa.me/6282299417818";
@@ -613,6 +614,107 @@ const MODULES: Module[] = [
             title: "Logout & Keamanan",
             content: "Untuk logout:\n\n1. Klik foto profil/nama di header\n2. Pilih Logout\n\nSession akan berakhir dan Anda perlu login ulang untuk mengakses dashboard. Gustafta menggunakan OAuth Replit yang aman — tidak ada password yang disimpan di sistem kami.",
             warning: "Jangan berbagi akun dengan orang lain. Setiap akun terikat dengan data dan chatbot yang berbeda."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: "ruang-simpan",
+    title: "Ruang Simpan & Memori Bisnis",
+    icon: HardDrive,
+    color: "text-indigo-600 dark:text-indigo-400",
+    bgColor: "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700",
+    description: "Simpan dokumen perusahaan agar seluruh AI Gustafta bisa memahami konteks bisnis Anda",
+    lessons: [
+      {
+        id: "rs-1",
+        title: "Apa itu Ruang Simpan?",
+        summary: "Pahami beda Ruang Simpan dengan cloud storage biasa — dan mengapa ini penting",
+        duration: "3 menit",
+        tags: ["pemula", "penting"],
+        steps: [
+          {
+            title: "Google Drive Menyimpan File. Gustafta Memahami Isinya.",
+            content: "Ruang Simpan bukan pengganti Google Drive atau Dropbox. Bedanya ada di satu hal penting:\n\nSaat Anda upload dokumen ke Ruang Simpan, AI Gustafta MEMBACA dan MEMAHAMI isi dokumen tersebut — bukan sekadar menyimpan nama file.\n\nHasilnya: setiap AI di Gustafta (Klinik, SipilClaw, Bedah Dokumen, dll) secara otomatis bisa menjawab pertanyaan berdasarkan dokumen NYATA perusahaan Anda.",
+            tip: "Ini disebut Memori Bisnis — pengetahuan perusahaan yang bisa dicari, ditanya, dan dimanfaatkan kapan saja."
+          },
+          {
+            title: "Apa yang Bisa Disimpan?",
+            content: "Ruang Simpan mendukung berbagai jenis file:\n\n📄 DOKUMEN TEKS: PDF, Word (.docx), TXT, Markdown\n🖼️ GAMBAR: JPG, PNG, WebP (dianalisis dengan AI Vision)\n\nContoh dokumen yang berguna:\n• Proposal tender dan kontrak proyek\n• SKK / SBU / sertifikat tenaga ahli\n• Metode kerja dan SOP perusahaan\n• Regulasi dan peraturan yang sering dipakai\n• Laporan proyek sebelumnya\n• Struktur harga dan daftar supplier",
+            tip: "Mulai dengan 3–5 dokumen yang paling sering Anda cari saat dibutuhkan mendadak."
+          },
+          {
+            title: "Gratis 15 MB — Cukup untuk Memulai",
+            content: "Setiap akun mendapat 15 MB gratis tanpa kartu kredit.\n\n15 MB setara dengan:\n• ~150 dokumen Word standar (10 halaman)\n• ~30 PDF teknis dengan teks (tanpa gambar besar)\n• ~15 PDF scan/gambar (ukuran lebih besar)\n\nUpgrade tersedia jika kebutuhan bertambah.",
+            action: { label: "Buka Ruang Simpan", href: "/ruang-simpan" }
+          }
+        ]
+      },
+      {
+        id: "rs-2",
+        title: "Cara Upload & Kelola Dokumen",
+        summary: "Langkah-langkah upload, membuat folder, dan memantau status AI",
+        duration: "4 menit",
+        tags: ["praktek"],
+        steps: [
+          {
+            title: "Upload Dokumen Pertama",
+            content: "1. Buka menu Ruang Simpan di navigasi atas\n2. Klik tombol Upload File (ikon panah ke atas)\n3. Pilih file dari komputer Anda (maks. 20 MB per file)\n4. Tunggu proses upload selesai\n\nSetelah upload, sistem otomatis memproses isi dokumen. Ini biasanya memakan waktu 10–60 detik tergantung ukuran file.",
+            tip: "Upload PDF teks (bukan scan) untuk hasil AI terbaik. PDF scan masih bisa diproses tapi lebih lambat."
+          },
+          {
+            title: "Status Badge: Apa Artinya?",
+            content: "Setiap file punya badge status:\n\n🔵 Memproses — AI sedang membaca isi dokumen. Tunggu sebentar.\n\n✅ Siap AI — Dokumen sudah dipahami AI. Aktif membantu semua fitur.\n\n❌ Gagal — Proses gagal (mungkin file rusak atau format tidak didukung). Coba hapus dan upload ulang.\n\nHanya file ber-badge Siap AI yang aktif membantu chat AI Anda.",
+            warning: "File yang masih Memproses belum aktif. Refresh halaman setelah 1–2 menit jika badge tidak berubah."
+          },
+          {
+            title: "Folder Default & Custom",
+            content: "Ruang Simpan sudah punya folder default:\n• 📁 Legalitas — akta, NPWP, NIB, izin usaha\n• 📁 Teknis — metode kerja, gambar, spesifikasi\n• 📁 Keuangan — laporan, neraca, RAB\n• 📁 Sertifikasi — SKK, SBU, sertifikat ahli\n• 📁 Proyek — dokumen per proyek\n\nAnda bisa membuat folder custom sendiri dengan klik tombol '+ Folder'.",
+            tip: "Pisahkan dokumen per kategori agar mudah dicari dan diberi akses selektif ke pihak luar."
+          }
+        ]
+      },
+      {
+        id: "rs-3",
+        title: "Bagaimana RS Terhubung ke Fitur Lain",
+        summary: "Cara dokumen di Ruang Simpan otomatis membantu semua AI Gustafta",
+        duration: "5 menit",
+        tags: ["penting", "integrasi"],
+        steps: [
+          {
+            title: "RS RAG: AI Menjawab Berdasarkan Dokumen Anda",
+            content: "Ini fitur paling penting yang SUDAH AKTIF secara otomatis:\n\nSaat Anda chat dengan AI manapun di Gustafta (Klinik Konsultasi, SipilClaw, Tendera, atau chatbot Anda sendiri), sistem otomatis mencari dokumen di Ruang Simpan yang relevan dengan pertanyaan Anda — lalu menyuntikkan informasinya ke dalam jawaban AI.\n\nContoh:\nAnda tanya SipilClaw: 'Berapa nilai jaminan penawaran untuk proyek RS ini?'\n→ AI otomatis mencari di RS Anda → menemukan kontrak proyek RS yang pernah Anda upload → menjawab berdasarkan angka NYATA di dokumen Anda.\n\nBukan jawaban generik. Jawaban berdasarkan data perusahaan Anda.",
+            tip: "Semakin banyak dokumen relevan di RS, semakin presisi jawaban AI untuk bisnis spesifik Anda."
+          },
+          {
+            title: "Integrasi Bedah Dokumen",
+            content: "Setelah file ber-status Siap AI, Anda bisa membukanya langsung di Bedah Dokumen untuk analisis lebih dalam:\n\n1. Di Ruang Simpan, klik file yang ingin dianalisis\n2. Klik tombol 'Buka di Bedah Dokumen'\n3. Bedah Dokumen membuka file dengan seluruh konteksnya sudah siap\n4. Mulai analisis: ringkasan, deteksi risiko, pertanyaan spesifik tentang isi\n\nBedah Dokumen cocok untuk:\n• Membaca kontrak panjang dan menemukan klausul risiko\n• Membandingkan spesifikasi teknis\n• Membuat ringkasan dokumen untuk rapat",
+            action: { label: "Buka Bedah Dokumen", href: "/bedah-dokumen" }
+          },
+          {
+            title: "Akses Biro Jasa (Fitur Kolaborasi)",
+            content: "Jika Anda menggunakan jasa biro konsultan (Mitra Biro Jasa Gustafta), Anda bisa memberikan akses terbatas ke dokumen tertentu tanpa perlu email/WhatsApp bolak-balik.\n\nCaranya:\n1. Buka detail file di Ruang Simpan\n2. Tab 'Paspor' → Kelola Akses\n3. Tambah akses untuk email biro jasa\n4. Pilih jenis akses (lihat / unduh) dan masa berlaku\n\nBiro jasa melihat dokumen yang diberi akses saja — tidak bisa melihat seluruh RS Anda.",
+            tip: "Paspor dokumen mencatat siapa yang mengakses file Anda dan kapan — audit trail otomatis."
+          }
+        ]
+      },
+      {
+        id: "rs-4",
+        title: "External Drive & Rencana ke Depan",
+        summary: "Apakah bisa konek ke Google Drive? Jawaban jujur dan jalan keluarnya",
+        duration: "2 menit",
+        tags: ["info"],
+        steps: [
+          {
+            title: "Kondisi Saat Ini: Upload Manual",
+            content: "Saat ini, Ruang Simpan menggunakan upload manual langsung dari komputer Anda. Belum ada sinkronisasi otomatis dengan Google Drive, Dropbox, atau OneDrive.\n\nJalan keluar sementara:\n• Download file dari Google Drive → upload ke Ruang Simpan\n• Untuk dokumen yang sering diupdate, jadwalkan upload ulang versi terbaru secara berkala (mingguan/bulanan)\n\nStrategi: simpan dokumen FINAL di Ruang Simpan, simpan dokumen DRAFT di Google Drive.",
+            tip: "Anda tidak perlu memindahkan semua file sekaligus. Mulai dari 5 dokumen yang paling sering dicari."
+          },
+          {
+            title: "Jika Anda Punya Link Google Drive",
+            content: "Dalam chat dengan AI Gustafta, Anda bisa paste link Google Drive publik langsung di chat:\n\n'Tolong analisis dokumen ini: https://drive.google.com/file/d/xxx'\n\nAI akan mencoba membaca isinya jika link bisa diakses. Namun hasilnya tidak disimpan ke Ruang Simpan — hanya untuk sesi chat tersebut.",
+            warning: "File Google Drive harus bermode 'Siapapun dengan link dapat melihat' agar bisa dibaca AI."
           }
         ]
       }
