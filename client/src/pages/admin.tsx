@@ -2721,6 +2721,26 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
 
+              {/* ── Kelola Academy Shortcut ── */}
+              <Card className="border-violet-500/30 bg-violet-500/5">
+                <CardContent className="py-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-violet-500/15 p-2">
+                        <GraduationCap className="h-5 w-5 text-violet-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">Kelola Academy</p>
+                        <p className="text-xs text-muted-foreground">Buat & kelola kursus, lesson, dan konten Academy</p>
+                      </div>
+                    </div>
+                    <Button asChild variant="outline" size="sm" className="shrink-0 border-violet-500/40 text-violet-400 hover:bg-violet-500/10">
+                      <a href="/admin/academy">Buka Academy →</a>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* ── URL Delivery Setting ── */}
               <ProdUrlCard appUrl={appUrl} isDevUrl={isDevUrl} onSaved={(u) => setAppUrl(u)} />
 
