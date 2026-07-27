@@ -10823,12 +10823,24 @@ Balas dengan JSON dengan struktur PERSIS ini:
       if (!provided || provided !== expected) {
         return res.status(401).json({ error: "Token tidak valid" });
       }
+      const { users: usersTable } = await import("@shared/schema");
+      const { eq, sql: sqlOp } = await import("drizzle-orm");
+
+      // Guard: reject if a superadmin already exists — token should be single-use
+      const existingSuperadmins = await db
+        .select({ id: usersTable.id })
+        .from(usersTable)
+        .where(eq(usersTable.role, "superadmin"))
+        .limit(1);
+      if (existingSuperadmins.length > 0) {
+        console.warn("[bootstrap-superadmin] Blocked reuse attempt — superadmin already exists (id=%s)", existingSuperadmins[0].id);
+        return res.status(403).json({ error: "Superadmin sudah ada. Endpoint ini hanya boleh digunakan sekali." });
+      }
+
       const email = String((req.body?.email || "")).trim().toLowerCase();
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         return res.status(400).json({ error: "Email tidak valid" });
       }
-      const { users: usersTable } = await import("@shared/schema");
-      const { eq, sql: sqlOp } = await import("drizzle-orm");
       const result = await db
         .update(usersTable)
         .set({ role: "superadmin" })
