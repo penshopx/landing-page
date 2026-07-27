@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { spawn } from "child_process";
+import { spawn, exec } from "child_process";
 import OpenAI from "openai";
 import { URL } from "url";
 import net from "net";
