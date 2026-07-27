@@ -593,10 +593,29 @@ export default function Landing() {
             <span className="text-yellow-300">SBU, SKK, dan Tender Konstruksi</span>
           </h1>
 
-          <p className="text-sm md:text-base text-blue-200 mb-8 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-blue-200 mb-6 leading-relaxed max-w-2xl mx-auto">
             Tanya jawab instan 24/7, bedah dokumen, pendampingan proyek, dan panduan konstruksi — semua dalam satu platform.
             Dibangun oleh praktisi konstruksi untuk praktisi konstruksi.
           </p>
+
+          {/* ── Flow hint Ruang Simpan ── */}
+          <div className="flex items-center justify-center gap-1 sm:gap-2 mb-7 flex-wrap">
+            {[
+              { icon: "📁", label: "Dokumen & catatan\ntersimpan rapi" },
+              { icon: "🧠", label: "AI membaca &\nmemahami konteks" },
+              { icon: "💬", label: "Jawaban lebih\nterarah & akurat" },
+            ].map((step, i, arr) => (
+              <div key={step.icon} className="flex items-center gap-1 sm:gap-2">
+                <div className="flex flex-col items-center gap-1 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 min-w-[90px]">
+                  <span className="text-lg leading-none">{step.icon}</span>
+                  <span className="text-[10px] text-blue-100 text-center leading-tight whitespace-pre-line">{step.label}</span>
+                </div>
+                {i < arr.length - 1 && (
+                  <span className="text-blue-300/60 text-sm hidden sm:block">→</span>
+                )}
+              </div>
+            ))}
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
             <Button asChild size="lg" className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 font-bold gap-2 px-6 h-12" data-testid="button-hero-klinik">
@@ -616,25 +635,6 @@ export default function Landing() {
           <div className="flex flex-wrap gap-4 text-xs text-blue-200 justify-center mb-8">
             {["✅ Respon instan", "✅ Berdasarkan regulasi terbaru", "✅ Dipercaya praktisi konstruksi"].map((s) => (
               <span key={s}>{s}</span>
-            ))}
-          </div>
-
-          {/* ── Flow hint Ruang Simpan ── tidak hard sell, hanya tunjukkan alur */}
-          <div className="flex items-center justify-center gap-1 sm:gap-2 mb-8 flex-wrap">
-            {[
-              { icon: "📁", label: "Dokumen & catatan\ntersimpan rapi" },
-              { icon: "🧠", label: "AI membaca &\nmemahami konteks" },
-              { icon: "💬", label: "Jawaban lebih\nterarah & akurat" },
-            ].map((step, i, arr) => (
-              <div key={step.icon} className="flex items-center gap-1 sm:gap-2">
-                <div className="flex flex-col items-center gap-1 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 min-w-[90px]">
-                  <span className="text-lg leading-none">{step.icon}</span>
-                  <span className="text-[10px] text-blue-100 text-center leading-tight whitespace-pre-line">{step.label}</span>
-                </div>
-                {i < arr.length - 1 && (
-                  <span className="text-blue-300/60 text-sm hidden sm:block">→</span>
-                )}
-              </div>
             ))}
           </div>
 
