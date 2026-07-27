@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { BookOpen, Clock, Users, Star, ChevronRight, GraduationCap, Wrench, Zap, Search, Bot, ExternalLink, Play, Loader2, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -211,6 +211,8 @@ export default function LmsPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [ecourseSearch, setEcourseSearch] = useState("");
+  const queryClient = useQueryClient();
+  const prevSeeding = useRef<boolean | undefined>(undefined);
 
   const { data: myCerts = [] } = useQuery<Certificate[]>({
     queryKey: ["/api/lms/certificates"],
@@ -228,12 +230,19 @@ export default function LmsPage() {
     },
   });
 
+  // When seeding transitions true → false, invalidate courses once so a
+  // stale empty-result cache is replaced with the freshly seeded catalog.
+  useEffect(() => {
+    if (prevSeeding.current === true && lmsStatus?.seeding === false) {
+      queryClient.invalidateQueries({ queryKey: ["/api/lms/courses"] });
+    }
+    prevSeeding.current = lmsStatus?.seeding;
+  }, [lmsStatus?.seeding, queryClient]);
+
   const { data: courses = [], isLoading } = useQuery<Course[]>({
     queryKey: ["/api/lms/courses", activeCategory],
     queryFn: () =>
       fetch(`/api/lms/courses?category=${activeCategory}`).then(r => r.json()),
-    // Refetch when seeding completes
-    refetchInterval: lmsStatus?.seeding ? 3000 : false,
   });
 
   const { data: agentEcourses = [], isLoading: ecLoading } = useQuery<AgentEcourse[]>({
