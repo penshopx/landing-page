@@ -597,9 +597,28 @@ export default function Landing() {
             </Button>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-xs text-blue-200 justify-center mb-10">
+          <div className="flex flex-wrap gap-4 text-xs text-blue-200 justify-center mb-8">
             {["✅ Respon instan", "✅ Berdasarkan regulasi terbaru", "✅ Dipercaya praktisi konstruksi"].map((s) => (
               <span key={s}>{s}</span>
+            ))}
+          </div>
+
+          {/* ── Flow hint Ruang Simpan ── tidak hard sell, hanya tunjukkan alur */}
+          <div className="flex items-center justify-center gap-1 sm:gap-2 mb-8 flex-wrap">
+            {[
+              { icon: "📁", label: "Dokumen & catatan\ntersimpan rapi" },
+              { icon: "🧠", label: "AI membaca &\nmemahami konteks" },
+              { icon: "💬", label: "Jawaban lebih\nterarah & akurat" },
+            ].map((step, i, arr) => (
+              <div key={step.icon} className="flex items-center gap-1 sm:gap-2">
+                <div className="flex flex-col items-center gap-1 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 min-w-[90px]">
+                  <span className="text-lg leading-none">{step.icon}</span>
+                  <span className="text-[10px] text-blue-100 text-center leading-tight whitespace-pre-line">{step.label}</span>
+                </div>
+                {i < arr.length - 1 && (
+                  <span className="text-blue-300/60 text-sm hidden sm:block">→</span>
+                )}
+              </div>
             ))}
           </div>
 
