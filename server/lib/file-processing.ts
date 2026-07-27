@@ -71,9 +71,11 @@ export async function extractDocumentContent(filePath: string): Promise<Extracte
 
     if (ext === ".pdf") {
       // Gunakan PyMuPDF (fitz) via python3 — lebih stabil dari pdf-parse di env ini
+      // Tulis ke file temp karena -c tidak mendukung multiline lewat JSON.stringify
       rawText = await new Promise<string>((resolve) => {
+        const tmpPy = `/tmp/rs-fitz-${Date.now()}.py`;
         const script = [
-          "import fitz, sys",
+          "import fitz",
           `doc = fitz.open(${JSON.stringify(absolutePath)})`,
           "parts = []",
           "for page in doc:",
@@ -81,17 +83,22 @@ export async function extractDocumentContent(filePath: string): Promise<Extracte
           "doc.close()",
           "print('\\n\\n'.join(parts))",
         ].join("\n");
-        exec(`python3 -c ${JSON.stringify(script)}`,
-          { maxBuffer: 20 * 1024 * 1024 },
-          (err: any, stdout: string, stderr: string) => {
-            if (err || !stdout?.trim()) {
-              console.warn("[file-processing] fitz text extract error:", stderr?.slice(0, 300));
-              resolve("");
-            } else {
-              resolve(stdout.trim());
+        // Tulis script ke file temp, lalu jalankan
+        fs.writeFile(tmpPy, script, (werr: any) => {
+          if (werr) { resolve(""); return; }
+          exec(`python3 ${JSON.stringify(tmpPy)}`,
+            { maxBuffer: 20 * 1024 * 1024 },
+            (err: any, stdout: string, stderr: string) => {
+              fs.unlink(tmpPy, () => {});
+              if (err || !stdout?.trim()) {
+                console.warn("[file-processing] fitz text extract error:", stderr?.slice(0, 300));
+                resolve("");
+              } else {
+                resolve(stdout.trim());
+              }
             }
-          }
-        );
+          );
+        });
       });
     } else if (ext === ".docx" || ext === ".doc") {
       const mammoth = await import("mammoth");

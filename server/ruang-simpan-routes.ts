@@ -149,6 +149,8 @@ function safeErr(res: Response, e: unknown, ctx: string): void {
 async function renderPdfPageBase64RS(pdfPath: string, pageIdx: number): Promise<string | null> {
   return new Promise(resolve => {
     const { exec } = require("child_process");
+    const { writeFile, unlink } = require("fs");
+    const tmpPy = `/tmp/rs-render-${Date.now()}-${pageIdx}.py`;
     const script = [
       "import fitz, base64, sys",
       `doc = fitz.open(${JSON.stringify(pdfPath)})`,
@@ -158,9 +160,15 @@ async function renderPdfPageBase64RS(pdfPath: string, pageIdx: number): Promise<
       "    sys.stdout.buffer.write(base64.b64encode(pix.tobytes('png')))",
       "doc.close()",
     ].join("\n");
-    exec(`python3 -c ${JSON.stringify(script)}`, { maxBuffer: 30 * 1024 * 1024 },
-      (err: any, stdout: string) => resolve((!err && stdout?.trim()) ? stdout.trim() : null)
-    );
+    writeFile(tmpPy, script, (werr: any) => {
+      if (werr) { resolve(null); return; }
+      exec(`python3 ${JSON.stringify(tmpPy)}`, { maxBuffer: 30 * 1024 * 1024 },
+        (err: any, stdout: string) => {
+          unlink(tmpPy, () => {});
+          resolve((!err && stdout?.trim()) ? stdout.trim() : null);
+        }
+      );
+    });
   });
 }
 
