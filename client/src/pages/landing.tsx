@@ -560,6 +560,22 @@ export default function Landing() {
     <div className="min-h-screen bg-background" data-testid="page-landing">
       <SharedHeader />
 
+      {/* ── RUANG SIMPAN INVITE STRIP ── */}
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 py-2.5 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 text-center sm:text-left">
+          <span className="text-white text-sm leading-snug">
+            <span className="font-semibold">📁 Ruang Simpan</span>
+            {" — "}simpan dokumen proyek Anda, lalu tanya apa saja. AI menjawab berdasarkan konteks Anda sendiri.
+          </span>
+          <Link
+            href={isAuthenticated ? "/ruang-simpan" : "/login"}
+            className="shrink-0 inline-flex items-center gap-1.5 bg-white text-blue-700 font-semibold text-xs px-3 py-1.5 rounded-full hover:bg-blue-50 transition-colors whitespace-nowrap"
+          >
+            Mulai Simpan & Tanya →
+          </Link>
+        </div>
+      </div>
+
       {/* ── HERO ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-slate-900 py-20 md:py-28 px-4">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.07),transparent_60%)]" />
