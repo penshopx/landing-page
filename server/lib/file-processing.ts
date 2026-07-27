@@ -70,11 +70,30 @@ export async function extractDocumentContent(filePath: string): Promise<Extracte
     let rawText = "";
 
     if (ext === ".pdf") {
-      const pdfParseModule = await import("pdf-parse");
-      const pdfParse = (pdfParseModule as any).default || pdfParseModule;
-      const dataBuffer = fs.readFileSync(absolutePath);
-      const data = await pdfParse(dataBuffer);
-      rawText = data.text;
+      // Gunakan PyMuPDF (fitz) via python3 — lebih stabil dari pdf-parse di env ini
+      rawText = await new Promise<string>((resolve) => {
+        const { exec } = require("child_process");
+        const script = [
+          "import fitz, sys",
+          `doc = fitz.open(${JSON.stringify(absolutePath)})`,
+          "parts = []",
+          "for page in doc:",
+          "    parts.append(page.get_text())",
+          "doc.close()",
+          "print('\\n\\n'.join(parts))",
+        ].join("\n");
+        exec(`python3 -c ${JSON.stringify(script)}`,
+          { maxBuffer: 20 * 1024 * 1024 },
+          (err: any, stdout: string, stderr: string) => {
+            if (err || !stdout?.trim()) {
+              console.warn("[file-processing] fitz text extract error:", stderr?.slice(0, 300));
+              resolve("");
+            } else {
+              resolve(stdout.trim());
+            }
+          }
+        );
+      });
     } else if (ext === ".docx" || ext === ".doc") {
       const mammoth = await import("mammoth");
       const result = await mammoth.extractRawText({ path: absolutePath });
