@@ -1,7 +1,6 @@
 import { eq, desc, and, sql, isNull, inArray, lt } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
 import { randomUUID } from "crypto";
+import { pool, db } from "./db";
 import {
   agents,
   bigIdeas,
@@ -176,14 +175,6 @@ import type {
   TenderSession,
   InsertTenderSession,
 } from "@shared/schema";
-
-const { Pool } = pg;
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const db = drizzle(pool);
 
 /**
  * Executor = koneksi DB normal (`db`) ATAU transaksi (`tx`) yang dilewatkan

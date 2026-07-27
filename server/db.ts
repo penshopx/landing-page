@@ -26,7 +26,7 @@ function intEnv(name: string, fallback: number): number {
   const n = parseInt(process.env[name] ?? "", 10);
   return Number.isFinite(n) ? n : fallback;
 }
-const DB_POOL_MAX = Math.max(2, intEnv("DB_POOL_MAX", 12));
+const DB_POOL_MAX = Math.max(2, intEnv("DB_POOL_MAX", 10));
 
 export const pool = new Pool({
   connectionString,
