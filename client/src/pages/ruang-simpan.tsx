@@ -1758,15 +1758,49 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
   const [type, setType] = useState("umum");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<WizardResult | null>(null);
+  const [selectedFileIds, setSelectedFileIds] = useState<string[] | null>(null); // null = all
+
+  // Fetch AI-ready files for this folder
+  const { data: readyFilesData } = useQuery<RSFile[]>({
+    queryKey: ["rs-ready-files", folderId],
+    queryFn: async () => {
+      const url = folderId && folderId !== "all"
+        ? `/api/ruang-simpan/files?folder_id=${folderId}`
+        : `/api/ruang-simpan/files`;
+      const res = await fetch(url, { credentials: "include" });
+      const all: RSFile[] = await res.json();
+      return all.filter(f => f.kb_status === "ready");
+    },
+    staleTime: 30_000,
+  });
+  const readyFiles: RSFile[] = readyFilesData || [];
+
+  // When files load for the first time, default to all selected
+  const effectiveSelected: string[] = selectedFileIds ?? readyFiles.map(f => f.id);
+  const toggleFile = (id: string) => {
+    const current = selectedFileIds ?? readyFiles.map(f => f.id);
+    setSelectedFileIds(
+      current.includes(id) ? current.filter(x => x !== id) : [...current, id]
+    );
+  };
+  const toggleAll = () => {
+    if (effectiveSelected.length === readyFiles.length) {
+      setSelectedFileIds([]);
+    } else {
+      setSelectedFileIds(readyFiles.map(f => f.id));
+    }
+  };
 
   const generate = async () => {
     if (!name.trim()) { toast({ title: "Nama asisten diperlukan", variant: "destructive" }); return; }
+    if (effectiveSelected.length === 0) { toast({ title: "Pilih minimal 1 dokumen", variant: "destructive" }); return; }
     setLoading(true);
     try {
       const data = await apiRequest("POST", "/api/ruang-simpan/generate-assistant", {
         folder_id: folderId === "all" ? undefined : folderId,
         name: name.trim(),
         assistant_type: type,
+        file_ids: effectiveSelected,
       });
       setResult(data);
       setStep("done");
@@ -1797,9 +1831,9 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
                 <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 transition-colors ${
                   step === s ? "bg-primary text-primary-foreground" : step > s ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
                 }`}>
-                  {step > s ? <Check className="h-3 w-3" /> : s}
+                  {(step as number) > s ? <Check className="h-3 w-3" /> : s}
                 </div>
-                {s < 3 && <div className={`h-0.5 flex-1 rounded transition-colors ${step > s ? "bg-emerald-400" : "bg-muted"}`} />}
+                {s < 3 && <div className={`h-0.5 flex-1 rounded transition-colors ${(step as number) > s ? "bg-emerald-400" : "bg-muted"}`} />}
               </div>
             ))}
           </div>
@@ -1808,10 +1842,10 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
         {/* Step 1: Name */}
         {step === 1 && (
           <div className="space-y-4 py-1">
+            <p className="text-sm text-muted-foreground">
+              Beri nama AI Asisten yang akan dibuat dari dokumen di <span className="font-semibold text-foreground">{folderName}</span>.
+            </p>
             <div>
-              <p className="text-sm text-muted-foreground mb-3">
-                Beri nama AI Asisten yang akan dibuat dari dokumen di <span className="font-semibold text-foreground">{folderName}</span>.
-              </p>
               <Label className="text-xs mb-1.5 block font-semibold">Nama AI Asisten</Label>
               <Input
                 value={name}
@@ -1827,54 +1861,81 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
           </div>
         )}
 
-        {/* Step 2: Type */}
+        {/* Step 2: File selection */}
         {step === 2 && (
           <div className="space-y-3 py-1">
-            <p className="text-sm text-muted-foreground">Pilih jenis asisten sesuai fungsi dokumen Anda.</p>
-            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">Pilih dokumen yang akan dijadikan sumber pengetahuan AI.</p>
+            </div>
+            {readyFiles.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground text-sm">
+                <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                Tidak ada dokumen berstatus "AI Siap" di folder ini.
+              </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between text-xs text-muted-foreground pb-1 border-b border-border">
+                  <button onClick={toggleAll} className="hover:text-foreground transition-colors font-medium">
+                    {effectiveSelected.length === readyFiles.length ? "Batalkan semua" : "Pilih semua"}
+                  </button>
+                  <span className={effectiveSelected.length === 0 ? "text-destructive" : ""}>
+                    {effectiveSelected.length}/{readyFiles.length} dipilih
+                  </span>
+                </div>
+                <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
+                  {readyFiles.map(f => {
+                    const checked = effectiveSelected.includes(f.id);
+                    return (
+                      <button
+                        key={f.id}
+                        onClick={() => toggleFile(f.id)}
+                        className={`w-full flex items-center gap-2.5 p-2 rounded-lg border text-left transition-all ${
+                          checked
+                            ? "border-primary/40 bg-primary/5"
+                            : "border-border hover:border-border hover:bg-muted/30 opacity-60"
+                        }`}
+                      >
+                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                          checked ? "bg-primary border-primary" : "border-muted-foreground"
+                        }`}>
+                          {checked && <Check className="h-2.5 w-2.5 text-white" />}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-medium text-foreground truncate leading-tight">{f.original_name}</p>
+                          <p className="text-[10px] text-muted-foreground">{f.kb_chunk_count ?? 0} potongan</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Step 3: Type + Confirm */}
+        {step === 3 && (
+          <div className="space-y-3 py-1">
+            <p className="text-sm text-muted-foreground">Pilih jenis asisten, lalu konfirmasi untuk membuat.</p>
+            <div className="grid grid-cols-2 gap-1.5 max-h-44 overflow-y-auto pr-1">
               {ASSISTANT_TYPES.map(t => (
                 <button
                   key={t.value}
                   onClick={() => setType(t.value)}
-                  className={`text-left p-2.5 rounded-xl border transition-all ${
+                  className={`text-left p-2 rounded-xl border transition-all ${
                     type === t.value
                       ? "border-primary bg-primary/5 ring-2 ring-primary/20"
                       : "border-border hover:border-primary/40 hover:bg-muted/50"
                   }`}
                 >
-                  <div className="text-base mb-1">{t.icon}</div>
-                  <p className="text-xs font-semibold leading-tight text-foreground">{t.label}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{t.desc}</p>
+                  <div className="text-sm mb-0.5">{t.icon}</div>
+                  <p className="text-[11px] font-semibold leading-tight text-foreground">{t.label}</p>
                 </button>
               ))}
             </div>
-          </div>
-        )}
-
-        {/* Step 3: Confirm */}
-        {step === 3 && (
-          <div className="space-y-3 py-1">
-            <div className="bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 rounded-xl border border-violet-100 dark:border-violet-900/30 p-4 space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="text-2xl">{selectedType.icon}</div>
-                <div>
-                  <p className="font-bold text-foreground">{name}</p>
-                  <p className="text-xs text-muted-foreground">{selectedType.label}</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-white dark:bg-card rounded-lg p-2 border border-border">
-                  <p className="text-[10px] text-muted-foreground mb-0.5">Sumber Dokumen</p>
-                  <p className="font-bold text-foreground">{folderName}</p>
-                </div>
-                <div className="bg-white dark:bg-card rounded-lg p-2 border border-border">
-                  <p className="text-[10px] text-muted-foreground mb-0.5">Model AI</p>
-                  <p className="font-bold text-foreground">GPT-4o</p>
-                </div>
-              </div>
-              <div className="text-[11px] text-muted-foreground bg-white/70 dark:bg-card/70 rounded-lg p-2.5 border border-border leading-relaxed">
-                <span className="text-violet-600 font-semibold">Proses otomatis:</span> AI akan membaca semua dokumen berstatus "AI Siap" di {folderName}, membangun knowledge base, dan mengaktifkan chatbot siap pakai.
-              </div>
+            <div className="bg-muted/40 rounded-xl border border-border px-3 py-2 text-[11px] text-muted-foreground space-y-0.5">
+              <p><span className="font-semibold text-foreground">{name}</span> · {selectedType.icon} {selectedType.label}</p>
+              <p>{effectiveSelected.length} dari {readyFiles.length} dokumen dipilih · Model GPT-4o</p>
             </div>
           </div>
         )}
@@ -1921,7 +1982,7 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
           {step === 2 && (
             <>
               <Button variant="ghost" size="sm" onClick={() => setStep(1)}>← Kembali</Button>
-              <Button size="sm" onClick={() => setStep(3)} className="gap-1.5">
+              <Button size="sm" onClick={() => setStep(3)} disabled={effectiveSelected.length === 0} className="gap-1.5">
                 Lanjut <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </>
@@ -1929,7 +1990,7 @@ function AIAssistantWizard({ folderId, folderName, onClose }: {
           {step === 3 && (
             <>
               <Button variant="ghost" size="sm" onClick={() => setStep(2)} disabled={loading}>← Kembali</Button>
-              <Button size="sm" onClick={generate} disabled={loading} className="gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0">
+              <Button size="sm" onClick={generate} disabled={loading || effectiveSelected.length === 0} className="gap-1.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white border-0">
                 {loading ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Membuat…</> : <><Wand2 className="h-3.5 w-3.5" /> Generate Sekarang</>}
               </Button>
             </>

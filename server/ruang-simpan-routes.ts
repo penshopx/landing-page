@@ -1388,17 +1388,26 @@ app.post("/api/ruang-simpan/generate-assistant", isAuthenticated, async (req: an
   const userId = extractUid(req, res);
   if (!userId) return;
   try {
-    const { folder_id, name, assistant_type = "umum" } = req.body;
+    const { folder_id, name, assistant_type = "umum", file_ids } = req.body;
     if (!name?.trim()) return res.status(422).json({ error: "Nama asisten diperlukan" });
 
-    // Get AI-ready files
-    let fileQuery = `SELECT id, original_name, size_bytes FROM ruang_simpan_files WHERE user_id = $1 AND kb_status = 'ready'`;
-    const params: any[] = [userId];
-    if (folder_id && folder_id !== "all") {
-      fileQuery += ` AND folder_id = $2`;
-      params.push(folder_id);
+    // Get AI-ready files — filter by explicit file_ids if provided, else folder
+    let filesRes;
+    if (Array.isArray(file_ids) && file_ids.length > 0) {
+      filesRes = await pool.query(
+        `SELECT id, original_name, size_bytes FROM ruang_simpan_files
+         WHERE user_id = $1 AND kb_status = 'ready' AND id = ANY($2::uuid[])`,
+        [userId, file_ids]
+      );
+    } else {
+      let fileQuery = `SELECT id, original_name, size_bytes FROM ruang_simpan_files WHERE user_id = $1 AND kb_status = 'ready'`;
+      const params: any[] = [userId];
+      if (folder_id && folder_id !== "all") {
+        fileQuery += ` AND folder_id = $2`;
+        params.push(folder_id);
+      }
+      filesRes = await pool.query(fileQuery, params);
     }
-    const filesRes = await pool.query(fileQuery, params);
     const files = filesRes.rows;
     if (files.length === 0) {
       return res.status(400).json({ error: "Tidak ada dokumen AI Siap di folder ini. Upload dokumen dan tunggu status 'AI Siap' terlebih dahulu." });
@@ -1435,7 +1444,7 @@ app.post("/api/ruang-simpan/generate-assistant", isAuthenticated, async (req: an
       `AI Assistant dari ${files.length} dokumen Ruang Simpan`,
       `Tanya apa saja tentang ${safeName}`,
       systemPrompt, 0.3, 1024, "gpt-4o",
-      false, false, true, true, "id", "ruang-simpan",
+      true, false, true, true, "id", "ruang-simpan",
       slug, token, userId, greeting,
       JSON.stringify(["Apa saja isi dokumen ini?", "Bantu saya memahami isi dokumen", "Apa poin penting yang perlu saya ketahui?"]),
     ]);
