@@ -611,6 +611,25 @@ export default function Store() {
                           <Layers className="h-2.5 w-2.5" />Multi-Agent
                         </Badge>
                       )}
+                      {detailAgent.isGustafta ? (
+                        <Badge className="bg-violet-600 text-white border-violet-700 text-xs px-2 py-0 flex items-center gap-1"
+                          data-testid={`badge-detail-gustafta-official-${detailAgent.id}`}
+                          title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin.">
+                          <ShieldCheck className="h-2.5 w-2.5" />Gustafta Official
+                        </Badge>
+                      ) : detailAgent.isCertified ? (
+                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs px-2 py-0 flex items-center gap-1"
+                          data-testid={`badge-detail-bersertifikat-${detailAgent.id}`}
+                          title="Kreator telah lulus workshop & sertifikasi Gustafta.">
+                          <ShieldCheck className="h-2.5 w-2.5" />Bersertifikat
+                        </Badge>
+                      ) : detailAgent.isCreatorMade ? (
+                        <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-0 flex items-center gap-1"
+                          data-testid={`badge-detail-pra-sertifikasi-${detailAgent.id}`}
+                          title="Dibuat kreator independen — belum bersertifikat. Periksa dulu sebelum membeli.">
+                          <ShieldAlert className="h-2.5 w-2.5" />Pra-Sertifikasi
+                        </Badge>
+                      ) : null}
                     </div>
                   </div>
                 </div>
