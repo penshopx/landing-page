@@ -2347,8 +2347,8 @@ export class DatabaseStorage implements IStorage {
       userId: row.userId,
       plan: row.plan as Subscription["plan"],
       status: (row.status || "pending") as Subscription["status"],
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       chatbotLimit: row.chatbotLimit || 1,
@@ -2366,8 +2366,8 @@ export class DatabaseStorage implements IStorage {
       userId: subscription.userId,
       plan: subscription.plan,
       status: subscription.status || "pending",
-      mayarOrderId: subscription.mayarOrderId,
-      mayarPaymentUrl: subscription.mayarPaymentUrl,
+      scalevOrderId: subscription.scalevOrderId,
+      scalevPaymentUrl: subscription.scalevPaymentUrl,
       amount: subscription.amount || 0,
       currency: subscription.currency || "IDR",
       chatbotLimit: subscription.chatbotLimit || 1,
@@ -2383,9 +2383,9 @@ export class DatabaseStorage implements IStorage {
     return this.mapSubscriptionRow(result[0]);
   }
 
-  async getSubscriptionByMayarOrderId(mayarOrderId: string): Promise<Subscription | undefined> {
+  async getSubscriptionByScalevOrderId(scalevOrderId: string): Promise<Subscription | undefined> {
     const result = await db.select().from(subscriptionsTable)
-      .where(eq(subscriptionsTable.mayarOrderId, mayarOrderId))
+      .where(eq(subscriptionsTable.scalevOrderId, scalevOrderId))
       .limit(1);
     if (result.length === 0) return undefined;
     return this.mapSubscriptionRow(result[0]);
@@ -2506,7 +2506,7 @@ export class DatabaseStorage implements IStorage {
         currency: "IDR",
         chatbotLimit,
         grantedBy: code.createdBy ?? null,
-        mayarOrderId: `CODE-${normalized}-${userId.slice(0, 8)}-${Date.now()}`,
+        scalevOrderId: `CODE-${normalized}-${userId.slice(0, 8)}-${Date.now()}`,
         startDate: now,
         endDate,
       }).returning();
@@ -3364,8 +3364,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3395,8 +3395,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3426,8 +3426,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3460,8 +3460,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3495,8 +3495,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3521,8 +3521,8 @@ export class DatabaseStorage implements IStorage {
       plan: insertSub.plan || "trial",
       status: insertSub.status || "active",
       accessToken: insertSub.accessToken,
-      mayarOrderId: insertSub.mayarOrderId || null,
-      mayarPaymentUrl: insertSub.mayarPaymentUrl || null,
+      scalevOrderId: insertSub.scalevOrderId || null,
+      scalevPaymentUrl: insertSub.scalevPaymentUrl || null,
       amount: insertSub.amount || 0,
       currency: insertSub.currency || "IDR",
       referralCode: insertSub.referralCode || null,
@@ -3540,8 +3540,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3564,8 +3564,8 @@ export class DatabaseStorage implements IStorage {
     if (data.plan !== undefined) updateData.plan = data.plan;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.accessToken !== undefined) updateData.accessToken = data.accessToken;
-    if (data.mayarOrderId !== undefined) updateData.mayarOrderId = data.mayarOrderId;
-    if (data.mayarPaymentUrl !== undefined) updateData.mayarPaymentUrl = data.mayarPaymentUrl;
+    if (data.scalevOrderId !== undefined) updateData.scalevOrderId = data.scalevOrderId;
+    if (data.scalevPaymentUrl !== undefined) updateData.scalevPaymentUrl = data.scalevPaymentUrl;
     if (data.amount !== undefined) updateData.amount = data.amount;
     if (data.currency !== undefined) updateData.currency = data.currency;
     if (data.referralCode !== undefined) updateData.referralCode = data.referralCode;
@@ -3588,8 +3588,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      mayarOrderId: row.mayarOrderId || undefined,
-      mayarPaymentUrl: row.mayarPaymentUrl || undefined,
+      scalevOrderId: row.scalevOrderId || undefined,
+      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,

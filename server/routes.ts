@@ -7044,7 +7044,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
             amount: planConfig?.monthlyFee ?? 0,
             currency: "IDR",
             chatbotLimit: Math.min(planConfig?.maxAgents ?? 3, 200),
-            mayarOrderId: `GUS-${plan.toUpperCase()}-${userId.slice(0, 8)}-${Date.now()}`,
+            scalevOrderId: `GUS-${plan.toUpperCase()}-${userId.slice(0, 8)}-${Date.now()}`,
             startDate: now.toISOString(),
             endDate: endDate.toISOString(),
           });
@@ -7090,7 +7090,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           amount: pricing.price,
           currency: "IDR",
           chatbotLimit: pricing.chatbotLimit,
-          mayarOrderId: orderId,
+          scalevOrderId: orderId,
         });
 
         // Scalev product slug mapping
@@ -7189,7 +7189,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           amount: planConfig.monthlyFee, // bulanan saja
           currency: "IDR",
           chatbotLimit: Math.min(planConfig.maxAgents === -1 ? 200 : planConfig.maxAgents, 200),
-          mayarOrderId: orderId,
+          scalevOrderId: orderId,
         });
 
         const monthlyLabel = planConfig.monthlyFee > 0
@@ -19031,7 +19031,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           currency: "IDR",
           chatbotLimit,
           grantedBy: req.user?.claims?.sub || null,
-          mayarOrderId: `EARLY-${plan.toUpperCase()}-${userId.slice(0, 8)}-${Date.now()}`,
+          scalevOrderId: `EARLY-${plan.toUpperCase()}-${userId.slice(0, 8)}-${Date.now()}`,
           startDate: now,
           endDate,
         });
@@ -19973,7 +19973,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               amount: Math.round(grossRevenue) || pricing?.price || 0,
               currency: "IDR",
               chatbotLimit: pricing?.chatbotLimit ?? 3,
-              mayarOrderId: `scalev_plan_${orderId}`,
+              scalevOrderId: `scalev_plan_${orderId}`,
               startDate: now.toISOString(),
               endDate: endDate.toISOString(),
             });
@@ -20223,7 +20223,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                   amount: 0,
                   currency: "IDR",
                   chatbotLimit: 1,
-                  mayarOrderId: `scalev_ebook_${orderId}`,
+                  scalevOrderId: `scalev_ebook_${orderId}`,
                   startDate: now.toISOString(),
                   endDate: endDate.toISOString(),
                 } as any);
@@ -20273,7 +20273,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 await storage.createSubscription({
                   userId: buyer.id, plan: "free_trial", status: "active",
                   amount: 0, currency: "IDR", chatbotLimit: 1,
-                  mayarOrderId: `scalev_starterkit_${orderId}`,
+                  scalevOrderId: `scalev_starterkit_${orderId}`,
                   startDate: now.toISOString(), endDate: endDate.toISOString(),
                 } as any);
                 trialGranted = true;
@@ -20395,7 +20395,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                   userId: buyer.id, plan: subPlan, status: "active",
                   amount: Math.round(grossRevenue), currency: "IDR",
                   chatbotLimit: planConfig?.maxAgents ?? 10,
-                  mayarOrderId: `scalev_${orderId}`,
+                  scalevOrderId: `scalev_${orderId}`,
                   startDate: now.toISOString(), endDate: endDate.toISOString(),
                 } as any);
                 console.log(`[Scalev] Subscription "${subPlan}" (${subDays}d) aktif untuk ${customerEmail} (user ${buyer.id})`);
