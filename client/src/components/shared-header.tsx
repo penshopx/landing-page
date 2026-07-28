@@ -252,20 +252,20 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
     { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
+    { href: "/toolkit",           label: "Toolkit",             icon: Hammer },
     { href: "/mitra-biro-jasa",   label: "Mitra",               icon: HandshakeIcon },
   ];
 
   // Baris 1.5 — solusi per segmen
   const navSolusi = [
-    { href: "/kontraktor",    label: "Untuk Kontraktor",    icon: Building2 },
-    { href: "/biro-jasa",     label: "Untuk Biro Jasa",     icon: Briefcase },
-    { href: "/konsultan-iso", label: "Untuk Konsultan ISO", icon: ClipboardList },
-    { href: "/skk",           label: "Portal SKK",          icon: GraduationCap, badge: "Ekosistem" },
+    { href: "/kontraktor",    label: "Kontraktor",    icon: Building2 },
+    { href: "/biro-jasa",     label: "Biro Jasa",     icon: Briefcase },
+    { href: "/konsultan-iso", label: "Konsultan ISO", icon: ClipboardList },
+    { href: "/skk",           label: "Portal SKK",    icon: GraduationCap, badge: "Ekosistem" },
   ];
 
   // Baris 2 — tools & layanan spesifik
   const navRow2 = [
-    { href: "/toolkit",                label: "Toolkit",                icon: Hammer },
     { href: "/ruang-kelola",           label: "Ruang Kelola",           icon: ClipboardList },
     { href: "/ruang-simpan",           label: "Ruang Simpan",           icon: HardDrive },
     { href: "/jasa-dokumen",           label: "Jasa Dokumen",           icon: FileCheck2 },

@@ -30,7 +30,6 @@ import {
   Calculator,
   Database,
   Wrench,
-  ShieldCheck,
   ShieldAlert,
 } from "lucide-react";
 
