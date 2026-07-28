@@ -3560,8 +3560,10 @@ Butuh bantuan? Hubungi kami:
 Selamat menggunakan! 🚀
 — Tim Gustafta`;
             const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-            const phoneNum = order.customerPhone?.replace(/\D/g, "");
-            const waDirectUrl = phoneNum ? `https://wa.me/${phoneNum.startsWith("0") ? "62" + phoneNum.slice(1) : phoneNum}?text=${encodeURIComponent(msg)}` : waUrl;
+            const rawPhone = order.customerPhone?.replace(/\D/g, "") ?? "";
+            const phoneNum = rawPhone.startsWith("0") ? "62" + rawPhone.slice(1) : rawPhone;
+            const validPhone = phoneNum.length >= 8;
+            const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : waUrl;
             return (
               <div className="space-y-4">
                 <div className="bg-muted/50 rounded-lg p-3 text-sm">

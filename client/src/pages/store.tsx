@@ -200,12 +200,17 @@ export default function Store() {
 
   const handleBuyNow = (agent: AgentProduct) => {
     trackViewContent({ content_name: agent.name, content_category: agent.category ?? "chatbot" });
-    // Semua produk store → Wuryanto Store (bayar.gustafta.my.id)
+    // Direct checkout link (set by admin per-product)
+    if (agent.paymentUrl) {
+      window.open(agent.paymentUrl, "_blank");
+      return;
+    }
+    // Scalev-integrated product → bayar.gustafta.my.id
     if (agent.scalevVariantId) {
       window.open("https://bayar.gustafta.my.id", "_blank");
       return;
     }
-    // Produk non-store → WA inquiry
+    // Fallback → WA inquiry
     const waMsg = encodeURIComponent(`Halo, saya ingin membeli: *${agent.name}*. Mohon informasi pembelian.`);
     window.open(`https://wa.me/${WA_CONTACT_NUMBER_2}?text=${waMsg}`, "_blank");
   };

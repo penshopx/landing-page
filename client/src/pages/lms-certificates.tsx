@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { GraduationCap, Award, Download, ChevronLeft, Loader2, CalendarDays } from "lucide-react";
+import { GraduationCap, Award, Download, ChevronLeft, Loader2, CalendarDays, ExternalLink, Linkedin, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
@@ -100,7 +100,7 @@ async function downloadCertificatePdf(params: {
   doc.setFont("helvetica", "italic");
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text("Dapat diverifikasi di gustafta.com/academy", W / 2, H - 28, { align: "center" });
+  doc.text(`Verifikasi: gustafta.my.id/lms/verify/${certificateCode}`, W / 2, H - 28, { align: "center" });
 
   doc.setDrawColor(r, g, b);
   doc.setLineWidth(0.8);
@@ -173,11 +173,46 @@ function CertificateCard({ cert }: { cert: Certificate }) {
           <p className="font-mono text-xs text-slate-700 break-all">{cert.certificateCode}</p>
         </div>
 
+        <div className="flex gap-1.5">
+          <a
+            href={`/lms/verify/${cert.certificateCode}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1"
+            data-testid={`link-verify-cert-${cert.id}`}
+          >
+            <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs">
+              <ExternalLink className="w-3 h-3" />
+              Verifikasi
+            </Button>
+          </a>
+          <a
+            href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`)}&title=${encodeURIComponent(`Sertifikat ${cert.course?.title || "Kursus"} — Gustafta Academy`)}&summary=${encodeURIComponent("Saya telah menyelesaikan kursus di Gustafta Academy!")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-testid={`link-linkedin-share-${cert.id}`}
+          >
+            <Button variant="outline" size="sm" className="gap-1 text-xs px-2.5 text-[#0A66C2] border-[#0A66C2]/30 hover:bg-[#0A66C2]/5">
+              <Linkedin className="w-3 h-3" />
+            </Button>
+          </a>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1 text-xs px-2.5"
+            onClick={() => navigator.clipboard.writeText(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`)}
+            title="Salin link verifikasi"
+            data-testid={`button-copy-verify-${cert.id}`}
+          >
+            <Copy className="w-3 h-3" />
+          </Button>
+        </div>
+
         <Button
           onClick={handleDownload}
           disabled={downloading}
           size="sm"
-          className="w-full mt-auto gap-2"
+          className="w-full gap-2"
           data-testid={`button-download-cert-${cert.id}`}
         >
           {downloading ? (

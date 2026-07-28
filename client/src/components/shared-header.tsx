@@ -10,13 +10,9 @@ import { useAuth } from "@/hooks/use-auth";
 import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import { Bot, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2 } from "lucide-react";
 
-const WA_NUMBERS = [
-  { display: WA_CONTACT_DISPLAY, link: WA_CONTACT_NUMBER },
-  { display: WA_CONTACT_DISPLAY_2, link: WA_CONTACT_NUMBER_2 },
-];
 
 const PLAN_BADGE_CONFIG: Record<string, { label: string; className: string }> = {
   free:        { label: "Free",        className: "bg-muted text-muted-foreground border-border" },
@@ -161,6 +157,7 @@ function PWAInstallButton() {
 }
 
 function ContactTopBar({ partner }: { partner: PartnerBranding | null }) {
+  const contact = useContactNumbers();
   // Host mitra whitelabel: tampilkan kontak MITRA (bukan kontak Gustafta/Scalev).
   if (partner) {
     if (!partner.contactPhone && !partner.contactEmail) return null;
@@ -200,7 +197,10 @@ function ContactTopBar({ partner }: { partner: PartnerBranding | null }) {
         <span className="flex items-center gap-1 font-medium text-foreground/70">
           <Smartphone className="h-3 w-3" /> Hubungi Kami:
         </span>
-        {WA_NUMBERS.map((n) => (
+        {[
+          { display: contact.display,  link: contact.primary },
+          { display: contact.display2, link: contact.secondary },
+        ].map((n) => (
           <a
             key={n.link}
             href={`https://wa.me/${n.link}`}

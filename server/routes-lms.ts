@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { db } from "./db";
 import { lmsCourses, lmsLessons, lmsEnrollments, lmsLessonProgress, lmsCertificates } from "@shared/schema";
 import { eq, and, asc, sql, count, inArray } from "drizzle-orm";
+import { sendEmail } from "./lib/email";
 
 function generateCertCode(): string {
   const year = new Date().getFullYear();
@@ -571,6 +572,41 @@ export function registerLmsRoutes(app: Express) {
         const [cert] = await db.select().from(lmsCertificates)
           .where(and(eq(lmsCertificates.userId, userId), eq(lmsCertificates.courseId, courseId)));
         certificateCode = cert?.certificateCode ?? null;
+
+        // Send email only when a brand-new cert was just inserted (code matches)
+        if (certificateCode === code) {
+          (async () => {
+            try {
+              const uRows = await db.execute(sql.raw(
+                `SELECT email, full_name FROM users WHERE id = '${userId.replace(/'/g, "''")}'`
+              ));
+              const uRow = (uRows as any).rows?.[0] ?? (uRows as any)[0];
+              const email = uRow?.email as string | undefined;
+              if (!email) return;
+              const [course] = await db.select({ title: lmsCourses.title })
+                .from(lmsCourses).where(eq(lmsCourses.id, courseId));
+              const courseTitle = course?.title ?? "Kursus";
+              const studentName = (uRow?.full_name as string) || "Peserta";
+              const verifyUrl = `https://gustafta.my.id/lms/verify/${certificateCode}`;
+              await sendEmail({
+                to: email,
+                subject: `🎓 Selamat! Sertifikat "${courseTitle}" berhasil diraih`,
+                html: `
+                  <div style="font-family:sans-serif;max-width:540px;margin:auto;padding:24px">
+                    <h2 style="color:#4f46e5">Selamat, ${studentName}! 🎓</h2>
+                    <p>Anda telah berhasil menyelesaikan kursus <strong>${courseTitle}</strong> di Gustafta Academy.</p>
+                    <p>Sertifikat Anda dengan kode <strong style="font-family:monospace">${certificateCode}</strong> telah diterbitkan.</p>
+                    <p style="margin:24px 0">
+                      <a href="${verifyUrl}" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600">
+                        Lihat &amp; Verifikasi Sertifikat
+                      </a>
+                    </p>
+                    <p style="color:#888;font-size:12px">Link verifikasi: ${verifyUrl}</p>
+                  </div>`,
+              });
+            } catch { /* fire-and-forget — never block progress response */ }
+          })();
+        }
       }
 
       res.json({ progress, completed: completedLessons.map(l => l.lessonId), certificateCode });
