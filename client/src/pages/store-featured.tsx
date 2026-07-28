@@ -437,7 +437,12 @@ export default function StoreFeatured() {
   });
 
   const handleBuy = (agent: AgentProduct) => {
-    // Semua produk store → Wuryanto Store
+    // Product-level payment URL takes priority over everything else
+    if (agent.paymentUrl) {
+      window.open(agent.paymentUrl, "_blank");
+      return;
+    }
+    // Scalev variant → Wuryanto Store (no explicit URL set yet)
     if (agent.scalevVariantId) {
       window.open("https://bayar.gustafta.my.id", "_blank");
       return;
