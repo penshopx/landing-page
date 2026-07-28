@@ -350,7 +350,7 @@ export default function AdminPage() {
   // Store tab state
   const [manualForm, setManualForm] = useState({ name: "", email: "", phone: "", agentId: "" });
   const [manualResult, setManualResult] = useState<{ accessUrl: string; agentName: string } | null>(null);
-  const [productForm, setProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", paymentUrl: "" });
+  const [productForm, setProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", paymentUrl: "", sortOrder: "0" });
   const [editPaymentUrlId, setEditPaymentUrlId] = useState<number | null>(null);
   const [editPaymentUrlValue, setEditPaymentUrlValue] = useState("");
   const [showProductForm, setShowProductForm] = useState(false);
@@ -706,7 +706,7 @@ export default function AdminPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/store/admin/products"] });
       queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
-      setProductForm({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", paymentUrl: "" });
+      setProductForm({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", paymentUrl: "", sortOrder: "0" });
       setShowProductForm(false);
       toast({ title: "Produk berhasil ditambahkan!" });
     },
@@ -1762,6 +1762,12 @@ export default function AdminPage() {
                           <Input value={productForm.emoji} onChange={(e) => setProductForm(f => ({ ...f, emoji: e.target.value }))}
                             placeholder="🤖" data-testid="input-product-emoji" />
                         </div>
+                        <div>
+                          <label className="text-xs font-medium mb-1 block text-muted-foreground">Urutan (sortOrder)</label>
+                          <Input type="number" value={productForm.sortOrder} onChange={(e) => setProductForm(f => ({ ...f, sortOrder: e.target.value }))}
+                            placeholder="0" data-testid="input-product-sort-order" />
+                          <p className="text-xs text-muted-foreground mt-1">0 = tampil paling atas; angka lebih besar = lebih bawah</p>
+                        </div>
                         <div className="sm:col-span-2">
                           <label className="text-xs font-medium mb-1 block text-muted-foreground">Link Pembayaran Scalev</label>
                           <Input value={productForm.paymentUrl} onChange={(e) => setProductForm(f => ({ ...f, paymentUrl: e.target.value }))}
@@ -1785,6 +1791,7 @@ export default function AdminPage() {
                           agentId: productForm.agentId ? Number(productForm.agentId) : null,
                           emoji: productForm.emoji || "🤖",
                           paymentUrl: productForm.paymentUrl || "",
+                          sortOrder: productForm.sortOrder !== "" ? Number(productForm.sortOrder) : 0,
                           isActive: true,
                         })}
                         data-testid="button-save-product">
