@@ -384,7 +384,7 @@ export default function AdminPage() {
   const [editPaymentUrlValue, setEditPaymentUrlValue] = useState("");
   const [showProductForm, setShowProductForm] = useState(false);
   const [editProductDialog, setEditProductDialog] = useState<{ open: boolean; product: StoreProduct | null }>({ open: false, product: null });
-  const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true, paymentUrl: "" });
+  const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true, paymentUrl: "", priceOverride: "" });
 
   // ---- Queries ----
   const { data: meData, isError: meError, isLoading: meLoading } = useQuery<AdminMeData>({
@@ -448,6 +448,9 @@ export default function AdminPage() {
     isActive: boolean;
     sortOrder: number;
     paymentUrl: string;
+    priceOverride: number | null;
+    computedPrice: number | null;
+    teamSize: number | null;
   }
 
   const { data: modulSubs = [], isLoading: modulSubsLoading, refetch: refetchModulSubs } = useQuery<ModulSub[]>({
@@ -1933,6 +1936,7 @@ export default function AdminPage() {
                                     sortOrder: String(p.sortOrder ?? 0),
                                     isActive: p.isActive,
                                     paymentUrl: p.paymentUrl || "",
+                                    priceOverride: p.priceOverride != null ? String(p.priceOverride) : "",
                                   });
                                   setEditProductDialog({ open: true, product: p });
                                 }}
@@ -3645,6 +3649,15 @@ Selamat menggunakan! 🚀
                 onChange={(e) => setEditProductForm(f => ({ ...f, price: e.target.value }))}
                 placeholder="149000"
                 data-testid="input-edit-product-price" />
+              {editProductDialog.product?.computedPrice != null && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Harga dari tim: <span className="font-medium text-foreground">Rp {editProductDialog.product.computedPrice.toLocaleString("id-ID")}</span>
+                  {editProductDialog.product.teamSize != null && (
+                    <span> ({editProductDialog.product.teamSize} agen)</span>
+                  )}
+                  {editProductForm.priceOverride ? " · Override aktif" : " · Otomatis"}
+                </p>
+              )}
             </div>
             <div>
               <label className="text-xs font-medium mb-1 block text-muted-foreground">Kategori</label>
@@ -3691,6 +3704,17 @@ Selamat menggunakan! 🚀
                 data-testid="input-edit-product-features" />
               <p className="text-xs text-muted-foreground mt-1">Setiap baris menjadi satu poin fitur di halaman store.</p>
             </div>
+            <div>
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Override Harga (opsional)</label>
+              <Input
+                type="number"
+                value={editProductForm.priceOverride}
+                onChange={(e) => setEditProductForm(f => ({ ...f, priceOverride: e.target.value }))}
+                placeholder="Kosongkan = harga dari tim"
+                data-testid="input-edit-product-price-override"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Isi untuk promo/harga khusus. Kosongkan agar harga otomatis dari jumlah agen.</p>
+            </div>
             <div className="sm:col-span-2">
               <label className="text-xs font-medium mb-1 block text-muted-foreground">Link Pembayaran (opsional)</label>
               <Input
@@ -3736,6 +3760,7 @@ Selamat menggunakan! 🚀
                     sortOrder: Number(editProductForm.sortOrder) || 0,
                     isActive: editProductForm.isActive,
                     paymentUrl: editProductForm.paymentUrl || "",
+                    priceOverride: editProductForm.priceOverride ? Number(editProductForm.priceOverride) : null,
                   },
                 });
               }}

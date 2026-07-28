@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { parseSubAgentsValue } from "./db-storage";
 import { db, pool } from "./db";
-import { customDomains, partners, insertPartnerSchema, partnerTopupRequests, trialRequests, subscriptionsTable, vouchers, series as seriesTable, bigIdeas as bigIdeasTable, toolboxes as toolboxesTable, agents as agentsTable, cores as coresTable, systemConfig, clientSubscriptions } from "@shared/schema";
+import { customDomains, partners, insertPartnerSchema, partnerTopupRequests, trialRequests, subscriptionsTable, vouchers, series as seriesTable, bigIdeas as bigIdeasTable, toolboxes as toolboxesTable, agents as agentsTable, cores as coresTable, systemConfig, clientSubscriptions, storeProducts } from "@shared/schema";
 import { users } from "@shared/models/auth";
 import { eq, and, desc, sql as sqlExpr, inArray, isNull, or } from "drizzle-orm";
 import {
@@ -138,6 +138,21 @@ Format: [SUGGEST_ACTION:category|type|label|deskripsi_singkat]
 
 const guestMessageTracker = new Map<string, { count: number; lastReset: string }>();
 
+// ── Store pricing tiers ───────────────────────────────────────────────────────
+// Biaya Lisensi tiered berdasarkan jumlah anggota tim (sub-agents + 1 orchestrator).
+//   1 agen   solo      → DEFAULT_LICENSE_PRICE (299.000)
+//   2–3 agen tim kecil → 499.000
+//   4–6 agen tim sedang → 799.000
+//   7+  agen tim besar  → 1.299.000
+function calcStorePrice(agenticSubAgents: any): number {
+  const subCount = Array.isArray(agenticSubAgents) ? agenticSubAgents.length : 0;
+  const total = subCount + 1; // include the orchestrator itself
+  if (total >= 7) return 1_299_000;
+  if (total >= 4) return 799_000;
+  if (total >= 2) return 499_000;
+  return DEFAULT_LICENSE_PRICE; // 299.000 — solo agent
+}
+
 // ── Store catalog cache ──────────────────────────────────────────────────────
 // GET /api/store/catalog re-fetches & enriches ALL active agents (900+ rows with
 // heavy text/jsonb columns) on every request, then filters/paginates in memory.
@@ -197,6 +212,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
   }
   const spWhere = spConditions.length > 1 ? and(...spConditions) : spConditions[0];
   const spRows = await db.select().from(storeProducts).where(spWhere).orderBy(storeProducts.sortOrder, storeProducts.id);
+
   // Harga coret ≈ 1,5× harga final (pembulatan ke ratusan ribu terdekat)
   const calcOriginalPrice = (total: number): number => {
     const base = calcStorePrice(Array(Math.max(0, total - 1)).fill(null));
@@ -221,7 +237,8 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
 
   const storeProductItems = spRows.map((p) => {
     const linkedSubAgents = p.agentId != null ? agentSubMap.get(p.agentId) : undefined;
-    const price = linkedSubAgents !== undefined ? calcStorePrice(linkedSubAgents) : p.price;
+    const computedPrice = linkedSubAgents !== undefined ? calcStorePrice(linkedSubAgents) : p.price;
+    const price = (p as any).priceOverride != null ? (p as any).priceOverride : computedPrice;
     const paymentUrl = (p as any).paymentUrl ||
       (p.agentId != null ? (agentPaymentUrlMap.get(p.agentId) || null) : null);
     return {
@@ -312,9 +329,16 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
     }
   }
 
-  // Re-compute store product prices with updated child counts
+  // Re-compute store product prices with updated child counts.
+  // priceOverride always wins — only update price when no override is set.
   const storeProductItemsFinal = storeProductItems.map(p => {
     if (p.agentId != null) {
+      // Find the original store row to check for override
+      const spRow = spRows.find(r => r.id === p.productId);
+      if (spRow && (spRow as any).priceOverride != null) {
+        // Admin-set override takes precedence — never overwrite it
+        return p;
+      }
       const linkedSub = agentSubMap.get(p.agentId);
       return { ...p, price: linkedSub !== undefined ? calcStorePrice(linkedSub) : p.price };
     }
@@ -7550,22 +7574,31 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         const product = await storage.getStoreProduct(Number(productId));
         if (!product || !product.isActive) return res.status(404).json({ error: "Produk tidak ditemukan" });
         itemName = product.name;
-        itemPrice = product.price;
         resolvedAgentId = product.agentId ?? null;
         resolvedProductId = product.id;
-        // Bila produk memetakan ke agen (buatan kreator), pakai harga LISENSI efektif agen
-        // dan catat kreator untuk bagi hasil 80/20 — konsisten dengan jalur agentId.
-        if (resolvedAgentId) {
+
+        // Precedence: explicit admin override → team-size tier → base product price.
+        // This mirrors the catalog pricing in buildStoreCatalogItems so buyers always
+        // see and pay the same amount.
+        if ((product as any).priceOverride != null) {
+          itemPrice = (product as any).priceOverride;
+        } else if (resolvedAgentId) {
           const { db } = await import("./db");
           const { agents: agentsTable } = await import("@shared/schema");
           const { eq } = await import("drizzle-orm");
-          const rows = await db.select({ userId: agentsTable.userId, licensePrice: agentsTable.licensePrice, licenseClass: agentsTable.licenseClass })
-            .from(agentsTable).where(eq(agentsTable.id, resolvedAgentId)).limit(1);
+          const rows = await db.select({
+            userId: agentsTable.userId,
+            agenticSubAgents: agentsTable.agenticSubAgents,
+          }).from(agentsTable).where(eq(agentsTable.id, resolvedAgentId)).limit(1);
           const agent = rows[0];
           if (agent) {
-            itemPrice = resolveLicensePrice(agent.licenseClass, agent.licensePrice);
+            itemPrice = calcStorePrice(parseSubAgentsValue(agent.agenticSubAgents));
             creatorUserId = (agent.userId ?? "").trim() || null;
+          } else {
+            itemPrice = product.price;
           }
+        } else {
+          itemPrice = product.price;
         }
       }
 
@@ -7740,33 +7773,25 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
   app.get("/api/store/admin/products", isAuthenticated, async (_req, res) => {
     try {
-      const { db } = await import("./db");
-      const { agents: agentsTable } = await import("@shared/schema");
-      const { inArray } = await import("drizzle-orm");
-
-      const products = await storage.getStoreProducts();
-
-      // Enrich each product with computedPrice — what buyers actually see.
-      // For agent-linked products the price is tier-driven by team size;
-      // for plain products it equals the stored price.
+      // Fetch ALL products (including inactive) for admin view
+      const products = await db.select().from(storeProducts).orderBy(storeProducts.sortOrder, storeProducts.id);
+      // Enrich with computedPrice and teamSize so the admin UI can display the price preview
       const linkedAgentIds = products.map(p => p.agentId).filter(Boolean) as number[];
-      const agentSubMap = new Map<number, any>();
+      const agentSubInfoMap = new Map<number, { subAgents: any[]; teamSize: number }>();
       if (linkedAgentIds.length > 0) {
-        const rows = await db.select({
-          id: agentsTable.id,
-          agenticSubAgents: agentsTable.agenticSubAgents,
-        }).from(agentsTable).where(inArray(agentsTable.id, linkedAgentIds));
+        const rows = await db.select({ id: agentsTable.id, agenticSubAgents: agentsTable.agenticSubAgents })
+          .from(agentsTable).where(inArray(agentsTable.id, linkedAgentIds));
         for (const r of rows) {
-          agentSubMap.set(r.id, parseSubAgentsValue(r.agenticSubAgents));
+          const subs = parseSubAgentsValue(r.agenticSubAgents);
+          agentSubInfoMap.set(r.id, { subAgents: subs, teamSize: subs.length + 1 });
         }
       }
-
       const enriched = products.map(p => {
-        const subs = p.agentId != null ? agentSubMap.get(p.agentId) : undefined;
-        const computedPrice = subs !== undefined ? calcStorePrice(subs) : p.price;
-        return { ...p, computedPrice };
+        const info = p.agentId != null ? agentSubInfoMap.get(p.agentId) : undefined;
+        const computedPrice = info !== undefined ? calcStorePrice(info.subAgents) : p.price;
+        const teamSize = info?.teamSize ?? null;
+        return { ...p, computedPrice, teamSize };
       });
-
       res.json(enriched);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch products" });

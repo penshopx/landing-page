@@ -490,6 +490,14 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] blueprint_submissions DDL error:`, e);
   }
 
+  // ── store_products.price_override column (idempotent DDL) ─────────────────
+  try {
+    await pool.query(`ALTER TABLE store_products ADD COLUMN IF NOT EXISTS price_override integer`);
+    console.log(`${new Date().toLocaleTimeString()} [express] store_products.price_override column ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] store_products.price_override DDL error:`, e);
+  }
+
   await registerRoutes(httpServer, app);
 
   // ── Boot-time channel health check ──────────────────────────────────────────
