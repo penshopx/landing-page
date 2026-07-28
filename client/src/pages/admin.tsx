@@ -51,6 +51,7 @@ interface AdminStats {
   activeSubscriptions: number;
   totalCourses: number;
   totalEnrollments: number;
+  activeAgents: number;
 }
 
 interface AdminUser {
@@ -438,8 +439,6 @@ export default function AdminPage() {
     description: string;
     category: string;
     price: number;
-    /** Effective buyer-facing price: tier-computed for agent-linked products, else equals price */
-    computedPrice?: number;
     agentId: number | null;
     emoji: string;
     features: string[] | null;
@@ -1042,7 +1041,7 @@ export default function AdminPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4">
           <Card data-testid="stat-total-users">
             <CardContent className="pt-5">
               <div className="flex items-center justify-between">
@@ -1111,6 +1110,18 @@ export default function AdminPage() {
                   <p className="text-3xl font-bold mt-1 text-violet-600">{statsLoading ? "—" : (stats?.totalEnrollments ?? 0)}</p>
                 </div>
                 <GraduationCap className="h-8 w-8 text-violet-500 opacity-80" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card data-testid="stat-active-agents">
+            <CardContent className="pt-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Agen Aktif</p>
+                  <p className="text-3xl font-bold mt-1 text-cyan-600">{statsLoading ? "—" : (stats?.activeAgents ?? 0)}</p>
+                </div>
+                <Cpu className="h-8 w-8 text-cyan-500 opacity-80" />
               </div>
             </CardContent>
           </Card>

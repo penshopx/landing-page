@@ -181,21 +181,6 @@ function invalidateStoreCatalog(): void {
   storeCatalogInflight.clear();
 }
 
-// Biaya Lisensi: tiered berdasarkan jumlah anggota tim (sub-agents + 1 orchestrator).
-// Tier harga (hak pakai, sekali bayar):
-//   1 agen   solo       → DEFAULT_LICENSE_PRICE (299.000)
-//   2–3 agen tim kecil  → 499.000
-//   4–6 agen tim sedang → 799.000
-//   7+  agen tim besar  → 1.299.000
-function calcStorePrice(agenticSubAgents: any): number {
-  const subCount = Array.isArray(agenticSubAgents) ? agenticSubAgents.length : 0;
-  const total = subCount + 1; // include the orchestrator itself
-  if (total >= 7) return 1_299_000;
-  if (total >= 4) return 799_000;
-  if (total >= 2) return 499_000;
-  return DEFAULT_LICENSE_PRICE; // 299.000 — solo agent
-}
-
 async function buildStoreCatalogItems(category: string, search: string): Promise<any[]> {
   const { db } = await import("./db");
   const { agents: agentsTable, storeProducts } = await import("@shared/schema");
@@ -2448,6 +2433,8 @@ export async function registerRoutes(
       }
       const clone = await storage.cloneAgentForOwner(masterId, user.id);
       console.log(`[deliver-private] Master #${masterId} → salinan privat #${clone.id} untuk ${email} (user ${user.id})`);
+      // Clone creates a new agent that may appear in admin store views — invalidate cache
+      invalidateStoreCatalog();
       res.json({
         success: true,
         agent: clone,
@@ -18774,6 +18761,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         [activeSubRow],
         [totalCoursesRow],
         [totalEnrollmentsRow],
+        [activeAgentsRow],
       ] = await Promise.all([
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(users),
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(users).where(eq(users.isActive, true)),
@@ -18781,6 +18769,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(subscriptionsTable).where(eq(subscriptionsTable.status, "active")),
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(lmsCourses).where(eq(lmsCourses.isActive, true)),
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(lmsEnrollments),
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(agentsTable).where(eq(agentsTable.isActive, true)),
       ]);
       res.json({
         totalUsers: totalUsersRow.count,
@@ -18789,6 +18778,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         activeSubscriptions: activeSubRow.count,
         totalCourses: totalCoursesRow.count,
         totalEnrollments: totalEnrollmentsRow.count,
+        activeAgents: activeAgentsRow.count,
       });
     } catch (error: any) {
       console.error("Admin stats error:", error);
@@ -23715,6 +23705,8 @@ POLA KERJA: ELICIT (pahami tahap & niat) → DISPATCH (agen sesuai kebutuhan) �
         },
       } as any);
 
+      // New team agents may be listed/curated — invalidate store catalog cache
+      invalidateStoreCatalog();
       res.json({
         ok: true,
         orchestratorId: orchestrator.id,
@@ -24150,6 +24142,9 @@ POLA KERJA: ELICIT (pahami tahap & niat) → DISPATCH (agen sesuai kebutuhan) �
         UPDATE agents SET agentic_sub_agents = ${JSON.stringify(agenticSubAgents)}::jsonb
         WHERE id = ${hubId}
       `);
+
+      // Wiring changes team size → store price changes → invalidate catalog cache (#89)
+      invalidateStoreCatalog();
 
       res.json({ ok: true, agenticSubAgents });
     } catch (err: any) { res.status(500).json({ error: err.message }); }
