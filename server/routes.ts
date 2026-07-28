@@ -20216,6 +20216,79 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   const BREVO_BOUNCE_ALERT_THRESHOLD = 0.2; // alert if >20% bounce rate over a window
   const BREVO_BOUNCE_ALERT_WINDOW = 60 * 60 * 1000; // 1-hour cooldown between alerts
 
+  // Proactive bounce alert — sends WA (Fonnte) to SUPERADMIN_PHONE, falls back to email.
+  // Fire-and-forget: never throws, never blocks the webhook response.
+  async function _sendBounceAlertNotification(ratePct: number, delivered: number, bounced: number, spam: number): Promise<void> {
+    const waMessage =
+      `*Gustafta Admin Alert* ⚠️\n\n` +
+      `Email bounce rate tinggi terdeteksi: *${ratePct}%*\n\n` +
+      `Statistik sesi ini:\n` +
+      `• Terkirim: ${delivered}\n` +
+      `• Bounced: ${bounced}\n` +
+      `• Spam/complaint: ${spam}\n\n` +
+      `Segera cek dashboard Brevo dan verifikasi reputasi domain pengirim.`;
+
+    // 1. Try WhatsApp via Fonnte to the first SUPERADMIN_PHONE
+    const rawPhone = (process.env.SUPERADMIN_PHONE || "").split(",")[0].trim();
+    const fonnteApiKey = process.env.FONNTE_API_KEY;
+    if (rawPhone && fonnteApiKey) {
+      try {
+        let target = rawPhone.replace(/[^\d]/g, "");
+        if (target.startsWith("0")) target = "62" + target.slice(1);
+        else if (target.startsWith("8")) target = "62" + target;
+        const resp = await fetch("https://api.fonnte.com/send", {
+          method: "POST",
+          headers: { Authorization: fonnteApiKey },
+          body: new URLSearchParams({ target, message: waMessage }),
+        });
+        const body: any = await resp.json().catch(() => ({}));
+        if (resp.ok && body?.status !== false) {
+          console.log(`[Brevo ALERT] WA notification sent to ${target}`);
+          return; // WA succeeded — no need for email fallback
+        }
+        console.error(`[Brevo ALERT] WA notification failed (HTTP ${resp.status}): ${JSON.stringify(body).slice(0, 200)}`);
+      } catch (waErr: any) {
+        console.error(`[Brevo ALERT] WA notification error: ${waErr?.message}`);
+      }
+    }
+
+    // 2. Fallback: send admin email via Brevo
+    try {
+      const { sendEmail } = await import("./lib/email");
+      // Use support@ as the admin recipient — same address used in reply-to throughout the app.
+      const adminEmail = process.env.BREVO_ALERT_EMAIL || "support@gustafta.com";
+      const htmlContent = `<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:32px;background:#f3f4f6;font-family:Arial,sans-serif">
+  <table width="480" style="background:#fff;border-radius:12px;padding:32px;margin:0 auto">
+    <tr><td>
+      <p style="margin:0 0 4px;font-size:22px;font-weight:700;color:#dc2626">⚠️ Gustafta — Admin Alert</p>
+      <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0">
+      <p style="font-size:16px;color:#111;margin:0 0 12px">Email bounce rate tinggi terdeteksi: <strong>${ratePct}%</strong></p>
+      <table style="font-size:14px;color:#374151;border-collapse:collapse;width:100%;margin:0 0 20px">
+        <tr><td style="padding:6px 12px 6px 0;border-bottom:1px solid #f3f4f6">Terkirim</td><td style="padding:6px 0;border-bottom:1px solid #f3f4f6"><strong>${delivered}</strong></td></tr>
+        <tr><td style="padding:6px 12px 6px 0;border-bottom:1px solid #f3f4f6">Bounced</td><td style="padding:6px 0;border-bottom:1px solid #f3f4f6"><strong>${bounced}</strong></td></tr>
+        <tr><td style="padding:6px 12px 6px 0">Spam/complaint</td><td style="padding:6px 0"><strong>${spam}</strong></td></tr>
+      </table>
+      <p style="font-size:14px;color:#6b7280;margin:0">Segera cek <a href="https://app.brevo.com" style="color:#4f46e5">dashboard Brevo</a> dan verifikasi reputasi domain pengirim.</p>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+      await sendEmail({
+        to: adminEmail,
+        subject: `⚠️ Brevo Bounce Alert: bounce rate ${ratePct}%`,
+        htmlContent,
+        textContent: `Gustafta Admin Alert\n\nEmail bounce rate tinggi: ${ratePct}%\nTerkirim: ${delivered} | Bounced: ${bounced} | Spam: ${spam}\n\nCek dashboard Brevo: https://app.brevo.com`,
+        tags: ["admin-alert", "bounce-alert"],
+      });
+      console.log(`[Brevo ALERT] Email notification sent to ${adminEmail}`);
+    } catch (emailErr: any) {
+      console.error(`[Brevo ALERT] Email notification error: ${emailErr?.message}`);
+    }
+  }
+
   function _checkBrevoAlerts() {
     const total = _brevoStats.delivered + _brevoStats.bounced + _brevoStats.spam;
     if (total < 10) return; // need at least 10 events before alerting
@@ -20223,11 +20296,14 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     const now = Date.now();
     if (bounceRate > BREVO_BOUNCE_ALERT_THRESHOLD && (now - _brevoStats.lastAlertAt) > BREVO_BOUNCE_ALERT_WINDOW) {
       _brevoStats.lastAlertAt = now;
+      const ratePct = Math.round(bounceRate * 100);
       console.error(
-        `[Brevo ALERT] High bounce/spam rate detected: ${Math.round(bounceRate * 100)}% ` +
+        `[Brevo ALERT] High bounce/spam rate detected: ${ratePct}% ` +
         `(bounced=${_brevoStats.bounced}, spam=${_brevoStats.spam}, delivered=${_brevoStats.delivered}). ` +
         `Check Brevo dashboard and verify sender domain/reputation.`
       );
+      // Fire-and-forget proactive notification (WA → email fallback).
+      void _sendBounceAlertNotification(ratePct, _brevoStats.delivered, _brevoStats.bounced, _brevoStats.spam);
     }
   }
 
