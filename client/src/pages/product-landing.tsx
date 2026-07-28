@@ -698,16 +698,36 @@ export default function ProductLanding() {
           <div className="container mx-auto px-4">
             <SectionHeader title="Pilih Paket yang Tepat" />
 
-            {agent.isGustafta && (
+            {(agent.isGustafta || agent.isCertified || agent.isCreatorMade) && (
               <div className="flex justify-center mb-6">
-                <Badge
-                  className="bg-violet-600 text-white border-violet-700 text-xs px-3 py-1 flex items-center gap-1.5"
-                  data-testid={`badge-beli-gustafta-official-${agent.id}`}
-                  title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin."
-                >
-                  <ShieldCheck className="h-3 w-3" />
-                  Gustafta Official
-                </Badge>
+                {agent.isGustafta ? (
+                  <Badge
+                    className="bg-violet-600 text-white border-violet-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                    data-testid={`badge-beli-gustafta-official-${agent.id}`}
+                    title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin."
+                  >
+                    <ShieldCheck className="h-3 w-3" />
+                    Gustafta Official
+                  </Badge>
+                ) : agent.isCertified ? (
+                  <Badge
+                    className="bg-emerald-600 text-white border-emerald-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                    data-testid={`badge-beli-bersertifikat-${agent.id}`}
+                    title="Kreator telah lulus workshop & sertifikasi Gustafta."
+                  >
+                    <ShieldCheck className="h-3 w-3" />
+                    Bersertifikat
+                  </Badge>
+                ) : (
+                  <Badge
+                    className="bg-amber-600 text-white border-amber-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                    data-testid={`badge-beli-pra-sertifikasi-${agent.id}`}
+                    title="Dibuat Fasilitator independen — belum melalui sertifikasi Gustafta."
+                  >
+                    <ShieldAlert className="h-3 w-3" />
+                    Pra-Sertifikasi
+                  </Badge>
+                )}
               </div>
             )}
 

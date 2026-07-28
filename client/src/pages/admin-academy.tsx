@@ -870,7 +870,7 @@ type LmsHealth = {
   };
 };
 
-function SeedStatusBadge({ status, seeding }: { status: string; seeding: boolean }) {
+function SeedStatusBadge({ status, seeding, retryIn }: { status: string; seeding: boolean; retryIn?: number }) {
   if (seeding || status === "pending") {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300">
@@ -890,8 +890,8 @@ function SeedStatusBadge({ status, seeding }: { status: string; seeding: boolean
   if (status === "error") {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
-        <span className="w-2 h-2 rounded-full bg-red-500" />
-        Seed error
+        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+        Seed error{retryIn != null && retryIn > 0 ? ` — retry otomatis ${retryIn}d` : retryIn === 0 ? " — memulai retry…" : ""}
       </span>
     );
   }
@@ -928,17 +928,45 @@ function LmsHealthCard({
     ? new Date(updatedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
     : null;
 
+  // Auto-retry countdown — starts at 30s when seedStatus === "error"
+  const [retryIn, setRetryIn] = useState<number | null>(null);
+
   const reseedMut = useMutation({
     mutationFn: () => apiRequest("POST", "/api/admin/lms/reseed"),
     onSuccess: () => {
       toast({ title: "Reseed dimulai", description: "Status akan berubah menjadi 'done' dalam beberapa detik." });
-      // Poll sampai seeding selesai
+      setRetryIn(null);
       const interval = setInterval(() => onRefresh(), 2000);
       setTimeout(() => clearInterval(interval), 30_000);
       onRefresh();
     },
-    onError: (e: any) => toast({ title: "Gagal reseed", description: e?.message || "Coba lagi.", variant: "destructive" }),
+    onError: (e: any) => {
+      toast({ title: "Gagal reseed", description: e?.message || "Coba lagi.", variant: "destructive" });
+      setRetryIn(30); // restart countdown after failure
+    },
   });
+
+  // Start / reset countdown whenever error state appears or disappears
+  useEffect(() => {
+    const isError = health?.seedStatus === "error" && !health?.seeding && !reseedMut.isPending;
+    if (!isError) { setRetryIn(null); return; }
+    setRetryIn(30);
+    const tick = setInterval(() => {
+      setRetryIn(prev => {
+        if (prev === null) return null;
+        if (prev <= 1) { clearInterval(tick); return 0; }
+        return prev - 1;
+      });
+    }, 1_000);
+    return () => clearInterval(tick);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [health?.seedStatus, health?.seeding]);
+
+  // Fire reseed when countdown reaches 0
+  useEffect(() => {
+    if (retryIn === 0 && !reseedMut.isPending) reseedMut.mutate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [retryIn]);
 
   return (
     <Card className="mb-6 border-2">
@@ -948,7 +976,7 @@ function LmsHealthCard({
             <Activity className="w-4 h-4 text-indigo-500" />
             <span className="font-semibold text-sm">Status LMS</span>
             {health && (
-              <SeedStatusBadge status={health.seedStatus} seeding={health.seeding} />
+              <SeedStatusBadge status={health.seedStatus} seeding={health.seeding} retryIn={retryIn ?? undefined} />
             )}
           </div>
           <div className="flex items-center gap-2">
