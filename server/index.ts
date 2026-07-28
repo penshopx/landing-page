@@ -649,16 +649,29 @@ for (const envVar of requiredEnvVars) {
 
           let promoted = 0;
 
-          // Promote by phone
+          // Helper: normalise a DB-stored phone to the same 62xxxxxxxxxx form used
+          // by normalizePhoneLocal so we can compare apples-to-apples in SQL.
+          // We strip every non-digit, then apply the same 0→62 / 8→62 prefix rules.
+          const dbPhoneNormSql = rawSql`
+            CASE
+              WHEN regexp_replace(COALESCE(phone, ''), '[^0-9]', '', 'g') LIKE '0%'
+                THEN '62' || substring(regexp_replace(COALESCE(phone, ''), '[^0-9]', '', 'g'), 2)
+              WHEN regexp_replace(COALESCE(phone, ''), '[^0-9]', '', 'g') LIKE '8%'
+                THEN '62' || regexp_replace(COALESCE(phone, ''), '[^0-9]', '', 'g')
+              ELSE regexp_replace(COALESCE(phone, ''), '[^0-9]', '', 'g')
+            END
+          `;
+
+          // Promote by phone — normalise both sides so format mismatches are caught
           for (const phone of superPhones) {
             const res: any = await rawDb.execute(rawSql`
               UPDATE users SET role = 'superadmin', updated_at = NOW()
-              WHERE phone = ${phone} AND role != 'superadmin'
-              RETURNING id, email
+              WHERE (${dbPhoneNormSql}) = ${phone} AND role != 'superadmin'
+              RETURNING id, email, phone
             `);
             const rows: any[] = res?.rows ?? [];
             for (const row of rows) {
-              log(`[SuperAdminBackfill] Promoted user ${row.id} (${row.email}) → superadmin (phone match)`);
+              log(`[SuperAdminBackfill] Promoted user ${row.id} (${row.email}, phone stored as "${row.phone}") → superadmin (phone match)`);
               promoted++;
             }
           }
@@ -679,6 +692,23 @@ for (const envVar of requiredEnvVars) {
 
           if (promoted === 0) {
             log("[SuperAdminBackfill] All matching users already have superadmin role — no changes needed");
+
+            // Sanity-check: if SUPERADMIN_PHONE is configured but no superadmin
+            // exists whose normalised phone matches, the env var might be stored in
+            // a format that still doesn't match (e.g. country-code prefix other than
+            // 0/8/62). Emit a clear WARNING so the operator knows to investigate.
+            if (superPhones.length > 0) {
+              const checkRes: any = await rawDb.execute(rawSql`
+                SELECT COUNT(*)::int AS cnt
+                FROM users
+                WHERE role = 'superadmin'
+                  AND (${dbPhoneNormSql}) = ANY(${superPhones})
+              `);
+              const matchingAdmins: number = checkRes?.rows?.[0]?.cnt ?? 0;
+              if (matchingAdmins === 0) {
+                log(`[SuperAdminBackfill] WARNING: SUPERADMIN_PHONE is set (${superPhones.join(", ")}) but NO superadmin row found with a matching normalised phone. The account may have been registered with a different phone format. Check the 'phone' column in the users table.`);
+              }
+            }
           }
         }
       } catch (err) {
