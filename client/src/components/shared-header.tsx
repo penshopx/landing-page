@@ -252,6 +252,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
     { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
+    { href: "/mitra-biro-jasa",   label: "Mitra",               icon: HandshakeIcon },
   ];
 
   // Baris 1.5 — solusi per segmen
@@ -269,10 +270,9 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/ruang-simpan",           label: "Ruang Simpan",           icon: HardDrive },
     { href: "/jasa-dokumen",           label: "Jasa Dokumen",           icon: FileCheck2 },
     { href: "/jasa-keuangan",          label: "Jasa Keuangan",          icon: TrendingUp },
-    { href: "/klinik-uji-kompetensi",  label: "Bimtek Uji Kompetensi", icon: GraduationCap },
-    { href: "/executive-summary",      label: "Executive Summary",      icon: FileText },
-    { href: "/store",                  label: "Produk AI",              icon: Zap },
-    { href: "/mitra-biro-jasa",        label: "Mitra",                  icon: HandshakeIcon },
+    { href: "/klinik-uji-kompetensi",  label: "Bimtek SKK",       icon: GraduationCap },
+    { href: "/executive-summary",      label: "Exec. Summary",    icon: FileText },
+    { href: "/store",                  label: "Produk AI",         icon: Zap },
   ];
 
   // Untuk mobile: semua item gabungan
