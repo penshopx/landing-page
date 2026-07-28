@@ -736,6 +736,11 @@ function FileCard({ file, onClick, onDelete }: { file: RSFile; onClick: () => vo
           {file.folder_name && (
             <Badge variant="outline" className="text-[10px]">{file.folder_name}</Badge>
           )}
+          {file.kelola_doc_id && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded border bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/40">
+              <ClipboardList className="h-2.5 w-2.5" /> Kelola
+            </span>
+          )}
         </div>
         <span className="text-[10px] text-muted-foreground">{formatDate(file.created_at)}</span>
       </div>

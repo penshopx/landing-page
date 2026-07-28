@@ -333,19 +333,71 @@ export async function registerRuangKelolaRoutes(app: Express): Promise<void> {
     }
 
     try {
-      let query = `SELECT id, category, doc_type, doc_name, doc_number, issued_by,
-                          issued_date, expired_date, status, notes, created_at, updated_at
-                   FROM ruang_kelola_documents WHERE user_id = $1`;
+      let query = `SELECT d.id, d.category, d.doc_type, d.doc_name, d.doc_number, d.issued_by,
+                          d.issued_date, d.expired_date, d.status, d.notes, d.created_at, d.updated_at,
+                          COUNT(sf.id)::int AS linked_file_count
+                   FROM ruang_kelola_documents d
+                   LEFT JOIN ruang_simpan_files sf
+                     ON sf.kelola_doc_id = d.id AND sf.user_id = d.user_id
+                   WHERE d.user_id = $1
+                   GROUP BY d.id`;
       const params: any[] = [userId];
-      if (category) { query += ` AND category = $2`; params.push(category); }
+      if (category) { query += ` AND d.category = $2`; params.push(category); }
       query += ` ORDER BY
-        CASE WHEN expired_date IS NOT NULL AND expired_date <= now() THEN 0
-             WHEN expired_date IS NOT NULL AND expired_date <= now() + interval '30 days' THEN 1
+        CASE WHEN d.expired_date IS NOT NULL AND d.expired_date <= now() THEN 0
+             WHEN d.expired_date IS NOT NULL AND d.expired_date <= now() + interval '30 days' THEN 1
              ELSE 2
-        END, expired_date ASC NULLS LAST, created_at DESC`;
+        END, d.expired_date ASC NULLS LAST, d.created_at DESC`;
       const { rows } = await pool.query(query, params);
       res.json(rows);  // user_id never selected → L10 implicit
     } catch (e) { safeError(res, e, "GET documents"); }
+  });
+
+  // ── GET /api/ruang-kelola/documents/:id/files ──────────────── L2,L3,L6
+  // Returns ruang_simpan files linked to this kelola doc (same user).
+  app.get("/api/ruang-kelola/documents/:id/files", isAuthenticated, async (req: any, res) => {
+    const userId = extractUserId(req, res);
+    if (!userId) return;
+    if (!assertValidUUID(req.params.id, res)) return;
+    const { id } = req.params;
+    try {
+      // L6: confirm the kelola doc belongs to the user before returning anything
+      const { rows: own } = await pool.query(
+        `SELECT id FROM ruang_kelola_documents WHERE id = $1 AND user_id = $2`, [id, userId]
+      );
+      if (!own.length) return res.status(403).json({ error: "Dokumen tidak ditemukan atau akses ditolak" });
+
+      const { rows } = await pool.query(
+        `SELECT f.id, f.original_name, f.mime_type, f.size_bytes, f.kb_status,
+                f.kb_chunk_count, f.doc_status, f.created_at
+         FROM ruang_simpan_files f
+         WHERE f.kelola_doc_id = $1 AND f.user_id = $2
+         ORDER BY f.created_at DESC`,
+        [id, userId]
+      );
+      res.json(rows);
+    } catch (e) { safeError(res, e, "GET documents/:id/files"); }
+  });
+
+  // ── GET /api/ruang-kelola/simpan-files ─────────────────────── L3
+  // Lightweight RS file list for the link picker (no binary data).
+  app.get("/api/ruang-kelola/simpan-files", isAuthenticated, async (req: any, res) => {
+    const userId = extractUserId(req, res);
+    if (!userId) return;
+    try {
+      const { rows } = await pool.query(
+        `SELECT f.id, f.original_name, f.mime_type, f.size_bytes, f.kb_status,
+                f.kelola_doc_id, f.created_at,
+                fo.name AS folder_name
+         FROM ruang_simpan_files f
+         LEFT JOIN ruang_simpan_folders fo ON fo.id = f.folder_id
+         WHERE f.user_id = $1
+         ORDER BY f.created_at DESC
+         LIMIT 200`,
+        [userId]
+      );
+      res.json(rows);
+    } catch (e) { safeError(res, e, "GET simpan-files"); }
   });
 
   // ── POST /api/ruang-kelola/documents ────────────────────────────── L1,L3,L5,L8

@@ -18,6 +18,7 @@ import {
   Bell, Search, RefreshCw, ScanLine, Upload, Sparkles,
   PhoneCall, Send, Check, ArrowRight, Lock, CalendarClock,
   BrainCircuit, Smartphone, HardDrive, BadgeCheck, Wrench,
+  Paperclip, Link2, LinkIcon, Unlink, FolderOpen, ExternalLink,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useRef } from "react";
@@ -51,8 +52,20 @@ interface RKDocument {
   status: "active" | "expiring_soon" | "expired" | "in_progress" | "won" | "lost" | "cancelled";
   notes?: string;
   metadata?: Record<string, any>;
+  linked_file_count?: number;
   created_at: string;
   updated_at: string;
+}
+
+interface RSFilePicker {
+  id: string;
+  original_name: string;
+  mime_type: string;
+  size_bytes: number;
+  kb_status: string;
+  kelola_doc_id?: string | null;
+  folder_name?: string;
+  created_at: string;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -168,6 +181,8 @@ export default function RuangKelolaPage() {
   const [editDoc, setEditDoc] = useState<RKDocument | null>(null);
   const [showBiroDialog, setShowBiroDialog] = useState(false);
   const [biroDoc, setBiroDoc] = useState<RKDocument | null>(null);
+  const [showLinkedFiles, setShowLinkedFiles] = useState(false);
+  const [linkedFilesDoc, setLinkedFilesDoc] = useState<RKDocument | null>(null);
 
   // ── Queries ────────────────────────────────────────────────────────────
   const { data: profile, isLoading: profileLoading } = useQuery<RKProfile | null>({
@@ -439,6 +454,19 @@ export default function RuangKelolaPage() {
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <button
+                              onClick={() => { setLinkedFilesDoc(doc); setShowLinkedFiles(true); }}
+                              className={`p-1.5 rounded-lg transition-colors relative
+                                ${doc.linked_file_count ? "text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+                              title="File Terlampir dari Ruang Simpan"
+                            >
+                              <Paperclip className="h-3.5 w-3.5" />
+                              {(doc.linked_file_count ?? 0) > 0 && (
+                                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-blue-600 text-white rounded-full text-[9px] font-bold flex items-center justify-center leading-none">
+                                  {doc.linked_file_count}
+                                </span>
+                              )}
+                            </button>
+                            <button
                               onClick={() => { setEditDoc(doc); setShowDocForm(true); }}
                               className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
                               title="Edit"
@@ -559,6 +587,16 @@ export default function RuangKelolaPage() {
         doc={biroDoc}
         companyName={profile?.company_name}
       />
+
+      {/* ── Linked Files Dialog ── */}
+      {linkedFilesDoc && (
+        <LinkedFilesDialog
+          open={showLinkedFiles}
+          onClose={() => { setShowLinkedFiles(false); setLinkedFilesDoc(null); }}
+          doc={linkedFilesDoc}
+          onChanged={() => qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/documents"] })}
+        />
+      )}
     </div>
   );
 }
@@ -915,6 +953,219 @@ function DocFormDialog({ open, onClose, doc, defaultCategory, onSave, isSaving }
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             {doc ? "Simpan Perubahan" : "Tambah Dokumen"}
           </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ── Linked Files Dialog ────────────────────────────────────────────────────
+function LinkedFilesDialog({ open, onClose, doc, onChanged }: {
+  open: boolean; onClose: () => void;
+  doc: RKDocument;
+  onChanged: () => void;
+}) {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const [pickerSearch, setPickerSearch] = useState("");
+  const [linking, setLinking] = useState<string | null>(null);
+  const [unlinking, setUnlinking] = useState<string | null>(null);
+
+  // Files already linked to this doc
+  const { data: linked = [], refetch: refetchLinked, isLoading: linkedLoading } = useQuery<RSFilePicker[]>({
+    queryKey: ["/api/ruang-kelola/documents", doc.id, "files"],
+    queryFn: () => fetch(`/api/ruang-kelola/documents/${doc.id}/files`).then(r => r.json()),
+    enabled: open,
+  });
+
+  // All RS files for the picker
+  const { data: allFiles = [], isLoading: allLoading } = useQuery<RSFilePicker[]>({
+    queryKey: ["/api/ruang-kelola/simpan-files"],
+    queryFn: () => fetch("/api/ruang-kelola/simpan-files").then(r => r.json()),
+    enabled: open,
+  });
+
+  const linkedIds = new Set(linked.map(f => f.id));
+
+  // Available = not yet linked to THIS doc, regardless of whether linked to another
+  const available = allFiles.filter(f =>
+    !linkedIds.has(f.id) &&
+    (pickerSearch === "" ||
+      f.original_name.toLowerCase().includes(pickerSearch.toLowerCase()) ||
+      (f.folder_name || "").toLowerCase().includes(pickerSearch.toLowerCase()))
+  );
+
+  const doLink = async (fileId: string) => {
+    setLinking(fileId);
+    try {
+      const r = await fetch(`/api/ruang-simpan/files/${fileId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kelola_doc_id: doc.id }),
+      });
+      if (!r.ok) throw new Error((await r.json()).error || "Gagal");
+      await refetchLinked();
+      qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/simpan-files"] });
+      onChanged();
+      toast({ title: "File berhasil dihubungkan" });
+    } catch (e: any) {
+      toast({ title: "Gagal menghubungkan file", description: e.message, variant: "destructive" });
+    } finally { setLinking(null); }
+  };
+
+  const doUnlink = async (fileId: string) => {
+    setUnlinking(fileId);
+    try {
+      const r = await fetch(`/api/ruang-simpan/files/${fileId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kelola_doc_id: null }),
+      });
+      if (!r.ok) throw new Error((await r.json()).error || "Gagal");
+      await refetchLinked();
+      qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/simpan-files"] });
+      onChanged();
+      toast({ title: "File berhasil dilepas dari dokumen ini" });
+    } catch (e: any) {
+      toast({ title: "Gagal melepas file", description: e.message, variant: "destructive" });
+    } finally { setUnlinking(null); }
+  };
+
+  const mimeLabel = (m: string) => {
+    if (m === "application/pdf") return "PDF";
+    if (m.startsWith("image/")) return "Gambar";
+    if (m.includes("word")) return "Word";
+    if (m.includes("sheet") || m.includes("excel")) return "Excel";
+    return "File";
+  };
+
+  const fmtSize = (b: number) => b >= 1e6 ? `${(b/1e6).toFixed(1)} MB` : `${Math.round(b/1024)} KB`;
+
+  return (
+    <Dialog open={open} onOpenChange={v => !v && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-base">
+            <Paperclip className="h-4 w-4 text-blue-600" />
+            File Terlampir — {doc.doc_name}
+          </DialogTitle>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Hubungkan file dari Ruang Simpan ke dokumen ini sebagai arsip digitalnya.
+          </p>
+        </DialogHeader>
+
+        {/* ── Currently linked ── */}
+        <div className="space-y-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            Terlampir ({linked.length})
+          </p>
+          {linkedLoading ? (
+            <div className="flex items-center gap-2 py-3 text-muted-foreground text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" /> Memuat...
+            </div>
+          ) : linked.length === 0 ? (
+            <div className="border border-dashed border-border rounded-xl py-6 text-center text-sm text-muted-foreground">
+              <FolderOpen className="h-7 w-7 mx-auto mb-2 opacity-40" />
+              Belum ada file terlampir.
+            </div>
+          ) : (
+            <div className="space-y-1.5">
+              {linked.map(f => (
+                <div key={f.id} className="flex items-center gap-3 bg-muted/40 rounded-lg px-3 py-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                    <HardDrive className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{f.original_name}</p>
+                    <p className="text-[11px] text-muted-foreground">{mimeLabel(f.mime_type)} · {fmtSize(f.size_bytes)}</p>
+                  </div>
+                  <a
+                    href="/ruang-simpan"
+                    className="p-1.5 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+                    title="Buka di Ruang Simpan"
+                    target="_blank" rel="noopener noreferrer"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                  <button
+                    onClick={() => doUnlink(f.id)}
+                    disabled={unlinking === f.id}
+                    className="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors text-muted-foreground hover:text-red-600"
+                    title="Lepas dari dokumen ini"
+                  >
+                    {unlinking === f.id
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : <Unlink className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── Divider ── */}
+        <div className="border-t border-border pt-4">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Tambah dari Ruang Simpan
+          </p>
+
+          <div className="relative mb-2">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <input
+              value={pickerSearch}
+              onChange={e => setPickerSearch(e.target.value)}
+              placeholder="Cari nama file..."
+              className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-border bg-background outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          {allLoading ? (
+            <div className="flex items-center gap-2 py-3 text-muted-foreground text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" /> Memuat file...
+            </div>
+          ) : available.length === 0 ? (
+            <div className="py-4 text-center text-sm text-muted-foreground">
+              {allFiles.length === 0
+                ? <span>Belum ada file di Ruang Simpan. <a href="/ruang-simpan" className="underline text-blue-600">Upload file</a> terlebih dahulu.</span>
+                : "Semua file sudah terlampir atau tidak ditemukan."}
+            </div>
+          ) : (
+            <div className="space-y-1.5 max-h-52 overflow-y-auto pr-1">
+              {available.map(f => (
+                <div key={f.id} className="flex items-center gap-3 hover:bg-muted/40 rounded-lg px-3 py-2 transition-colors">
+                  <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <HardDrive className="h-3.5 w-3.5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm truncate">{f.original_name}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {mimeLabel(f.mime_type)} · {fmtSize(f.size_bytes)}
+                      {f.folder_name && ` · 📁 ${f.folder_name}`}
+                      {f.kelola_doc_id && f.kelola_doc_id !== doc.id && (
+                        <span className="ml-1 text-amber-600">· sudah terhubung ke dok lain</span>
+                      )}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-1 text-xs h-7 px-2 shrink-0"
+                    onClick={() => doLink(f.id)}
+                    disabled={linking === f.id}
+                  >
+                    {linking === f.id
+                      ? <Loader2 className="h-3 w-3 animate-spin" />
+                      : <LinkIcon className="h-3 w-3" />}
+                    Hubungkan
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Tutup</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
