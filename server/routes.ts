@@ -17435,9 +17435,18 @@ Return JSON format:
         return res.status(404).json({ error: "Landing page not found" });
       }
       const slug = (agent as any).slug || slugify(agent.name);
+
+      // Cek apakah produk ini Gustafta Official via store_products
+      const spRes = await pool.query<{ is_gustafta: boolean }>(
+        `SELECT is_gustafta FROM store_products WHERE agent_id = $1 AND is_active = true LIMIT 1`,
+        [agent.id]
+      );
+      const isGustafta = spRes.rows[0]?.is_gustafta === true;
+
       res.json({
         id: agent.id,
         slug,
+        isGustafta,
         name: agent.name,
         tagline: (agent as any).tagline || "",
         description: agent.description,

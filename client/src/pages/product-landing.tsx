@@ -13,6 +13,7 @@ import {
   CheckCircle,
   Star,
   Shield,
+  ShieldCheck,
   Award,
   ArrowRight,
   Bot,
@@ -362,6 +363,19 @@ export default function ProductLanding() {
               </div>
             )}
 
+            {agent.isGustafta && (
+              <div className="flex justify-center mb-4">
+                <Badge
+                  className="bg-violet-600 text-white border-violet-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                  data-testid={`badge-gustafta-official-${agent.id}`}
+                  title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin."
+                >
+                  <ShieldCheck className="h-3 w-3" />
+                  Gustafta Official
+                </Badge>
+              </div>
+            )}
+
             <h1
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white"
               data-testid="text-hero-headline"
@@ -634,6 +648,19 @@ export default function ProductLanding() {
         <section className="py-16 md:py-20 bg-muted/50">
           <div className="container mx-auto px-4">
             <SectionHeader title="Pilih Paket yang Tepat" />
+
+            {agent.isGustafta && (
+              <div className="flex justify-center mb-6">
+                <Badge
+                  className="bg-violet-600 text-white border-violet-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                  data-testid={`badge-beli-gustafta-official-${agent.id}`}
+                  title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin."
+                >
+                  <ShieldCheck className="h-3 w-3" />
+                  Gustafta Official
+                </Badge>
+              </div>
+            )}
 
             {conversionOffers.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
