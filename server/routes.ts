@@ -3265,6 +3265,107 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
     }
   });
 
+  // Import file dari Ruang Simpan ke KB Agent
+  app.post("/api/knowledge-base/from-ruang-simpan", isAuthenticated, async (req, res) => {
+    try {
+      const { agentId, simpanFileId } = req.body as { agentId: string; simpanFileId: string };
+      if (!agentId || !simpanFileId) {
+        return res.status(400).json({ error: "agentId dan simpanFileId diperlukan" });
+      }
+
+      // Auth: pastikan user bisa edit agent ini
+      const targetAgent = await storage.getAgent(agentId);
+      if (!targetAgent) return res.status(404).json({ error: "Agent tidak ditemukan" });
+      const authCheck = await assertCanMutateAgent(req, targetAgent);
+      if (!authCheck.ok) return res.status(authCheck.status).json({ error: authCheck.error });
+
+      const userId = (req.user as any)?.id || (req.user as any)?.claims?.sub;
+
+      // Ambil file dari Ruang Simpan milik user
+      const [rsFile] = await pool.query<{
+        id: string; original_name: string; mime_type: string; size_bytes: number;
+        extracted_text: string | null; kb_status: string;
+      }>(
+        `SELECT id, original_name, mime_type, size_bytes, extracted_text, kb_status
+         FROM ruang_simpan_files WHERE id = $1 AND user_id = $2 LIMIT 1`,
+        [simpanFileId, userId]
+      ).then(r => r.rows);
+
+      if (!rsFile) return res.status(404).json({ error: "File tidak ditemukan di Ruang Simpan" });
+
+      // Ambil teks — dari extracted_text atau fallback ke chunks
+      let extractedText = rsFile.extracted_text || "";
+      if (!extractedText.trim()) {
+        const chunksRes = await pool.query<{ content: string }>(
+          `SELECT content FROM ruang_simpan_chunks WHERE file_id = $1 ORDER BY chunk_index ASC`,
+          [rsFile.id]
+        );
+        extractedText = chunksRes.rows.map(r => r.content).join("\n\n");
+      }
+
+      // Tentukan fileType dari mime_type
+      const mimeToType: Record<string, string> = {
+        "application/pdf": "pdf",
+        "application/msword": "doc",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+        "application/vnd.ms-excel": "xls",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+        "application/vnd.ms-powerpoint": "ppt",
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation": "pptx",
+        "text/plain": "txt",
+        "image/jpeg": "jpeg", "image/png": "png", "image/gif": "gif", "image/webp": "webp",
+      };
+      const fileType = mimeToType[rsFile.mime_type] || "other";
+
+      // Buat KB entry
+      const kb = await storage.createKnowledgeBase({
+        agentId,
+        name: rsFile.original_name.replace(/\.[^/.]+$/, ""),
+        type: "file" as const,
+        content: extractedText || `[File: ${rsFile.original_name}]`,
+        description: `Diimpor dari Ruang Simpan (${rsFile.original_name})`,
+        fileName: rsFile.original_name,
+        fileSize: Number(rsFile.size_bytes),
+        fileType: fileType as any,
+        fileUrl: `/api/ruang-simpan/file/${rsFile.id}/download`,
+        processingStatus: "processing" as const,
+        extractedText: extractedText || "",
+        knowledgeLayer: "operational",
+        simpanFileId: rsFile.id,
+      } as any);
+
+      res.json({ ok: true, kb });
+
+      // RAG processing async
+      (async () => {
+        try {
+          const textForRag = extractedText.trim();
+          if (textForRag.length > 0) {
+            await storage.deleteChunksByKnowledgeBase(kb.id);
+            const agentForRag = await storage.getAgent(agentId);
+            const chunks = await processKnowledgeBaseForRAG(
+              parseInt(kb.id),
+              parseInt(agentId),
+              textForRag,
+              kb.name,
+              agentForRag?.ragChunkSize ?? 800,
+              agentForRag?.ragChunkOverlap ?? 200
+            );
+            if (chunks.length > 0) await storage.createChunks(chunks);
+          }
+          await storage.updateKnowledgeBase(kb.id, { processingStatus: "completed" });
+          console.log(`[KB/from-rs] "${kb.name}" → ${extractedText.length} chars, RAG selesai`);
+        } catch (ragErr) {
+          console.error(`[KB/from-rs] RAG gagal:`, ragErr);
+          await storage.updateKnowledgeBase(kb.id, { processingStatus: "completed" });
+        }
+      })();
+    } catch (error) {
+      console.error("[KB/from-rs] Error:", error);
+      res.status(500).json({ error: "Gagal mengimpor file dari Ruang Simpan" });
+    }
+  });
+
   // Upload file for knowledge base
   app.post("/api/knowledge-base/upload", isAuthenticated, upload.single("file"), async (req, res) => {
     try {

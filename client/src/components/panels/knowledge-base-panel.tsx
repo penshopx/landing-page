@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { BookOpen, Plus, FileText, Link, Type, Trash2, Search, Upload, File, Image as ImageIcon, Pencil, Brain, RefreshCw, Loader2, Settings2, RotateCcw, Power, ExternalLink, Youtube, Cloud, Music, Video, Globe } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { BookOpen, Plus, FileText, Link, Type, Trash2, Search, Upload, File, Image as ImageIcon, Pencil, Brain, RefreshCw, Loader2, Settings2, RotateCcw, Power, ExternalLink, Youtube, Cloud, Music, Video, Globe, FolderOpen } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { RSFilePicker, type RSPickerFile } from "@/components/rs-file-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -303,6 +304,8 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [ragSettingsOpen, setRagSettingsOpen] = useState(false);
+  const [rsPickerOpen, setRsPickerOpen] = useState(false);
+  const [rsImporting, setRsImporting] = useState(false);
   const [ragChunkSize, setRagChunkSize] = useState(agent.ragChunkSize ?? 800);
   const [ragChunkOverlap, setRagChunkOverlap] = useState(agent.ragChunkOverlap ?? 200);
   const [ragTopK, setRagTopK] = useState(agent.ragTopK ?? 5);
@@ -460,6 +463,30 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
         description: "Gagal mengupload file",
         variant: "destructive",
       });
+    }
+  };
+
+  // Handler: pilih file dari Ruang Simpan → import ke KB agent
+  const handleImportFromRS = async (file: RSPickerFile) => {
+    setRsImporting(true);
+    try {
+      const res = await fetch("/api/knowledge-base/from-ruang-simpan", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentId: agent.id, simpanFileId: file.id }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Gagal mengimpor file");
+      }
+      toast({ title: "File diimpor", description: `"${file.original_name}" berhasil ditambahkan ke Knowledge Base.` });
+      // Invalidate KB list
+      queryClient.invalidateQueries({ queryKey: ["/api/knowledge-base", agent.id] });
+    } catch (e: any) {
+      toast({ title: "Gagal impor", description: e.message, variant: "destructive" });
+    } finally {
+      setRsImporting(false);
     }
   };
 
@@ -1835,6 +1862,31 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
             Upload Dokumen
           </Button>
 
+          {/* Tombol: import dari Ruang Simpan langsung dari toolbar */}
+          <Button
+            variant="outline"
+            disabled={agent.ragEnabled === false || rsImporting}
+            onClick={() => setRsPickerOpen(true)}
+            data-testid="button-kb-from-rs-toolbar"
+            className="border-blue-200 text-blue-700 hover:bg-blue-50"
+          >
+            {rsImporting ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <FolderOpen className="w-4 h-4 mr-2" />
+            )}
+            Dari Ruang Simpan
+          </Button>
+
+          {/* RS File Picker Dialog */}
+          <RSFilePicker
+            open={rsPickerOpen}
+            onOpenChange={setRsPickerOpen}
+            onSelect={handleImportFromRS}
+            title="Impor dari Ruang Simpan ke Knowledge Base"
+            description="Pilih dokumen yang sudah tersimpan di Ruang Simpan untuk langsung ditambahkan ke Knowledge Base agent ini."
+          />
+
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button disabled={agent.ragEnabled === false} data-testid="button-kb-add">
@@ -1922,9 +1974,21 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
                         <Upload className="w-10 h-10 mx-auto text-muted-foreground" />
                         <p className="text-sm text-muted-foreground">Drag & drop atau klik untuk upload</p>
                         <p className="text-xs text-muted-foreground">PDF, Word, Excel, PPT, TXT (Max 50MB)</p>
-                        <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending} data-testid="button-kb-pick-file">
-                          {uploadFile.isPending ? "Uploading..." : "Pilih Dokumen"}
-                        </Button>
+                        <div className="flex gap-2 justify-center flex-wrap">
+                          <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadFile.isPending} data-testid="button-kb-pick-file">
+                            {uploadFile.isPending ? "Uploading..." : "Pilih Dokumen"}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => setRsPickerOpen(true)}
+                            disabled={uploadFile.isPending}
+                            data-testid="button-kb-from-rs"
+                            className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                          >
+                            <FolderOpen className="w-4 h-4 mr-1.5" />
+                            Dari Ruang Simpan
+                          </Button>
+                        </div>
                       </div>
                     )}
                     <input ref={fileInputRef} type="file" className="hidden"
