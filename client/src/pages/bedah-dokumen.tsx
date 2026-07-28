@@ -17,8 +17,9 @@ import {
   AlertTriangle, Clock, CheckCircle2, XCircle, ChevronRight,
   Send, Loader2, FileSearch, Lock, Sparkles, RotateCcw,
   ListChecks, BookOpen, ShieldAlert, Lightbulb, Download, Package,
-  Scale, Copy, RefreshCw, TrendingUp,
+  Scale, Copy, RefreshCw, TrendingUp, FolderOpen,
 } from "lucide-react";
+import { RSFilePicker, type RSPickerFile } from "@/components/rs-file-picker";
 
 interface RegulasiNote {
   status_regulasi: string;
@@ -796,6 +797,8 @@ function UploadZone({ onUploaded, isFree, docCount }: {
 }) {
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [rsPickerOpen, setRsPickerOpen] = useState(false);
+  const [rsImporting, setRsImporting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -833,6 +836,29 @@ function UploadZone({ onUploaded, isFree, docCount }: {
     }
   };
 
+  const handleImportFromRS = async (file: RSPickerFile) => {
+    if (isFree && docCount >= 1) {
+      toast({ title: "Batas Gratis", description: "Hapus dokumen lama atau upgrade ke Starter untuk import lebih.", variant: "destructive" });
+      return;
+    }
+    setRsImporting(true);
+    try {
+      const resp = await fetch(`/api/bedah-dokumen/from-rs/${file.id}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || "Import gagal");
+      queryClient.invalidateQueries({ queryKey: ["/api/bedah-dokumen/my"] });
+      onUploaded(data.id);
+      toast({ title: "Dokumen diimpor", description: `"${file.original_name}" sedang dianalisis AI…` });
+    } catch (err: any) {
+      toast({ title: "Gagal impor", description: err.message, variant: "destructive" });
+    } finally {
+      setRsImporting(false);
+    }
+  };
+
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault(); setDragging(false);
     const file = e.dataTransfer.files[0];
@@ -846,43 +872,73 @@ function UploadZone({ onUploaded, isFree, docCount }: {
   };
 
   return (
-    <div
-      className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-colors cursor-pointer ${
-        dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-muted/30"
-      } ${uploading ? "pointer-events-none opacity-70" : ""}`}
-      onDragOver={e => { e.preventDefault(); setDragging(true); }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={onDrop}
-      onClick={() => inputRef.current?.click()}
-    >
-      <input ref={inputRef} type="file" accept=".pdf,.txt,.jpg,.jpeg,.png,.webp" className="hidden" onChange={onInputChange} />
-      {uploading ? (
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-sm font-medium">Mengunggah & menganalisis…</p>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Upload className="h-7 w-7 text-primary" />
-          </div>
-          <div>
-            <p className="font-semibold">Seret file ke sini atau klik untuk pilih</p>
-            <p className="text-sm text-muted-foreground mt-1">PDF · Gambar Teknis (JPG/PNG) · TXT • Maks. 50 MB</p>
-          </div>
-          <div className="flex gap-2 text-xs text-muted-foreground flex-wrap justify-center">
-            {["📋 Dokumen Tender", "🏗️ SKK/SBU", "📜 Kontrak", "📐 Gambar Teknis"].map(t => (
-              <span key={t} className="bg-muted/60 rounded-full px-2.5 py-1 border border-border/50">{t}</span>
-            ))}
-          </div>
-          {isFree && docCount >= 1 && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">
-              <Lock className="h-3 w-3" />Hapus dokumen lama atau upgrade untuk upload lebih
+    <>
+      <div
+        className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-colors cursor-pointer ${
+          dragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-muted/30"
+        } ${uploading || rsImporting ? "pointer-events-none opacity-70" : ""}`}
+        onDragOver={e => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDrop}
+        onClick={() => inputRef.current?.click()}
+      >
+        <input ref={inputRef} type="file" accept=".pdf,.txt,.jpg,.jpeg,.png,.webp" className="hidden" onChange={onInputChange} />
+        {uploading || rsImporting ? (
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <p className="text-sm font-medium">
+              {rsImporting ? "Mengimpor dari Ruang Simpan…" : "Mengunggah & menganalisis…"}
             </p>
-          )}
-        </div>
-      )}
-    </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Upload className="h-7 w-7 text-primary" />
+            </div>
+            <div>
+              <p className="font-semibold">Seret file ke sini atau klik untuk pilih</p>
+              <p className="text-sm text-muted-foreground mt-1">PDF · Gambar Teknis (JPG/PNG) · TXT • Maks. 50 MB</p>
+            </div>
+            <div className="flex gap-2 text-xs text-muted-foreground flex-wrap justify-center">
+              {["📋 Dokumen Tender", "🏗️ SKK/SBU", "📜 Kontrak", "📐 Gambar Teknis"].map(t => (
+                <span key={t} className="bg-muted/60 rounded-full px-2.5 py-1 border border-border/50">{t}</span>
+              ))}
+            </div>
+            {isFree && docCount >= 1 && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1 bg-amber-500/10 px-3 py-1.5 rounded-full border border-amber-500/20">
+                <Lock className="h-3 w-3" />Hapus dokumen lama atau upgrade untuk upload lebih
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Tombol alternatif: import dari Ruang Simpan */}
+      <div className="flex items-center gap-3 mt-2">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-xs text-muted-foreground">atau</span>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+      <Button
+        variant="outline"
+        className="w-full border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950"
+        onClick={() => setRsPickerOpen(true)}
+        disabled={uploading || rsImporting}
+        data-testid="button-bedah-from-rs"
+      >
+        <FolderOpen className="h-4 w-4 mr-2" />
+        Ambil dari Ruang Simpan
+      </Button>
+
+      <RSFilePicker
+        open={rsPickerOpen}
+        onOpenChange={setRsPickerOpen}
+        onSelect={handleImportFromRS}
+        title="Pilih dokumen dari Ruang Simpan"
+        description="Dokumen langsung dianalisis AI — tidak perlu upload ulang."
+        accept={["application/pdf", "text/plain", "image/"]}
+      />
+    </>
   );
 }
 

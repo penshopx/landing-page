@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Bot, Loader2, ArrowLeft, MessageCircle, ChevronRight, Lock, CreditCard, Download, Smartphone, Mic, MicOff, Volume2, VolumeX, Paperclip, X, FileText, Image as ImageIcon, Music, Video, File, Share2, Copy, Check, FileDown, FileCode2, Trash2, Link2 } from "lucide-react";
+import { Send, Bot, Loader2, ArrowLeft, MessageCircle, ChevronRight, Lock, CreditCard, Download, Smartphone, Mic, MicOff, Volume2, VolumeX, Paperclip, X, FileText, Image as ImageIcon, Music, Video, File, Share2, Copy, Check, FileDown, FileCode2, Trash2, Link2, FolderOpen } from "lucide-react";
+import { RSFilePicker, type RSPickerFile } from "@/components/rs-file-picker";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -92,6 +93,7 @@ export default function ModulChat() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFiles, setPendingFiles] = useState<UploadedFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [rsPickerOpen, setRsPickerOpen] = useState(false);
 
   // Voice STT
   const [isListening, setIsListening] = useState(false);
@@ -145,6 +147,23 @@ export default function ModulChat() {
 
   const removePendingFile = (idx: number) => {
     setPendingFiles(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  const handleImportFromRS = async (file: RSPickerFile) => {
+    setIsUploading(true);
+    try {
+      const resp = await fetch(`/api/chat/from-rs/${file.id}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error || "Gagal mengimpor file");
+      setPendingFiles(prev => [...prev, data as UploadedFile]);
+    } catch (err: any) {
+      console.error("[modul-chat/from-rs]", err);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   // TTS speak
@@ -1086,6 +1105,28 @@ export default function ModulChat() {
           >
             <Paperclip className="w-5 h-5" />
           </Button>
+
+          {/* Tombol: ambil file dari Ruang Simpan */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setRsPickerOpen(true)}
+            disabled={isStreaming || isUploading}
+            className="shrink-0 text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
+            title="Ambil dari Ruang Simpan"
+            data-testid="button-from-rs"
+          >
+            <FolderOpen className="w-5 h-5" />
+          </Button>
+
+          {/* RS File Picker */}
+          <RSFilePicker
+            open={rsPickerOpen}
+            onOpenChange={setRsPickerOpen}
+            onSelect={handleImportFromRS}
+            title="Lampirkan file dari Ruang Simpan"
+            description="Dokumen dikirim sebagai konteks percakapan — AI akan membaca isinya."
+          />
 
           {/* Mic button */}
           {speechSupported && (

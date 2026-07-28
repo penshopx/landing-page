@@ -5135,6 +5135,88 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
+  // Import file dari Ruang Simpan ke chat context (salin ke /uploads/ agar processAttachmentsAndUrls bisa baca)
+  app.post("/api/chat/from-rs/:fileId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = getSessionUserId(req);
+      if (!userId) return res.status(401).json({ error: "Tidak terautentikasi" });
+
+      const rsFileRes = await pool.query<{
+        id: string; original_name: string; mime_type: string; size_bytes: number;
+        storage_key: string | null; file_content: Buffer | null; extracted_text: string | null;
+      }>(
+        `SELECT id, original_name, mime_type, size_bytes, storage_key, file_content, extracted_text
+         FROM ruang_simpan_files WHERE id = $1 AND user_id = $2 LIMIT 1`,
+        [req.params.fileId, userId]
+      );
+      const rsFile = rsFileRes.rows[0];
+      if (!rsFile) return res.status(404).json({ error: "File tidak ditemukan di Ruang Simpan" });
+
+      // Ambil bytes file
+      let buffer: Buffer | null = null;
+      if (rsFile.storage_key) {
+        try {
+          const { downloadFile } = await import("./lib/object-storage");
+          buffer = await downloadFile(rsFile.storage_key);
+        } catch (dlErr) {
+          console.warn("[chat/from-rs] Object Storage download gagal:", dlErr);
+        }
+      }
+      if (!buffer && rsFile.file_content) {
+        buffer = Buffer.isBuffer(rsFile.file_content)
+          ? rsFile.file_content
+          : Buffer.from(rsFile.file_content);
+      }
+
+      const ext = path.extname(rsFile.original_name).toLowerCase() || ".bin";
+      const imageExts = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+      const audioExts = [".mp3", ".wav", ".ogg", ".m4a", ".aac"];
+      const videoExts = [".mp4", ".webm", ".mov"];
+      const docExts   = [".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".csv"];
+
+      let category = "other";
+      if (imageExts.includes(ext)) category = "image";
+      else if (audioExts.includes(ext)) category = "audio";
+      else if (videoExts.includes(ext)) category = "video";
+      else if (docExts.includes(ext))   category = "document";
+
+      let fileUrl: string;
+
+      if (buffer) {
+        // Salin ke /uploads/ agar processAttachmentsAndUrls bisa baca via fs
+        const uploadsDir = path.join(process.cwd(), "uploads");
+        await import("fs/promises").then(fs => fs.mkdir(uploadsDir, { recursive: true }));
+        const safeFilename = `rs-${Date.now()}-${rsFile.original_name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+        const destPath = path.join(uploadsDir, safeFilename);
+        await import("fs/promises").then(fs => fs.writeFile(destPath, buffer!));
+        fileUrl = `/uploads/${safeFilename}`;
+      } else if (rsFile.extracted_text) {
+        // Fallback: simpan teks sebagai .txt
+        const uploadsDir = path.join(process.cwd(), "uploads");
+        await import("fs/promises").then(fs => fs.mkdir(uploadsDir, { recursive: true }));
+        const safeFilename = `rs-${Date.now()}-${rsFile.original_name.replace(/[^a-zA-Z0-9._-]/g, "_")}.txt`;
+        const destPath = path.join(uploadsDir, safeFilename);
+        await import("fs/promises").then(fs => fs.writeFile(destPath, rsFile.extracted_text!));
+        fileUrl = `/uploads/${safeFilename}`;
+        category = "document";
+      } else {
+        return res.status(400).json({ error: "File tidak memiliki konten yang bisa diproses. Pastikan file sudah selesai diproses AI di Ruang Simpan." });
+      }
+
+      res.json({
+        fileName: rsFile.original_name,
+        fileSize: Number(rsFile.size_bytes),
+        fileType: ext.replace(".", ""),
+        fileUrl,
+        category,
+        mimeType: rsFile.mime_type,
+      });
+    } catch (error) {
+      console.error("[chat/from-rs] Error:", error);
+      res.status(500).json({ error: "Gagal mengimpor file dari Ruang Simpan" });
+    }
+  });
+
   // Upload file in chat (no auth required for public chat)
   app.post("/api/chat/upload", upload.single("file"), async (req, res) => {
     try {
