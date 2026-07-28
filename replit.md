@@ -186,3 +186,12 @@ Setelah re-import dari GitHub, atur ulang secrets berikut via **Replit Secrets**
 | `TENDER_INGEST_KEY` | Relay SIRUP tender data |
 
 **Jika key pernah masuk git history** (pernah ada di `.replit [userenv.shared]`): rotate key tersebut di dashboard masing-masing — BREVO (`xkeysib-...`) dan Scalev (`sk_...`) — agar nilai lama di history git tidak bisa dipakai lagi.
+
+## 🗑️ Secrets yang sudah dihapus (jangan buat ulang)
+
+| Secret | Keterangan |
+|--------|-----------|
+| `MAYAR_API_KEY` | **DIHAPUS** — Mayar digantikan sepenuhnya oleh Scalev. Jika masih muncul di Replit Secrets, hapus manual. |
+| `MAYAR_WEBHOOK_SECRET` | **DIHAPUS** — Tidak pernah dipakai sejak migrasi ke Scalev. Jika masih muncul di Replit Secrets, hapus manual. |
+
+> Kolom `mayar_order_id` dan `mayar_payment_url` di tabel `subscriptions` **tetap ada** sebagai nama legacy — kolomnya masih aktif dipakai untuk menyimpan order ID dan payment URL Scalev. Lihat komentar di `server/db/schema.ts`.

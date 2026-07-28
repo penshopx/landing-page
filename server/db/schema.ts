@@ -190,7 +190,9 @@ export const subscriptions = pgTable("subscriptions", {
   userId: varchar("user_id", { length: 36 }).notNull(),
   planId: text("plan_id").notNull(),
   status: text("status").default("pending"),
+  // Legacy column name — now used as a generic order/transaction ID for any payment provider (Scalev, access codes, early-adopter grants, etc.)
   mayarOrderId: text("mayar_order_id"),
+  // Legacy column name — originally stored a Mayar checkout URL; retained for historical data. Mayar was replaced by Scalev.
   mayarPaymentUrl: text("mayar_payment_url"),
   amount: integer("amount").default(0),
   currency: text("currency").default("IDR"),
