@@ -49,6 +49,8 @@ interface AdminStats {
   activeUsers: number;
   pendingTrialRequests: number;
   activeSubscriptions: number;
+  totalCourses: number;
+  totalEnrollments: number;
 }
 
 interface AdminUser {
@@ -360,12 +362,17 @@ export default function AdminPage() {
         credentials: "include",
       });
       const data = await res.json();
+      if (res.status === 401) {
+        // Sesi habis — tunjukkan pesan dengan link login ulang
+        handle401Error(new Error("401 Unauthorized"), "Sesi habis", "Silakan login ulang dan simpan kembali.");
+        return;
+      }
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan");
       queryClient.invalidateQueries({ queryKey: ["/api/config/contact"] });
       setWaContactForm({ primary: "", secondary: "" });
       toast({ title: "✅ Nomor WhatsApp diperbarui!", description: `${data.primary} / ${data.secondary}` });
     } catch (e: any) {
-      toast({ title: "Error", description: e.message, variant: "destructive" });
+      handle401Error(e, "Error", e.message);
     } finally { setWaContactSaving(false); }
   }
 
@@ -377,7 +384,7 @@ export default function AdminPage() {
   const [editPaymentUrlValue, setEditPaymentUrlValue] = useState("");
   const [showProductForm, setShowProductForm] = useState(false);
   const [editProductDialog, setEditProductDialog] = useState<{ open: boolean; product: StoreProduct | null }>({ open: false, product: null });
-  const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true });
+  const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true, paymentUrl: "" });
 
   // ---- Queries ----
   const { data: meData, isError: meError, isLoading: meLoading } = useQuery<AdminMeData>({
@@ -837,6 +844,16 @@ export default function AdminPage() {
     retry: false,
   });
 
+  const [alertRecipientInput, setAlertRecipientInput] = useState("");
+  const saveAlertRecipientMutation = useMutation({
+    mutationFn: (email: string) => apiRequest("POST", "/api/admin/brevo-alert-recipient", { email }),
+    onSuccess: () => {
+      toast({ title: "✅ Penerima alert berhasil disimpan" });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/brevo-stats"] });
+    },
+    onError: (err: any) => handle401Error(err, "Gagal simpan", err?.message),
+  });
+
   const sendTestEmailMutation = useMutation({
     mutationFn: async (to: string) => {
       const res = await apiRequest("POST", "/api/admin/email/send-test", { to });
@@ -1020,7 +1037,7 @@ export default function AdminPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <Card data-testid="stat-total-users">
             <CardContent className="pt-5">
               <div className="flex items-center justify-between">
@@ -1065,6 +1082,30 @@ export default function AdminPage() {
                   <p className="text-3xl font-bold mt-1 text-yellow-600">{statsLoading ? "—" : (stats?.pendingTrialRequests ?? 0)}</p>
                 </div>
                 <AlertCircle className="h-8 w-8 text-yellow-500 opacity-80" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card data-testid="stat-total-courses">
+            <CardContent className="pt-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Kursus Aktif</p>
+                  <p className="text-3xl font-bold mt-1 text-emerald-600">{statsLoading ? "—" : (stats?.totalCourses ?? 0)}</p>
+                </div>
+                <BookOpen className="h-8 w-8 text-emerald-500 opacity-80" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card data-testid="stat-total-enrollments">
+            <CardContent className="pt-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Total Enrollment</p>
+                  <p className="text-3xl font-bold mt-1 text-violet-600">{statsLoading ? "—" : (stats?.totalEnrollments ?? 0)}</p>
+                </div>
+                <GraduationCap className="h-8 w-8 text-violet-500 opacity-80" />
               </div>
             </CardContent>
           </Card>
@@ -1731,7 +1772,16 @@ export default function AdminPage() {
                         <RefreshCw className="h-4 w-4" />
                       </Button>
                       <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white gap-1"
-                        onClick={() => setShowProductForm(!showProductForm)}
+                        onClick={() => {
+                          if (!showProductForm) {
+                            // Auto-fill sort order: max existing + 10
+                            const maxOrder = orderedProducts.length > 0
+                              ? Math.max(...orderedProducts.map(p => p.sortOrder ?? 0))
+                              : 0;
+                            setProductForm(f => ({ ...f, sortOrder: String(maxOrder + 10) }));
+                          }
+                          setShowProductForm(!showProductForm);
+                        }}
                         data-testid="button-toggle-product-form">
                         <Plus className="h-4 w-4" /> {showProductForm ? "Tutup Form" : "Tambah Produk"}
                       </Button>
@@ -1868,6 +1918,7 @@ export default function AdminPage() {
                                     features: (p.features ?? []).join("\n"),
                                     sortOrder: String(p.sortOrder ?? 0),
                                     isActive: p.isActive,
+                                    paymentUrl: p.paymentUrl || "",
                                   });
                                   setEditProductDialog({ open: true, product: p });
                                 }}
@@ -2694,8 +2745,8 @@ export default function AdminPage() {
 
                   {/* Delivery stats */}
                   {brevoStats && (
-                    <div className="rounded-lg border bg-muted/30 p-4">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Delivery Stats (sesi ini)</p>
+                    <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Delivery Stats (kumulatif)</p>
                       <div className="grid grid-cols-4 gap-3 text-center">
                         <div>
                           <p className="text-lg font-bold text-green-600">{brevoStats.delivered}</p>
@@ -2714,7 +2765,35 @@ export default function AdminPage() {
                           <p className="text-xs text-muted-foreground">Bounce rate</p>
                         </div>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">{brevoStats.note}</p>
+                      <p className="text-xs text-muted-foreground">{brevoStats.note}</p>
+
+                      {/* Konfigurasi penerima alert bounce — Task #79 */}
+                      <div className="pt-2 border-t border-border/50">
+                        <p className="text-xs font-semibold text-muted-foreground mb-1">Penerima Alert Bounce</p>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Saat ini: <strong>{brevoStats.alertRecipient}</strong>
+                        </p>
+                        <div className="flex gap-2">
+                          <Input
+                            type="email"
+                            placeholder={brevoStats.alertRecipient}
+                            value={alertRecipientInput}
+                            onChange={e => setAlertRecipientInput(e.target.value)}
+                            className="text-sm h-8"
+                            data-testid="input-bounce-alert-recipient"
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 shrink-0"
+                            disabled={saveAlertRecipientMutation.isPending || !alertRecipientInput.includes("@")}
+                            onClick={() => saveAlertRecipientMutation.mutate(alertRecipientInput.trim())}
+                            data-testid="button-save-bounce-alert-recipient"
+                          >
+                            {saveAlertRecipientMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : "Simpan"}
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -3596,6 +3675,16 @@ Selamat menggunakan! 🚀
                 data-testid="input-edit-product-features" />
               <p className="text-xs text-muted-foreground mt-1">Setiap baris menjadi satu poin fitur di halaman store.</p>
             </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Link Pembayaran (opsional)</label>
+              <Input
+                value={editProductForm.paymentUrl}
+                onChange={(e) => setEditProductForm(f => ({ ...f, paymentUrl: e.target.value }))}
+                placeholder="https://mayar.id/... atau link Scalev"
+                data-testid="input-edit-product-payment-url"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Jika diisi, tombol Beli di halaman produk akan mengarah ke link ini langsung.</p>
+            </div>
             <div className="sm:col-span-2 flex items-center gap-3">
               <label className="text-xs font-medium text-muted-foreground">Status</label>
               <button
@@ -3630,6 +3719,7 @@ Selamat menggunakan! 🚀
                     features: featuresArr,
                     sortOrder: Number(editProductForm.sortOrder) || 0,
                     isActive: editProductForm.isActive,
+                    paymentUrl: editProductForm.paymentUrl || "",
                   },
                 });
               }}

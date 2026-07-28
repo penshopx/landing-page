@@ -492,6 +492,17 @@ for (const envVar of requiredEnvVars) {
 
   await registerRoutes(httpServer, app);
 
+  // ── Boot-time channel health check ──────────────────────────────────────────
+  if (!process.env.BREVO_API_KEY) {
+    console.warn(
+      `${new Date().toLocaleTimeString()} [Email] ⚠️  BREVO_API_KEY tidak terkonfigurasi — ` +
+      `semua pengiriman email (OTP, notifikasi, Tender Alert) akan GAGAL DIAM-DIAM. ` +
+      `Tambahkan secret BREVO_API_KEY di Replit Secrets.`
+    );
+  } else {
+    console.log(`${new Date().toLocaleTimeString()} [Email] ✓ BREVO_API_KEY terkonfigurasi`);
+  }
+
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";

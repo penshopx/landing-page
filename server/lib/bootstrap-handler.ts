@@ -30,9 +30,24 @@ export function makeBootstrapHandler(db: BootstrapDb) {
         return;
       }
       const expected = expectedRaw.trim();
+
+      // Tolak jika token di env terlalu pendek — hindari token trivial seperti "123"
+      if (expected.length < 16) {
+        res.status(503).json({ error: "BOOTSTRAP_ADMIN_TOKEN terlalu pendek — minimal 16 karakter untuk keamanan." });
+        return;
+      }
+
       const providedRaw: string = req.header("x-bootstrap-token") || "";
       const provided = providedRaw.trim();
-      if (!provided || provided !== expected) {
+      if (!provided) {
+        res.status(401).json({ error: "Header x-bootstrap-token wajib disertakan" });
+        return;
+      }
+      if (provided.length < 16) {
+        res.status(401).json({ error: "Token terlalu pendek — minimal 16 karakter" });
+        return;
+      }
+      if (provided !== expected) {
         res.status(401).json({ error: "Token tidak valid" });
         return;
       }

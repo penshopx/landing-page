@@ -29,6 +29,8 @@ import {
   type MiniApp,
   type MiniAppType,
   insertResearchReportSchema,
+  lmsCourses,
+  lmsEnrollments,
 } from "@shared/schema";
 import { priceForClass, isPremiumClass, resolveLicensePrice, DEFAULT_LICENSE_PRICE } from "@shared/premium-classes";
 import { formatTeamPlansForPrompt, parseTierNumber, tierPlanToTimAgen } from "@shared/team-blueprints";
@@ -18712,15 +18714,28 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   // ==================== ADMIN: DASHBOARD STATS ====================
   app.get("/api/admin/stats", isAuthenticated, requireAdmin, async (req: any, res: any) => {
     try {
-      const [totalUsersRow] = await db.select({ count: sqlExpr<number>`count(*)::int` }).from(users);
-      const [activeUsersRow] = await db.select({ count: sqlExpr<number>`count(*)::int` }).from(users).where(eq(users.isActive, true));
-      const [pendingTrialRow] = await db.select({ count: sqlExpr<number>`count(*)::int` }).from(trialRequests).where(eq(trialRequests.status, "pending"));
-      const [activeSubRow] = await db.select({ count: sqlExpr<number>`count(*)::int` }).from(subscriptionsTable).where(eq(subscriptionsTable.status, "active"));
+      const [
+        [totalUsersRow],
+        [activeUsersRow],
+        [pendingTrialRow],
+        [activeSubRow],
+        [totalCoursesRow],
+        [totalEnrollmentsRow],
+      ] = await Promise.all([
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(users),
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(users).where(eq(users.isActive, true)),
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(trialRequests).where(eq(trialRequests.status, "pending")),
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(subscriptionsTable).where(eq(subscriptionsTable.status, "active")),
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(lmsCourses).where(eq(lmsCourses.isActive, true)),
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(lmsEnrollments),
+      ]);
       res.json({
         totalUsers: totalUsersRow.count,
         activeUsers: activeUsersRow.count,
         pendingTrialRequests: pendingTrialRow.count,
         activeSubscriptions: activeSubRow.count,
+        totalCourses: totalCoursesRow.count,
+        totalEnrollments: totalEnrollmentsRow.count,
       });
     } catch (error: any) {
       console.error("Admin stats error:", error);
@@ -20402,9 +20417,39 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   //   URL: https://<your-domain>/api/webhooks/brevo
   //   Events: delivered, soft_bounce, hard_bounce, spam, invalid_email, deferred
   //
-  // In-memory bounce tracker (resets on server restart — for alerting purposes only).
-  // For persistent storage, promote this to a DB table.
+  // Bounce tracker — persisted di system_config agar tidak hilang saat redeploy.
+  // Key: "email_bounce_stats" → JSON { delivered, bounced, spam, lastAlertAt }
   const _brevoStats = { delivered: 0, bounced: 0, spam: 0, lastAlertAt: 0 };
+
+  // Load snapshot awal dari DB saat routes terdaftar
+  (async () => {
+    try {
+      const rows = await db.select({ value: systemConfig.value })
+        .from(systemConfig).where(eq(systemConfig.key, "email_bounce_stats")).limit(1);
+      if (rows[0]?.value) {
+        const saved = JSON.parse(rows[0].value);
+        _brevoStats.delivered   = saved.delivered   ?? 0;
+        _brevoStats.bounced     = saved.bounced      ?? 0;
+        _brevoStats.spam        = saved.spam         ?? 0;
+        _brevoStats.lastAlertAt = saved.lastAlertAt  ?? 0;
+        console.log("[Brevo] Bounce stats dimuat dari DB:", _brevoStats);
+      }
+    } catch (e) { /* non-fatal, mulai dari 0 */ }
+  })();
+
+  async function _persistBrevoStats() {
+    try {
+      const payload = JSON.stringify({
+        delivered:   _brevoStats.delivered,
+        bounced:     _brevoStats.bounced,
+        spam:        _brevoStats.spam,
+        lastAlertAt: _brevoStats.lastAlertAt,
+        savedAt:     Date.now(),
+      });
+      await db.insert(systemConfig).values({ key: "email_bounce_stats", value: payload })
+        .onConflictDoUpdate({ target: systemConfig.key, set: { value: payload } });
+    } catch (e) { /* non-fatal */ }
+  }
   const BREVO_BOUNCE_ALERT_THRESHOLD = 0.2; // alert if >20% bounce rate over a window
   const BREVO_BOUNCE_ALERT_WINDOW = 60 * 60 * 1000; // 1-hour cooldown between alerts
 
@@ -20447,8 +20492,13 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     // 2. Fallback: send admin email via Brevo
     try {
       const { sendEmail } = await import("./lib/email");
-      // Use support@ as the admin recipient — same address used in reply-to throughout the app.
-      const adminEmail = process.env.BREVO_ALERT_EMAIL || "support@gustafta.com";
+      // Recipient: configurable via system_config key "brevo_alert_email", fallback ke env/hardcode
+      let adminEmail = process.env.BREVO_ALERT_EMAIL || "support@gustafta.com";
+      try {
+        const cfgRows = await db.select({ value: systemConfig.value })
+          .from(systemConfig).where(eq(systemConfig.key, "brevo_alert_email")).limit(1);
+        if (cfgRows[0]?.value) adminEmail = cfgRows[0].value;
+      } catch { /* gunakan fallback */ }
       const htmlContent = `<!DOCTYPE html>
 <html lang="id">
 <head><meta charset="UTF-8"></head>
@@ -20548,14 +20598,15 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
             subject.toLowerCase().includes("verifikasi") ||
             subject.toLowerCase().includes("otp");
 
+          let _statsChanged = false;
           switch (event) {
             case "delivered":
-              _brevoStats.delivered++;
+              _brevoStats.delivered++; _statsChanged = true;
               console.log(`[Brevo] ✓ DELIVERED — to=${email} messageId=${messageId} tags=[${tags}] ts=${ts}`);
               break;
 
             case "hard_bounce":
-              _brevoStats.bounced++;
+              _brevoStats.bounced++; _statsChanged = true;
               console.error(
                 `[Brevo] ✗ HARD BOUNCE${isOtpEmail ? " [OTP EMAIL]" : ""} — ` +
                 `to=${email} reason="${reason}" messageId=${messageId} ts=${ts}`
@@ -20566,7 +20617,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               break;
 
             case "soft_bounce":
-              _brevoStats.bounced++;
+              _brevoStats.bounced++; _statsChanged = true;
               console.warn(
                 `[Brevo] ~ SOFT BOUNCE${isOtpEmail ? " [OTP EMAIL]" : ""} — ` +
                 `to=${email} reason="${reason}" messageId=${messageId} ts=${ts}`
@@ -20574,7 +20625,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               break;
 
             case "spam":
-              _brevoStats.spam++;
+              _brevoStats.spam++; _statsChanged = true;
               console.error(
                 `[Brevo] ⚠ SPAM REPORT${isOtpEmail ? " [OTP EMAIL]" : ""} — ` +
                 `to=${email} messageId=${messageId} ts=${ts}`
@@ -20582,7 +20633,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               break;
 
             case "invalid_email":
-              _brevoStats.bounced++;
+              _brevoStats.bounced++; _statsChanged = true;
               console.error(
                 `[Brevo] ✗ INVALID EMAIL${isOtpEmail ? " [OTP EMAIL]" : ""} — ` +
                 `to=${email} messageId=${messageId} ts=${ts}`
@@ -20606,6 +20657,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           }
 
           _checkBrevoAlerts();
+          if (_statsChanged) void _persistBrevoStats();
           processed++;
         } catch (evtErr: any) {
           // Isolate per-event failures so one bad payload doesn't drop the rest
@@ -20622,10 +20674,17 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     }
   });
 
-  // ── Admin: Brevo email delivery stats (current session) ──────────────────────
+  // ── Admin: Brevo email delivery stats (persisted across restarts) ──────────────
   app.get("/api/admin/brevo-stats", isAuthenticated, requireAdmin, async (_req: any, res: any) => {
     const total = _brevoStats.delivered + _brevoStats.bounced + _brevoStats.spam;
     const bounceRate = total > 0 ? ((_brevoStats.bounced + _brevoStats.spam) / total) : 0;
+    // Ambil konfigurasi alert recipient dari system_config
+    let alertRecipient = process.env.BREVO_ALERT_EMAIL || "support@gustafta.com";
+    try {
+      const cfgRows = await db.select({ value: systemConfig.value })
+        .from(systemConfig).where(eq(systemConfig.key, "brevo_alert_email")).limit(1);
+      if (cfgRows[0]?.value) alertRecipient = cfgRows[0].value;
+    } catch { /* gunakan fallback */ }
     res.json({
       delivered: _brevoStats.delivered,
       bounced: _brevoStats.bounced,
@@ -20633,8 +20692,20 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       total,
       bounceRatePct: Math.round(bounceRate * 1000) / 10,
       alertThresholdPct: Math.round(BREVO_BOUNCE_ALERT_THRESHOLD * 100),
-      note: "Stats are in-memory only and reset on server restart.",
+      alertRecipient,
+      note: "Stats dipersist di system_config dan bertahan melewati server restart.",
     });
+  });
+
+  // ── Admin: Update bounce alert recipient ─────────────────────────────────────
+  app.post("/api/admin/brevo-alert-recipient", isAuthenticated, requireAdmin, async (req: any, res: any) => {
+    const { email: recipientEmail } = req.body;
+    if (!recipientEmail || typeof recipientEmail !== "string" || !recipientEmail.includes("@")) {
+      return res.status(400).json({ error: "Email tidak valid" });
+    }
+    await db.insert(systemConfig).values({ key: "brevo_alert_email", value: recipientEmail.trim() })
+      .onConflictDoUpdate({ target: systemConfig.key, set: { value: recipientEmail.trim() } });
+    res.json({ ok: true, alertRecipient: recipientEmail.trim() });
   });
 
   // ── Admin: Check Brevo sender domain authentication status ───────────────────

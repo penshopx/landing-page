@@ -57,7 +57,7 @@ export interface ContactNumbers {
 export function useContactNumbers(): ContactNumbers {
   const { data } = useQuery<{ primary: string; secondary: string }>({
     queryKey: ["/api/config/contact"],
-    staleTime: 60 * 60 * 1000,      // 1 hour — reuse cached value
+    staleTime: 5 * 60 * 1000,        // 5 menit — cukup responsif saat admin rotasi nomor
     gcTime: 2 * 60 * 60 * 1000,     // evict from cache after 2 hours of disuse
     refetchOnWindowFocus: false,
   });

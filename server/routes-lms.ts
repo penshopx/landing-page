@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { db } from "./db";
 import { lmsCourses, lmsLessons, lmsEnrollments, lmsLessonProgress, lmsCertificates } from "@shared/schema";
-import { eq, and, asc, sql, count } from "drizzle-orm";
+import { eq, and, asc, sql, count, inArray } from "drizzle-orm";
 
 function generateCertCode(): string {
   const year = new Date().getFullYear();
@@ -389,6 +389,38 @@ async function seedLmsDataTracked() {
 export function registerLmsRoutes(app: Express) {
   seedLmsDataTracked();
 
+  // POST /api/admin/lms/courses/bulk-deactivate — nonaktifkan beberapa kursus sekaligus
+  app.post("/api/admin/lms/courses/bulk-deactivate", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const { ids } = req.body;
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: "Harus menyertakan array ids yang tidak kosong" });
+      }
+      const validIds = ids.map(Number).filter(n => !isNaN(n) && n > 0);
+      if (validIds.length === 0) {
+        return res.status(400).json({ error: "Tidak ada ID valid dalam array ids" });
+      }
+      await db.update(lmsCourses)
+        .set({ isActive: false, updatedAt: new Date() })
+        .where(inArray(lmsCourses.id, validIds));
+      res.json({ ok: true, deactivated: validIds.length, ids: validIds });
+    } catch (err: any) {
+      console.error("[LMS] Bulk deactivate error:", err?.message);
+      res.status(500).json({ error: "Gagal menonaktifkan kursus" });
+    }
+  });
+
+  // POST /api/admin/lms/reseed — trigger re-seed dari health dashboard (admin only)
+  app.post("/api/admin/lms/reseed", isAuthenticated, requireAdminLms, async (_req, res) => {
+    if (lmsSeedStatus === "pending") {
+      return res.status(409).json({ error: "Seeding sudah berjalan, tunggu selesai dulu." });
+    }
+    lmsSeedStatus = "pending";
+    // Jalankan async — jangan tunggu selesai agar response cepat
+    seedLmsDataTracked().catch(e => console.error("[LMS] Manual reseed error:", e));
+    res.json({ ok: true, message: "Reseed dimulai. Status akan berubah ke 'done' atau 'error' dalam beberapa detik." });
+  });
+
   // GET /api/lms/status — seeding status + course count (public, lightweight)
   app.get("/api/lms/status", async (_req, res) => {
     try {
@@ -482,8 +514,18 @@ export function registerLmsRoutes(app: Express) {
       const [existing] = await db.select().from(lmsEnrollments)
         .where(and(eq(lmsEnrollments.userId, userId), eq(lmsEnrollments.courseId, courseId)));
       if (existing) return res.json(existing);
+
+      // Jika student pernah punya sertifikat (enrollment dihapus manual oleh admin),
+      // jangan reset progress ke 0 — mulai dari 100 agar cert tetap konsisten.
+      const [existingCert] = await db.select({ id: lmsCertificates.id })
+        .from(lmsCertificates)
+        .where(and(eq(lmsCertificates.userId, userId), eq(lmsCertificates.courseId, courseId)));
+      const initialProgress = existingCert ? 100 : 0;
+      const initialCompletedAt = existingCert ? new Date() : undefined;
+
       const [enrollment] = await db.insert(lmsEnrollments)
-        .values({ userId, courseId, progress: 0 }).returning();
+        .values({ userId, courseId, progress: initialProgress, ...(initialCompletedAt ? { completedAt: initialCompletedAt } : {}) })
+        .returning();
       res.json(enrollment);
     } catch (e) {
       res.status(500).json({ error: "Gagal mendaftar kursus" });

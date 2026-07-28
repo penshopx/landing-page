@@ -923,9 +923,22 @@ function LmsHealthCard({
   onRefresh: () => void;
   updatedAt: number;
 }) {
+  const { toast } = useToast();
   const lastUpdated = updatedAt
     ? new Date(updatedAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
     : null;
+
+  const reseedMut = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/admin/lms/reseed"),
+    onSuccess: () => {
+      toast({ title: "Reseed dimulai", description: "Status akan berubah menjadi 'done' dalam beberapa detik." });
+      // Poll sampai seeding selesai
+      const interval = setInterval(() => onRefresh(), 2000);
+      setTimeout(() => clearInterval(interval), 30_000);
+      onRefresh();
+    },
+    onError: (e: any) => toast({ title: "Gagal reseed", description: e?.message || "Coba lagi.", variant: "destructive" }),
+  });
 
   return (
     <Card className="mb-6 border-2">
@@ -941,6 +954,21 @@ function LmsHealthCard({
           <div className="flex items-center gap-2">
             {lastUpdated && (
               <span className="text-xs text-muted-foreground">Diperbarui {lastUpdated}</span>
+            )}
+            {/* Tombol Re-seed — muncul saat error atau saat admin butuh force-refresh */}
+            {health && (health.seedStatus === "error" || health.seedStatus === "done") && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs gap-1"
+                onClick={() => reseedMut.mutate()}
+                disabled={reseedMut.isPending || health.seeding}
+                title="Jalankan ulang seed data kursus"
+                data-testid="button-lms-reseed"
+              >
+                <RefreshCw className={`w-3 h-3 ${reseedMut.isPending ? "animate-spin" : ""}`} />
+                {reseedMut.isPending ? "Memulai…" : "Re-seed"}
+              </Button>
             )}
             <Button
               variant="ghost"
@@ -1009,6 +1037,19 @@ export default function AdminAcademyPage() {
   const [localCourses, setLocalCourses] = useState<Course[]>([]);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [selectedCourseIds, setSelectedCourseIds] = useState<Set<number>>(new Set());
+
+  const bulkDeactivateMutation = useMutation({
+    mutationFn: (ids: number[]) =>
+      apiRequest("POST", "/api/admin/lms/courses/bulk-deactivate", { ids }),
+    onSuccess: (data: any) => {
+      toast({ title: `✅ ${data.deactivated} kursus dinonaktifkan` });
+      setSelectedCourseIds(new Set());
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+    },
+    onError: (e: any) =>
+      toast({ title: "Gagal menonaktifkan", description: e?.message, variant: "destructive" }),
+  });
 
   useEffect(() => {
     const prev = document.title;
@@ -1232,29 +1273,74 @@ export default function AdminAcademyPage() {
             </CardContent>
           </Card>
         ) : (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleCourseDragEnd}
-          >
-            <SortableContext
-              items={localCourses.map((c) => c.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                {localCourses.map((course) => (
-                  <SortableCourseCard
-                    key={course.id}
-                    course={course}
-                    expanded={expanded.has(course.id)}
-                    onToggle={() => toggleExpand(course.id)}
-                    onEdit={() => setCourseDialog({ open: true, initial: course })}
-                    onDelete={() => setDeleteCourse(course)}
-                  />
-                ))}
+          <>
+            {/* Bulk action toolbar — muncul saat ada kursus yang dipilih */}
+            {selectedCourseIds.size > 0 && (
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-muted/60 border rounded-lg text-sm">
+                <span className="font-medium">{selectedCourseIds.size} kursus dipilih</span>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="h-7 px-3 text-xs gap-1.5"
+                  disabled={bulkDeactivateMutation.isPending}
+                  onClick={() => bulkDeactivateMutation.mutate(Array.from(selectedCourseIds))}
+                  data-testid="button-bulk-deactivate"
+                >
+                  {bulkDeactivateMutation.isPending
+                    ? <><Loader2 className="h-3 w-3 animate-spin" /> Menonaktifkan...</>
+                    : <><EyeOff className="h-3 w-3" /> Nonaktifkan semua</>}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-3 text-xs"
+                  onClick={() => setSelectedCourseIds(new Set())}
+                >
+                  Batalkan pilihan
+                </Button>
               </div>
-            </SortableContext>
-          </DndContext>
+            )}
+
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleCourseDragEnd}
+            >
+              <SortableContext
+                items={localCourses.map((c) => c.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-3">
+                  {localCourses.map((course) => (
+                    <div key={course.id} className="flex items-start gap-2">
+                      <input
+                        type="checkbox"
+                        className="mt-5 h-4 w-4 rounded border-gray-300 cursor-pointer flex-shrink-0"
+                        checked={selectedCourseIds.has(course.id)}
+                        onChange={(e) => {
+                          setSelectedCourseIds(prev => {
+                            const next = new Set(prev);
+                            e.target.checked ? next.add(course.id) : next.delete(course.id);
+                            return next;
+                          });
+                        }}
+                        data-testid={`checkbox-course-${course.id}`}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <SortableCourseCard
+                          course={course}
+                          expanded={expanded.has(course.id)}
+                          onToggle={() => toggleExpand(course.id)}
+                          onEdit={() => setCourseDialog({ open: true, initial: course })}
+                          onDelete={() => setDeleteCourse(course)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </>
         )}
       </div>
 

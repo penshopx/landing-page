@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { BookOpen, Clock, Users, Star, ChevronRight, GraduationCap, Wrench, Zap, Search, Bot, ExternalLink, Play, Loader2, Award } from "lucide-react";
+import { BookOpen, Clock, Users, Star, ChevronRight, GraduationCap, Wrench, Zap, Search, Bot, ExternalLink, Play, Loader2, Award, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 
 interface Course {
   id: number;
@@ -86,8 +87,12 @@ function formatDuration(minutes: number) {
   return m > 0 ? `${h}j ${m}m` : `${h} jam`;
 }
 
-function CourseCard({ course }: { course: Course }) {
+function CourseCard({ course, enrollment }: { course: Course; enrollment?: MyEnrollment }) {
   const level = LEVEL_LABELS[course.level] || LEVEL_LABELS.beginner;
+  const isCompleted = !!enrollment?.completedAt;
+  const progress = enrollment?.progress ?? 0;
+  const isEnrolled = !!enrollment;
+
   return (
     <Link href={`/lms/course/${course.id}`}>
       <div
@@ -99,12 +104,17 @@ function CourseCard({ course }: { course: Course }) {
           <div className="flex items-start justify-between mb-3">
             <span className="text-3xl">{course.emoji}</span>
             <div className="flex flex-col items-end gap-1">
-              {course.isFeatured && (
+              {isCompleted ? (
+                <Badge className="text-xs bg-green-100 text-green-700 border-green-200 flex items-center gap-1" data-testid={`badge-completed-${course.id}`}>
+                  <CheckCircle2 className="w-2.5 h-2.5" />
+                  Selesai
+                </Badge>
+              ) : course.isFeatured ? (
                 <Badge className="text-xs bg-amber-100 text-amber-700 border-amber-200">
                   <Star className="w-2.5 h-2.5 mr-1" />
                   Unggulan
                 </Badge>
-              )}
+              ) : null}
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${level.color}`}>
                 {level.label}
               </span>
@@ -119,6 +129,23 @@ function CourseCard({ course }: { course: Course }) {
           <p className="text-sm text-slate-600 leading-relaxed flex-1 mb-4">
             {course.shortDesc}
           </p>
+
+          {/* Progress bar — tampil saat sudah enrollment */}
+          {isEnrolled && (
+            <div className="mb-3" data-testid={`progress-bar-${course.id}`}>
+              <div className="flex items-center justify-between text-xs mb-1">
+                <span className="text-slate-500">{isCompleted ? "Kursus selesai" : "Progres belajar"}</span>
+                <span className={`font-semibold ${isCompleted ? "text-green-600" : "text-indigo-600"}`}>
+                  {progress}%
+                </span>
+              </div>
+              <Progress
+                value={progress}
+                className={`h-1.5 ${isCompleted ? "[&>div]:bg-green-500" : "[&>div]:bg-indigo-500"}`}
+              />
+            </div>
+          )}
+
           <div className="flex items-center justify-between text-xs text-slate-400 border-t border-slate-100 pt-3 mt-auto">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1">
@@ -201,6 +228,13 @@ interface Certificate {
   certificateCode: string;
 }
 
+interface MyEnrollment {
+  courseId: number;
+  progress: number;
+  completedAt: string | null;
+  completedLessons: number[];
+}
+
 interface LmsStatus {
   seeding: boolean;
   seedStatus: "pending" | "done" | "error";
@@ -219,6 +253,15 @@ export default function LmsPage() {
     queryFn: () => fetch("/api/lms/certificates").then(r => r.ok ? r.json() : []),
     retry: false,
   });
+
+  const { data: myEnrollments = [] } = useQuery<MyEnrollment[]>({
+    queryKey: ["/api/lms/my-courses"],
+    queryFn: () => fetch("/api/lms/my-courses").then(r => r.ok ? r.json() : []),
+    retry: false,
+  });
+
+  // Map courseId → enrollment untuk lookup O(1)
+  const enrollmentMap = Object.fromEntries(myEnrollments.map(e => [e.courseId, e]));
 
   const { data: lmsStatus } = useQuery<LmsStatus>({
     queryKey: ["/api/lms/status"],
@@ -371,7 +414,7 @@ export default function LmsPage() {
                   <h2 className="font-bold text-slate-800">Kursus Unggulan</h2>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {featured.map(c => <CourseCard key={c.id} course={c} />)}
+                  {featured.map(c => <CourseCard key={c.id} course={c} enrollment={enrollmentMap[c.id]} />)}
                 </div>
               </section>
             )}
@@ -384,7 +427,7 @@ export default function LmsPage() {
                   </h2>
                 </div>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {regular.map(c => <CourseCard key={c.id} course={c} />)}
+                  {regular.map(c => <CourseCard key={c.id} course={c} enrollment={enrollmentMap[c.id]} />)}
                 </div>
               </section>
             )}
