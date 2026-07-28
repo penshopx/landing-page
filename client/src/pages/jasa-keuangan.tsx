@@ -8,9 +8,8 @@ import {
   Building2, Wallet, Receipt, ClipboardList, Zap, Users,
 } from "lucide-react";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20layanan%20Finance%20%26%20Tax%20Center`;
 
 function handleWaClick() {
   trackLead({ content_name: "Jasa Keuangan WA CTA" });
@@ -146,6 +145,8 @@ const HEALTH_SCORES = [
 ];
 
 export default function JasaKeuanganPage() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20layanan%20Finance%20%26%20Tax%20Center`;
   const { ctaUrl: builderUrl } = useTrialCTA();
 
   return (

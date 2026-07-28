@@ -8,14 +8,15 @@ import { Check, Gift, BookOpen, FileText, Video, Sparkles, ChevronRight } from "
 import { EBOOK_DIALOG } from "@/data/pricing";
 import coverFlat from "@assets/Monolog-_cover_1781287565935.jpg";
 import cover3D from "@assets/Buku_3D_1781288556255.png";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 const SCALEV_EBOOK = "https://bayar.gustafta.my.id/p/ebook-buku-i-dialog-gustafta";
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Ebook%20Buku%20I%20-%20DIALOG`;
 
 const BONUS_ICONS = [BookOpen, Sparkles, FileText, Video, Gift];
 
 export default function EbookDialog() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Ebook%20Buku%20I%20-%20DIALOG`;
   useEffect(() => {
     trackViewContent({ content_name: "Ebook Buku I DIALOG Landing", content_category: "Ebook" });
   }, []);

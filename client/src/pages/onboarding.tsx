@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +70,7 @@ const PLANS_TO_SHOW = ["starter", "profesional", "bisnis", "enterprise"] as cons
 type ShowPlan = (typeof PLANS_TO_SHOW)[number];
 
 export default function OnboardingPage() {
+  const contact = useContactNumbers();
   const { user, isAuthenticated } = useAuth();
   const { planInfo } = useFeatureAccess();
   const [, navigate] = useLocation();
@@ -79,7 +80,7 @@ export default function OnboardingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<"choose" | "confirm" | "success">("choose");
 
-  const WA = `https://wa.me/${WA_CONTACT_NUMBER_2}`;
+  const WA = `https://wa.me/${contact.secondary}`;
   const waMsg = (plan: string) => {
     trackLead({ content_name: "WhatsApp CTA" });
     return `${WA}?text=${encodeURIComponent(`Halo, saya ingin berlangganan Gustafta Apps paket ${PLAN_CONFIGS[plan as ShowPlan]?.name ?? plan}. User: ${user?.email ?? "-"}`)}`;

@@ -18,13 +18,12 @@ import {
 } from "lucide-react";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
 
-const WA_NUMBER = WA_CONTACT_NUMBER_2;
 
 function waMsg(topic: string) {
   trackLead({ content_name: "WhatsApp CTA" });
-  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Halo Gustafta, saya butuh bantuan onboarding: ${topic}`)}`;
+  return `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(`Halo Gustafta, saya butuh bantuan onboarding: ${topic}`)}`;
 }
 
 function CodeBlock({ code }: { code: string }) {

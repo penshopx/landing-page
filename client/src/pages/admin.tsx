@@ -1912,7 +1912,15 @@ export default function AdminPage() {
                                 <p className="font-medium text-sm truncate">{p.name}</p>
                                 <p className="text-xs text-muted-foreground">
                                   {p.category} ·{" "}
-                                  {p.computedPrice != null && p.computedPrice !== p.price ? (
+                                  {p.priceOverride != null ? (
+                                    <>
+                                      <span className="line-through text-muted-foreground/60">Rp {(p.computedPrice ?? p.price).toLocaleString("id-ID")}</span>
+                                      {" "}
+                                      <span className="text-orange-600 font-semibold">Rp {p.priceOverride.toLocaleString("id-ID")}</span>
+                                      {" "}
+                                      <span className="text-[10px] bg-orange-100 text-orange-700 px-1 py-0.5 rounded font-medium">override</span>
+                                    </>
+                                  ) : p.computedPrice != null && p.computedPrice !== p.price ? (
                                     <>
                                       <span className="line-through text-muted-foreground/60">Rp {p.price.toLocaleString("id-ID")}</span>
                                       {" "}

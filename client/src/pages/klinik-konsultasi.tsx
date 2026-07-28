@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
 import {
   Stethoscope, FileCheck2, Gavel, HardHat, Briefcase, Truck, Award, Building2,
   ArrowRight, MessageCircle, Headset, CheckCircle2, Clock, Sparkles, Bot,
@@ -231,6 +231,7 @@ function KlinikFeedbackForm() {
 }
 
 export default function KlinikKonsultasiPage() {
+  const contact = useContactNumbers();
   useEffect(() => {
     const prevTitle = document.title;
     document.title = "Klinik Konstruksi — Tanya AI Dulu, Operator Bila Perlu | Gustafta";

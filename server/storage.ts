@@ -493,6 +493,7 @@ export interface IStorage {
   // Scalev Mapping methods
   getScalevMappings(): Promise<ScalevMapping[]>;
   getScalevMappingByProductName(name: string): Promise<ScalevMapping | undefined>;
+  getScalevMappingByAgentId(agentId: number): Promise<ScalevMapping | undefined>;
   createScalevMapping(data: InsertScalevMapping): Promise<ScalevMapping>;
   updateScalevMapping(id: number, data: Partial<InsertScalevMapping>): Promise<ScalevMapping | undefined>;
   deleteScalevMapping(id: number): Promise<boolean>;
@@ -2605,6 +2606,7 @@ export class MemStorage implements IStorage {
   // Scalev Mapping stubs (MemStorage)
   async getScalevMappings(): Promise<ScalevMapping[]> { return []; }
   async getScalevMappingByProductName(_name: string): Promise<ScalevMapping | undefined> { return undefined; }
+  async getScalevMappingByAgentId(_agentId: number): Promise<ScalevMapping | undefined> { return undefined; }
   async createScalevMapping(data: InsertScalevMapping): Promise<ScalevMapping> {
     return { id: 1, ...data, type: data.type ?? "chatbot", agentId: data.agentId ?? null, bigIdeaId: data.bigIdeaId ?? null, label: data.label ?? "", createdAt: new Date() } as ScalevMapping;
   }

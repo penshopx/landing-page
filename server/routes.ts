@@ -7244,7 +7244,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       try {
         const { orderId } = req.params;
         const userId = req.user?.claims?.sub || "";
-        const sub = await storage.getSubscriptionByMayarOrderId(orderId);
+        const sub = await storage.getSubscriptionByScalevOrderId(orderId);
         if (!sub || sub.userId !== userId) {
           return res.status(404).json({ error: "Order not found" });
         }

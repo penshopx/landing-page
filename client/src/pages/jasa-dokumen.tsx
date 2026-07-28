@@ -8,9 +8,8 @@ import {
   Clock, Database, Bell, BarChart3, Zap, Building2, Users,
 } from "lucide-react";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20layanan%20pengurusan%20dokumen%20perusahaan`;
 
 function handleWaClick() {
   trackLead({ content_name: "Jasa Dokumen WA CTA" });
@@ -161,6 +160,8 @@ const JOURNEY = [
 ];
 
 export default function JasaDokumenPage() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20layanan%20pengurusan%20dokumen%20perusahaan`;
   const { ctaUrl: builderUrl } = useTrialCTA();
 
   return (

@@ -10,7 +10,7 @@ import {
   Smartphone, Code2, Globe, Zap, Package, BookOpen, AlertTriangle
 } from "lucide-react";
 import { useState } from "react";
-import { WA_CONTACT_LINK, WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 interface StoreAccessData {
   order: {
@@ -91,6 +91,7 @@ function rewriteDomainInCode(code: string | null | undefined): string | null {
 }
 
 export default function StoreAccess() {
+  const contact = useContactNumbers();
   const { token } = useParams<{ token: string }>();
   const [activeFormat, setActiveFormat] = useState<"chat" | "iframe" | "widget">("chat");
 
@@ -129,10 +130,10 @@ export default function StoreAccess() {
             </div>
           </div>
           <div className="flex items-center gap-3 text-sm text-gray-400">
-            <a href={WA_CONTACT_LINK} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
+            <a href={contact.link} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 hover:text-white transition-colors">
               <Smartphone className="h-4 w-4" />
-              <span className="hidden sm:inline">{WA_CONTACT_DISPLAY}</span>
+              <span className="hidden sm:inline">{contact.display}</span>
             </a>
           </div>
         </div>
@@ -409,16 +410,16 @@ export default function StoreAccess() {
                 <p className="text-gray-300 text-sm font-medium mb-1">Butuh bantuan pasang atau setup?</p>
                 <p className="text-gray-500 text-xs mb-3">Tim Gustafta siap bantu melalui WhatsApp.</p>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                  <a href={`https://wa.me/${WA_CONTACT_NUMBER}?text=Halo%2C%20saya%20baru%20beli%20chatbot%20dari%20Gustafta%20Store%20dan%20butuh%20bantuan%20pasang.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+                  <a href={`https://wa.me/${contact.primary}?text=Halo%2C%20saya%20baru%20beli%20chatbot%20dari%20Gustafta%20Store%20dan%20butuh%20bantuan%20pasang.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 w-full sm:w-auto" data-testid="button-wa-support-1">
                       <Smartphone className="h-4 w-4 mr-2" />
-                      WA {WA_CONTACT_DISPLAY}
+                      WA {contact.display}
                     </Button>
                   </a>
-                  <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20baru%20beli%20chatbot%20dari%20Gustafta%20Store%20dan%20butuh%20bantuan%20pasang.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+                  <a href={`https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20baru%20beli%20chatbot%20dari%20Gustafta%20Store%20dan%20butuh%20bantuan%20pasang.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
                     <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 w-full sm:w-auto" data-testid="button-wa-support-2">
                       <Smartphone className="h-4 w-4 mr-2" />
-                      WA {WA_CONTACT_DISPLAY_2}
+                      WA {contact.display2}
                     </Button>
                   </a>
                 </div>

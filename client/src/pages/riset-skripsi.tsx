@@ -10,8 +10,7 @@ import {
 } from "lucide-react";
 
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20solusi%20AI%20untuk%20riset%20dan%20skripsi`;
+import { useContactNumbers } from "@/lib/contact";
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }
@@ -103,6 +102,8 @@ const STAGES = [
 ];
 
 export default function RisetSkripsiPage() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20solusi%20AI%20untuk%20riset%20dan%20skripsi`;
   const { isAuthenticated } = useAuth();
   const { ctaUrl: builderUrl } = useTrialCTA();
 

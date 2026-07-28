@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { usePartnerBranding } from "@/hooks/use-partner-branding";
 type Mode = "choose" | "login" | "register" | "verify" | "forgot" | "reset";
 
 export default function LoginPage() {
+  const contact = useContactNumbers();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const { partner } = usePartnerBranding();
@@ -552,7 +553,7 @@ export default function LoginPage() {
                   <p className="text-xs text-muted-foreground pl-6">
                     Klik <span className="font-medium">"Kirim ulang kode OTP"</span> di bawah untuk mencoba lagi. Jika masalah berlanjut, hubungi{" "}
                     <a
-                      href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(`Halo, kode OTP saya gagal terkirim di ${partner?.brandName || "Gustafta"}`)}`}
+                      href={`https://wa.me/${contact.secondary}?text=${encodeURIComponent(`Halo, kode OTP saya gagal terkirim di ${partner?.brandName || "Gustafta"}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary underline"

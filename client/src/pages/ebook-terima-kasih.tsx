@@ -3,12 +3,13 @@ import { Link } from "wouter";
 import { CheckCircle2, Download, MessageCircle } from "lucide-react";
 import { EBOOK_DIALOG } from "@/data/pricing";
 import { trackCustomEvent } from "@/hooks/use-meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 const DOWNLOAD_URL = "/ebooks/trilogi-buku-1-dialog.pdf";
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20baru%20saja%20membeli%20Ebook%20Buku%20I%20-%20DIALOG`;
 
 export default function EbookTerimaKasih() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20baru%20saja%20membeli%20Ebook%20Buku%20I%20-%20DIALOG`;
   useEffect(() => {
     trackCustomEvent("Ebook_ThankYou_View", { source: "ebook-dialog" });
   }, []);

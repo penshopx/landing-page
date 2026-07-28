@@ -16,8 +16,7 @@ function openCheckout(e: { preventDefault: () => void }, url: string, label: str
 }
 
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20solusi%20AI%20untuk%20transisi%20energi%20dan%20lingkungan`;
+import { useContactNumbers } from "@/lib/contact";
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }
@@ -111,6 +110,8 @@ const colorStyles: Record<string, { bg: string; border: string; icon: string; ta
 };
 
 export default function TransisiEnergiPage() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20solusi%20AI%20untuk%20transisi%20energi%20dan%20lingkungan`;
   const { isAuthenticated } = useAuth();
   const { ctaUrl: builderUrl } = useTrialCTA();
 

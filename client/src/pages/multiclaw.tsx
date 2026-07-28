@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { Smartphone, LayoutGrid, ChevronRight, Star, Zap, Crown } from "lucide-react";
-import { WA_CONTACT_LINK } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 type PlanTier = "starter" | "profesional" | "bisnis";
 
@@ -186,6 +186,7 @@ const starterCount = CLAW_CATEGORIES.flatMap(c => c.items).filter(i => i.plan ==
 const proCount = CLAW_CATEGORIES.flatMap(c => c.items).filter(i => i.plan !== "bisnis").length;
 
 export default function MulticlawPage() {
+  const contact = useContactNumbers();
   return (
     <div className="min-h-screen bg-background">
       <SharedHeader />
@@ -281,7 +282,7 @@ export default function MulticlawPage() {
           <h2 className="text-xl font-bold mb-2">Tidak Menemukan Claw yang Anda Butuhkan?</h2>
           <p className="text-sm text-muted-foreground mb-5">Claw baru ditambahkan setiap bulan. Hubungi kami untuk request domain baru.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href={WA_CONTACT_LINK} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+            <a href={contact.link} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="gap-2 font-bold" data-testid="button-multiclaw-request-wa">
                 <Smartphone className="w-4 h-4" /> Request Claw Baru
               </Button>

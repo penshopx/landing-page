@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useRef } from "react";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type Category = "semua" | "legalitas" | "sbu" | "skk" | "perizinan" | "tender";
@@ -170,6 +170,7 @@ function formatDate(dateStr?: string) {
 
 // ── Main Component ─────────────────────────────────────────────────────────
 export default function RuangKelolaPage() {
+  const contact = useContactNumbers();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
@@ -1190,6 +1191,7 @@ function BiroJasaDialog({ open, onClose, doc, companyName }: {
   doc?: RKDocument | null;
   companyName?: string;
 }) {
+  const { secondary: waSecondary } = useContactNumbers();
   const { toast } = useToast();
   const [serviceType, setServiceType] = useState("");
   const [notes, setNotes] = useState("");
@@ -1235,7 +1237,7 @@ function BiroJasaDialog({ open, onClose, doc, companyName }: {
     (notes ? `💬 Catatan: ${notes}\n` : "") +
     `\nMohon info lebih lanjut. Terima kasih!`
   );
-  const waUrl = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${waMessage}`;
+  const waUrl = `https://wa.me/${waSecondary}?text=${waMessage}`;
 
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
@@ -1322,6 +1324,7 @@ function BiroJasaDialog({ open, onClose, doc, companyName }: {
 // ── Landing Page (unauthenticated) ────────────────────────────────────────────
 
 function RuangKelolaLandingPage() {
+  const { secondary: waSecondaryKelola } = useContactNumbers();
   const CATEGORIES = [
     { icon: Shield,      color: "text-blue-600 bg-blue-50 dark:bg-blue-900/20",      label: "Legalitas",   desc: "NIB, NPWP, Akta, SK Kemenkumham, PKP" },
     { icon: BadgeCheck,  color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20", label: "SBU",     desc: "Sertifikat Badan Usaha semua subklasifikasi" },
@@ -1529,7 +1532,7 @@ function RuangKelolaLandingPage() {
               <LogIn className="h-4 w-4" /> Daftar & Mulai Gratis
             </Button>
           </Link>
-          <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Kelola%20Gustafta`} target="_blank" rel="noopener noreferrer">
+          <a href={`https://wa.me/${waSecondaryKelola}?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Kelola%20Gustafta`} target="_blank" rel="noopener noreferrer">
             <Button size="lg" variant="outline" className="gap-2 border-white/30 text-white hover:bg-white/10">
               <PhoneCall className="h-4 w-4" /> Tanya via WhatsApp
             </Button>

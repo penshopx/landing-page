@@ -5,7 +5,7 @@ import { SharedHeader } from "@/components/shared-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2, useContactNumbers } from "@/lib/contact";
 import {
   ShoppingBag, CreditCard, Package, Building2,
   CheckCircle2, AlertCircle, ArrowRight, Copy,
@@ -493,6 +493,7 @@ function ProductCard({ product }: { product: Product }) {
 
 /* ── Page ───────────────────────────────── */
 export default function PanduanDeliveryPage() {
+  const contact = useContactNumbers();
   return (
     <div className="min-h-screen bg-background">
       <SharedHeader />
@@ -569,7 +570,7 @@ export default function PanduanDeliveryPage() {
                 Buka Admin Panel
               </Button>
             </Link>
-            <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20butuh%20bantuan%20delivery%20produk%20Gustafta.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20butuh%20bantuan%20delivery%20produk%20Gustafta.`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
               <Button className="gap-2 bg-green-600 hover:bg-green-700 text-white">
                 <MessageCircle className="h-4 w-4" />
                 WA Tim Teknis

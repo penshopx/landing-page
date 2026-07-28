@@ -14,13 +14,12 @@ import {
 } from "lucide-react";
 import { HOSTING_PERIODS, SERVICE_TIERS } from "@/data/pricing";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
 
-const WA_NUMBER = WA_CONTACT_NUMBER_2;
 
 function waLink(msg: string) {
   trackLead({ content_name: "WhatsApp CTA" });
-  return `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  return `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(msg)}`;
 }
 
 const SUBSCRIPTION_PLANS: Record<string, {

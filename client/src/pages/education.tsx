@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
@@ -173,6 +173,7 @@ const comparison = [
 ];
 
 export default function EducationPage() {
+  const contact = useContactNumbers();
   const [, navigate] = useLocation();
 
   return (

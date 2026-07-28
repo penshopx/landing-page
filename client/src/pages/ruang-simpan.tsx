@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { RUANG_SIMPAN_PLANS } from "@/data/pricing";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -162,6 +162,7 @@ function actionLabel(action: string): string {
 const ONBOARDING_KEY = "rs-onboarding-v1-dismissed";
 
 export default function RuangSimpanPage() {
+  const contact = useContactNumbers();
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
@@ -1607,6 +1608,7 @@ const PLAN_COLOR_MAP: Record<string, { badge: string; ring: string; btn: string;
 };
 
 function RuangSimpanLandingPage() {
+  const contact = useContactNumbers();
   return (
     <div className="min-h-screen bg-background">
       <SharedHeader />
@@ -1861,7 +1863,7 @@ function RuangSimpanLandingPage() {
               <LogIn className="h-4 w-4" /> Buat Akun Gratis
             </Button>
           </Link>
-          <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Simpan`} target="_blank" rel="noopener noreferrer">
+          <a href={`https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Ruang%20Simpan`} target="_blank" rel="noopener noreferrer">
             <Button size="lg" variant="outline" className="gap-2 border-white/30 text-white hover:bg-white/10">
               Tanya via WhatsApp
             </Button>

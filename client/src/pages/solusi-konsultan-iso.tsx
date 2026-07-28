@@ -3,13 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import {
   Check, ArrowRight, ClipboardList, MessageCircle, FileText,
   RefreshCw, Zap, Star, ChevronRight, BarChart3, AlertCircle, Users,
 } from "lucide-react";
 
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20konsultan%20ISO%20dan%20ingin%20tahu%20lebih%20lanjut%20tentang%20AI%20Specialist%20untuk%20bisnis%20saya`;
 
 const PAIN_POINTS = [
   {
@@ -112,6 +111,8 @@ const WORKFLOW = [
 ];
 
 export default function SolusiKonsultanISOPage() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20konsultan%20ISO%20dan%20ingin%20tahu%20lebih%20lanjut%20tentang%20AI%20Specialist%20untuk%20bisnis%20saya`;
   return (
     <div className="min-h-screen bg-white dark:bg-background">
       <SharedHeader />

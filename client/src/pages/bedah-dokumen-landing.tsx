@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import {
   Upload, FileSearch, CheckSquare, MessageSquare, ArrowRight,
   Zap, ShieldCheck, Clock, FileText, AlertTriangle, CheckCircle2,
@@ -137,6 +137,7 @@ const TESTIMONIALS = [
 ];
 
 export default function BedahDokumenLandingPage() {
+  const contact = useContactNumbers();
   const { isAuthenticated } = useAuth();
 
   return (
@@ -469,7 +470,7 @@ export default function BedahDokumenLandingPage() {
             Atau hubungi kami untuk <strong>konsultasi per kasus Rp 149.000</strong> jika hanya butuh sekali pakai
             {" · "}
             <a
-              href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20info%20bedah%20dokumen%20per%20kasus`}
+              href={`https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20info%20bedah%20dokumen%20per%20kasus`}
               className="underline underline-offset-2"
               onClick={() => trackLead({ content_name: "Bedah Dokumen Per Kasus WA" })}
             >
@@ -525,7 +526,7 @@ export default function BedahDokumenLandingPage() {
               </Button>
             </Link>
             <a
-              href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20tahu%20lebih%20tentang%20Bedah%20Dokumen%20AI`}
+              href={`https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20tahu%20lebih%20tentang%20Bedah%20Dokumen%20AI`}
               onClick={() => trackLead({ content_name: "Bedah Dokumen Footer WA" })}
             >
               <Button size="lg" variant="outline" className="gap-2 text-base px-8 py-6 rounded-2xl">

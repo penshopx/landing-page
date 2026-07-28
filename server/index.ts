@@ -717,13 +717,18 @@ for (const envVar of requiredEnvVars) {
             // a format that still doesn't match (e.g. country-code prefix other than
             // 0/8/62). Emit a clear WARNING so the operator knows to investigate.
             if (superPhones.length > 0) {
-              const checkRes: any = await rawDb.execute(rawSql`
-                SELECT COUNT(*)::int AS cnt
-                FROM users
-                WHERE role = 'superadmin'
-                  AND (${dbPhoneNormSql}) = ANY(${superPhones})
-              `);
-              const matchingAdmins: number = checkRes?.rows?.[0]?.cnt ?? 0;
+              // Check each phone individually — avoids passing a JS array to rawSql
+              // which drizzle serializes as a plain string, not a PG array literal.
+              let matchingAdmins = 0;
+              for (const sp of superPhones) {
+                const checkRes: any = await rawDb.execute(rawSql`
+                  SELECT COUNT(*)::int AS cnt
+                  FROM users
+                  WHERE role = 'superadmin'
+                    AND (${dbPhoneNormSql}) = ${sp}
+                `);
+                matchingAdmins += checkRes?.rows?.[0]?.cnt ?? 0;
+              }
               if (matchingAdmins === 0) {
                 log(`[SuperAdminBackfill] WARNING: SUPERADMIN_PHONE is set (${superPhones.join(", ")}) but NO superadmin row found with a matching normalised phone. The account may have been registered with a different phone format. Check the 'phone' column in the users table.`);
               }

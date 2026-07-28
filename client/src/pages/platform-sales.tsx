@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -318,6 +318,7 @@ const INCOME_STREAMS = [
 ];
 
 export default function PlatformSalesPage() {
+  const contact = useContactNumbers();
   const [activeTab, setActiveTab] = useState<"monthly" | "yearly">("monthly");
   const [activeFeature, setActiveFeature] = useState(0);
 
@@ -327,7 +328,7 @@ export default function PlatformSalesPage() {
     return `Rp ${yearly.toLocaleString("id-ID")}`;
   };
 
-  const WA_BASE = `https://wa.me/${WA_CONTACT_NUMBER_2}`;
+  const WA_BASE = `https://wa.me/${contact.secondary}`;
   const waLink = (msg: string) => {
     trackLead({ content_name: "WhatsApp CTA" });
     return `${WA_BASE}?text=${encodeURIComponent(msg)}`;

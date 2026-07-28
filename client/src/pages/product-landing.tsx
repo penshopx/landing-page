@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import DemoChat from "@/components/demo-chat";
-import { WA_CONTACT_NUMBER } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import {
   AlertTriangle,
   CheckCircle,
@@ -43,6 +43,7 @@ const OUTPUT_TYPES = [
 
 // KB customization section component
 function KBCustomSection({ agentName }: { agentName: string }) {
+  const { primary: waP } = useContactNumbers();
   return (
     <section className="py-14 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -79,7 +80,7 @@ function KBCustomSection({ agentName }: { agentName: string }) {
             </div>
             <p className="text-xs text-slate-400">Kustomisasi via dashboard<br />atau hubungi tim Gustafta</p>
             <a
-              href={`https://wa.me/${WA_CONTACT_NUMBER}?text=Halo%2C+saya+ingin+kustomisasi+KB+untuk+chatbot`}
+              href={`https://wa.me/${waP}?text=Halo%2C+saya+ingin+kustomisasi+KB+untuk+chatbot`}
               target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 mt-3 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-xs font-medium transition-colors"
             >
@@ -151,6 +152,7 @@ function injectMetaPixel(pixelId: string) {
 }
 
 export default function ProductLanding() {
+  const contact = useContactNumbers();
   const params = useParams<{ agentId: string }>();
   const agentId = params.agentId || "";
 

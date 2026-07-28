@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -94,9 +94,10 @@ type PriceTab = "sesi" | "dokumen" | "paket";
 
 // ─── Page Component ───────────────────────────────────────────────────────────
 export default function KlinikPage() {
+  const contact = useContactNumbers();
   const [activeTab, setActiveTab] = useState<PriceTab>("paket");
 
-  const WA_LINK = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20tanya%20tentang%20Klinik%20Konsultasi%20AI`;
+  const WA_LINK = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20tanya%20tentang%20Klinik%20Konsultasi%20AI`;
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
@@ -321,7 +322,7 @@ export default function KlinikPage() {
                   <a
                     href={s.scalevSlug
                       ? `https://bayar.gustafta.my.id/p/${s.scalevSlug}`
-                      : `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20${encodeURIComponent(s.name)}%20Klinik%20AI%20Gustafta`}
+                      : `https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20ingin%20${encodeURIComponent(s.name)}%20Klinik%20AI%20Gustafta`}
                     target="_blank" rel="noopener noreferrer"
                   >
                     <Button variant="outline" className="w-full" size="sm">
@@ -361,7 +362,7 @@ export default function KlinikPage() {
                   <a
                     href={d.scalevSlug
                       ? `https://bayar.gustafta.my.id/p/${d.scalevSlug}`
-                      : `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20butuh%20generator%20${encodeURIComponent(d.name)}%20dari%20Klinik%20AI`}
+                      : `https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20butuh%20generator%20${encodeURIComponent(d.name)}%20dari%20Klinik%20AI`}
                     target="_blank" rel="noopener noreferrer"
                   >
                     <Button variant="outline" className="w-full" size="sm">

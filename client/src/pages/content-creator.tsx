@@ -10,8 +10,7 @@ import {
 } from "lucide-react";
 
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20solusi%20AI%20untuk%20content%20creator`;
+import { useContactNumbers } from "@/lib/contact";
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }
@@ -103,6 +102,8 @@ const colorStyles: Record<string, { bg: string; border: string; icon: string; ta
 const NICHES = ["🎮 Gaming", "💄 Beauty & Fashion", "🍳 Food & Kuliner", "✈️ Travel", "💪 Health & Fitness", "💰 Finansial & Investasi", "👶 Parenting", "🏠 Home & Lifestyle", "📚 Edukasi & Self-dev", "⚙️ Teknologi & Gadget", "🎨 Seni & Desain", "🌿 Sustainability"];
 
 export default function ContentCreatorPage() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20konsultasi%20solusi%20AI%20untuk%20content%20creator`;
   const { isAuthenticated } = useAuth();
   const { ctaUrl: builderUrl } = useTrialCTA();
 

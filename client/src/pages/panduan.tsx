@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { PRICING } from "@/data/pricing";
-import { WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
 import {
   BookOpen, CheckCircle2, Circle, ChevronRight, ChevronLeft,
   Search, MessageCircle, Bot, Database, ShoppingBag, CreditCard,
@@ -726,6 +726,7 @@ const MODULES: Module[] = [
 const ALL_LESSONS = MODULES.flatMap(m => m.lessons.map(l => ({ ...l, moduleId: m.id, moduleTitle: m.title, moduleColor: m.color })));
 
 export default function Panduan() {
+  const contact = useContactNumbers();
   const [progress, setProgress] = useState<Record<string, boolean>>(loadProgress);
   const [activeModuleId, setActiveModuleId] = useState<string>("quickstart");
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
@@ -832,12 +833,12 @@ export default function Panduan() {
             ))}
           </div>
           <div className="flex flex-wrap gap-3 mt-4">
-            <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20tertarik%20beli%20Starter%20Kit%20Gustafta`} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20tertarik%20beli%20Starter%20Kit%20Gustafta`} target="_blank" rel="noopener noreferrer">
               <button className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
                 <BookOpen className="h-3.5 w-3.5" /> Beli Starter Kit ({PRICING.starterKit.short})
               </button>
             </a>
-            <a href={`https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%2C%20saya%20ingin%20tahu%20jadwal%20Workshop%20Gustafta`} target="_blank" rel="noopener noreferrer">
+            <a href={`https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20ingin%20tahu%20jadwal%20Workshop%20Gustafta`} target="_blank" rel="noopener noreferrer">
               <button className="inline-flex items-center gap-2 border border-green-400 text-green-700 dark:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/30 text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
                 <GraduationCap className="h-3.5 w-3.5" /> Info Jadwal Workshop
               </button>
