@@ -438,6 +438,8 @@ export default function AdminPage() {
     description: string;
     category: string;
     price: number;
+    /** Effective buyer-facing price: tier-computed for agent-linked products, else equals price */
+    computedPrice?: number;
     agentId: number | null;
     emoji: string;
     features: string[] | null;
@@ -1894,7 +1896,19 @@ export default function AdminPage() {
                               <span className="text-xl flex-shrink-0">{p.emoji}</span>
                               <div className="min-w-0">
                                 <p className="font-medium text-sm truncate">{p.name}</p>
-                                <p className="text-xs text-muted-foreground">{p.category} · Rp {p.price.toLocaleString("id-ID")}
+                                <p className="text-xs text-muted-foreground">
+                                  {p.category} ·{" "}
+                                  {p.computedPrice != null && p.computedPrice !== p.price ? (
+                                    <>
+                                      <span className="line-through text-muted-foreground/60">Rp {p.price.toLocaleString("id-ID")}</span>
+                                      {" "}
+                                      <span className="text-blue-600 font-semibold">Rp {p.computedPrice.toLocaleString("id-ID")}</span>
+                                      {" "}
+                                      <span className="text-[10px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-medium">tim</span>
+                                    </>
+                                  ) : (
+                                    <>Rp {(p.computedPrice ?? p.price).toLocaleString("id-ID")}</>
+                                  )}
                                   {p.agentId ? ` · Agent #${p.agentId}` : ""}
                                 </p>
                               </div>

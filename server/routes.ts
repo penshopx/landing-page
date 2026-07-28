@@ -166,6 +166,21 @@ function invalidateStoreCatalog(): void {
   storeCatalogInflight.clear();
 }
 
+// Biaya Lisensi: tiered berdasarkan jumlah anggota tim (sub-agents + 1 orchestrator).
+// Tier harga (hak pakai, sekali bayar):
+//   1 agen   solo       → DEFAULT_LICENSE_PRICE (299.000)
+//   2–3 agen tim kecil  → 499.000
+//   4–6 agen tim sedang → 799.000
+//   7+  agen tim besar  → 1.299.000
+function calcStorePrice(agenticSubAgents: any): number {
+  const subCount = Array.isArray(agenticSubAgents) ? agenticSubAgents.length : 0;
+  const total = subCount + 1; // include the orchestrator itself
+  if (total >= 7) return 1_299_000;
+  if (total >= 4) return 799_000;
+  if (total >= 2) return 499_000;
+  return DEFAULT_LICENSE_PRICE; // 299.000 — solo agent
+}
+
 async function buildStoreCatalogItems(category: string, search: string): Promise<any[]> {
   const { db } = await import("./db");
   const { agents: agentsTable, storeProducts } = await import("@shared/schema");
@@ -182,22 +197,6 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
   }
   const spWhere = spConditions.length > 1 ? and(...spConditions) : spConditions[0];
   const spRows = await db.select().from(storeProducts).where(spWhere).orderBy(storeProducts.sortOrder, storeProducts.id);
-
-  // Biaya Lisensi: tiered berdasarkan jumlah anggota tim (sub-agents + 1 orchestrator).
-  // Biaya Setup oleh tim Gustafta: Rp 999.000 (terpisah, opsional).
-  // Tier harga (hak pakai, sekali bayar):
-  //   1 agen   solo     → DEFAULT_LICENSE_PRICE (299.000)
-  //   2–3 agen tim kecil → 499.000
-  //   4–6 agen tim sedang → 799.000
-  //   7+  agen tim besar  → 1.299.000
-  const calcStorePrice = (agenticSubAgents: any): number => {
-    const subCount = Array.isArray(agenticSubAgents) ? agenticSubAgents.length : 0;
-    const total = subCount + 1; // include the orchestrator itself
-    if (total >= 7) return 1_299_000;
-    if (total >= 4) return 799_000;
-    if (total >= 2) return 499_000;
-    return DEFAULT_LICENSE_PRICE; // 299.000 — solo agent
-  };
   // Harga coret ≈ 1,5× harga final (pembulatan ke ratusan ribu terdekat)
   const calcOriginalPrice = (total: number): number => {
     const base = calcStorePrice(Array(Math.max(0, total - 1)).fill(null));
@@ -7741,8 +7740,34 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
   app.get("/api/store/admin/products", isAuthenticated, async (_req, res) => {
     try {
+      const { db } = await import("./db");
+      const { agents: agentsTable } = await import("@shared/schema");
+      const { inArray } = await import("drizzle-orm");
+
       const products = await storage.getStoreProducts();
-      res.json(products);
+
+      // Enrich each product with computedPrice — what buyers actually see.
+      // For agent-linked products the price is tier-driven by team size;
+      // for plain products it equals the stored price.
+      const linkedAgentIds = products.map(p => p.agentId).filter(Boolean) as number[];
+      const agentSubMap = new Map<number, any>();
+      if (linkedAgentIds.length > 0) {
+        const rows = await db.select({
+          id: agentsTable.id,
+          agenticSubAgents: agentsTable.agenticSubAgents,
+        }).from(agentsTable).where(inArray(agentsTable.id, linkedAgentIds));
+        for (const r of rows) {
+          agentSubMap.set(r.id, parseSubAgentsValue(r.agenticSubAgents));
+        }
+      }
+
+      const enriched = products.map(p => {
+        const subs = p.agentId != null ? agentSubMap.get(p.agentId) : undefined;
+        const computedPrice = subs !== undefined ? calcStorePrice(subs) : p.price;
+        return { ...p, computedPrice };
+      });
+
+      res.json(enriched);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch products" });
     }

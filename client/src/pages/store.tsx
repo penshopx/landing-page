@@ -631,8 +631,7 @@ export default function Store() {
                       ) : detailAgent.isCreatorMade ? (
                         <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-0 flex items-center gap-1"
                           title="Dibuat Fasilitator independen — belum melalui sertifikasi Gustafta."
-                data-testid={`badge-detail-pra-sertifikasi-${detailAgent.id}`}
-                          title="Dibuat kreator independen — belum bersertifikat. Periksa dulu sebelum membeli.">
+                          data-testid={`badge-detail-pra-sertifikasi-${detailAgent.id}`}>
                           <ShieldAlert className="h-2.5 w-2.5" />Pra-Sertifikasi
                         </Badge>
                       ) : null}
