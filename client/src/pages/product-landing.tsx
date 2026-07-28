@@ -30,6 +30,8 @@ import {
   Calculator,
   Database,
   Wrench,
+  ShieldCheck,
+  ShieldAlert,
 } from "lucide-react";
 
 // Output types setiap chatbot bisa hasilkan
@@ -208,6 +210,36 @@ export default function ProductLanding() {
                   </Avatar>
                 </div>
               )}
+              {/* Curation badges */}
+              {(agent.isGustafta || agent.isCertified || agent.isCreatorMade) && (
+                <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+                  {agent.isGustafta ? (
+                    <span
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-violet-600 text-white border border-violet-400"
+                      data-testid="badge-landing-gustafta-official"
+                      title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin."
+                    >
+                      <ShieldCheck className="h-3 w-3" />Gustafta Official
+                    </span>
+                  ) : agent.isCertified ? (
+                    <span
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white border border-emerald-400"
+                      data-testid="badge-landing-bersertifikat"
+                      title="Kreator telah lulus workshop & sertifikasi Gustafta."
+                    >
+                      <ShieldCheck className="h-3 w-3" />Bersertifikat
+                    </span>
+                  ) : agent.isCreatorMade ? (
+                    <span
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-600 text-white border border-amber-400"
+                      data-testid="badge-landing-pra-sertifikasi"
+                      title="Dibuat kreator independen — belum bersertifikat."
+                    >
+                      <ShieldAlert className="h-3 w-3" />Pra-Sertifikasi
+                    </span>
+                  ) : null}
+                </div>
+              )}
               <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight text-white" data-testid="text-hero-headline">
                 {agent.name}
               </h1>
@@ -363,16 +395,34 @@ export default function ProductLanding() {
               </div>
             )}
 
-            {agent.isGustafta && (
-              <div className="flex justify-center mb-4">
-                <Badge
-                  className="bg-violet-600 text-white border-violet-700 text-xs px-3 py-1 flex items-center gap-1.5"
-                  data-testid={`badge-gustafta-official-${agent.id}`}
-                  title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin."
-                >
-                  <ShieldCheck className="h-3 w-3" />
-                  Gustafta Official
-                </Badge>
+            {/* Curation badges */}
+            {(agent.isGustafta || agent.isCertified || agent.isCreatorMade) && (
+              <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+                {agent.isGustafta ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-violet-600 text-white border border-violet-400"
+                    data-testid="badge-landing-gustafta-official"
+                    title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin."
+                  >
+                    <ShieldCheck className="h-3 w-3" />Gustafta Official
+                  </span>
+                ) : agent.isCertified ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white border border-emerald-400"
+                    data-testid="badge-landing-bersertifikat"
+                    title="Kreator telah lulus workshop & sertifikasi Gustafta."
+                  >
+                    <ShieldCheck className="h-3 w-3" />Bersertifikat
+                  </span>
+                ) : agent.isCreatorMade ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-600 text-white border border-amber-400"
+                    data-testid="badge-landing-pra-sertifikasi"
+                    title="Dibuat kreator independen — belum bersertifikat."
+                  >
+                    <ShieldAlert className="h-3 w-3" />Pra-Sertifikasi
+                  </span>
+                ) : null}
               </div>
             )}
 

@@ -17473,6 +17473,9 @@ Return JSON format:
         calendlyUrl: (agent as any).calendlyUrl || "",
         metaPixelId: agent.metaPixelId || "",
         chatUrl: `${getServerBaseUrl(req)}/chat/${slug}`,
+        isGustafta: (agent as any).isGustafta === true,
+        isCertified: (agent as any).isCertified === true,
+        isCreatorMade: ((agent as any).userId ?? "").trim() !== "",
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch landing page" });
