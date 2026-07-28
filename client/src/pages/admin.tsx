@@ -977,6 +977,40 @@ export default function AdminPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* Session Identity — lets the founder confirm their role at a glance */}
+        <div
+          className={`rounded-lg border px-4 py-3 flex items-center gap-3 ${
+            isSuperAdmin
+              ? "bg-purple-50/60 border-purple-200 dark:bg-purple-950/20 dark:border-purple-900/50"
+              : "bg-blue-50/60 border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/50"
+          }`}
+          data-testid="banner-session-identity"
+        >
+          {isSuperAdmin
+            ? <Crown className="h-5 w-5 text-purple-500 flex-shrink-0" />
+            : <Shield className="h-5 w-5 text-blue-500 flex-shrink-0" />}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate" data-testid="text-session-email">
+              {meData.user?.email || "—"}
+            </p>
+            <p className={`text-xs ${isSuperAdmin ? "text-purple-700 dark:text-purple-300" : "text-blue-700 dark:text-blue-300"}`}>
+              {isSuperAdmin
+                ? "Anda masuk sebagai Super Admin — akses penuh ke semua fitur."
+                : "Anda masuk sebagai Admin."}
+            </p>
+          </div>
+          <span
+            className={`text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1 flex-shrink-0 ${
+              isSuperAdmin
+                ? "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300"
+                : "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300"
+            }`}
+            data-testid="badge-current-role"
+          >
+            {isSuperAdmin ? <><Crown className="h-3 w-3" /> Super Admin</> : <><Shield className="h-3 w-3" /> Admin</>}
+          </span>
+        </div>
+
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card data-testid="stat-total-users">

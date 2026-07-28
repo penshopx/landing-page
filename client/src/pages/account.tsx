@@ -14,7 +14,7 @@ import {
   User, CreditCard, Bot, LayoutDashboard, LogOut,
   Calendar, ArrowRight, Zap, CheckCircle2, Clock, XCircle,
   ShoppingBag, HeadphonesIcon, Pencil, X, Save, Loader2,
-  Building2, Briefcase, FileText
+  Building2, Briefcase, FileText, Crown, Shield
 } from "lucide-react";
 
 interface AccountData {
@@ -196,9 +196,14 @@ export default function AccountPage() {
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" /> Bergabung {formatDate(user?.createdAt || null)}
                   </p>
-                  {(user?.role === "admin" || user?.role === "superadmin") && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 font-medium">
-                      {user.role === "superadmin" ? "Super Admin" : "Admin"}
+                  {user?.role === "superadmin" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 font-medium flex items-center gap-1 w-fit" data-testid="badge-role-superadmin">
+                      <Crown className="h-3 w-3" /> Super Admin
+                    </span>
+                  )}
+                  {user?.role === "admin" && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 font-medium flex items-center gap-1 w-fit" data-testid="badge-role-admin">
+                      <Shield className="h-3 w-3" /> Admin
                     </span>
                   )}
                 </div>
