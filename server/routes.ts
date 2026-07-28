@@ -24143,9 +24143,8 @@ POLA KERJA: ELICIT (pahami tahap & niat) → DISPATCH (agen sesuai kebutuhan) �
         WHERE id = ${hubId}
       `);
 
-      // Wiring changes team size → store price changes → invalidate catalog cache (#89)
+      // Wiring changes team size → store price changes → invalidate catalog cache.
       invalidateStoreCatalog();
-
       res.json({ ok: true, agenticSubAgents });
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
