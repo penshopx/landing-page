@@ -31,7 +31,7 @@ export default function MitraBiroJasaPage() {
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/25 text-white text-xs font-semibold mb-6">
             <Users className="h-3.5 w-3.5" />
-            Khusus untuk Biro Jasa &amp; Konsultan Konstruksi
+            Untuk Biro Jasa, Konsultan, LSP &amp; Mitra Konstruksi
           </div>
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">
             Anda Punya 200+ Klien.<br />

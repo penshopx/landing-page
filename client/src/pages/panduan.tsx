@@ -695,7 +695,7 @@ const MODULES: Module[] = [
           },
           {
             title: "Akses Biro Jasa (Fitur Kolaborasi)",
-            content: "Jika Anda menggunakan jasa biro konsultan (Mitra Biro Jasa Gustafta), Anda bisa memberikan akses terbatas ke dokumen tertentu tanpa perlu email/WhatsApp bolak-balik.\n\nCaranya:\n1. Buka detail file di Ruang Simpan\n2. Tab 'Paspor' → Kelola Akses\n3. Tambah akses untuk email biro jasa\n4. Pilih jenis akses (lihat / unduh) dan masa berlaku\n\nBiro jasa melihat dokumen yang diberi akses saja — tidak bisa melihat seluruh RS Anda.",
+            content: "Jika Anda menggunakan jasa biro konsultan (Mitra Gustafta), Anda bisa memberikan akses terbatas ke dokumen tertentu tanpa perlu email/WhatsApp bolak-balik.\n\nCaranya:\n1. Buka detail file di Ruang Simpan\n2. Tab 'Paspor' → Kelola Akses\n3. Tambah akses untuk email biro jasa\n4. Pilih jenis akses (lihat / unduh) dan masa berlaku\n\nBiro jasa melihat dokumen yang diberi akses saja — tidak bisa melihat seluruh RS Anda.",
             tip: "Paspor dokumen mencatat siapa yang mengakses file Anda dan kapan — audit trail otomatis."
           }
         ]

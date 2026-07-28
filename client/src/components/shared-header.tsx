@@ -272,7 +272,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/klinik-uji-kompetensi",  label: "Bimtek Uji Kompetensi", icon: GraduationCap },
     { href: "/executive-summary",      label: "Executive Summary",      icon: FileText },
     { href: "/store",                  label: "Produk AI",              icon: Zap },
-    { href: "/mitra-biro-jasa",        label: "Mitra Biro Jasa",        icon: HandshakeIcon },
+    { href: "/mitra-biro-jasa",        label: "Mitra",                  icon: HandshakeIcon },
   ];
 
   // Untuk mobile: semua item gabungan
