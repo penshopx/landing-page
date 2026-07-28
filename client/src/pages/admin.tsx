@@ -320,6 +320,28 @@ export default function AdminPage() {
       .catch(() => {});
   }, []);
 
+  // ── Shared 401 / session-expired error handler ──────────────────────────
+  function handle401Error(err: any, fallbackMsg: string, fallbackDesc?: string) {
+    const is401 = err instanceof Error && err.message.startsWith("401");
+    if (is401) {
+      toast({
+        title: "Sesi habis — silakan login ulang",
+        description: (
+          <span>
+            Input Anda masih tersimpan di form.{" "}
+            <a href="/login" className="underline font-medium">
+              Login ulang
+            </a>{" "}
+            lalu simpan kembali.
+          </span>
+        ) as any,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: fallbackMsg, description: fallbackDesc, variant: "destructive" });
+    }
+  }
+
   // ── WA Contact Numbers (runtime, from /api/config/contact) ──
   const contact = useContactNumbers();
   const [waContactForm, setWaContactForm] = useState({ primary: "", secondary: "" });
@@ -455,9 +477,7 @@ export default function AdminPage() {
       setAutoRegForm({ productName: "", price: "", description: "", type: "chatbot", agentId: "", bigIdeaId: "", agentIds: "", label: "" });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/scalev-mappings"] });
     },
-    onError: (err: any) => {
-      toast({ title: "Gagal", description: err?.message || "Terjadi kesalahan.", variant: "destructive" });
-    },
+    onError: (err: any) => handle401Error(err, "Gagal", err?.message || "Terjadi kesalahan."),
   });
 
   const { data: storeOrders = [], isLoading: storeOrdersLoading, refetch: refetchOrders } = useQuery<StoreOrder[]>({
@@ -492,7 +512,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
       toast({ title: "✅ Urutan produk disimpan." });
     },
-    onError: () => toast({ title: "Gagal simpan urutan.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal simpan urutan."),
   });
 
   const handleProductDragStart = (e: React.DragEvent, id: number) => {
@@ -544,7 +564,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blueprint-submissions"] });
       toast({ title: "Status diperbarui." });
     },
-    onError: () => toast({ title: "Gagal update status.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal update status."),
   });
 
   const createScalevMutation = useMutation({
@@ -556,7 +576,7 @@ export default function AdminPage() {
       setScalevEditId(null);
       toast({ title: "Mapping berhasil disimpan." });
     },
-    onError: () => toast({ title: "Gagal menyimpan mapping.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal menyimpan mapping."),
   });
 
   const updateScalevMutation = useMutation({
@@ -568,7 +588,7 @@ export default function AdminPage() {
       setScalevEditId(null);
       toast({ title: "Mapping diperbarui." });
     },
-    onError: () => toast({ title: "Gagal memperbarui mapping.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal memperbarui mapping."),
   });
 
   const deleteScalevMutation = useMutation({
@@ -577,7 +597,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/scalev-mappings"] });
       toast({ title: "Mapping dihapus." });
     },
-    onError: () => toast({ title: "Gagal menghapus mapping.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal menghapus mapping."),
   });
 
   // ---- Mutations ----
@@ -588,7 +608,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       toast({ title: "Status pengguna diperbarui." });
     },
-    onError: () => toast({ title: "Gagal memperbarui status.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal memperbarui status."),
   });
 
   const earlyAdopterMutation = useMutation({
@@ -602,7 +622,7 @@ export default function AdminPage() {
       setEarlyDialog({ open: false, user: null });
       toast({ title: "Early Adopter aktif", description: result?.message || "Langganan gratis diaktifkan." });
     },
-    onError: () => toast({ title: "Gagal mengaktifkan Early Adopter.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal mengaktifkan Early Adopter."),
   });
 
   const toggleAdminMutation = useMutation({
@@ -612,7 +632,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       toast({ title: "Status admin diperbarui." });
     },
-    onError: () => toast({ title: "Gagal memperbarui status admin.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal memperbarui status admin."),
   });
 
   const setRoleMutation = useMutation({
@@ -623,7 +643,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/admins"] });
       toast({ title: "Role pengguna diperbarui." });
     },
-    onError: () => toast({ title: "Gagal mengubah role.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal mengubah role."),
   });
 
   const approveTrialMutation = useMutation({
@@ -644,13 +664,20 @@ export default function AdminPage() {
           : "User belum daftar — kirim kode voucher via WA/Email agar bisa redeem.",
       });
     },
-    onError: (err: any) => toast({
-      title: "Gagal menyetujui trial.",
-      description: err?.message?.includes("sudah diproses")
-        ? "Permintaan ini sudah diproses sebelumnya."
-        : (err?.message || "Terjadi kesalahan server."),
-      variant: "destructive",
-    }),
+    onError: (err: any) => {
+      const is401 = err instanceof Error && err.message.startsWith("401");
+      if (is401) {
+        handle401Error(err, "");
+      } else {
+        toast({
+          title: "Gagal menyetujui trial.",
+          description: err?.message?.includes("sudah diproses")
+            ? "Permintaan ini sudah diproses sebelumnya."
+            : (err?.message || "Terjadi kesalahan server."),
+          variant: "destructive",
+        });
+      }
+    },
   });
 
   const rejectTrialMutation = useMutation({
@@ -663,7 +690,7 @@ export default function AdminPage() {
       setRejectNotes("");
       toast({ title: "Permintaan trial ditolak." });
     },
-    onError: () => toast({ title: "Gagal menolak permintaan.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal menolak permintaan."),
   });
 
   const updateSubMutation = useMutation({
@@ -681,7 +708,7 @@ export default function AdminPage() {
         setTimeout(() => setWaDialog({ open: true, sub: activatedSub }), 300);
       }
     },
-    onError: () => toast({ title: "Gagal memperbarui langganan.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal memperbarui langganan."),
   });
 
   const createManualOrderMutation = useMutation({
@@ -695,7 +722,7 @@ export default function AdminPage() {
       refetchOrders();
       toast({ title: "Link akses berhasil dibuat!", description: `Order manual untuk ${data.agentName} siap dikirim.` });
     },
-    onError: (err: any) => toast({ title: "Gagal buat order manual", description: err.message, variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal buat order manual", err?.message),
   });
 
   const createProductMutation = useMutation({
@@ -710,7 +737,7 @@ export default function AdminPage() {
       setShowProductForm(false);
       toast({ title: "Produk berhasil ditambahkan!" });
     },
-    onError: (err: any) => toast({ title: "Gagal tambah produk", description: err.message, variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal tambah produk", err?.message),
   });
 
   const deleteProductMutation = useMutation({
@@ -720,7 +747,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
       toast({ title: "Produk dihapus." });
     },
-    onError: () => toast({ title: "Gagal hapus produk.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal hapus produk."),
   });
 
   const updateProductMutation = useMutation({
@@ -732,26 +759,7 @@ export default function AdminPage() {
       setEditProductDialog({ open: false, product: null });
       toast({ title: "Produk berhasil diperbarui!" });
     },
-    onError: (err: any) => {
-      const is401 = err instanceof Error && err.message.startsWith("401");
-      if (is401) {
-        toast({
-          title: "Sesi habis — silakan login ulang",
-          description: (
-            <span>
-              Edit Anda masih tersimpan di form.{" "}
-              <a href="/login" className="underline font-medium">
-                Login ulang
-              </a>{" "}
-              lalu simpan kembali.
-            </span>
-          ) as any,
-          variant: "destructive",
-        });
-      } else {
-        toast({ title: "Gagal memperbarui produk.", variant: "destructive" });
-      }
-    },
+    onError: (err: any) => handle401Error(err, "Gagal memperbarui produk."),
   });
 
   const updateModulSubMutation = useMutation({
@@ -767,7 +775,7 @@ export default function AdminPage() {
         setTimeout(() => setModulWaDialog({ open: true, sub: activatedSub }), 300);
       }
     },
-    onError: () => toast({ title: "Gagal memperbarui subscriber.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal memperbarui subscriber."),
   });
 
   const toggleProductMutation = useMutation({
@@ -778,7 +786,7 @@ export default function AdminPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/store/catalog"] });
       toast({ title: "Status produk diperbarui." });
     },
-    onError: () => toast({ title: "Gagal ubah status produk.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal ubah status produk."),
   });
 
   const updatePaymentUrlMutation = useMutation({
@@ -790,7 +798,7 @@ export default function AdminPage() {
       setEditPaymentUrlId(null);
       toast({ title: "Link pembayaran disimpan." });
     },
-    onError: () => toast({ title: "Gagal simpan link pembayaran.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal simpan link pembayaran."),
   });
 
   const seedLexComMutation = useMutation({
@@ -805,7 +813,7 @@ export default function AdminPage() {
         queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
       }
     },
-    onError: () => toast({ title: "Gagal seed LexCom", description: "Coba lagi atau cek log server.", variant: "destructive" }),
+    onError: (err: any) => handle401Error(err, "Gagal seed LexCom", "Coba lagi atau cek log server."),
   });
 
   // ---- Email Health ----
@@ -840,7 +848,7 @@ export default function AdminPage() {
     },
     onError: (err: any) => {
       setTestEmailResult({ ok: false, reason: err?.message || "Gagal mengirim email." });
-      toast({ title: "Gagal kirim test email", description: err?.message || "Cek BREVO_API_KEY dan konfigurasi domain.", variant: "destructive" });
+      handle401Error(err, "Gagal kirim test email", err?.message || "Cek BREVO_API_KEY dan konfigurasi domain.");
     },
   });
 
