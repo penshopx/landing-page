@@ -232,7 +232,7 @@ export default function ProductLanding() {
                     <span
                       className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-600 text-white border border-amber-400"
                       data-testid="badge-landing-pra-sertifikasi"
-                      title="Dibuat kreator independen — belum bersertifikat."
+                      title="Dibuat Fasilitator independen — belum melalui sertifikasi Gustafta."
                     >
                       <ShieldAlert className="h-3 w-3" />Pra-Sertifikasi
                     </span>
@@ -417,7 +417,7 @@ export default function ProductLanding() {
                   <span
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-600 text-white border border-amber-400"
                     data-testid="badge-landing-pra-sertifikasi"
-                    title="Dibuat kreator independen — belum bersertifikat."
+                    title="Dibuat Fasilitator independen — belum melalui sertifikasi Gustafta."
                   >
                     <ShieldAlert className="h-3 w-3" />Pra-Sertifikasi
                   </span>

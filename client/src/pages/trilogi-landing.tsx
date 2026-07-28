@@ -8,40 +8,43 @@ import {
 import {
   Flame, Check, Star, Lightbulb, Users, Zap, Target, BadgeCheck,
   BookOpen, Brain, GraduationCap, Briefcase, ChevronRight,
+  HardHat, FileText, ClipboardList, Building2, Award, Wrench,
 } from "lucide-react";
 import { TRILOGI } from "@/data/pricing";
 import coverFlat from "@assets/Monolog-_cover_1781287565935.jpg";
 import cover3D from "@assets/Buku_3D_1781288556255.png";
 import mockupDevices from "@assets/1781288755_1781288818548.jpg";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 const SCALEV_BUNDLE = "https://bayar.gustafta.my.id";
 const SCALEV_BUKU1  = "https://bayar.gustafta.my.id";
-const WA_URL = `https://wa.me/${WA_CONTACT_NUMBER_2}?text=Halo%20Gustafta%2C%20saya%20mau%20tanya%20tentang%20Trilogi%20Dari%20Monolog%20ke%20Dialog`;
 
-// Data riset/lembaga resmi (konteks umum, bukan janji hasil produk). Diverifikasi via sumber publik.
-const STATS_TRILOGI = [
+// Data konteks industri konstruksi Indonesia (sumber publik/resmi)
+const STATS_KONSTRUKSI = [
   {
-    icon: Briefcase,
-    value: "±49%",
-    label: "Estimasi penghasilan pensiun rata-rata pekerja Indonesia dibanding gaji terakhir — turun lebih dari separuh.",
-    source: "OECD, Pensions at a Glance Asia/Pacific 2024",
+    icon: Building2,
+    value: "±300 rb",
+    label: "BUJK terdaftar di LPJK yang wajib memenuhi standar SBU, SKK, dan kelayakan administrasi secara berkala.",
+    source: "LPJK / BPKH Konstruksi, 2024",
   },
   {
-    icon: BookOpen,
-    value: "65,43%",
-    label: "Indeks literasi keuangan nasional 2024 — sebagian besar penduduk belum sepenuhnya siap kelola keuangan jangka panjang.",
-    source: "OJK & BPS, SNLIK 2024",
+    icon: FileText,
+    value: "60–70%",
+    label: "Estimasi tender yang gugur di tahap administrasi — bukan karena harga, tapi karena kelengkapan dokumen.",
+    source: "Laporan LKPP & praktisi pengadaan, 2023–2024",
   },
   {
     icon: Brain,
     value: "+14%",
-    label: "Rata-rata kenaikan produktivitas pekerja yang dibantu AI generatif.",
+    label: "Rata-rata kenaikan produktivitas profesional yang dibantu AI generatif dalam pekerjaan berbasis dokumen.",
     source: "Brynjolfsson, Li & Raymond, NBER w31161 / QJE, 2023",
   },
 ];
 
 export default function TrilogiLanding() {
+  const contact = useContactNumbers();
+  const WA_URL = `https://wa.me/${contact.secondary}?text=Halo%20Gustafta%2C%20saya%20ingin%20tahu%20lebih%20lanjut%20tentang%20Peta%20Jalan%20Konstruksi%20Digital`;
+
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
@@ -62,7 +65,7 @@ export default function TrilogiLanding() {
   }, []);
 
   useEffect(() => {
-    trackViewContent({ content_name: "Trilogi Ebook Landing", content_category: "Ebook" });
+    trackViewContent({ content_name: "Peta Jalan Konstruksi Digital", content_category: "Panduan" });
   }, []);
 
   const openCheckout = (
@@ -77,9 +80,9 @@ export default function TrilogiLanding() {
     window.open(withMetaAttribution(url), "_blank", "noopener,noreferrer");
   };
   const handleBundleClick = (e: { preventDefault: () => void }) =>
-    openCheckout(e, SCALEV_BUNDLE, "Trilogi Bundle", TRILOGI.bundle.amount);
+    openCheckout(e, SCALEV_BUNDLE, "Peta Jalan Bundle", TRILOGI.bundle.amount);
   const handleBuku1Click = (e: { preventDefault: () => void }) =>
-    openCheckout(e, SCALEV_BUKU1, "Trilogi Buku 1", TRILOGI.bukuSatu.amount);
+    openCheckout(e, SCALEV_BUKU1, "Peta Jalan Buku 1", TRILOGI.bukuSatu.amount);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800 font-sans" data-testid="page-trilogi-landing">
@@ -109,14 +112,14 @@ export default function TrilogiLanding() {
             <a href={SCALEV_BUNDLE} target="_blank" rel="noopener noreferrer" onClick={handleBundleClick}
               className="bg-orange-500 hover:bg-orange-400 text-white font-bold py-2 px-5 rounded-full text-sm transition-all transform hover:scale-105 active:scale-95"
               data-testid="button-nav-earlybird">
-              Ambil Early Bird
+              Mulai Peta Jalan
             </a>
           </div>
         </div>
       </nav>
 
       {/* ══════════════════════════════════════════════
-          HERO — PAIN HEADLINE + 3D Book Cover
+          HERO
       ══════════════════════════════════════════════ */}
       <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-600 text-white py-16 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
@@ -125,27 +128,27 @@ export default function TrilogiLanding() {
             {/* LEFT — Teks & CTA */}
             <div>
               <span className="bg-blue-950/60 text-blue-100 text-sm font-semibold px-4 py-1.5 rounded-full mb-6 inline-block border border-blue-400/30">
-                🚀 Untuk Karyawan, Profesional &amp; Calon Pensiunan
+                🏗️ Untuk BUJK, Tenaga Ahli &amp; Profesional Jasa Konstruksi
               </span>
 
               <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-extrabold mb-5 leading-tight" data-testid="text-trilogi-hero">
-                Kerja 15 Tahun,<br />
-                Tapi Tabungan Cuma Cukup{" "}
-                <span className="text-orange-400 underline decoration-wavy decoration-orange-400/50">6 Bulan?</span>
+                Bisnis Konstruksi Jalan —<br />
+                Tapi Dokumentasi &amp; Kepatuhan Masih{" "}
+                <span className="text-orange-400 underline decoration-wavy decoration-orange-400/50">Jadi Beban?</span>
               </h1>
 
               <p className="text-base md:text-lg text-blue-100 mb-8 leading-relaxed">
-                Masalahnya <strong className="text-white">BUKAN</strong> kamu kurang pintar.
-                Masalahnya, keahlianmu selama ini cuma <strong className="text-orange-300">"MONOLOG"</strong> — satu arah ke perusahaan.
-                Begitu perusahaan berhenti mendengar,{" "}
-                <strong className="text-white">penghasilan ikut berhenti</strong>.
+                Masalahnya <strong className="text-white">BUKAN</strong> kurang pengalaman.
+                Masalahnya, pengetahuan teknis Anda masih berjalan <strong className="text-orange-300">"MANUAL"</strong> —
+                bergantung pada waktu, tenaga, dan orang yang tidak bisa standby 24 jam.{" "}
+                <strong className="text-white">Saatnya biarkan AI bekerja atas nama keahlian Anda.</strong>
               </p>
 
               <div className="flex flex-col sm:flex-row gap-3 mb-5">
                 <a href={SCALEV_BUNDLE} target="_blank" rel="noopener noreferrer" onClick={handleBundleClick}
                   className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-400 text-white text-base font-bold py-4 px-7 rounded-xl shadow-2xl transition-all transform hover:scale-105 active:scale-95"
                   data-testid="button-hero-bundle">
-                  🔥 Amankan Slot Early Bird
+                  🗺️ Ambil Peta Jalan Sekarang
                 </a>
                 <a href={WA_URL} target="_blank" rel="noopener noreferrer"
                   onClick={() => trackContact()}
@@ -165,14 +168,12 @@ export default function TrilogiLanding() {
             {/* RIGHT — 3D Book Cover */}
             <div className="flex items-center justify-center md:justify-end">
               <div className="relative">
-                {/* Glow effect */}
                 <div className="absolute inset-0 bg-orange-400/20 blur-3xl rounded-full scale-110" />
                 <img
                   src={cover3D}
-                  alt="Ebook Dari Monolog ke Dialog — cover 3D"
+                  alt="Peta Jalan Konstruksi Digital — Panduan AI untuk BUJK dan Profesional"
                   className="relative w-64 sm:w-72 md:w-80 drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                 />
-                {/* Badge early bird */}
                 <div className="absolute -top-3 -right-3 bg-orange-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-full shadow-lg rotate-6 border-2 border-white">
                   Early Bird 🔥
                 </div>
@@ -184,21 +185,21 @@ export default function TrilogiLanding() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          PROBLEM — Pain Points
+          PROBLEM — Pain Points Konstruksi
       ══════════════════════════════════════════════ */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-10">
-            Pernah Merasa Seperti Hamster di Roda Putar?
+            Familiar dengan Salah Satu Kondisi Ini?
           </h2>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
               {[
-                "Gaji cuma numpang lewat. Bayar cicilan, SPP anak, biaya orang tua — langsung habis tanpa sisa.",
-                "Tiap ada rumor PHK atau restrukturisasi, jantung langsung dag-dig-dug. Padahal sudah kerja puluhan tahun.",
-                "Mendekati pensiun, tapi bayangan \"berhenti kerja = berhenti penghasilan\" bikin malam tak bisa tidur.",
-                "Pengen punya side income, tapi mikir: \"Saya gaptek, masa harus belajar coding dari nol?\"",
+                "SBU mau diperpanjang, tapi dokumen teknis selalu ada yang kurang atau tidak sesuai format — proses makan waktu berbulan-bulan.",
+                "Ikut tender sudah semangat, tapi gugur di tahap administrasi karena persyaratan tidak lengkap — padahal kemampuan teknis sudah cukup.",
+                "Peraturan PUPR, Perpres pengadaan, dan standar SKK terus diperbarui — susah diikuti sendiri tanpa tim legal khusus.",
+                "Ingin digitalisasi operasional tapi bingung mulai dari mana, dan khawatir biaya konsultan IT terlalu mahal.",
               ].map((text, i) => (
                 <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-red-50 border border-red-100">
                   <span className="text-red-500 text-xl mt-0.5 flex-shrink-0">❌</span>
@@ -207,19 +208,16 @@ export default function TrilogiLanding() {
               ))}
             </div>
 
-            <div className="bg-red-600 text-white p-7 rounded-2xl shadow-xl flex flex-col justify-center">
-              <p className="text-xl font-extrabold mb-3">STOP. Itu bukan salahmu.</p>
-              <p className="text-red-100 leading-relaxed text-sm mb-4">
-                Selama ini kamu <strong className="text-white">membangun rumah di atas pasir</strong>.
-                Keahlian dan pengalamanmu hanya "berbicara" satu arah ke satu tempat kerja.
-                Saat tempat itu berhenti mendengar,{" "}
-                <strong className="text-white">penghasilanmu mati suri</strong>.
+            <div className="bg-blue-900 text-white p-7 rounded-2xl shadow-xl flex flex-col justify-center">
+              <p className="text-xl font-extrabold mb-3">STOP. Ini bukan salah Anda.</p>
+              <p className="text-blue-100 leading-relaxed text-sm mb-4">
+                Selama ini pengetahuan dan pengalaman Anda <strong className="text-white">bekerja satu arah</strong> —
+                tersimpan di kepala Anda sendiri, tidak bisa diakses kapanpun dibutuhkan, dan habis saat Anda tidak hadir.
               </p>
               <p className="text-white font-bold text-sm">
-                Saatnya beralih dari{" "}
-                <span className="bg-white/20 px-1.5 py-0.5 rounded">MONOLOG</span> ke{" "}
-                <span className="bg-orange-400 px-1.5 py-0.5 rounded">DIALOG</span>{" "}
-                — penghasilan yang terus mengalir meski kamu sedang tidur.
+                Saatnya ubah keahlian konstruksi Anda menjadi{" "}
+                <span className="bg-orange-400 px-1.5 py-0.5 rounded">ASISTEN AI</span>{" "}
+                yang bekerja 24 jam — menjawab pertanyaan, menyusun dokumen, dan memandu tim Anda.
               </p>
             </div>
           </div>
@@ -227,31 +225,45 @@ export default function TrilogiLanding() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          SOLUTION — Trilogi + META-CASE
+          SOLUTION — 3 Tahap Peta Jalan
       ══════════════════════════════════════════════ */}
       <section className="py-16 px-4 bg-gray-100">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">Solusinya</p>
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
-            Ubah Pengalaman Kerjamu Jadi{" "}
-            <span className="text-blue-700">"Mesin Uang" 24/7</span>
+            Peta Jalan 3 Tahap Menuju{" "}
+            <span className="text-blue-700">BUJK &amp; Profesional Konstruksi Berbasis AI</span>
           </h2>
           <p className="text-gray-600 max-w-3xl mx-auto text-sm leading-relaxed mb-10">
-            Ebook <strong className="text-gray-900">Trilogi: Dari Monolog ke Dialog</strong> memandu Anda menjadi
-            seorang <em>Orchestrator</em>. Anda tidak perlu coding. Cukup{" "}
-            <strong className="text-gray-900">pimpin 6 Agen AI MultiClaw</strong> — Researcher, Narrator, Designer,
-            Case Builder, Futurist, Editor — untuk bekerja atas nama keahlian Anda, 24 jam sehari.
+            Panduan <strong className="text-gray-900">Trilogi: Dari Monolog ke Dialog</strong> — diadaptasi untuk konteks
+            jasa konstruksi dan keteknikan Indonesia. Tidak perlu coding. Cukup pimpin{" "}
+            <strong className="text-gray-900">Agen AI Spesialis Konstruksi</strong> untuk bekerja atas nama keahlian Anda.
           </p>
 
           {/* 3 Buku */}
           <div className="grid sm:grid-cols-3 gap-4 mb-10">
             {[
-              { n: "I", title: "Belajar", sub: "Pahami cara kerja AI dan rakit chatbot spesialis dari pengalaman Anda", color: "from-blue-700 to-blue-500" },
-              { n: "II", title: "Bekerja", sub: "Praktik langsung: rakit asisten AI pertama dan dapatkan klien pertama", color: "from-emerald-700 to-emerald-500" },
-              { n: "III", title: "Berkarya", sub: "Skalakan: dari 1 asisten jadi ekosistem chatbot dengan penghasilan subscription", color: "from-orange-700 to-orange-500" },
+              {
+                n: "I", icon: BookOpen,
+                title: "Kenali",
+                sub: "Pahami cara kerja AI dalam ekosistem jasa konstruksi: SBU, SKK, tender, dan kepatuhan regulasi",
+                color: "from-blue-700 to-blue-500",
+              },
+              {
+                n: "II", icon: HardHat,
+                title: "Terapkan",
+                sub: "Bangun asisten AI spesialis: Dokumentasi Proyek, Panduan SKK, Analisis Tender, dan Advisor Regulasi",
+                color: "from-emerald-700 to-emerald-500",
+              },
+              {
+                n: "III", icon: Wrench,
+                title: "Skalakan",
+                sub: "Dari satu BUJK ke ekosistem layanan konstruksi digital — termasuk Fasilitator dan kolaborasi multi-tim",
+                color: "from-orange-700 to-orange-500",
+              },
             ].map((b) => (
               <div key={b.n} className={`bg-gradient-to-br ${b.color} text-white rounded-2xl p-6 shadow-lg text-left`}>
-                <div className="text-xs font-bold opacity-70 mb-1">BUKU {b.n}</div>
+                <div className="text-xs font-bold opacity-70 mb-1">TAHAP {b.n}</div>
                 <div className="text-2xl font-extrabold mb-2">{b.title}</div>
                 <p className="text-sm text-white/80 leading-relaxed">{b.sub}</p>
               </div>
@@ -262,48 +274,48 @@ export default function TrilogiLanding() {
           <div className="max-w-2xl mx-auto mb-10">
             <img
               src={mockupDevices}
-              alt="Trilogi Dari Monolog ke Dialog — tersedia di tablet, HP, dan buku fisik"
+              alt="Peta Jalan Konstruksi Digital — tersedia di tablet, HP, dan buku digital"
               className="w-full rounded-2xl shadow-xl"
             />
             <p className="text-xs text-gray-500 text-center mt-2">Tersedia dalam format PDF, Flipbook Interaktif, dan dapat dicetak</p>
           </div>
 
-          {/* META-CASE */}
+          {/* META-CASE — Gustafta sebagai bukti */}
           <div className="bg-blue-950 text-white p-8 rounded-2xl shadow-2xl max-w-3xl mx-auto border border-blue-700/40">
             <div className="flex items-center gap-3 mb-4">
               <Lightbulb className="w-6 h-6 text-yellow-400 flex-shrink-0" />
-              <h3 className="text-lg font-extrabold">META-CASE: Bukti Nyata Metode Ini Bekerja</h3>
+              <h3 className="text-lg font-extrabold">Bukti Nyata: Dibangun oleh Praktisi Konstruksi</h3>
             </div>
             <p className="text-blue-100 leading-relaxed text-sm">
-              Ebook Trilogi yang sedang Anda baca ini{" "}
-              <strong className="text-white">DITULIS menggunakan metode yang sama</strong> yang diajarkan di dalamnya.
-              Proses riset, narasi, pengecekan fakta, hingga desain struktur bab — semuanya dieksekusi oleh
-              Tim 6-Agen AI MultiClaw, dipimpin satu <em>Orchestrator</em> (manusia).
+              Platform Gustafta dan panduan ini <strong className="text-white">dibuat oleh praktisi</strong> di persimpangan
+              teknologi dan industri konstruksi — bukan konsultan IT yang belajar konstruksi dari buku.
+              Lebih dari <strong className="text-white">1.350+ Agen AI Spesialis</strong> yang aktif hari ini dibangun
+              menggunakan metode yang sama yang Anda akan pelajari.
             </p>
             <p className="text-blue-200 text-sm mt-3">
-              <strong className="text-white">Jadi jika Anda bertanya: "Ini beneran works?"</strong><br />
-              Jawabannya: Anda sedang memegang buktinya.
+              <strong className="text-white">Jika Anda bertanya: "Ini cocok untuk konstruksi?"</strong><br />
+              Jawabannya: Platform ini lahir dari dunia konstruksi. Kontraktor, konsultan, dan LSP sudah menggunakannya.
             </p>
           </div>
         </div>
       </section>
 
       {/* ══════════════════════════════════════════════
-          RISET / DATA — Konteks industri & lembaga resmi (tanpa testimoni)
+          DATA — Konteks Industri Konstruksi
       ══════════════════════════════════════════════ */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2 text-center">Menurut Data</p>
           <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-4">
-            Kenapa Ini Mendesak — Bukan Sekadar Menakut-nakuti
+            Mengapa Digitalisasi Konstruksi Sudah Tidak Opsional
           </h2>
           <p className="text-center text-gray-500 text-sm max-w-2xl mx-auto mb-10">
-            Data lembaga resmi menunjukkan betapa rapuhnya posisi keuangan banyak pekerja saat penghasilan
-            utama berhenti — dan betapa besar daya ungkit yang kini dibuka oleh AI.
+            Data industri menunjukkan betapa besarnya potensi yang hilang ketika dokumentasi, kepatuhan,
+            dan kompetensi masih dikelola secara manual.
           </p>
 
           <div className="grid sm:grid-cols-3 gap-5 mb-6">
-            {STATS_TRILOGI.map((s, i) => {
+            {STATS_KONSTRUKSI.map((s, i) => {
               const SIcon = s.icon;
               return (
                 <div key={i} className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center" data-testid={`stat-trilogi-${i}`}>
@@ -318,15 +330,15 @@ export default function TrilogiLanding() {
             })}
           </div>
           <p className="text-center text-[11px] text-gray-400 max-w-2xl mx-auto">
-            Angka di atas adalah temuan riset/lembaga resmi sebagai konteks umum, bukan janji hasil spesifik dari produk ini.
+            Angka di atas adalah estimasi/temuan riset sebagai konteks umum, bukan janji hasil spesifik dari produk ini.
           </p>
 
           {/* Trust stats */}
           <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: Users, value: "1350+", label: "Agent AI Spesialis" },
+              { icon: Users, value: "1.350+", label: "Agen AI Spesialis" },
               { icon: Target, value: "131", label: "Hub Orchestrator" },
-              { icon: Zap, value: "80+", label: "MultiClaw AI Tools" },
+              { icon: ClipboardList, value: "80+", label: "Tools Digital" },
               { icon: BadgeCheck, value: "24/7", label: "AI Selalu Aktif" },
             ].map((s) => {
               const SIcon = s.icon;
@@ -343,7 +355,69 @@ export default function TrilogiLanding() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          PRICING — Paket Basic vs Premium (Bundling)
+          FASILITATOR SECTION — Peran dalam Ekosistem
+      ══════════════════════════════════════════════ */}
+      <section className="py-16 px-4 bg-blue-50 border-y border-blue-100">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2 text-center">Ekosistem Konstruksi Digital</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-4">
+            Menjadi Fasilitator — Bukan Sekadar Pengguna AI
+          </h2>
+          <p className="text-center text-gray-600 text-sm max-w-3xl mx-auto mb-10">
+            Fasilitator adalah pendamping profesional bagi BUJK dan Tenaga Profesional Konstruksi.
+            Bukan konsultan IT — tapi praktisi lapangan yang membekali rekan sejawat dengan alat dan sistem yang tepat.
+          </p>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {[
+              {
+                icon: ClipboardList, color: "text-blue-600", bg: "bg-blue-100",
+                title: "Dokumentasi &amp; Kelayakan",
+                desc: "Memastikan seluruh aktivitas bisnis dan profesi siap dokumentasi — SBU, SKK, laporan proyek, dan rekam jejak kinerja.",
+              },
+              {
+                icon: Wrench, color: "text-emerald-600", bg: "bg-emerald-100",
+                title: "Problem Solver Lapangan",
+                desc: "Hadir sebagai solusi nyata atas masalah yang dihadapi saat pelaksanaan: tender, audit, sertifikasi, dan kepatuhan regulasi.",
+              },
+              {
+                icon: GraduationCap, color: "text-violet-600", bg: "bg-violet-100",
+                title: "Advisor Kompetensi",
+                desc: "Memberikan saran peningkatan kompetensi, produktivitas, dan profesionalitas — termasuk rekomendasi asisten AI dan toolkit digital.",
+              },
+              {
+                icon: Brain, color: "text-orange-600", bg: "bg-orange-100",
+                title: "Efisien &amp; Efektif",
+                desc: "Mempercepat pekerjaan yang selama ini memakan waktu: analisis regulasi, penyusunan dokumen, dan monitoring lapangan.",
+              },
+              {
+                icon: Building2, color: "text-cyan-600", bg: "bg-cyan-100",
+                title: "Mitra BUJK &amp; Profesional",
+                desc: "Bekerja berdampingan dengan kontraktor, konsultan, LSP, dan asosiasi — bukan sebagai vendor tapi sebagai mitra strategis.",
+              },
+              {
+                icon: Award, color: "text-amber-600", bg: "bg-amber-100",
+                title: "Rekomendasi AI &amp; Digital",
+                desc: "Menyarankan asisten AI, toolkit digital, dan sistem yang sesuai kebutuhan spesifik BUJK dan tenaga profesional.",
+              },
+            ].map((item, i) => {
+              const IIcon = item.icon;
+              return (
+                <div key={i} className="bg-white rounded-xl border border-blue-100 p-5 shadow-sm">
+                  <div className={`${item.bg} w-10 h-10 rounded-lg flex items-center justify-center mb-3`}>
+                    <IIcon className={`w-5 h-5 ${item.color}`} />
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-sm mb-1.5" dangerouslySetInnerHTML={{ __html: item.title }} />
+                  <p className="text-xs text-gray-600 leading-relaxed">{item.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════
+          PRICING
       ══════════════════════════════════════════════ */}
       <section id="pricing" className="py-16 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
@@ -351,7 +425,7 @@ export default function TrilogiLanding() {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Pilih Paket Anda</h2>
           <p className="text-gray-500 mb-10 text-sm max-w-2xl mx-auto">
             Ditulis oleh Wuryanto Kusdjali — praktisi di persimpangan teknologi, pendidikan, dan industri konstruksi,
-            serta pimpinan asosiasi jasa konstruksi dan pengarah lembaga sertifikasi.
+            serta pimpinan asosiasi jasa konstruksi dan pengarah lembaga sertifikasi kompetensi.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 items-stretch text-left">
@@ -361,7 +435,7 @@ export default function TrilogiLanding() {
               <div className="text-3xl mb-2">🥉</div>
               <h3 className="text-lg font-extrabold text-gray-900 mb-1">PAKET BASIC</h3>
               <p className="text-gray-500 text-xs mb-5 leading-relaxed">
-                Fokus: Memulai transformasi dari sekadar "tahu" menjadi "bisa berdialog" dengan AI.
+                Fokus: Memahami cara kerja AI dalam konteks jasa konstruksi dan memulai transformasi digital pertama.
               </p>
 
               <div className="mb-5">
@@ -386,7 +460,11 @@ export default function TrilogiLanding() {
 
               <p className="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">🎯 Paling Cocok Untuk:</p>
               <ul className="space-y-1.5 mb-7 text-xs text-gray-500">
-                {TRILOGI.bukuSatu.cocokUntuk.map((item, i) => (
+                {[
+                  "BUJK yang ingin mulai adopsi AI tanpa kerumitan teknis",
+                  "Tenaga Ahli yang ingin membangun asisten spesialis bidangnya",
+                  "Konsultan yang ingin efisienkan proses dokumentasi dan audit",
+                ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-blue-400 mt-0.5">•</span>{item}
                   </li>
@@ -408,7 +486,7 @@ export default function TrilogiLanding() {
               <div className="text-3xl mb-2">🥇</div>
               <h3 className="text-lg font-extrabold text-gray-900 mb-1">PAKET PREMIUM (BUNDLING LENGKAP)</h3>
               <p className="text-gray-500 text-xs mb-5 leading-relaxed">
-                Fokus: Transformasi total. Dari dialog, kolaborasi tim virtual, hingga kreasi karya nyata yang bisa diwariskan.
+                Fokus: Transformasi total — dari asisten tunggal, tim virtual, hingga ekosistem layanan konstruksi digital yang bisa diwariskan.
               </p>
 
               <div className="mb-5">
@@ -437,7 +515,11 @@ export default function TrilogiLanding() {
 
               <p className="text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">🎯 Paling Cocok Untuk:</p>
               <ul className="space-y-1.5 mb-7 text-xs text-gray-500">
-                {TRILOGI.bundle.cocokUntuk.map((item, i) => (
+                {[
+                  "Pemimpin BUJK yang ingin digitalisasi operasional secara menyeluruh",
+                  "Fasilitator yang ingin membangun layanan pendampingan berbasis AI",
+                  "Asosiasi dan LSP yang ingin memperkuat ekosistem kompetensi anggota",
+                ].map((item, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="text-orange-400 mt-0.5">•</span>{item}
                   </li>
@@ -457,21 +539,21 @@ export default function TrilogiLanding() {
           <div className="flex justify-center mt-8">
             <img
               src={coverFlat}
-              alt="Cover Ebook Dari Monolog ke Dialog"
+              alt="Cover Peta Jalan Konstruksi Digital"
               className="w-28 rounded-xl shadow-lg border border-gray-100"
             />
           </div>
 
           {/* Platform teaser */}
           <div className="mt-10 p-6 bg-blue-50 border border-blue-200 rounded-2xl text-left max-w-xl mx-auto">
-            <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-2">Sudah punya Ebook?</p>
+            <p className="text-xs font-bold text-blue-600 uppercase tracking-wide mb-2">Sudah punya Panduan?</p>
             <p className="text-sm text-gray-700 mb-3">
-              Langsung praktik di <strong className="text-blue-700">Gustafta Builder</strong> — platform no-code untuk membangun chatbot AI Anda.
-              Paket Premium sudah termasuk <strong>Trial 7 hari</strong>.
+              Langsung praktik di <strong className="text-blue-700">Gustafta Platform</strong> — lebih dari 1.350 Agen AI
+              Spesialis Konstruksi siap dipakai. Paket Premium sudah termasuk <strong>Trial 7 hari</strong>.
             </p>
             <Link href="/packs">
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-blue-700 hover:text-blue-600 cursor-pointer">
-                Lihat Paket Gustafta Builder <ChevronRight className="w-4 h-4" />
+                Lihat Paket Gustafta <ChevronRight className="w-4 h-4" />
               </span>
             </Link>
           </div>
@@ -490,24 +572,24 @@ export default function TrilogiLanding() {
           <Accordion type="single" collapsible className="space-y-3">
             {[
               {
-                q: `🤔 "Saya sudah tua, masa harus belajar teknologi baru?"`,
-                a: "Justru ini keunggulan Anda! Pengalaman 10–20 tahun yang Anda miliki adalah aset yang tidak dipunya generasi muda. Gustafta adalah alat no-code — tidak ada coding, tidak ada server. Jika Anda bisa isi formulir online dan kirim email, Anda sudah bisa melakukannya.",
+                q: `🤔 "Saya tidak berlatar belakang IT — apakah bisa menggunakan AI?"`,
+                a: "Justru ini keunggulan Anda. Pengalaman 10–20 tahun di lapangan adalah aset yang tidak dipunya developer IT. Gustafta dirancang no-code — tidak perlu coding. Jika Anda bisa mengisi formulir dan mengirim email, Anda sudah bisa membangun asisten AI spesialis konstruksi.",
               },
               {
-                q: `🤔 "Saya terancam PHK, tidak punya banyak waktu untuk belajar hal baru"`,
-                a: "Justru karena itulah ini DARURAT. Buku ini dirancang untuk orang sibuk — setiap bab bisa dibaca 15–20 menit. Total cukup 20–25 jam dalam 1–3 bulan untuk membangun fondasi 'sekoci' finansial pertama Anda.",
+                q: `🤔 "Apakah bisa dipakai untuk tender dan pengurusan SBU/SKK?"`,
+                a: "Ya, itu justru kasus penggunaan utama. Gustafta memiliki 1.350+ Agen AI Spesialis termasuk yang khusus membantu analisis dokumen tender, panduan syarat SKK, pemahaman regulasi PUPR, dan monitoring kelayakan BUJK. Panduan ini menjelaskan cara menggunakannya secara optimal.",
               },
               {
-                q: `🤔 "Apa bedanya dengan belajar dari YouTube gratis?"`,
-                a: "YouTube memberikan serpihan informasi. Trilogi memberikan sistem yang teruji end-to-end: dari mindset, memilih keahlian, membangun chatbot, hingga mendapatkan klien pertama dan menskalakan penghasilan subscription. Plus template dan prompt pack siap pakai.",
+                q: `🤔 "Apakah sesuai regulasi konstruksi Indonesia yang terus berubah?"`,
+                a: "Platform Gustafta diperbarui mengikuti Perpres, PP, dan Permen PUPR terbaru. Tim kami dari kalangan praktisi dan asosiasi konstruksi aktif memastikan agen AI selalu relevan dengan regulasi terkini — termasuk Perpres 46/2025 tentang pengadaan dan standar kompetensi.",
               },
               {
-                q: `🤔 "Apakah saya perlu berlangganan Gustafta setelah beli ebook ini?"`,
-                a: "Tidak wajib. Ebook bisa dipelajari sendiri terlebih dahulu. Paket Premium sudah termasuk BONUS Trial Gustafta Builder 7 hari agar Anda bisa langsung praktik. Setelah itu, Anda bebas memilih lanjut berlangganan atau tidak.",
+                q: `🤔 "Apa bedanya dengan software manajemen proyek yang sudah ada?"`,
+                a: "Software manajemen proyek mengotomatiskan proses yang sudah Anda tahu. Gustafta membuat pengetahuan teknis Anda bisa diakses oleh siapapun di tim — seperti punya ahli yang bisa menjawab pertanyaan kapanpun, tanpa harus menunggu Anda tersedia.",
               },
               {
                 q: `🤔 "Bagaimana jika saya tidak puas setelah beli?"`,
-                a: "Untuk Paket Premium (Bundling), berlaku Garansi 30 Hari Bersyarat: uang kembali 100% jika Anda sudah membaca minimal 2 dari 3 buku, mencoba minimal 1 latihan per buku, dan melampirkan dokumentasi singkat (foto catatan/screenshot).",
+                a: "Untuk Paket Premium berlaku Garansi 30 Hari Bersyarat: uang kembali 100% jika Anda sudah membaca minimal 2 dari 3 buku, mencoba minimal 1 latihan per buku, dan melampirkan dokumentasi singkat. Kami percaya diri karena ribuan BUJK dan profesional sudah membuktikannya.",
               },
             ].map((item, i) => (
               <AccordionItem key={i} value={`faq-${i}`} className="border border-gray-200 rounded-xl px-4">
@@ -524,24 +606,24 @@ export default function TrilogiLanding() {
       </section>
 
       {/* ══════════════════════════════════════════════
-          FINAL CTA — Urgency Close
+          FINAL CTA
       ══════════════════════════════════════════════ */}
       <section className="py-16 px-4 bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-2xl md:text-3xl font-extrabold mb-4">Dua Pilihan di Depan Anda</h2>
           <div className="grid sm:grid-cols-2 gap-4 mb-8 text-left">
             <div className="bg-red-900/40 border border-red-500/40 rounded-xl p-5">
-              <p className="font-bold text-red-300 mb-2">❌ Tidak melakukan apa-apa</p>
+              <p className="font-bold text-red-300 mb-2">❌ Tetap seperti sekarang</p>
               <p className="text-sm text-red-200/80 leading-relaxed">
-                Tetap di roda hamster. Tetap khawatir soal PHK. Tetap bergantung pada satu sumber penghasilan.
-                5 tahun lagi situasinya tidak berubah.
+                Dokumentasi masih manual, kalah tender karena administrasi, regulasi terus dikejar.
+                5 tahun lagi prosesnya masih sama.
               </p>
             </div>
             <div className="bg-green-900/40 border border-green-400/40 rounded-xl p-5">
-              <p className="font-bold text-green-300 mb-2">✅ Ambil langkah hari ini</p>
+              <p className="font-bold text-green-300 mb-2">✅ Mulai peta jalan hari ini</p>
               <p className="text-sm text-green-200/80 leading-relaxed">
-                Mulai ubah keahlian jadi chatbot AI. 3 bulan lagi punya side income pertama.
-                6 bulan lagi punya penghasilan yang tidak bergantung satu bos.
+                Dalam 3 bulan punya asisten AI spesialis. Tender lebih siap, dokumen lebih rapi,
+                dan tim Anda punya panduan yang bisa diakses kapanpun.
               </p>
             </div>
           </div>
@@ -549,7 +631,7 @@ export default function TrilogiLanding() {
           <a href={SCALEV_BUNDLE} target="_blank" rel="noopener noreferrer" onClick={handleBundleClick}
             className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-400 text-white text-lg font-extrabold py-5 px-10 rounded-2xl shadow-2xl transition-all transform hover:scale-105 active:scale-95 mb-4"
             data-testid="button-final-cta">
-            🔥 Ya, Saya Mau Mulai Sekarang
+            🗺️ Ya, Saya Mau Mulai Sekarang
           </a>
           <p className="text-sm text-blue-200">✅ Garansi 30 Hari Bersyarat &nbsp;|&nbsp; ⏰ Harga Early Bird berakhir 15 Agustus 2026</p>
         </div>
@@ -557,7 +639,7 @@ export default function TrilogiLanding() {
 
       {/* ── Footer ── */}
       <footer className="bg-gray-950 text-gray-500 py-8 px-4 text-center text-sm">
-        <p className="mb-1 text-gray-400">© 2026 Gustafta — WordPress-nya Ekosistem Kompetensi Indonesia.</p>
+        <p className="mb-1 text-gray-400">© 2026 Gustafta — Platform AI untuk Ekosistem Jasa Konstruksi Indonesia.</p>
         <p className="text-xs">
           Butuh bantuan?{" "}
           <a href={WA_URL} target="_blank" rel="noopener noreferrer" onClick={() => trackContact()}
@@ -586,7 +668,7 @@ export default function TrilogiLanding() {
         <a href={SCALEV_BUNDLE} target="_blank" rel="noopener noreferrer" onClick={handleBundleClick}
           className="flex-1 bg-orange-500 hover:bg-orange-400 text-white text-sm font-bold py-3 rounded-xl text-center transition-all active:scale-95"
           data-testid="button-mobile-sticky-buy">
-          🔥 Early Bird {TRILOGI.bundle.price}
+          🗺️ Peta Jalan {TRILOGI.bundle.price}
         </a>
         <a href={WA_URL} target="_blank" rel="noopener noreferrer" onClick={() => trackContact()}
           className="px-4 bg-green-500 hover:bg-green-400 text-white text-sm font-bold py-3 rounded-xl transition-all active:scale-95"

@@ -630,7 +630,8 @@ export default function Store() {
                         </Badge>
                       ) : detailAgent.isCreatorMade ? (
                         <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-0 flex items-center gap-1"
-                          data-testid={`badge-detail-pra-sertifikasi-${detailAgent.id}`}
+                          title="Dibuat Fasilitator independen — belum melalui sertifikasi Gustafta."
+                data-testid={`badge-detail-pra-sertifikasi-${detailAgent.id}`}
                           title="Dibuat kreator independen — belum bersertifikat. Periksa dulu sebelum membeli.">
                           <ShieldAlert className="h-2.5 w-2.5" />Pra-Sertifikasi
                         </Badge>
@@ -919,7 +920,7 @@ function AgentCard({
               </Badge>
             ) : agent.isCreatorMade && (
               <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-0 flex items-center gap-1"
-                data-testid={`badge-pra-sertifikasi-${agent.id}`} title="Dibuat kreator independen — belum bersertifikat. Periksa dulu sebelum membeli.">
+                data-testid={`badge-pra-sertifikasi-${agent.id}`} title="Dibuat Fasilitator independen — belum melalui sertifikasi Gustafta. Periksa sebelum membeli.">
                 <ShieldAlert className="h-2.5 w-2.5" />Pra-Sertifikasi
               </Badge>
             )}
