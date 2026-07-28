@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,8 +18,6 @@ interface HelpdeskAgent {
 }
 
 export function ChaesaWidget() {
-  const [location] = useLocation();
-  const isHomepage = location === "/";
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<WidgetMessage[]>([]);
   const [input, setInput] = useState("");
@@ -147,7 +144,7 @@ export function ChaesaWidget() {
 
   return (
     <>
-      <div className={`fixed bottom-6 z-50 flex flex-col gap-3 ${isHomepage ? "left-6 items-start" : "right-6 items-end"}`}>
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 items-end">
         {isOpen && (
           <div
             className="w-80 sm:w-96 rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden bg-card"

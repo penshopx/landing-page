@@ -17,7 +17,7 @@ import {
   MessageCircle, ShieldCheck, Store, Bot, FileText, CreditCard,
   GraduationCap, Smartphone, Users, Building2, Briefcase, User,
   Send, Loader2, Sparkles, X, ChevronDown, Lock, ShoppingBag, FileDown,
-  Mic, MicOff, Paperclip, Bell, Clock, Target, Mail, Stethoscope, CalendarDays,
+  Mic, MicOff, Paperclip, Bell, Clock, Target, Mail, Stethoscope,
 } from "lucide-react";
 
 const GUSTAFTA_AGENT_ID = "1";
@@ -562,18 +562,18 @@ export default function Landing() {
     <div className="min-h-screen bg-background" data-testid="page-landing">
       <SharedHeader />
 
-      {/* ── RUANG SIMPAN INVITE STRIP ── */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 py-2.5 px-4">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 text-center sm:text-left">
-          <span className="text-white text-sm leading-snug">
-            <span className="font-semibold">📁 Ruang Simpan</span>
-            {" — "}simpan dokumen proyek Anda, lalu tanya apa saja. AI menjawab berdasarkan konteks Anda sendiri.
+      {/* ── ANNOUNCEMENT STRIP ── */}
+      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 py-2 px-4 border-b border-white/10">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+          <span className="text-white/90 text-xs leading-snug flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 bg-yellow-400/20 border border-yellow-400/40 text-yellow-300 text-[10px] font-bold px-2 py-0.5 rounded-full">✨ Baru</span>
+            <span><span className="font-semibold text-white">Ruang Simpan + AI Memory</span> — upload dokumen Anda, tanya apa saja, AI menjawab berdasarkan konteks nyata bisnis Anda.</span>
           </span>
           <Link
             href={isAuthenticated ? "/ruang-simpan" : "/login"}
             className="shrink-0 inline-flex items-center gap-1.5 bg-white text-blue-700 font-semibold text-xs px-3 py-1.5 rounded-full hover:bg-blue-50 transition-colors whitespace-nowrap"
           >
-            Mulai Simpan & Tanya →
+            Coba Gratis →
           </Link>
         </div>
       </div>
@@ -586,56 +586,43 @@ export default function Landing() {
         <div className="max-w-4xl mx-auto relative text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 text-white text-xs font-semibold mb-6 backdrop-blur-sm">
             <Wrench className="h-3.5 w-3.5" />
-            Dibangun oleh Praktisi Konstruksi
+            Platform AI Spesialis Konstruksi Indonesia
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 leading-tight" data-testid="text-hero-title">
-            Solusi Digital untuk
+            AI yang Benar-Benar Paham
             <br />
-            <span className="text-yellow-300">SBU, SKK, dan Tender Konstruksi</span>
+            <span className="text-yellow-300">Konstruksi Indonesia</span>
           </h1>
 
           <p className="text-sm md:text-base text-blue-200 mb-6 leading-relaxed max-w-2xl mx-auto">
-            Tanya jawab instan 24/7, bedah dokumen, pendampingan proyek, dan panduan konstruksi — semua dalam satu platform.
-            Dibangun oleh praktisi konstruksi untuk praktisi konstruksi.
+            Konsultasi SBU, SKK, Tender — jawaban instan 24/7. Bedah dokumen, pantau perizinan, dan simpan memori bisnis Anda.
+            Dibangun oleh praktisi konstruksi, untuk praktisi konstruksi.
           </p>
-
-          {/* ── Flow hint Ruang Simpan ── */}
-          <div className="flex items-center justify-center gap-1 sm:gap-2 mb-7 flex-wrap">
-            {[
-              { icon: "📁", label: "Dokumen & catatan\ntersimpan rapi" },
-              { icon: "🧠", label: "AI membaca &\nmemahami konteks" },
-              { icon: "💬", label: "Jawaban lebih\nterarah & akurat" },
-            ].map((step, i, arr) => (
-              <div key={step.icon} className="flex items-center gap-1 sm:gap-2">
-                <div className="flex flex-col items-center gap-1 bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2 min-w-[90px]">
-                  <span className="text-lg leading-none">{step.icon}</span>
-                  <span className="text-[10px] text-blue-100 text-center leading-tight whitespace-pre-line">{step.label}</span>
-                </div>
-                {i < arr.length - 1 && (
-                  <span className="text-blue-300/60 text-sm hidden sm:block">→</span>
-                )}
-              </div>
-            ))}
-          </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
             <Button asChild size="lg" className="w-full sm:w-auto bg-white text-blue-700 hover:bg-blue-50 font-bold gap-2 px-6 h-12" data-testid="button-hero-klinik">
               <Link href="/klinik-konsultasi">
                 <Stethoscope className="w-4 h-4" />
-                Mulai Tanya Sekarang
+                Mulai Konsultasi Gratis
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="w-full sm:w-auto border-white/40 text-white hover:bg-white/10 gap-2 px-6 h-12" data-testid="button-hero-packs">
-              <Link href="/bedah-dokumen">
+              <Link href="/store">
                 <BookOpen className="w-4 h-4" />
-                Lihat Paket Bedah Kasus
+                Lihat AI Specialist
               </Link>
             </Button>
           </div>
 
-          <div className="flex flex-wrap gap-4 text-xs text-blue-200 justify-center mb-8">
-            {["✅ Respon instan", "✅ Berdasarkan regulasi terbaru", "✅ Dipercaya praktisi konstruksi"].map((s) => (
+          {/* Social proof mini */}
+          <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-blue-200 justify-center mb-8">
+            {[
+              "✅ Respon instan 24/7",
+              "✅ Regulasi SBU, SKK, Tender terbaru",
+              "✅ Gratis untuk pertanyaan dasar",
+              "✅ Tanpa perlu install apapun",
+            ].map((s) => (
               <span key={s}>{s}</span>
             ))}
           </div>
@@ -653,6 +640,25 @@ export default function Landing() {
               className="w-full aspect-video"
               data-testid="video-hero-explainer"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* ── STATS BAR ── */}
+      <section className="py-8 px-4 bg-slate-50 dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+            {[
+              { value: "80+", label: "AI Specialist tersedia" },
+              { value: "24/7", label: "Konsultasi tanpa batas" },
+              { value: "12+", label: "Domain konstruksi" },
+              { value: "Gratis", label: "Untuk mulai pakai" },
+            ].map((s) => (
+              <div key={s.label} className="flex flex-col gap-1">
+                <span className="text-2xl font-black text-blue-600 dark:text-blue-400">{s.value}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">{s.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -1451,37 +1457,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── EVENT: INDOBUILDTECH 2026 ── */}
-      <section className="py-16 px-4 bg-gray-50 dark:bg-muted/20" data-testid="section-indobuildtech">
-        <div className="max-w-5xl mx-auto">
-          <div className="rounded-3xl border border-orange-200 dark:border-orange-800 bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/30 dark:to-background p-8 md:p-10">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-orange-600 text-white">
-                <CalendarDays className="w-3 h-3" /> Event
-              </span>
-              <span className="text-[10px] font-semibold text-orange-700 dark:text-orange-400 uppercase tracking-wider">
-                ASDAMKINDO × Gustafta
-              </span>
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
-              Seminar Nasional Indobuildtech 2026
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4 max-w-2xl">
-              Tema "Perkuatan Bangunan Miring". Kunjungi booth kami dan lihat langsung solusi AI Gustafta untuk industri konstruksi — plus bonus eksklusif untuk peserta seminar.
-            </p>
-            <p className="inline-flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mb-6">
-              <Clock className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" /> Kamis, 9 Juli 2026 · 13.00–17.30 WIB
-            </p>
-            <div>
-              <Button asChild size="lg" className="gap-2 bg-orange-600 hover:bg-orange-700 text-white" data-testid="btn-indobuildtech">
-                <Link href="/indobuildtech">
-                  Lihat Detail Event <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ── SOLUSI AI PER BIDANG ── */}
       <section className="py-16 px-4 bg-white dark:bg-background">

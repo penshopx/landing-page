@@ -183,7 +183,7 @@ export function DialogGustaftaWidget() {
     <>
       {/* Floating Promo Card — muncul saat dialog sudah dalam */}
       {isOpen && showPromo && !promoDismissed && (
-        <div className="fixed bottom-24 left-4 z-50 w-[300px] max-w-[calc(100vw-2rem)]">
+        <div className="fixed bottom-24 right-4 z-50 w-[300px] max-w-[calc(100vw-2rem)]">
           <div className="bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 border border-purple-500/40 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-500">
             <div className="p-4">
               <button
@@ -228,11 +228,11 @@ export function DialogGustaftaWidget() {
       )}
 
       {/* Main widget */}
-      <div className="fixed bottom-4 left-4 z-50">
+      <div className="fixed bottom-4 right-4 z-50">
         {/* Chat Window */}
         <div
           className={cn(
-            "absolute bottom-16 left-0 w-[360px] max-w-[calc(100vw-2rem)] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 origin-bottom-left",
+            "absolute bottom-16 right-0 w-[360px] max-w-[calc(100vw-2rem)] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 origin-bottom-right",
             isOpen
               ? "scale-100 opacity-100 pointer-events-auto"
               : "scale-95 opacity-0 pointer-events-none"
@@ -411,7 +411,7 @@ export function DialogGustaftaWidget() {
 
           {/* Label */}
           {!isOpen && (
-            <div className="absolute bottom-1 left-16 bg-[#0e3a6e]/90 border border-cyan-500/30 text-cyan-200 text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap shadow-lg pointer-events-none backdrop-blur-sm">
+            <div className="absolute bottom-1 right-16 bg-[#0e3a6e]/90 border border-cyan-500/30 text-cyan-200 text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap shadow-lg pointer-events-none backdrop-blur-sm">
               Dialog Gustafta
             </div>
           )}
