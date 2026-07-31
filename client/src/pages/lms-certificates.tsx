@@ -187,13 +187,15 @@ function CertificateCard({ cert }: { cert: Certificate }) {
             </Button>
           </a>
           <a
-            href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`)}&title=${encodeURIComponent(`Sertifikat ${cert.course?.title || "Kursus"} — Gustafta Academy`)}&summary=${encodeURIComponent("Saya telah menyelesaikan kursus di Gustafta Academy!")}`}
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`)}`}
             target="_blank"
             rel="noopener noreferrer"
             data-testid={`link-linkedin-share-${cert.id}`}
+            className="flex-1"
           >
-            <Button variant="outline" size="sm" className="gap-1 text-xs px-2.5 text-[#0A66C2] border-[#0A66C2]/30 hover:bg-[#0A66C2]/5">
+            <Button variant="outline" size="sm" className="w-full gap-1.5 text-xs text-[#0A66C2] border-[#0A66C2]/30 hover:bg-[#0A66C2]/5">
               <Linkedin className="w-3 h-3" />
+              Bagikan ke LinkedIn
             </Button>
           </a>
           <Button
