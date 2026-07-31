@@ -587,22 +587,73 @@ export function registerLmsRoutes(app: Express) {
                 .from(lmsCourses).where(eq(lmsCourses.id, courseId));
               const courseTitle = course?.title ?? "Kursus";
               const studentName = (uRow?.full_name as string) || "Peserta";
-              const verifyUrl = `https://gustafta.my.id/lms/verify/${certificateCode}`;
+              const issueDate = now.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+              const appBase = process.env.REPLIT_DEV_DOMAIN
+                ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+                : "https://gustafta.my.id";
+              const certsUrl = `${appBase}/lms/certificates`;
+              const verifyUrl = `${appBase}/lms/verify/${certificateCode}`;
+
+              const htmlContent = `<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 0">
+    <tr><td align="center">
+      <table width="480" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;padding:40px;font-family:Arial,sans-serif;color:#111">
+        <tr><td>
+          <p style="margin:0 0 4px;font-size:22px;font-weight:700;color:#4f46e5">Gustafta Academy</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0">
+          <p style="font-size:16px;margin:0 0 8px">Selamat, <b>${studentName}</b>! 🎓</p>
+          <p style="font-size:15px;color:#374151;margin:0 0 16px">
+            Anda telah berhasil menyelesaikan kursus <b>${courseTitle}</b> di Gustafta Academy.
+          </p>
+          <div style="padding:20px;background:#f5f3ff;border-radius:8px;border:1px solid #c4b5fd;margin:0 0 24px">
+            <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Nama Kursus</p>
+            <p style="font-size:16px;font-weight:700;color:#111;margin:0 0 12px">${courseTitle}</p>
+            <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Tanggal Terbit</p>
+            <p style="font-size:14px;color:#111;margin:0 0 12px">${issueDate}</p>
+            <p style="font-size:13px;color:#6b7280;margin:0 0 4px">Kode Sertifikat</p>
+            <p style="font-size:15px;font-weight:700;color:#4f46e5;font-family:monospace;letter-spacing:1px;margin:0">${certificateCode}</p>
+          </div>
+          <div style="text-align:center;margin:0 0 16px">
+            <a href="${certsUrl}" style="display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;font-size:15px;font-weight:700;padding:14px 28px;border-radius:8px">📄 Unduh Sertifikat PDF</a>
+          </div>
+          <div style="text-align:center;margin:0 0 24px">
+            <a href="${verifyUrl}" style="font-size:13px;color:#4f46e5;text-decoration:underline">Verifikasi keaslian sertifikat →</a>
+          </div>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:0 0 16px">
+          <p style="font-size:12px;color:#9ca3af;margin:0">Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi kelulusan Anda kapan saja.</p>
+          <p style="font-size:12px;color:#9ca3af;margin:8px 0 0">© 2026 Gustafta. Seluruh hak dilindungi.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+              const textContent = `Selamat, ${studentName}!
+
+Anda telah berhasil menyelesaikan kursus "${courseTitle}" di Gustafta Academy.
+
+Nama Kursus  : ${courseTitle}
+Tanggal Terbit: ${issueDate}
+Kode Sertifikat: ${certificateCode}
+
+Unduh sertifikat PDF: ${certsUrl}
+Verifikasi keaslian : ${verifyUrl}
+
+Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi kelulusan Anda kapan saja.
+
+© 2026 Gustafta.`;
+
               await sendEmail({
                 to: email,
+                toName: studentName,
                 subject: `🎓 Selamat! Sertifikat "${courseTitle}" berhasil diraih`,
-                html: `
-                  <div style="font-family:sans-serif;max-width:540px;margin:auto;padding:24px">
-                    <h2 style="color:#4f46e5">Selamat, ${studentName}! 🎓</h2>
-                    <p>Anda telah berhasil menyelesaikan kursus <strong>${courseTitle}</strong> di Gustafta Academy.</p>
-                    <p>Sertifikat Anda dengan kode <strong style="font-family:monospace">${certificateCode}</strong> telah diterbitkan.</p>
-                    <p style="margin:24px 0">
-                      <a href="${verifyUrl}" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:600">
-                        Lihat &amp; Verifikasi Sertifikat
-                      </a>
-                    </p>
-                    <p style="color:#888;font-size:12px">Link verifikasi: ${verifyUrl}</p>
-                  </div>`,
+                htmlContent,
+                textContent,
+                tags: ["certificate", "lms"],
               });
             } catch { /* fire-and-forget — never block progress response */ }
           })();
