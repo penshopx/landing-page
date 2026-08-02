@@ -713,6 +713,7 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
       const [course] = await db.select({
         id: lmsCourses.id, title: lmsCourses.title, emoji: lmsCourses.emoji,
         color: lmsCourses.color, category: lmsCourses.category,
+        instructor: lmsCourses.instructor,
       }).from(lmsCourses).where(eq(lmsCourses.id, cert.courseId));
       // Get student display name
       const nameRows = await db.execute(sql.raw(
