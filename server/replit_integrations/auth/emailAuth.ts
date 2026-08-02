@@ -623,6 +623,126 @@ export function registerEmailAuthRoutes(app: Express): void {
     }
   });
 
+  // ── WA OTP LOGIN — passwordless, step 1: request OTP ──────────────────────
+  app.post("/api/auth/request-wa-login", otpLimiter, async (req, res) => {
+    try {
+      const { phone } = req.body;
+      if (!phone) return res.status(400).json({ error: "Nomor WhatsApp wajib diisi." });
+      const normalizedPhone = normalizePhone(String(phone));
+      if (normalizedPhone.length < 10) {
+        return res.status(400).json({ error: "Format nomor WhatsApp tidak valid. Contoh: 08123456789" });
+      }
+
+      const [existing] = await db.select().from(users).where(eq(users.phone, normalizedPhone)).limit(1);
+
+      const otpKey = `wa_login:${normalizedPhone}`;
+      const code = generateOTP();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+      await db.update(emailVerifications).set({ used: true }).where(eq(emailVerifications.email, otpKey));
+      await db.insert(emailVerifications).values({ id: randomUUID(), email: otpKey, code, expiresAt });
+
+      const firstName = existing?.firstName || "Pengguna";
+      const result = await sendOtpWhatsapp(normalizedPhone, code, firstName, "register");
+
+      if (!result.sent) {
+        if (result.reason === "not_configured") {
+          if (isProduction) {
+            return res.status(503).json({ error: "Layanan WhatsApp belum dikonfigurasi. Hubungi administrator." });
+          }
+          return res.json({ success: true, isNewUser: !existing, otpFallback: code, message: "OTP dibuat (WA belum dikonfigurasi)." });
+        }
+        console.error(`[EmailAuth] WA login OTP send failed (${result.reason}) for ${normalizedPhone}: ${result.detail ?? ""}`);
+        return res.status(503).json({ error: "Kode OTP gagal terkirim ke WhatsApp. Coba lagi dalam beberapa menit, atau hubungi administrator jika masalah berlanjut." });
+      }
+
+      res.json({ success: true, isNewUser: !existing, message: "Kode OTP dikirim ke WhatsApp Anda." });
+    } catch (err) {
+      console.error("[EmailAuth] Request WA login error:", err);
+      res.status(500).json({ error: "Terjadi kesalahan. Silakan coba lagi." });
+    }
+  });
+
+  // ── WA OTP LOGIN — passwordless, step 2: verify OTP + create session ───────
+  app.post("/api/auth/verify-wa-login", otpLimiter, async (req: any, res) => {
+    try {
+      const { phone, code, firstName: rawFirstName, lastName: rawLastName } = req.body;
+      if (!phone || !code) return res.status(400).json({ error: "Nomor HP dan kode OTP wajib diisi." });
+
+      const normalizedPhone = normalizePhone(String(phone));
+      const otpKey = `wa_login:${normalizedPhone}`;
+
+      const [verif] = await db
+        .select()
+        .from(emailVerifications)
+        .where(
+          and(
+            eq(emailVerifications.email, otpKey),
+            eq(emailVerifications.code, String(code).trim()),
+            eq(emailVerifications.used, false),
+            gt(emailVerifications.expiresAt, new Date())
+          )
+        )
+        .limit(1);
+
+      if (!verif) return res.status(400).json({ error: "Kode OTP salah atau sudah kadaluarsa." });
+
+      await db.update(emailVerifications).set({ used: true }).where(eq(emailVerifications.id, verif.id));
+
+      let [userRow] = await db.select().from(users).where(eq(users.phone, normalizedPhone)).limit(1);
+      const isNewUser = !userRow;
+
+      if (!userRow) {
+        const firstName = sanitizePlainText((rawFirstName || "Pengguna").trim());
+        const lastName = sanitizePlainText((rawLastName || "").trim());
+        const newId = randomUUID();
+        await db.insert(users).values({
+          id: newId,
+          phone: normalizedPhone,
+          firstName,
+          lastName,
+          emailVerified: true,
+          otpChannel: "wa",
+          authProvider: "email",
+          isActive: true,
+        } as any);
+        [userRow] = await db.select().from(users).where(eq(users.id, newId)).limit(1);
+        seedSampleAgentForEmailUser(newId, firstName).catch(() => {});
+        console.log(`[EmailAuth] Auto-registered new WA user ${normalizedPhone} (id=${newId})`);
+      }
+
+      if (!userRow) return res.status(500).json({ error: "Gagal membuat akun. Silakan coba lagi." });
+
+      if (userRow.isActive === false) {
+        return res.status(403).json({ error: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta." });
+      }
+
+      const effectiveRole = await promoteSuperAdminIfMatch(userRow.id, userRow.phone, userRow.role, userRow.email);
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.regenerate((err: any) => { if (err) reject(err); else resolve(); });
+      });
+
+      (req.session as any).emailUser = {
+        id: userRow.id,
+        email: userRow.email,
+        firstName: userRow.firstName,
+        lastName: userRow.lastName,
+        role: effectiveRole,
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err: any) => { if (err) reject(err); else resolve(); });
+      });
+
+      console.log(`[EmailAuth] WA login OK for ${normalizedPhone} (user=${userRow.id}, new=${isNewUser})`);
+      res.json({ success: true, isNewUser, message: isNewUser ? "Akun berhasil dibuat! Selamat datang." : "Berhasil masuk!" });
+    } catch (err) {
+      console.error("[EmailAuth] Verify WA login error:", err);
+      res.status(500).json({ error: "Terjadi kesalahan. Silakan coba lagi." });
+    }
+  });
+
   // ── FORGOT PASSWORD: Step 1 — request reset OTP ─────────────────────────────
   app.post("/api/auth/request-reset", otpLimiter, async (req, res) => {
     try {

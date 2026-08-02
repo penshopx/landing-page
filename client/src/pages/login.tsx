@@ -12,7 +12,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, CheckCircle2, LogOut, AlertTr
 import { trackCompleteRegistration, trackLead } from "@/lib/meta-pixel";
 import { usePartnerBranding } from "@/hooks/use-partner-branding";
 
-type Mode = "choose" | "login" | "register" | "verify" | "forgot" | "reset";
+type Mode = "choose" | "login" | "register" | "verify" | "forgot" | "reset" | "wa-otp" | "wa-otp-verify";
 
 export default function LoginPage() {
   const contact = useContactNumbers();
@@ -21,11 +21,20 @@ export default function LoginPage() {
   const { partner } = usePartnerBranding();
   const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const returnUrl = searchParams.get("return") || searchParams.get("redirect") || "/dashboard";
-  const initialMode: Mode = searchParams.get("mode") === "register" ? "register" : "login";
+  const initialMode: Mode = searchParams.get("mode") === "register" ? "register" : "choose";
   const [mode, setMode] = useState<Mode>(initialMode);
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
+
+  // WA OTP (passwordless) state
+  const [waPhone, setWaPhone] = useState("");
+  const [waCode, setWaCode] = useState("");
+  const [waFirstName, setWaFirstName] = useState("");
+  const [waLastName, setWaLastName] = useState("");
+  const [waIsNewUser, setWaIsNewUser] = useState(false);
+  const [waFallback, setWaFallback] = useState<string | undefined>(undefined);
+  const [waSendError, setWaSendError] = useState<string | undefined>(undefined);
 
   // Fields
   const [email, setEmail] = useState("");
@@ -208,6 +217,63 @@ export default function LoginPage() {
     }
   };
 
+  // ── WA OTP handlers (passwordless) ──────────────────────────────────────────
+  const handleRequestWaLogin = async () => {
+    if (!waPhone.trim()) {
+      toast({ title: "Nomor WhatsApp wajib diisi", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    setWaFallback(undefined);
+    setWaSendError(undefined);
+    try {
+      const res = await apiRequest("POST", "/api/auth/request-wa-login", { phone: waPhone });
+      setWaIsNewUser(!!res?.isNewUser);
+      setWaFallback(res?.otpFallback);
+      if (res?.otpFallback) {
+        toast({ title: "OTP dibuat", description: "Layanan WA belum dikonfigurasi — lihat kode di layar." });
+      } else {
+        toast({ title: "Kode OTP dikirim!", description: `Cek WhatsApp ${waPhone}` });
+      }
+      setMode("wa-otp-verify");
+    } catch (err: any) {
+      const msg = (err?.message || "").replace(/^\d+: /, "");
+      setWaSendError(msg || "Kode OTP gagal terkirim. Coba lagi.");
+      toast({ title: "Gagal kirim OTP", description: msg, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyWaLogin = async () => {
+    if (!waCode || waCode.length !== 6) {
+      toast({ title: "Kode OTP harus 6 digit", variant: "destructive" });
+      return;
+    }
+    if (waIsNewUser && !waFirstName.trim()) {
+      toast({ title: "Nama depan wajib diisi", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      await apiRequest("POST", "/api/auth/verify-wa-login", {
+        phone: waPhone,
+        code: waCode,
+        firstName: waFirstName || undefined,
+        lastName: waLastName || undefined,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      trackCompleteRegistration();
+      trackLead();
+      window.location.href = returnUrl;
+    } catch (err: any) {
+      const msg = (err?.message || "").replace(/^\d+: /, "");
+      toast({ title: "Verifikasi gagal", description: msg, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleResendOTP = async () => {
     setLoading(true);
     try {
@@ -263,30 +329,43 @@ export default function LoginPage() {
             <>
               <div className="text-center space-y-1">
                 <h1 className="text-xl font-bold">Masuk ke {partner?.brandName || "Gustafta"}</h1>
-                <p className="text-sm text-muted-foreground">Gunakan email & password Anda</p>
+                <p className="text-sm text-muted-foreground">Pilih cara masuk Anda</p>
               </div>
 
               <div className="space-y-3">
                 <Button
+                  className="w-full h-12 gap-3 font-medium bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => { setWaPhone(""); setWaCode(""); setWaFirstName(""); setWaLastName(""); setWaFallback(undefined); setWaSendError(undefined); setMode("wa-otp"); }}
+                  data-testid="button-login-wa"
+                >
+                  <Phone className="h-5 w-5" />
+                  Masuk / Daftar dengan WhatsApp
+                </Button>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">atau</span>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
                   className="w-full h-11 gap-3 font-medium"
                   onClick={() => setMode("login")}
                   data-testid="button-login-email"
                 >
                   <Mail className="h-4 w-4" />
-                  Masuk dengan Email
+                  Masuk dengan Email & Password
                 </Button>
-              </div>
-
-              <p className="text-center text-sm text-muted-foreground">
-                Belum punya akun?{" "}
-                <button
-                  className="text-primary font-medium hover:underline"
+                <Button
+                  variant="ghost"
+                  className="w-full h-10 gap-2 text-sm"
                   onClick={() => setMode("register")}
                   data-testid="button-go-register"
                 >
-                  Daftar sekarang
-                </button>
-              </p>
+                  <User className="h-4 w-4" />
+                  Daftar akun baru (email)
+                </Button>
+              </div>
             </>
           )}
 
@@ -605,6 +684,147 @@ export default function LoginPage() {
               </button>
             </>
           )}
+          {/* ── WA OTP — enter phone ── */}
+          {mode === "wa-otp" && (
+            <>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setMode("choose")} className="text-muted-foreground hover:text-foreground">
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <div>
+                  <h1 className="text-lg font-bold">Masuk dengan WhatsApp</h1>
+                  <p className="text-xs text-muted-foreground">Kode OTP dikirim ke nomor WA Anda</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="wa-phone">Nomor WhatsApp *</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="wa-phone"
+                      type="tel"
+                      placeholder="08123456789"
+                      className="pl-9"
+                      value={waPhone}
+                      onChange={(e) => setWaPhone(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleRequestWaLogin()}
+                      autoFocus
+                      data-testid="input-wa-phone"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">Format: 08xxx, 628xxx, atau +628xxx. Jika belum punya akun, akun baru dibuat otomatis.</p>
+                </div>
+                {waSendError && (
+                  <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive flex gap-2">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>{waSendError}</span>
+                  </div>
+                )}
+                <Button className="w-full bg-green-600 hover:bg-green-700" onClick={handleRequestWaLogin} disabled={loading || !waPhone.trim()} data-testid="button-send-wa-otp">
+                  {loading ? "Mengirim..." : "Kirim Kode OTP via WhatsApp"}
+                </Button>
+              </div>
+
+              <p className="text-center text-sm text-muted-foreground">
+                Punya email & password?{" "}
+                <button className="text-primary font-medium hover:underline" onClick={() => setMode("login")}>
+                  Login email
+                </button>
+              </p>
+            </>
+          )}
+
+          {/* ── WA OTP — verify code ── */}
+          {mode === "wa-otp-verify" && (
+            <>
+              <div className="text-center space-y-2">
+                <div className="mx-auto h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                  <Phone className="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h1 className="text-lg font-bold">{waIsNewUser ? "Buat Akun via WhatsApp" : "Verifikasi WhatsApp"}</h1>
+                <p className="text-sm text-muted-foreground">
+                  {waFallback
+                    ? <>Layanan WA belum dikonfigurasi — gunakan kode di bawah</>
+                    : <>Kode OTP dikirim ke WhatsApp<br /><span className="font-medium text-foreground">{waPhone}</span></>
+                  }
+                </p>
+              </div>
+
+              {waFallback && (
+                <div className="rounded-xl border-2 border-dashed border-amber-400 bg-amber-50 dark:bg-amber-950/30 p-4 text-center space-y-1">
+                  <p className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">Kode OTP Anda</p>
+                  <p className="text-3xl font-bold tracking-[0.3em] text-amber-900 dark:text-amber-200 select-all">{waFallback}</p>
+                  <p className="text-xs text-amber-600 dark:text-amber-500">Salin kode ini dan masukkan di bawah</p>
+                </div>
+              )}
+
+              <div className="space-y-3">
+                {/* Name fields — only for new users */}
+                {waIsNewUser && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="wa-firstname">Nama Depan *</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="wa-firstname"
+                          placeholder="Budi"
+                          className="pl-9"
+                          value={waFirstName}
+                          onChange={(e) => setWaFirstName(e.target.value)}
+                          data-testid="input-wa-firstname"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="wa-lastname">Nama Belakang</Label>
+                      <Input
+                        id="wa-lastname"
+                        placeholder="Santoso"
+                        value={waLastName}
+                        onChange={(e) => setWaLastName(e.target.value)}
+                        data-testid="input-wa-lastname"
+                      />
+                    </div>
+                  </div>
+                )}
+                <div className="space-y-1.5">
+                  <Label htmlFor="wa-otp-code">Kode OTP (6 digit)</Label>
+                  <Input
+                    id="wa-otp-code"
+                    placeholder="123456"
+                    maxLength={6}
+                    className="text-center text-2xl font-bold tracking-widest h-12"
+                    value={waCode}
+                    onChange={(e) => setWaCode(e.target.value.replace(/\D/g, ""))}
+                    onKeyDown={(e) => e.key === "Enter" && handleVerifyWaLogin()}
+                    autoFocus={!waIsNewUser}
+                    data-testid="input-wa-otp-code"
+                  />
+                </div>
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700"
+                  onClick={handleVerifyWaLogin}
+                  disabled={loading || waCode.length !== 6 || (waIsNewUser && !waFirstName.trim())}
+                  data-testid="button-verify-wa-otp"
+                >
+                  {loading ? "Memverifikasi..." : waIsNewUser ? "Buat Akun & Masuk" : "Masuk"}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-sm"
+                  onClick={() => { setWaCode(""); setMode("wa-otp"); }}
+                  disabled={loading}
+                  data-testid="button-back-wa-otp"
+                >
+                  ← Ganti nomor / kirim ulang
+                </Button>
+              </div>
+            </>
+          )}
+
           {/* ── FORGOT PASSWORD ── */}
           {mode === "forgot" && (
             <>
@@ -735,7 +955,7 @@ export default function LoginPage() {
         </div>
 
         {/* Admin / Replit OIDC fallback — small discreet link */}
-        {mode !== "verify" && (
+        {mode !== "verify" && mode !== "wa-otp-verify" && (
           <p className="text-center text-xs text-muted-foreground mt-3">
             <button
               type="button"
