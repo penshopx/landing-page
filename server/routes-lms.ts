@@ -959,6 +959,37 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
       const [{ totalEnrollments }] = await db
         .select({ totalEnrollments: count() })
         .from(lmsEnrollments);
+
+      // Certificate stats
+      const [{ totalCertificates }] = await db
+        .select({ totalCertificates: count() })
+        .from(lmsCertificates);
+
+      // Completions that still have no certificate (should be 0 after a successful backfill)
+      const pendingCertRows = await db.execute(sql.raw(`
+        SELECT COUNT(*) AS pending_count
+        FROM lms_enrollments e
+        WHERE e.progress = 100
+          AND e.completed_at IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM lms_certificates c
+            WHERE c.user_id = e.user_id AND c.course_id = e.course_id
+          )
+      `));
+      const pendingCertificates = Number(
+        (pendingCertRows.rows?.[0] as any)?.pending_count ?? 0
+      );
+
+      // Last backfill metadata from system_config
+      let lastBackfill: { backfilled: number; total: number; at: string } | null = null;
+      try {
+        const cfgRows = await db.execute(sql.raw(
+          `SELECT value FROM system_config WHERE key = 'lms_cert_backfill_last' LIMIT 1`
+        ));
+        const raw = (cfgRows.rows?.[0] as any)?.value;
+        if (raw) lastBackfill = typeof raw === "string" ? JSON.parse(raw) : raw;
+      } catch (_) { /* non-critical */ }
+
       res.json({
         seedStatus: lmsSeedStatus,
         seeding: lmsSeedStatus === "pending",
@@ -967,7 +998,10 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
           activeCourses: Number(activeCourses),
           totalLessons: Number(totalLessons),
           totalEnrollments: Number(totalEnrollments),
+          totalCertificates: Number(totalCertificates),
+          pendingCertificates,
         },
+        lastBackfill,
       });
     } catch (e) {
       console.error("[LMS-ADMIN] GET health:", e);

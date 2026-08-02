@@ -867,7 +867,10 @@ type LmsHealth = {
     activeCourses: number;
     totalLessons: number;
     totalEnrollments: number;
+    totalCertificates: number;
+    pendingCertificates: number;
   };
+  lastBackfill: { backfilled: number; total: number; at: string } | null;
 };
 
 function SeedStatusBadge({ status, seeding, retryIn }: { status: string; seeding: boolean; retryIn?: number }) {
@@ -1017,32 +1020,88 @@ function LmsHealthCard({
             Memuat status…
           </div>
         ) : health ? (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                {health.counts.totalCourses}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">Total Kursus</p>
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                  {health.counts.totalCourses}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">Total Kursus</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {health.counts.activeCourses}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">Kursus Aktif & Publik</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {health.counts.totalLessons}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">Total Pelajaran</p>
+              </div>
+              <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+                <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {health.counts.totalEnrollments}
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">Total Pendaftaran</p>
+              </div>
             </div>
-            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                {health.counts.activeCourses}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">Kursus Aktif & Publik</p>
+
+            {/* Certificate backfill stats */}
+            <div className="mt-3 border-t pt-3">
+              <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">Sertifikat</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+                  <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                    {health.counts.totalCertificates ?? "—"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Total Sertifikat</p>
+                </div>
+                <div className={`rounded-lg px-4 py-3 text-center ${
+                  (health.counts.pendingCertificates ?? 0) > 0
+                    ? "bg-red-50 dark:bg-red-950/30"
+                    : "bg-muted/50"
+                }`}>
+                  <p className={`text-2xl font-bold ${
+                    (health.counts.pendingCertificates ?? 0) > 0
+                      ? "text-red-600 dark:text-red-400"
+                      : "text-green-600 dark:text-green-400"
+                  }`}>
+                    {health.counts.pendingCertificates ?? "—"}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Selesai Tanpa Sertifikat</p>
+                </div>
+                <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
+                  {health.lastBackfill ? (
+                    <>
+                      <p className="text-2xl font-bold text-teal-600 dark:text-teal-400">
+                        {health.lastBackfill.backfilled}
+                        {health.lastBackfill.total > 0 && (
+                          <span className="text-base font-normal text-muted-foreground">
+                            /{health.lastBackfill.total}
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Backfill Boot Terakhir
+                      </p>
+                      <p className="text-[10px] text-muted-foreground/70 truncate">
+                        {new Date(health.lastBackfill.at).toLocaleString("id-ID", {
+                          day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit",
+                        })}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-2xl font-bold text-muted-foreground">—</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Backfill Boot Terakhir</p>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {health.counts.totalLessons}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">Total Pelajaran</p>
-            </div>
-            <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
-              <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                {health.counts.totalEnrollments}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">Total Pendaftaran</p>
-            </div>
-          </div>
+          </>
         ) : (
           <p className="text-sm text-destructive">Gagal memuat status LMS.</p>
         )}

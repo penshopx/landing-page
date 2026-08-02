@@ -431,8 +431,24 @@ for (const envVar of requiredEnvVars) {
         } catch (_) { /* skip individual failures */ }
       }
       console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill: ${backfilled}/${pending.rows.length} inserted`);
+      // Persist backfill result so the health dashboard can surface it
+      try {
+        await pool.query(
+          `INSERT INTO system_config (key, value) VALUES ('lms_cert_backfill_last', $1)
+           ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+          [JSON.stringify({ backfilled, total: pending.rows.length, at: new Date().toISOString() })]
+        );
+      } catch (_) { /* non-critical */ }
     } else {
       console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill: nothing to do`);
+      // Record idempotent run so health can confirm it
+      try {
+        await pool.query(
+          `INSERT INTO system_config (key, value) VALUES ('lms_cert_backfill_last', $1)
+           ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+          [JSON.stringify({ backfilled: 0, total: 0, at: new Date().toISOString() })]
+        );
+      } catch (_) { /* non-critical */ }
     }
   } catch (e) {
     console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill error:`, e);
