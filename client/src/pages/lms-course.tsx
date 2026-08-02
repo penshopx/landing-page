@@ -99,11 +99,11 @@ async function downloadCertificatePdf(params: {
   doc.text(`Diterbitkan: ${dateStr}`, 30, H - 35);
   doc.text(`Kode Sertifikat: ${certificateCode}`, 30, H - 28);
 
-  // Platform URL
+  // Platform URL — full verification link so the PDF is self-contained
   doc.setFont("helvetica", "italic");
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text("Dapat diverifikasi di gustafta.com/academy", W / 2, H - 28, { align: "center" });
+  doc.text(`Dapat diverifikasi di: https://gustafta.my.id/lms/verify/${certificateCode}`, W / 2, H - 28, { align: "center" });
 
   // Seal placeholder (circle)
   doc.setDrawColor(r, g, b);
