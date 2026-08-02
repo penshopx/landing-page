@@ -218,6 +218,12 @@ export default function LoginPage() {
   };
 
   // ── WA OTP handlers (passwordless) ──────────────────────────────────────────
+  const parseApiError = (err: any): string => {
+    let raw = (err?.message || "").replace(/^\d+:\s*/, "");
+    try { const p = JSON.parse(raw); raw = p.error || p.message || raw; } catch {}
+    return raw;
+  };
+
   const handleRequestWaLogin = async () => {
     if (!waPhone.trim()) {
       toast({ title: "Nomor WhatsApp wajib diisi", variant: "destructive" });
@@ -237,8 +243,8 @@ export default function LoginPage() {
       }
       setMode("wa-otp-verify");
     } catch (err: any) {
-      const msg = (err?.message || "").replace(/^\d+: /, "");
-      setWaSendError(msg || "Kode OTP gagal terkirim. Coba lagi.");
+      const msg = parseApiError(err) || "Kode OTP gagal terkirim. Coba lagi.";
+      setWaSendError(msg);
       toast({ title: "Gagal kirim OTP", description: msg, variant: "destructive" });
     } finally {
       setLoading(false);
