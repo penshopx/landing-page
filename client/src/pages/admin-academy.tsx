@@ -986,8 +986,8 @@ function LmsHealthCard({
             {lastUpdated && (
               <span className="text-xs text-muted-foreground">Diperbarui {lastUpdated}</span>
             )}
-            {/* Tombol Re-seed — muncul saat error atau saat admin butuh force-refresh */}
-            {health && (health.seedStatus === "error" || health.seedStatus === "done") && (
+            {/* Tombol Re-seed — muncul saat error atau catalog dilewati (sudah ada semua) */}
+            {health && (health.seedStatus === "error" || health.seedStatus === "skipped") && (
               <Button
                 variant="outline"
                 size="sm"

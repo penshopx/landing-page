@@ -315,7 +315,8 @@ const SEED_COURSES = [
 // Reconcile-per-slug: never early-return based on row count alone.
 // This ensures new courses added to SEED_COURSES are inserted even when
 // the table already has older courses from a previous boot.
-async function seedLmsData() {
+// Returns the number of new courses inserted (0 = all slugs already existed).
+async function seedLmsData(): Promise<{ added: number }> {
   try {
     let added = 0;
     for (const courseData of SEED_COURSES) {
@@ -365,7 +366,10 @@ async function seedLmsData() {
     }
     if (added > 0) {
       console.log(`[LMS] Seed selesai — ${added} kursus baru ditambahkan (total target: ${SEED_COURSES.length}).`);
+    } else {
+      console.log(`[LMS] Seed dilewati — semua ${SEED_COURSES.length} kursus sudah ada.`);
     }
+    return { added };
   } catch (e) {
     console.error("[LMS] Seed error:", e);
     throw e; // propagate so seedLmsDataTracked can set error status
@@ -373,13 +377,15 @@ async function seedLmsData() {
 }
 
 // ─── Seed status tracker ─────────────────────────────────────────────────────
-type SeedStatus = "pending" | "done" | "error";
+type SeedStatus = "pending" | "done" | "skipped" | "error";
 let lmsSeedStatus: SeedStatus = "pending";
 
 async function seedLmsDataTracked() {
   try {
-    await seedLmsData();
-    lmsSeedStatus = "done";
+    const { added } = await seedLmsData();
+    // "skipped" = ran successfully but all slugs already existed, nothing new inserted.
+    // Admin can still trigger a manual re-seed; the button shows for "skipped" or "error".
+    lmsSeedStatus = added === 0 ? "skipped" : "done";
   } catch (e) {
     lmsSeedStatus = "error";
     console.error("[LMS] Seed fatal:", e);
