@@ -135,8 +135,8 @@ function CourseCard({ course, enrollment }: { course: Course; enrollment?: MyEnr
             <div className="mb-3" data-testid={`progress-bar-${course.id}`}>
               <div className="flex items-center justify-between text-xs mb-1">
                 <span className="text-slate-500">{isCompleted ? "Kursus selesai" : "Progres belajar"}</span>
-                <span className={`font-semibold ${isCompleted ? "text-green-600" : "text-indigo-600"}`}>
-                  {progress}%
+                <span className={`font-semibold ${isCompleted ? "text-green-600" : "text-indigo-600"}`} data-testid={`progress-label-${course.id}`}>
+                  {enrollment?.completedLessons?.length ?? 0}/{course.lessonCount} selesai
                 </span>
               </div>
               <Progress
