@@ -792,39 +792,14 @@ async function saveProdUrlToDb(url: string): Promise<void> {
 // Admin can rotate primary/secondary WA numbers without a redeploy via
 // POST /api/admin/contact  →  saved to system_config
 // GET /api/config/contact  ←  served from in-memory cache (loaded at startup)
-const WA_CONTACT_DEFAULTS = {
-  primary: process.env.WA_CONTACT_PRIMARY || "6281287941900",
-  secondary: process.env.WA_CONTACT_SECONDARY || "6282299417818",
-};
-let _cachedWaContact: { primary: string; secondary: string } | null = null;
-
-async function loadWaContactFromDb(): Promise<{ primary: string; secondary: string } | null> {
-  try {
-    const rows = await db.select().from(systemConfig)
-      .where(inArray(systemConfig.key, ["wa_contact_primary", "wa_contact_secondary"]));
-    const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
-    const primary = map["wa_contact_primary"];
-    const secondary = map["wa_contact_secondary"];
-    if (!primary && !secondary) return null;
-    return {
-      primary: primary || WA_CONTACT_DEFAULTS.primary,
-      secondary: secondary || WA_CONTACT_DEFAULTS.secondary,
-    };
-  } catch { return null; }
-}
-
-async function saveWaContactToDb(primary: string, secondary: string): Promise<void> {
-  // Let errors propagate — the caller (POST /api/admin/contact) must return non-2xx on failure.
-  await db.insert(systemConfig).values({ key: "wa_contact_primary", value: primary })
-    .onConflictDoUpdate({ target: systemConfig.key, set: { value: primary, updatedAt: new Date() } });
-  await db.insert(systemConfig).values({ key: "wa_contact_secondary", value: secondary })
-    .onConflictDoUpdate({ target: systemConfig.key, set: { value: secondary, updatedAt: new Date() } });
-  _cachedWaContact = { primary, secondary };
-}
-
-function getWaContact(): { primary: string; secondary: string } {
-  return _cachedWaContact || WA_CONTACT_DEFAULTS;
-}
+// Logic extracted to server/lib/wa-contact.ts for testability.
+import {
+  loadWaContactFromDb,
+  saveWaContactToDb,
+  getWaContact,
+  setWaContactCache,
+  makeAdminContactHandler,
+} from "./lib/wa-contact";
 
 /**
  * Returns the canonical production base URL for building external-facing links.
@@ -911,7 +886,7 @@ export async function registerRoutes(
       // Load WA contact numbers from DB (admin may have rotated them)
       const waContact = await loadWaContactFromDb();
       if (waContact) {
-        _cachedWaContact = waContact;
+        setWaContactCache(waContact);
         console.log(`[startup] WA contact numbers loaded from DB: ${waContact.primary} / ${waContact.secondary}`);
       }
     } catch { /* non-critical */ }
@@ -11370,23 +11345,7 @@ Balas dengan JSON dengan struktur PERSIS ini:
   }
 
   // Admin: rotate WA contact numbers without redeploying
-  app.post("/api/admin/contact", isAuthenticated, requireAdmin, async (req: any, res: any) => {
-    const { primary, secondary } = req.body as { primary?: string; secondary?: string };
-    if (!primary || !secondary) return res.status(400).json({ error: "primary and secondary required" });
-    // Strip all non-digits so the admin can paste numbers with dashes/spaces/+
-    const cleanPrimary = String(primary).replace(/\D/g, "");
-    const cleanSecondary = String(secondary).replace(/\D/g, "");
-    if (cleanPrimary.length < 8 || cleanSecondary.length < 8) {
-      return res.status(400).json({ error: "Nomor tidak valid (minimal 8 digit)" });
-    }
-    try {
-      await saveWaContactToDb(cleanPrimary, cleanSecondary);
-    } catch (err: any) {
-      console.error("[admin/contact] DB write failed:", err);
-      return res.status(500).json({ error: "Gagal menyimpan nomor ke database. Coba lagi." });
-    }
-    return res.json({ ok: true, primary: cleanPrimary, secondary: cleanSecondary });
-  });
+  app.post("/api/admin/contact", isAuthenticated, requireAdmin, makeAdminContactHandler());
 
   // Admin: manually set the production URL (saved to DB + in-memory cache)
   app.post("/api/admin/set-prod-url", isAuthenticated, requireAdmin, async (req: any, res: any) => {
