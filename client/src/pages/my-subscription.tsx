@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 const FEATURE_ICONS: Record<FeatureKey, typeof Check> = {
   chatbot: MessageSquare,
@@ -58,11 +58,11 @@ function formatLimit(val: number) {
   return val.toLocaleString("id-ID");
 }
 
-const WA = (plan: string, email: string) =>
-  `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(`Halo, saya ingin upgrade ke paket ${PLAN_CONFIGS[plan as keyof typeof PLAN_CONFIGS]?.name ?? plan}. Email: ${email}`)}`;
-
 export default function MySubscriptionPage() {
   const contact = useContactNumbers();
+  const WA = (plan: string, email: string) =>
+    `https://wa.me/${contact.secondary}?text=${encodeURIComponent(`Halo, saya ingin upgrade ke paket ${PLAN_CONFIGS[plan as keyof typeof PLAN_CONFIGS]?.name ?? plan}. Email: ${email}`)}`;
+
   const { user, isAuthenticated } = useAuth();
   const { planInfo, isLoading } = useFeatureAccess();
   const [, navigate] = useLocation();

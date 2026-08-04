@@ -16,7 +16,7 @@ import {
   ShoppingBag, Plus, ExternalLink, Package, Trash2, Pencil, MessageCircle, Loader2,
   Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical
 } from "lucide-react";
-import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 // ---- Types ----
 interface AdminMeData {
@@ -269,7 +269,7 @@ const PLAN_LABEL_WA: Record<string, string> = {
   monthly: "1 Bulan", quarterly: "3 Bulan", semiannual: "6 Bulan", annual: "12 Bulan", free: "Free",
 };
 
-function makeWelcomeWA(sub: AdminSubscription, appUrl: string, d1 = WA_CONTACT_DISPLAY, d2 = WA_CONTACT_DISPLAY_2): string {
+function makeWelcomeWA(sub: AdminSubscription, appUrl: string, d1: string, d2: string): string {
   const name = [sub.user?.firstName, sub.user?.lastName].filter(Boolean).join(" ") || "Kak";
   const plan = PLAN_LABEL_WA[sub.plan] ?? sub.plan;
   return `Halo ${name}! 👋

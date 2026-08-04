@@ -14,10 +14,7 @@ import { useClawPackages, packageForRoute } from "@/hooks/use-claw-packages";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2, WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2 } from "@/lib/contact";
-
-const WA_TRIAL_NUMBER = WA_CONTACT_NUMBER;
-const WA_TRIAL_NUMBER_2 = WA_CONTACT_NUMBER_2;
+import { useContactNumbers } from "@/lib/contact";
 
 /** Statistik faktual kapasitas produk (BUKAN testimoni/angka pengguna fiktif) — mis. "10 Agen Spesialis". */
 export interface CapabilityStat {
@@ -270,9 +267,10 @@ function buildWaMessage(title: string, reason: "auth" | "plan", requiredPlan: Pl
 
 function LockedScreen({ title, description, highlights, icon, reason, requiredPlan, className, pas }: LockedScreenProps) {
   const planConfig = PLAN_CONFIGS[requiredPlan];
+  const contact = useContactNumbers();
   const waMsg = buildWaMessage(title, reason, requiredPlan);
-  const waUrl1 = `https://wa.me/${WA_TRIAL_NUMBER}?text=${waMsg}`;
-  const waUrl2 = `https://wa.me/${WA_TRIAL_NUMBER_2}?text=${waMsg}`;
+  const waUrl1 = `https://wa.me/${contact.primary}?text=${waMsg}`;
+  const waUrl2 = `https://wa.me/${contact.secondary}?text=${waMsg}`;
 
   const fallback = genericPas(title, description, highlights);
   const problemTitle = pas?.problemTitle ?? fallback.problemTitle;
@@ -437,7 +435,7 @@ function LockedScreen({ title, description, highlights, icon, reason, requiredPl
                     data-testid="button-wa-trial-1"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    {WA_CONTACT_DISPLAY}
+                    {contact.display}
                   </Button>
                 </a>
                 <a href={waUrl2} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer">
@@ -448,7 +446,7 @@ function LockedScreen({ title, description, highlights, icon, reason, requiredPl
                     data-testid="button-wa-trial-2"
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    {WA_CONTACT_DISPLAY_2}
+                    {contact.display2}
                   </Button>
                 </a>
               </div>

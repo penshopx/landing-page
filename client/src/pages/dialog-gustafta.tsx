@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import { MessageContent } from "@/lib/format-message";
 import {
   Send, X, RefreshCw, Share2, Copy, MessageCircle,
@@ -84,7 +84,7 @@ Ceritakan padaku — kamu bekerja di bidang apa, atau ada tantangan apa yang ing
 const GREETING = greetingFor("Gustafta");
 
 
-const waUrl = (text: string, phone: string = WA_CONTACT_NUMBER_2) => {
+const waUrl = (text: string, phone: string) => {
   trackLead({ content_name: "WhatsApp CTA" });
   return `https://wa.me/${phone.replace(/[^0-9]/g, "").replace(/^0/, "62")}?text=${encodeURIComponent(text)}`;
 };
@@ -133,11 +133,12 @@ export default function DialogGustaftaPage() {
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { partner } = usePartnerBranding();
+  const contact = useContactNumbers();
 
   // Whitelabel: brand & kontak ikut mitra bila diakses dari host mitra
   const brandName = partner?.brandName || "Gustafta";
   const brandLogo = partner ? (partner.logoUrl || null) : "/logo-gustafta.png";
-  const waPhone = partner?.contactPhone ? partner.contactPhone : WA_CONTACT_NUMBER_2;
+  const waPhone = partner?.contactPhone ? partner.contactPhone : contact.secondary;
   const accentColor = partner?.primaryColor || null;
 
   const s3UnlockWa = waUrl(

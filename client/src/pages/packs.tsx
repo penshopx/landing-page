@@ -15,7 +15,7 @@ import {
   Send, Loader2, Bot
 } from "lucide-react";
 import { SERVICE_TIERS, HOSTING_SUMMARY, HOSTING_RANGE, PRICING } from "@/data/pricing";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 interface Pack {
   id: string;
@@ -174,7 +174,6 @@ const PACKS: Pack[] = [
   },
 ];
 
-const waLink = (msg: string) => `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(msg)}`;
 
 const KONSUL_MAX = 5;
 const AGENT_ID = "1"; // Gustafta Helpdesk
@@ -209,6 +208,8 @@ const REKOMENDASI = [
 ];
 
 function BerkembangDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const contact = useContactNumbers();
+  const waLink = (msg: string) => contact.waLink(msg, true);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -396,6 +397,7 @@ function BerkembangDialog({ open, onClose }: { open: boolean; onClose: () => voi
 
 export default function PacksPage() {
   const contact = useContactNumbers();
+  const waLink = (msg: string) => contact.waLink(msg, true);
   const [, navigate] = useLocation();
   const [showKonsul, setShowKonsul] = useState(false);
 

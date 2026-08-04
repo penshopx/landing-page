@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import {
   Stethoscope, FileCheck2, Gavel, HardHat, Briefcase, Truck, Award, Building2,
   ArrowRight, MessageCircle, Headset, CheckCircle2, Clock, Sparkles, Bot,
@@ -28,11 +28,6 @@ import {
  * WhatsApp memakai kontak konsultasi resmi yang sudah dipakai di seluruh app).
  */
 
-const OPERATOR_WA =
-  `https://wa.me/${WA_CONTACT_NUMBER_2}?text=` +
-  encodeURIComponent(
-    "Halo Operator Gustafta, pertanyaan saya di Klinik Konstruksi belum terjawab AI. Mohon bantuannya.",
-  );
 
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
@@ -232,6 +227,7 @@ function KlinikFeedbackForm() {
 
 export default function KlinikKonsultasiPage() {
   const contact = useContactNumbers();
+  const operatorWa = contact.waLink("Halo Operator Gustafta, pertanyaan saya di Klinik Konstruksi belum terjawab AI. Mohon bantuannya.", true);
   useEffect(() => {
     const prevTitle = document.title;
     document.title = "Klinik Konstruksi — Tanya AI Dulu, Operator Bila Perlu | Gustafta";
@@ -267,7 +263,7 @@ export default function KlinikKonsultasiPage() {
               <a href="#loket"><Sparkles className="h-4 w-4" /> Masuk & Pilih Loket</a>
             </Button>
             <Button asChild size="lg" variant="outline" className="gap-2 border-white/40 text-white bg-white/10 hover:bg-white/20 hover:text-white" data-testid="button-operator-hero">
-              <a href={OPERATOR_WA} target="_blank" rel="noopener noreferrer">
+              <a href={operatorWa} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="h-4 w-4" /> Hubungi Operator
               </a>
             </Button>
@@ -446,7 +442,7 @@ export default function KlinikKonsultasiPage() {
               </div>
             </div>
             <Button asChild size="lg" className="bg-teal-600 hover:bg-teal-500 text-white gap-2 shrink-0" data-testid="button-operator-fallback">
-              <a href={OPERATOR_WA} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">
+              <a href={operatorWa} onClick={handleWaClick} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="h-4 w-4" /> Hubungi Operator (WhatsApp)
               </a>
             </Button>

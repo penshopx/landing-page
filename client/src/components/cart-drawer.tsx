@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/use-cart";
 import { useToast } from "@/hooks/use-toast";
-import { WA_CONTACT_NUMBER, WA_CONTACT_NUMBER_2 } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 function formatPrice(n: number) {
   return "Rp " + n.toLocaleString("id-ID");
@@ -16,6 +16,7 @@ export function CartDrawer() {
     selectedTotal, selectedCount, buildCheckoutUrl, clearCart,
   } = useCart();
   const { toast } = useToast();
+  const contact = useContactNumbers();
 
   const handleCheckout = () => {
     const selected = items.filter(i => i.selected);
@@ -36,7 +37,7 @@ export function CartDrawer() {
     if (waItems.length > 0) {
       const productList = waItems.map(i => `- ${i.name} (${formatPrice(i.price)})`).join("\n");
       const msg = encodeURIComponent(`Halo, saya ingin membeli:\n${productList}\n\nMohon info cara pembelian.`);
-      window.open(`https://wa.me/${WA_CONTACT_NUMBER_2}?text=${msg}`, "_blank");
+      window.open(`https://wa.me/${contact.secondary}?text=${msg}`, "_blank");
     }
   };
 

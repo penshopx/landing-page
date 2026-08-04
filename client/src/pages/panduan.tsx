@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { PRICING } from "@/data/pricing";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import {
   BookOpen, CheckCircle2, Circle, ChevronRight, ChevronLeft,
   Search, MessageCircle, Bot, Database, ShoppingBag, CreditCard,
@@ -15,7 +15,6 @@ import {
   HardDrive, BrainCircuit, FileSearch, Share2
 } from "lucide-react";
 
-const WA_HELPDESK = `https://wa.me/${WA_CONTACT_NUMBER_2}`;
 const HELPDESK_AGENT_ID = 1;
 
 const STORAGE_KEY = "gustafta_panduan_progress_v1";
@@ -396,7 +395,7 @@ const MODULES: Module[] = [
           {
             title: "Akses Chatbot Setelah Beli",
             content: "Setelah pembayaran berhasil:\n\n1. Cek email untuk link akses unik Anda\n2. Buka link tersebut — Anda langsung bisa chat dengan chatbot\n3. Simpan link ini karena ini akses eksklusif Anda\n\nJika tidak menerima email dalam 30 menit, hubungi kami via WhatsApp.",
-            action: { label: "Hubungi Support", href: WA_HELPDESK }
+            action: { label: "Hubungi Support", href: "__wa_helpdesk__" }
           }
         ]
       },
@@ -727,6 +726,7 @@ const ALL_LESSONS = MODULES.flatMap(m => m.lessons.map(l => ({ ...l, moduleId: m
 
 export default function Panduan() {
   const contact = useContactNumbers();
+  const waHelpdesk = contact.link2;
   const [progress, setProgress] = useState<Record<string, boolean>>(loadProgress);
   const [activeModuleId, setActiveModuleId] = useState<string>("quickstart");
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
@@ -959,7 +959,7 @@ export default function Panduan() {
                       <span className="text-sm font-medium">Tanya Helpdesk AI</span>
                     </button>
                   </a>
-                  <a href={WA_HELPDESK} target="_blank" rel="noopener noreferrer">
+                  <a href={waHelpdesk} target="_blank" rel="noopener noreferrer">
                     <button className="w-full text-left rounded-lg px-3 py-2.5 flex items-center gap-3 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors text-green-600 dark:text-green-400"
                       data-testid="sidebar-wa">
                       <MessageCircle className="h-4 w-4 flex-shrink-0" />
@@ -1057,16 +1057,30 @@ export default function Panduan() {
                         </div>
                       )}
 
-                      {activeLesson.steps[activeStep].action && (
-                        <div className="mt-4">
-                          <Link href={activeLesson.steps[activeStep].action!.href}>
-                            <Button variant="outline" size="sm" className="gap-2" data-testid="btn-step-action">
-                              <ArrowRight className="h-3.5 w-3.5" />
-                              {activeLesson.steps[activeStep].action!.label}
-                            </Button>
-                          </Link>
-                        </div>
-                      )}
+                      {activeLesson.steps[activeStep].action && (() => {
+                        const act = activeLesson.steps[activeStep].action!;
+                        const href = act.href === "__wa_helpdesk__" ? waHelpdesk : act.href;
+                        const isExternal = href.startsWith("http");
+                        return (
+                          <div className="mt-4">
+                            {isExternal ? (
+                              <a href={href} target="_blank" rel="noopener noreferrer">
+                                <Button variant="outline" size="sm" className="gap-2" data-testid="btn-step-action">
+                                  <ArrowRight className="h-3.5 w-3.5" />
+                                  {act.label}
+                                </Button>
+                              </a>
+                            ) : (
+                              <Link href={href}>
+                                <Button variant="outline" size="sm" className="gap-2" data-testid="btn-step-action">
+                                  <ArrowRight className="h-3.5 w-3.5" />
+                                  {act.label}
+                                </Button>
+                              </Link>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Navigation */}
@@ -1164,7 +1178,7 @@ export default function Panduan() {
                           <Bot className="h-3.5 w-3.5" /> Helpdesk AI
                         </Button>
                       </a>
-                      <a href={WA_HELPDESK} target="_blank" rel="noopener noreferrer">
+                      <a href={waHelpdesk} target="_blank" rel="noopener noreferrer">
                         <Button size="sm" className="gap-1.5 bg-green-600 hover:bg-green-700 text-white" data-testid="btn-ask-wa">
                           <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
                         </Button>

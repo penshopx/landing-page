@@ -14,13 +14,7 @@ import {
 } from "lucide-react";
 import { HOSTING_PERIODS, SERVICE_TIERS } from "@/data/pricing";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
-
-
-function waLink(msg: string) {
-  trackLead({ content_name: "WhatsApp CTA" });
-  return `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(msg)}`;
-}
+import { useContactNumbers } from "@/lib/contact";
 
 const SUBSCRIPTION_PLANS: Record<string, {
   key: string; name: string; price: string; priceNum: number;
@@ -139,6 +133,12 @@ function parseQueryParams(search: string): Record<string, string> {
 }
 
 export default function CheckoutPage() {
+  const contact = useContactNumbers();
+  const waLink = (msg: string) => {
+    trackLead({ content_name: "WhatsApp CTA" });
+    return contact.waLink(msg, true);
+  };
+
   const [location] = useLocation();
   const search = typeof window !== "undefined" ? window.location.search : "";
   const params = parseQueryParams(search);

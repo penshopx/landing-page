@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
@@ -10,7 +10,6 @@ import {
   ClipboardCheck, Scale
 } from "lucide-react";
 
-const waLink = (msg: string) => `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(msg)}`;
 
 const segments = [
   {
@@ -174,6 +173,7 @@ const comparison = [
 
 export default function EducationPage() {
   const contact = useContactNumbers();
+  const waLink = (msg: string) => contact.waLink(msg, true);
   const [, navigate] = useLocation();
 
   return (

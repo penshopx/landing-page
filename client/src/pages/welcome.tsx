@@ -18,13 +18,7 @@ import {
 } from "lucide-react";
 import { SharedHeader } from "@/components/shared-header";
 import { trackLead } from "@/lib/meta-pixel";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
-
-
-function waMsg(topic: string) {
-  trackLead({ content_name: "WhatsApp CTA" });
-  return `https://wa.me/${WA_CONTACT_NUMBER_2}?text=${encodeURIComponent(`Halo Gustafta, saya butuh bantuan onboarding: ${topic}`)}`;
-}
+import { useContactNumbers } from "@/lib/contact";
 
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
@@ -155,6 +149,12 @@ function makeSampleIframe(base: string) {
 }
 
 export default function WelcomePage() {
+  const contact = useContactNumbers();
+  const waMsg = (topic: string) => {
+    trackLead({ content_name: "WhatsApp CTA" });
+    return `https://wa.me/${contact.secondary}?text=${encodeURIComponent(`Halo Gustafta, saya butuh bantuan onboarding: ${topic}`)}`;
+  };
+
   const { user, isAuthenticated } = useAuth();
   const { data: subscription } = useQuery<any>({ queryKey: ["/api/subscriptions/my"] });
   const [activeStep, setActiveStep] = useState(0);

@@ -470,7 +470,7 @@ function BisnisPaket() {
               <div className={`text-lg font-bold ${pack.color}`}>{pack.pesan}</div>
               <div className="text-base font-bold text-gray-900 dark:text-white mt-1">{pack.price}</div>
               <div className="text-[10px] text-gray-400 mt-0.5">{pack.perPesan}</div>
-              <a href="https://wa.me/6281234567890?text=Halo%20Gustafta%2C%20saya%20ingin%20top-up%20kredit%20pesan" onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="mt-3 w-full">
+              <a href={contact.waLink("Halo Gustafta, saya ingin top-up kredit pesan", true)} onClick={() => trackLead({ content_name: "WhatsApp CTA" })} target="_blank" rel="noopener noreferrer" className="mt-3 w-full">
                 <Button size="sm" variant="outline" className={`w-full text-[11px] h-7 border-current ${pack.color}`}>
                   Beli <Plus className="w-3 h-3 ml-1"/>
                 </Button>

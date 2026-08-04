@@ -14,7 +14,7 @@ import {
   Hotel, Factory, ChevronRight, Lightbulb, Wrench
 } from "lucide-react";
 import { HOSTING, HOSTING_PERIODS, HOSTING_RANGE, SERVICE_TIERS } from "@/data/pricing";
-import { WA_CONTACT_NUMBER_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 
 interface PricingTier {
   name: string;
@@ -280,7 +280,6 @@ const chatbotCatalog: ChatbotCategory[] = [
   },
 ];
 
-const WHATSAPP_NUMBER = WA_CONTACT_NUMBER_2; // static fallback; component uses useContactNumbers() hook
 
 const paymentMethods = [
   {
@@ -642,7 +641,7 @@ export default function Pricing() {
               <p className="text-xs text-muted-foreground mt-0.5">Kami bisa membangun chatbot custom sesuai kebutuhan spesifik bisnis Anda.</p>
             </div>
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=Halo%2C+saya+ingin+pesan+chatbot+custom+dari+Gustafta`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
+              href={`https://wa.me/${contact.secondary}?text=Halo%2C+saya+ingin+pesan+chatbot+custom+dari+Gustafta`} onClick={() => trackLead({ content_name: "WhatsApp CTA" })}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-shrink-0"
