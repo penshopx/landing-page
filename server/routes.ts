@@ -18632,6 +18632,62 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     }
   });
 
+  // ==================== ADMIN: SEND TEST EMAIL ====================
+  // Sends a simple transactional test email to the logged-in admin's own address
+  // so they can confirm Brevo delivery works without triggering a real OTP flow.
+  // Fire-and-forget from the admin's perspective — always returns a JSON result.
+  app.post("/api/admin/email-health/test", requireAdmin, async (req: any, res: any) => {
+    try {
+      const userId = getSessionUserId(req);
+      const [dbUser] = await db.select({ email: users.email, username: users.username }).from(users).where(eq(users.id, userId));
+      const adminEmail = dbUser?.email || req.session?.emailUser?.email || null;
+      if (!adminEmail) {
+        return res.status(400).json({ sent: false, error: "Alamat email admin tidak ditemukan di profil akun." });
+      }
+
+      const { sendEmail } = await import("./lib/email");
+      const result = await sendEmail({
+        to: adminEmail,
+        toName: dbUser?.username || "Admin",
+        subject: "✅ Tes Pengiriman Email — Gustafta",
+        htmlContent: `<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 0">
+    <tr><td align="center">
+      <table width="480" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;padding:40px;font-family:Arial,sans-serif;color:#111">
+        <tr><td>
+          <p style="margin:0 0 4px;font-size:22px;font-weight:700;color:#1e3a8a">Gustafta</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:16px 0">
+          <p style="font-size:16px;margin:0 0 12px">✅ <b>Email transaksional berfungsi dengan baik.</b></p>
+          <p style="font-size:14px;color:#374151;margin:0 0 16px">Email uji ini dikirim dari panel admin Gustafta untuk memverifikasi koneksi Brevo aktif dan bisa mengirim pesan ke alamat ini.</p>
+          <div style="padding:16px;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;margin:0 0 20px">
+            <p style="margin:0;font-size:13px;color:#166534">Dikirim pada: <b>${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })} WIB</b></p>
+          </div>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:0 0 16px">
+          <p style="font-size:12px;color:#9ca3af;margin:0">Email ini dikirim otomatis oleh sistem Gustafta untuk keperluan pengujian.</p>
+          <p style="font-size:12px;color:#9ca3af;margin:8px 0 0">© 2026 Gustafta. Seluruh hak dilindungi.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+        textContent: `Email transaksional berfungsi dengan baik.\n\nEmail uji ini dikirim dari panel admin Gustafta untuk memverifikasi koneksi Brevo.\n\nDikirim pada: ${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })} WIB\n\n© 2026 Gustafta.`,
+        tags: ["admin-test", "transactional"],
+      });
+
+      if (result.sent) {
+        return res.json({ sent: true, to: adminEmail });
+      } else {
+        return res.status(502).json({ sent: false, reason: result.reason, detail: result.detail || null, to: adminEmail });
+      }
+    } catch (err: any) {
+      return res.status(500).json({ sent: false, error: err?.message || "Terjadi kesalahan saat mengirim email uji." });
+    }
+  });
+
   // ==================== USER: MY ACCOUNT ====================
   app.get("/api/my/account", isAuthenticated, async (req: any, res: any) => {
     try {

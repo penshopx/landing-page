@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Activity, Lock, ArrowRight, Loader2, CheckCircle2, XCircle, AlertCircle, Cpu, Mail, RefreshCw } from "lucide-react";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { Activity, Lock, ArrowRight, Loader2, CheckCircle2, XCircle, AlertCircle, Cpu, Mail, RefreshCw, Send } from "lucide-react";
 
 type ProviderHealthEntry = {
   lastSuccess: string | null;
@@ -145,6 +145,17 @@ export default function AdminAiHealthPage() {
     refetchIntervalInBackground: false,
   });
 
+  const [testEmailResult, setTestEmailResult] = useState<{ sent: boolean; to?: string; reason?: string; detail?: string; error?: string } | null>(null);
+
+  const testEmailMutation = useMutation({
+    mutationFn: async () => {
+      const resp = await fetch("/api/admin/email-health/test", { method: "POST", credentials: "include" });
+      return resp.json();
+    },
+    onSuccess: (data) => setTestEmailResult(data),
+    onError: (err: any) => setTestEmailResult({ sent: false, error: err?.message || "Gagal menghubungi server." }),
+  });
+
   if (authLoading) {
     return (
       <div className="min-h-screen bg-white dark:bg-background">
@@ -208,23 +219,58 @@ export default function AdminAiHealthPage() {
 
         {/* ── Email / Brevo Health ── */}
         <div className="space-y-3" data-testid="section-email-health">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">Email Transaksional (Brevo)</h2>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-1.5 text-xs"
-              onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/admin/email-health"] })}
-              disabled={emailFetching}
-              data-testid="btn-refresh-email-health"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${emailFetching ? "animate-spin" : ""}`} />
-              Cek ulang
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/admin/email-health"] })}
+                disabled={emailFetching}
+                data-testid="btn-refresh-email-health"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${emailFetching ? "animate-spin" : ""}`} />
+                Cek ulang
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs"
+                onClick={() => { setTestEmailResult(null); testEmailMutation.mutate(); }}
+                disabled={testEmailMutation.isPending}
+                data-testid="btn-send-test-email"
+              >
+                {testEmailMutation.isPending
+                  ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  : <Send className="h-3.5 w-3.5" />}
+                Kirim Email Uji
+              </Button>
+            </div>
           </div>
+
+          {testEmailResult && (
+            <div
+              className={`rounded-md px-3 py-2.5 text-sm border flex items-start gap-2 ${
+                testEmailResult.sent
+                  ? "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300"
+                  : "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-400"
+              }`}
+              data-testid="text-test-email-result"
+            >
+              {testEmailResult.sent
+                ? <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0" />
+                : <XCircle className="h-4 w-4 mt-0.5 shrink-0" />}
+              <span>
+                {testEmailResult.sent
+                  ? <>Email uji berhasil dikirim ke <b>{testEmailResult.to}</b>. Cek kotak masuk kamu.</>
+                  : <>Gagal mengirim email uji: {testEmailResult.detail || testEmailResult.error || testEmailResult.reason || "Kesalahan tidak diketahui."}</>}
+              </span>
+            </div>
+          )}
 
           {emailLoading && !emailHealth ? (
             <Card><CardContent className="pt-5 flex items-center gap-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /> Memeriksa koneksi Brevo…</CardContent></Card>
