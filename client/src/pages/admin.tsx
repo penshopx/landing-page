@@ -3599,8 +3599,9 @@ Selamat menggunakan! 🚀
             const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
             const rawPhone = order.customerPhone?.replace(/\D/g, "") ?? "";
             const phoneNum = rawPhone.startsWith("0") ? "62" + rawPhone.slice(1) : rawPhone;
-            const validPhone = phoneNum.length >= 8;
-            const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : waUrl;
+            // Strict E.164 validation: must start with 62 and have at least 8 trailing digits
+            const validPhone = /^62\d{8,}$/.test(phoneNum);
+            const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : null;
             return (
               <div className="space-y-4">
                 <div className="bg-muted/50 rounded-lg p-3 text-sm">
@@ -3628,11 +3629,29 @@ Selamat menggunakan! 🚀
                   <Button variant="outline" className="flex-1 text-xs" onClick={() => { navigator.clipboard.writeText(msg); toast({ title: "Pesan disalin!" }); }} data-testid="button-copy-store-wa-msg">
                     <Copy className="h-3.5 w-3.5 mr-1.5" /> Salin Teks
                   </Button>
-                  <Button className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white" onClick={() => window.open(waDirectUrl, "_blank")} data-testid="button-open-store-wa">
-                    <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> {phoneNum ? "WA Langsung" : "Buka WA"}
+                  <Button
+                    className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                    onClick={() => {
+                      if (waDirectUrl) {
+                        window.open(waDirectUrl, "_blank");
+                      } else if (rawPhone) {
+                        // Phone present but not a valid Indonesian E.164 number
+                        toast({
+                          title: "Nomor tidak valid",
+                          description: `"${order.customerPhone}" bukan nomor WA yang valid. Salin teks dan kirim manual.`,
+                          variant: "destructive",
+                        });
+                      } else {
+                        // No phone stored — open WA with text only
+                        window.open(waUrl, "_blank");
+                      }
+                    }}
+                    data-testid="button-open-store-wa"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> {validPhone ? "WA Langsung" : "Buka WA"}
                   </Button>
                 </div>
-                {phoneNum && (
+                {validPhone && (
                   <p className="text-xs text-muted-foreground text-center">
                     "WA Langsung" membuka chat ke nomor {order.customerPhone} dengan pesan sudah terisi.
                   </p>

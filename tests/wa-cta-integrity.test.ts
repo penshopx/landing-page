@@ -171,7 +171,7 @@ describe("wa.me URL construction safety", () => {
     "pages/partner-landing.tsx",               // partner.contactPhone from DB
     "components/shared-header.tsx",            // partner.contactPhone from DB (guarded); n.link from contact array
     "pages/dialog-gustafta.tsx",               // phone arg, replaced to E.164 before use
-    "pages/admin.tsx",                         // admin → customer phone (E.164 formatted) for direct WA message
+    "pages/admin.tsx",                         // admin → customer phone (validated /^62\d{8,}$/ after E.164 normalisation; toast error on invalid)
     "pages/pricing.tsx",                       // WHATSAPP_NUMBER = WA_CONTACT_NUMBER_2 (local alias)
   ]);
 
