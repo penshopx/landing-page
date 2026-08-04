@@ -16,7 +16,7 @@ import assert from "node:assert/strict";
 import express from "express";
 import { createServer } from "node:http";
 import type { Server } from "node:http";
-import { makeBootstrapHandler, type BootstrapDb } from "../server/lib/bootstrap-handler";
+import { makeBootstrapHandler, tokenWeaknessReason, type BootstrapDb } from "../server/lib/bootstrap-handler";
 
 // ── In-memory BootstrapDb stub ────────────────────────────────────────────────
 type FakeUser = { id: string; email: string; role: string };
@@ -51,8 +51,8 @@ function makeFakeDb(): BootstrapDb {
 }
 
 // ── Token ─────────────────────────────────────────────────────────────────────
-const TOKEN =
-  "bootstrap-test-token-" + Math.random().toString(36).slice(2, 10);
+// Must satisfy the 32-char / 3-class / 8-unique-chars policy.
+const TOKEN = "Bootstrap-Test-Token-2024!xZ9mQpR";
 
 // ── Express app using the REAL production handler ─────────────────────────────
 const app = express();
@@ -111,6 +111,144 @@ test("503 when BOOTSTRAP_ADMIN_TOKEN env var is not set", async () => {
   assert.equal(status, 503);
   assert.ok(json.error, "should return an error message");
   process.env.BOOTSTRAP_ADMIN_TOKEN = saved;
+});
+
+// ── tokenWeaknessReason unit tests ───────────────────────────────────────────
+// Policy: ≥32 chars AND ≥12 unique distinct characters.
+
+test("tokenWeaknessReason: null for a strong 32-char mixed token", () => {
+  assert.equal(tokenWeaknessReason("Bootstrap-Test-Token-2024!xZ9mQpR"), null);
+});
+
+test("tokenWeaknessReason: null for a 64-char hex token (all 16 hex digits represented)", () => {
+  // Simulate output of: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+  // Use a representative value that exercises all 16 hex digits and has no periodic repetition.
+  const hexToken = "4a7f3c1e9b2d0f8a6e5c4b3a2d1f0e9c8b7a6f5e4d3c2b1a0f9e8d7c6b5a4f3e";
+  assert.equal(new Set(hexToken).size, 16, "sanity: hex token should have 16 unique chars");
+  assert.equal(tokenWeaknessReason(hexToken), null, "well-formed CSPRNG hex token must pass");
+});
+
+test("tokenWeaknessReason: rejects token shorter than 32 characters", () => {
+  const reason = tokenWeaknessReason("Bootstrap-Admin-2024!");  // 21 chars
+  assert.ok(reason !== null && reason.includes("32"), `expected '32' in: ${reason}`);
+});
+
+test("tokenWeaknessReason: rejects 'PasswordPassword' (16 chars — below 32-char minimum)", () => {
+  const reason = tokenWeaknessReason("PasswordPassword");
+  assert.ok(reason !== null, "'PasswordPassword' must be rejected");
+  assert.ok(reason.includes("32"), `should cite 32-char requirement, got: ${reason}`);
+});
+
+test("tokenWeaknessReason: rejects all-digit 32-char token (only 10 unique chars — below 12)", () => {
+  // Digits 0-9 = at most 10 unique chars, so any all-digit 32-char token fails rule 2.
+  const reason = tokenWeaknessReason("12345678901234567890123456789012");
+  assert.ok(reason !== null, "all-digit 32-char token must be rejected");
+  assert.ok(!reason.includes("pendek"), "should not cite length — it is long enough");
+});
+
+test("tokenWeaknessReason: rejects repeated-pattern token with 8 unique chars (caught by uniqueness check)", () => {
+  // "abcABC1!" repeated 4× = 32 chars, 8 unique chars < 12 → caught by rule 2.
+  const repeated = "abcABC1!abcABC1!abcABC1!abcABC1!";
+  assert.equal(new Set(repeated).size, 8, "sanity: token must have exactly 8 unique chars");
+  const reason = tokenWeaknessReason(repeated);
+  assert.ok(reason !== null, "repeated-pattern token with 8 unique chars must be rejected");
+});
+
+test("tokenWeaknessReason: rejects repeated-pattern token with 12 unique chars (caught by pattern check)", () => {
+  // "abcdefghijkl" repeated 2.67× = 32 chars, 12 unique chars — passes rule 2 but is periodic.
+  // This is the key bypass that unique-char count alone misses.
+  const repeated = "abcdefghijklabcdefghijklabcdefgh";
+  assert.equal(new Set(repeated).size, 12, "sanity: token must have exactly 12 unique chars");
+  const reason = tokenWeaknessReason(repeated);
+  assert.ok(reason !== null, "period-12 repeated token with 12 unique chars must be rejected by pattern check");
+  assert.ok(
+    reason.includes("berulang"),
+    `expected 'berulang' (repeated pattern) message, got: ${reason}`,
+  );
+});
+
+test("tokenWeaknessReason: rejects repeated-pattern token with 7 unique chars (caught by uniqueness check)", () => {
+  // "abcABC1" repeated ~4.5× = 32 chars, 7 unique chars < 12.
+  const repeated = "abcABC1abcABC1abcABC1abcABC1abcA";
+  assert.equal(new Set(repeated).size, 7, "sanity: token must have exactly 7 unique chars");
+  const reason = tokenWeaknessReason(repeated);
+  assert.ok(reason !== null, "repeated-pattern token with 7 unique chars must be rejected");
+});
+
+// ── HTTP-level enforcement ────────────────────────────────────────────────────
+
+test("503 when BOOTSTRAP_ADMIN_TOKEN is shorter than 32 characters", async () => {
+  const saved = process.env.BOOTSTRAP_ADMIN_TOKEN;
+  process.env.BOOTSTRAP_ADMIN_TOKEN = "tooshort";   // 8 chars
+  const { status, json } = await post({ email: "anyone@example.com" }, "tooshort");
+  assert.equal(status, 503, "short configured token must yield 503");
+  assert.ok(
+    typeof json.error === "string" && json.error.includes("32"),
+    `error should mention 32-character minimum, got: ${json.error}`,
+  );
+  process.env.BOOTSTRAP_ADMIN_TOKEN = saved;
+});
+
+test("503 when BOOTSTRAP_ADMIN_TOKEN is all-digits (only 10 unique chars — below 12)", async () => {
+  const saved = process.env.BOOTSTRAP_ADMIN_TOKEN;
+  process.env.BOOTSTRAP_ADMIN_TOKEN = "12345678901234567890123456789012"; // 32 digits, ≤10 unique
+  const { status, json } = await post({ email: "anyone@example.com" }, "12345678901234567890123456789012");
+  assert.equal(status, 503, "all-digit configured token must yield 503");
+  assert.ok(typeof json.error === "string" && json.error.length > 0, "should return error message");
+  process.env.BOOTSTRAP_ADMIN_TOKEN = saved;
+});
+
+test("503 when BOOTSTRAP_ADMIN_TOKEN is 'PasswordPassword' (too short — 16 chars)", async () => {
+  const saved = process.env.BOOTSTRAP_ADMIN_TOKEN;
+  process.env.BOOTSTRAP_ADMIN_TOKEN = "PasswordPassword"; // 16 chars — below 32
+  const { status, json } = await post({ email: "anyone@example.com" }, "PasswordPassword");
+  assert.equal(status, 503, "'PasswordPassword' configured token must yield 503");
+  assert.ok(typeof json.error === "string" && json.error.length > 0, "should return error message");
+  process.env.BOOTSTRAP_ADMIN_TOKEN = saved;
+});
+
+test("503 when BOOTSTRAP_ADMIN_TOKEN is a repeated-pattern token (8 unique chars — below 12)", async () => {
+  const saved = process.env.BOOTSTRAP_ADMIN_TOKEN;
+  const repeated = "abcABC1!abcABC1!abcABC1!abcABC1!"; // 32 chars, 8 unique < 12
+  process.env.BOOTSTRAP_ADMIN_TOKEN = repeated;
+  const { status, json } = await post({ email: "anyone@example.com" }, repeated);
+  assert.equal(status, 503, "repeated-pattern configured token must yield 503");
+  assert.ok(typeof json.error === "string" && json.error.length > 0, "should return error message");
+  process.env.BOOTSTRAP_ADMIN_TOKEN = saved;
+});
+
+test("503 when BOOTSTRAP_ADMIN_TOKEN is a period-12 repeated-pattern token (12 unique chars)", async () => {
+  // This is the key bypass: 32 chars, 12 unique chars passes the uniqueness check,
+  // but periodic structure makes it trivially guessable — caught by pattern detection.
+  const saved = process.env.BOOTSTRAP_ADMIN_TOKEN;
+  const repeated = "abcdefghijklabcdefghijklabcdefgh"; // period 12, 12 unique chars
+  process.env.BOOTSTRAP_ADMIN_TOKEN = repeated;
+  const { status, json } = await post({ email: "anyone@example.com" }, repeated);
+  assert.equal(status, 503, "period-12 repeated configured token must yield 503");
+  assert.ok(typeof json.error === "string" && json.error.length > 0, "should return error message");
+  process.env.BOOTSTRAP_ADMIN_TOKEN = saved;
+});
+
+test("401 when x-bootstrap-token header is shorter than 32 characters", async () => {
+  const { status, json } = await post({ email: "anyone@example.com" }, "tooshort");
+  assert.equal(status, 401, "short provided token must yield 401");
+  assert.ok(
+    typeof json.error === "string" && json.error.includes("32"),
+    `error should mention 32-character minimum, got: ${json.error}`,
+  );
+});
+
+test("401 when x-bootstrap-token header is all-digits (only 10 unique chars — below 12)", async () => {
+  const { status, json } = await post({ email: "anyone@example.com" }, "12345678901234567890123456789012");
+  assert.equal(status, 401, "all-digit provided token must yield 401");
+  assert.ok(typeof json.error === "string" && json.error.length > 0, "should return error message");
+});
+
+test("401 when x-bootstrap-token header is a repeated-pattern token (8 unique chars)", async () => {
+  // "abcABC1!" repeated 4× = 32 chars, only 8 unique chars < 12 required.
+  const { status, json } = await post({ email: "anyone@example.com" }, "abcABC1!abcABC1!abcABC1!abcABC1!");
+  assert.equal(status, 401, "repeated-pattern provided token must yield 401");
+  assert.ok(typeof json.error === "string" && json.error.length > 0, "should return error message");
 });
 
 test("401 when x-bootstrap-token header is absent", async () => {

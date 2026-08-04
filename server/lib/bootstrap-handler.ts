@@ -21,6 +21,83 @@ export interface BootstrapDb {
   promoteToSuperadmin(email: string): Promise<Array<{ id: string | number; email: string; role: string }>>;
 }
 
+/**
+ * Returns true when `token` is built by repeating a shorter prefix.
+ * Works by trying every period length from 1 to floor(len/2): if every
+ * character at position i equals the character at position (i % period),
+ * the token is periodic and therefore trivially guessable.
+ *
+ * Examples that return true:
+ *   "abcABC1!abcABC1!abcABC1!abcABC1!"  (period 8)
+ *   "abcdefghijklabcdefghijklabcdefgh"  (period 12, partial final repeat)
+ *   "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  (period 1)
+ */
+function isRepeatedPattern(token: string): boolean {
+  const len = token.length;
+  for (let period = 1; period <= Math.floor(len / 2); period++) {
+    let periodic = true;
+    for (let i = period; i < len; i++) {
+      if (token[i] !== token[i % period]) {
+        periodic = false;
+        break;
+      }
+    }
+    if (periodic) return true;
+  }
+  return false;
+}
+
+/**
+ * Returns a human-readable weakness description when a token is too weak, or
+ * null when the token is acceptable.  Rules (applied to both the configured
+ * env token and the caller-supplied header token):
+ *
+ *   1. Minimum 32 characters — appropriate for a randomly generated secret.
+ *      Short tokens are trivially brute-forced.
+ *   2. At least 12 unique distinct characters.
+ *      Rejects all-digit tokens (0–9 = max 10 unique), all-same-character
+ *      tokens, and many simple repeated patterns.
+ *   3. Must not be a repeated-pattern string.
+ *      Detects any token whose characters repeat with a fixed period, e.g.
+ *      "abcABC1!abcABC1!..." (period 8) or "abcdefghijklabcdefghijkl..."
+ *      (period 12), regardless of how many unique characters they contain.
+ *
+ * Recommended generation:
+ *   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ *   (64 random hex chars — satisfies all three rules in practice)
+ *
+ * Examples that PASS:  any securely generated 32+-char random token
+ * Examples that FAIL:
+ *   "PasswordPassword"                   (16 chars — rule 1)
+ *   "12345678901234567890123456789012"   (10 unique — rule 2)
+ *   "abcABC1!abcABC1!abcABC1!abcABC1!" (repeated period-8 — rule 3)
+ *   "abcdefghijklabcdefghijklabcdefgh" (repeated period-12 — rule 3)
+ */
+export function tokenWeaknessReason(token: string): string | null {
+  if (token.length < 32) {
+    return (
+      "terlalu pendek — minimal 32 karakter " +
+      "(gunakan token acak, contoh: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\")"
+    );
+  }
+
+  const uniqueChars = new Set(token).size;
+  if (uniqueChars < 12) {
+    return (
+      "terlalu seragam atau mudah ditebak — gunakan token acak dengan minimal 12 karakter unik " +
+      "(hindari pola berulang dan token yang hanya terdiri dari digit atau huruf yang sama)"
+    );
+  }
+
+  if (isRepeatedPattern(token)) {
+    return (
+      "mengandung pola berulang — hindari token yang merupakan pengulangan karakter atau frasa pendek"
+    );
+  }
+
+  return null;
+}
+
 export function makeBootstrapHandler(db: BootstrapDb) {
   return async function bootstrapSuperadminHandler(req: any, res: any): Promise<void> {
     try {
@@ -31,9 +108,12 @@ export function makeBootstrapHandler(db: BootstrapDb) {
       }
       const expected = expectedRaw.trim();
 
-      // Tolak jika token di env terlalu pendek — hindari token trivial seperti "123"
-      if (expected.length < 16) {
-        res.status(503).json({ error: "BOOTSTRAP_ADMIN_TOKEN terlalu pendek — minimal 16 karakter untuk keamanan." });
+      // Tolak jika token di env terlalu pendek atau trivial — hindari "123", "aaaa...", dsb.
+      const configWeakness = tokenWeaknessReason(expected);
+      if (configWeakness) {
+        res.status(503).json({
+          error: `BOOTSTRAP_ADMIN_TOKEN ${configWeakness}. Perbarui nilai di environment variable.`,
+        });
         return;
       }
 
@@ -43,8 +123,9 @@ export function makeBootstrapHandler(db: BootstrapDb) {
         res.status(401).json({ error: "Header x-bootstrap-token wajib disertakan" });
         return;
       }
-      if (provided.length < 16) {
-        res.status(401).json({ error: "Token terlalu pendek — minimal 16 karakter" });
+      const providedWeakness = tokenWeaknessReason(provided);
+      if (providedWeakness) {
+        res.status(401).json({ error: `Token ${providedWeakness}` });
         return;
       }
       if (provided !== expected) {
