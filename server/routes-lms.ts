@@ -428,6 +428,23 @@ export function registerLmsRoutes(app: Express) {
     res.json({ ok: true, message: "Reseed dimulai. Status akan berubah ke 'done' atau 'error' dalam beberapa detik." });
   });
 
+  // POST /api/lms/retry-seed — public endpoint to retry a failed seed (no auth required)
+  // Only fires when status is "error"; a 30-second cooldown prevents accidental flooding.
+  let lastPublicRetrySeedAt = 0;
+  app.post("/api/lms/retry-seed", async (_req, res) => {
+    if (lmsSeedStatus !== "error") {
+      return res.status(409).json({ error: "Seed tidak dalam kondisi error; retry tidak diperlukan." });
+    }
+    const now = Date.now();
+    if (now - lastPublicRetrySeedAt < 30_000) {
+      return res.status(429).json({ error: "Terlalu sering. Tunggu 30 detik sebelum coba lagi." });
+    }
+    lastPublicRetrySeedAt = now;
+    lmsSeedStatus = "pending";
+    seedLmsDataTracked().catch(e => console.error("[LMS] Public retry-seed error:", e));
+    res.json({ ok: true, message: "Retry dimulai. Halaman akan diperbarui otomatis." });
+  });
+
   // GET /api/lms/status — seeding status + course count (public, lightweight)
   app.get("/api/lms/status", async (_req, res) => {
     try {
