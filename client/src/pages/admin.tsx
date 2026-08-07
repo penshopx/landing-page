@@ -742,8 +742,7 @@ export default function AdminPage() {
 
   const createManualOrderMutation = useMutation({
     mutationFn: async (data: { agentId: number; name: string; email: string; phone: string }) => {
-      const res = await apiRequest("POST", "/api/store/order/manual", data);
-      return res.json();
+      return apiRequest("POST", "/api/store/order/manual", data);
     },
     onSuccess: (data: any) => {
       setManualResult({ accessUrl: data.accessUrl, agentName: data.agentName });
@@ -831,9 +830,8 @@ export default function AdminPage() {
 
   const seedLexComMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/admin/seed-lexcom", {}),
-    onSuccess: async (res: any) => {
-      const data = await res.json().catch(() => ({}));
-      if (data.skipped) {
+    onSuccess: async (data: any) => {
+      if (data?.skipped) {
         toast({ title: "LexCom sudah ada", description: "Series LexCom sudah tersedia di workspace Anda." });
       } else {
         toast({ title: "LexCom berhasil di-seed!", description: data.message });
@@ -877,8 +875,7 @@ export default function AdminPage() {
 
   const sendTestEmailMutation = useMutation({
     mutationFn: async (to: string) => {
-      const res = await apiRequest("POST", "/api/admin/email/send-test", { to });
-      return res.json ? res.json() : res;
+      return apiRequest("POST", "/api/admin/email/send-test", { to });
     },
     onSuccess: (data: any) => {
       setTestEmailResult({ ok: true, message: data.message });
