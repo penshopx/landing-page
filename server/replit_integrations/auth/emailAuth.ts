@@ -87,7 +87,8 @@ function isValidEmail(email: unknown): email is string {
 }
 
 // Normalize Indonesian phone numbers to Fonnte's expected format (62xxxxxxxxxx, digits only).
-function normalizePhone(raw: string): string {
+// Exported for unit-testing phone-format coverage in superadmin promotion.
+export function normalizePhone(raw: string): string {
   let digits = raw.replace(/[^\d]/g, "");
   if (digits.startsWith("0")) digits = "62" + digits.slice(1);
   else if (digits.startsWith("8")) digits = "62" + digits;
@@ -98,21 +99,54 @@ function normalizePhone(raw: string): string {
 // Set SUPERADMIN_PHONE in Replit Secrets (comma-separated for multiple numbers).
 // Role is DB-persisted so every existing admin/superadmin check across the app
 // (getDbRole, isAdminUser, etc.) picks it up automatically on next login.
-function buildSuperAdminPhones(): Set<string> {
-  const raw = process.env.SUPERADMIN_PHONE || "";
+
+/** Exported for testing: build a normalised set of superadmin phones from a raw
+ *  comma-separated env-style string (defaults to SUPERADMIN_PHONE env var). */
+export function buildSuperAdminPhones(raw = process.env.SUPERADMIN_PHONE || ""): Set<string> {
   if (!raw.trim()) return new Set();
   return new Set(raw.split(",").map((p) => normalizePhone(p.trim())).filter(Boolean));
 }
+
+/** Exported for testing: true when `phone` (as stored in the DB) normalises to a
+ *  value present in `allowlist`.  This is the exact production predicate used by
+ *  promoteSuperAdminIfMatch — if the normalizePhone call is ever removed here the
+ *  unit tests will immediately catch the regression. */
+export function phoneInAllowlist(
+  phone: string | null | undefined,
+  allowlist: Set<string>,
+): boolean {
+  return !!phone && allowlist.has(normalizePhone(phone));
+}
+
 const SUPERADMIN_PHONES = buildSuperAdminPhones();
+
+/** Minimal db-update interface accepted by promoteSuperAdminIfMatch.
+ *  Production code passes the real drizzle `db`; tests pass a spy. */
+interface DbUpdater {
+  update: (table: unknown) => { set: (vals: unknown) => { where: (cond: unknown) => Promise<unknown> } };
+}
 
 // Idempotent, upgrade-only: promotes a user row to role "superadmin" if their
 // phone matches the allowlist OR their email appears in SUPERADMIN_EMAILS env.
 // Safe to call on every register/verify/login — never downgrades, never touches other users.
-async function promoteSuperAdminIfMatch(userId: string, phone: string | null | undefined, currentRole: string | null | undefined, email?: string | null): Promise<string> {
+// Exported (with optional dbOverride / phonesOverride) so unit tests can
+// exercise the real logic against a spy and an injected phone allowlist without
+// needing a live database or a module reload to change env vars.
+export async function promoteSuperAdminIfMatch(
+  userId: string,
+  phone: string | null | undefined,
+  currentRole: string | null | undefined,
+  email?: string | null,
+  dbOverride?: DbUpdater,
+  phonesOverride?: Set<string>,
+): Promise<string> {
   if (currentRole === "superadmin") return "superadmin";
 
-  // Check phone allowlist
-  const phoneMatches = !!phone && SUPERADMIN_PHONES.has(normalizePhone(phone));
+  // Check phone allowlist using the production predicate.
+  // phonesOverride is only set in unit tests; production always uses the
+  // module-level SUPERADMIN_PHONES set built from env at startup.
+  const phonesSet = phonesOverride ?? SUPERADMIN_PHONES;
+  const phoneMatches = phoneInAllowlist(phone, phonesSet);
 
   // Check SUPERADMIN_EMAILS env var (comma-separated list of emails)
   const superadminEmails = (process.env.SUPERADMIN_EMAILS || "")
@@ -121,8 +155,9 @@ async function promoteSuperAdminIfMatch(userId: string, phone: string | null | u
 
   if (!phoneMatches && !emailMatches) return currentRole || "user";
 
+  const dbToUse = (dbOverride ?? db) as typeof db;
   try {
-    await db.update(users).set({ role: "superadmin", updatedAt: new Date() }).where(eq(users.id, userId));
+    await dbToUse.update(users).set({ role: "superadmin", updatedAt: new Date() }).where(eq(users.id, userId));
     const reason = phoneMatches ? "phone match" : "email match";
     console.log(`[EmailAuth] Promoted user ${userId} to superadmin (${reason})`);
   } catch (err) {

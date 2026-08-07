@@ -514,6 +514,14 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] store_products.price_override DDL error:`, e);
   }
 
+  // ── store_products.download_path column (idempotent DDL) ──────────────────
+  try {
+    await pool.query(`ALTER TABLE store_products ADD COLUMN IF NOT EXISTS download_path text`);
+    console.log(`${new Date().toLocaleTimeString()} [express] store_products.download_path column ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] store_products.download_path DDL error:`, e);
+  }
+
   await registerRoutes(httpServer, app);
 
   // ── Boot-time channel health check ──────────────────────────────────────────
