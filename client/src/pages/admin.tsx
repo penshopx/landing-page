@@ -756,8 +756,7 @@ export default function AdminPage() {
 
   const createProductMutation = useMutation({
     mutationFn: async (data: object) => {
-      const res = await apiRequest("POST", "/api/store/admin/products", data);
-      return res.json();
+      return apiRequest("POST", "/api/store/admin/products", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/store/admin/products"] });
