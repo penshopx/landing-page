@@ -176,7 +176,7 @@ const storeCatalogInflight = new Map<string, Promise<any[]>>();
 // (category, search) and a single mutation can affect many keys, so we clear
 // all of them; the next request cold-builds via single-flight. Public browsing
 // still hits the warm cache after that one rebuild — no load-test regression.
-function invalidateStoreCatalog(): void {
+export function invalidateStoreCatalog(): void {
   storeCatalogCache.clear();
   storeCatalogInflight.clear();
 }
@@ -408,7 +408,7 @@ function refreshStoreCatalog(cacheKey: string, category: string, search: string)
   return inflight;
 }
 
-async function getStoreCatalogItems(category: string, search: string): Promise<any[]> {
+export async function getStoreCatalogItems(category: string, search: string): Promise<any[]> {
   const cacheKey = `${category}||${search}`;
   const cached = storeCatalogCache.get(cacheKey);
   if (cached) {
