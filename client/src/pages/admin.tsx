@@ -385,7 +385,7 @@ export default function AdminPage() {
   const [editPaymentUrlValue, setEditPaymentUrlValue] = useState("");
   const [showProductForm, setShowProductForm] = useState(false);
   const [editProductDialog, setEditProductDialog] = useState<{ open: boolean; product: StoreProduct | null }>({ open: false, product: null });
-  const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true, paymentUrl: "", priceOverride: "", downloadPath: "" });
+  const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true, paymentUrl: "", priceOverride: "", downloadPath: "", scalevProductName: "" });
 
   // ---- Queries ----
   const { data: meData, isError: meError, isLoading: meLoading } = useQuery<AdminMeData>({
@@ -451,6 +451,7 @@ export default function AdminPage() {
     computedPrice: number | null;
     teamSize: number | null;
     downloadPath: string | null;
+    scalevProductName: string | null;
   }
 
   const { data: modulSubs = [], isLoading: modulSubsLoading, refetch: refetchModulSubs } = useQuery<ModulSub[]>({
@@ -1958,6 +1959,7 @@ export default function AdminPage() {
                                     paymentUrl: p.paymentUrl || "",
                                     priceOverride: p.priceOverride != null ? String(p.priceOverride) : "",
                                     downloadPath: p.downloadPath || "",
+                                    scalevProductName: p.scalevProductName || "",
                                   });
                                   setEditProductDialog({ open: true, product: p });
                                 }}
@@ -3790,7 +3792,17 @@ Selamat menggunakan! 🚀
                 placeholder="mis. OSS/Template-SPTJM-OSS.docx"
                 data-testid="input-edit-product-download-path"
               />
-              <p className="text-xs text-muted-foreground mt-1">Path file digital yang dikirim setelah pembelian. Huruf besar/kecil harus tepat.</p>
+              <p className="text-xs text-muted-foreground mt-1">Path file di bucket Supabase. Huruf besar/kecil harus tepat.</p>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-medium mb-1 block text-muted-foreground">Nama Produk Scalev (untuk auto-delivery)</label>
+              <Input
+                value={editProductForm.scalevProductName}
+                onChange={(e) => setEditProductForm(f => ({ ...f, scalevProductName: e.target.value }))}
+                placeholder="mis. Template SPTJM Penyelamat"
+                data-testid="input-edit-product-scalev-name"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Nama produk/varian persis di dashboard Scalev. Dipakai untuk cocokkan webhook → kirim file otomatis.</p>
             </div>
             <div className="sm:col-span-2 flex items-center gap-3">
               <label className="text-xs font-medium text-muted-foreground">Status</label>
@@ -3829,6 +3841,7 @@ Selamat menggunakan! 🚀
                     paymentUrl: editProductForm.paymentUrl || "",
                     priceOverride: editProductForm.priceOverride ? Number(editProductForm.priceOverride) : null,
                     downloadPath: editProductForm.downloadPath || null,
+                    scalevProductName: editProductForm.scalevProductName || null,
                   },
                 });
               }}

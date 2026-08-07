@@ -20029,6 +20029,93 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       }
       // ─────────────────────────────────────────────────────────────────────────
 
+      // ── Digital Product Delivery (download_path via Supabase Storage) ─────────
+      // Cek apakah ada store_product dengan download_path yang cocok dengan
+      // nama produk Scalev (scalev_product_name) atau nama produk webhook.
+      // Jika cocok: generate signed URL → kirim email ke pembeli → catat order.
+      {
+        const webhookProductNames: string[] = [
+          data.product_name || "",
+          data.name || "",
+          ...Object.keys(finalVariants),
+        ].map((s: string) => s.trim().toLowerCase()).filter(Boolean);
+
+        if (webhookProductNames.length > 0 && customerEmail) {
+          try {
+            const { db: dbDp } = await import("./db");
+            const { storeProducts: spTbl } = await import("@shared/schema");
+            const { isNotNull: dpNotNull } = await import("drizzle-orm");
+            const allDigital = await dbDp
+              .select()
+              .from(spTbl)
+              .where(dpNotNull(spTbl.downloadPath));
+
+            const matched = allDigital.find((p: any) => {
+              const scalevName = (p.scalevProductName || "").trim().toLowerCase();
+              const storeName = (p.name || "").trim().toLowerCase();
+              return webhookProductNames.some(
+                (wn: string) =>
+                  (scalevName && wn === scalevName) || wn === storeName,
+              );
+            });
+
+            if (matched && matched.downloadPath) {
+              console.log(
+                `[Scalev] Digital product matched: "${matched.name}" → ${matched.downloadPath}`,
+              );
+              try {
+                const { generateSignedDownloadUrl } = await import("./lib/supabase-storage");
+                const { sendDigitalProductDeliveryEmail } = await import("./lib/email");
+                const { randomUUID: dpUUID } = await import("crypto");
+                const { db: dbOrd } = await import("./db");
+                const { storeOrders: soTbl } = await import("@shared/schema");
+
+                // Generate 24-hour signed URL
+                const signedUrl = await generateSignedDownloadUrl(matched.downloadPath, 86_400);
+
+                // Send delivery email (fire-and-forget)
+                sendDigitalProductDeliveryEmail({
+                  to: customerEmail,
+                  customerName: customerName || null,
+                  productName: matched.name,
+                  downloadUrl: signedUrl,
+                  expiryHours: 24,
+                }).then((r: any) => {
+                  if (r.sent) {
+                    console.log(`[DigitalDelivery] Email terkirim ke ${customerEmail} untuk "${matched.name}"`);
+                  } else {
+                    console.error(`[DigitalDelivery] Email gagal ke ${customerEmail}: ${r.reason} — ${r.detail ?? ""}`);
+                  }
+                }).catch((e: any) => {
+                  console.error("[DigitalDelivery] sendEmail error:", e?.message);
+                });
+
+                // Record order
+                await dbOrd.insert(soTbl).values({
+                  productId: matched.id,
+                  customerName: customerName || "Customer",
+                  customerEmail,
+                  customerPhone,
+                  amount: Math.round(grossRevenue),
+                  midtransOrderId: `scalev_${orderId}`,
+                  accessToken: dpUUID(),
+                  status: "paid",
+                } as any).onConflictDoNothing();
+
+                console.log(`[DigitalDelivery] Order recorded for "${matched.name}" — ${customerEmail}`);
+                return res.status(200).json({ received: true, type: "digital_product_delivery" });
+              } catch (dpErr: any) {
+                console.error("[DigitalDelivery] Error:", dpErr?.message);
+                // Don't block webhook — fall through to normal handling
+              }
+            }
+          } catch (dpLookupErr: any) {
+            console.error("[DigitalDelivery] Lookup error:", dpLookupErr?.message);
+          }
+        }
+      }
+      // ─────────────────────────────────────────────────────────────────────────
+
       const { randomUUID: genUUID } = await import("crypto");
       const baseUrl = getServerBaseUrl(req);
       const accessToken = genUUID();

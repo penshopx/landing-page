@@ -2158,6 +2158,7 @@ export const storeProducts = pgTable("store_products", {
   sortOrder: integer("sort_order").default(0),
   paymentUrl: text("payment_url").default(""),
   scalevVariantId: integer("scalev_variant_id"),
+  scalevProductName: text("scalev_product_name"),
   priceOverride: integer("price_override"),
   downloadPath: text("download_path"),
   createdAt: timestamp("created_at").defaultNow().notNull(),

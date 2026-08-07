@@ -655,3 +655,98 @@ Kamu menerima email ini karena status sertifikasi chatbot di akun Gustafta kamu 
     tags: ["agent-certification", "transactional"],
   });
 }
+
+// ── Digital Product Delivery ──────────────────────────────────────────────────
+
+interface DigitalProductDeliveryOptions {
+  to: string;
+  customerName?: string | null;
+  productName: string;
+  downloadUrl: string;
+  /** Hours until link expires (default 24) */
+  expiryHours?: number;
+}
+
+/**
+ * Sends a digital product download link to the buyer.
+ * Fire-and-forget safe — never throws.
+ */
+export async function sendDigitalProductDeliveryEmail(
+  opts: DigitalProductDeliveryOptions,
+): Promise<SendEmailResult> {
+  const greetName = opts.customerName?.trim() || "Pembeli";
+  const expiry = opts.expiryHours ?? 24;
+
+  const html = `<!DOCTYPE html>
+<html lang="id">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f3f4f6;font-family:'Segoe UI',Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6;padding:32px 0">
+    <tr><td align="center">
+      <table width="100%" style="max-width:520px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+        <!-- Header -->
+        <tr><td style="background:linear-gradient(135deg,#16a34a 0%,#15803d 100%);padding:28px 32px;text-align:center">
+          <p style="margin:0;font-size:13px;color:rgba(255,255,255,.8);letter-spacing:1px;text-transform:uppercase">Gustafta Digital</p>
+          <h1 style="margin:8px 0 0;font-size:24px;font-weight:700;color:#ffffff">📦 File Siap Diunduh!</h1>
+        </td></tr>
+        <!-- Body -->
+        <tr><td style="padding:32px">
+          <p style="margin:0 0 16px;font-size:15px;color:#374151">Halo <strong>${greetName}</strong>,</p>
+          <p style="margin:0 0 20px;font-size:15px;color:#374151;line-height:1.6">
+            Terima kasih atas pembelian <strong>${opts.productName}</strong>. 
+            File Anda sudah siap — klik tombol di bawah untuk mengunduhnya sekarang.
+          </p>
+          <!-- CTA Button -->
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0">
+            <tr><td align="center">
+              <a href="${opts.downloadUrl}"
+                 style="display:inline-block;background:#16a34a;color:#ffffff;text-decoration:none;font-size:16px;font-weight:700;padding:14px 36px;border-radius:8px;letter-spacing:.3px">
+                ⬇️ Unduh File Sekarang
+              </a>
+            </td></tr>
+          </table>
+          <!-- Warning -->
+          <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;margin:20px 0">
+            <p style="margin:0;font-size:13px;color:#92400e;line-height:1.5">
+              ⏰ <strong>Link aktif selama ${expiry} jam</strong> sejak email ini dikirim.<br>
+              Segera unduh dan simpan file ke perangkat Anda.
+            </p>
+          </div>
+          <!-- Alt Link -->
+          <p style="margin:16px 0 0;font-size:12px;color:#6b7280;line-height:1.5">
+            Jika tombol tidak berfungsi, salin link ini ke browser:<br>
+            <span style="color:#16a34a;word-break:break-all">${opts.downloadUrl}</span>
+          </p>
+        </td></tr>
+        <!-- Footer -->
+        <tr><td style="background:#f9fafb;padding:20px 32px;text-align:center;border-top:1px solid #e5e7eb">
+          <p style="margin:0;font-size:12px;color:#9ca3af">Butuh bantuan? Hubungi kami di <a href="https://gustafta.my.id" style="color:#16a34a">gustafta.my.id</a></p>
+          <p style="margin:6px 0 0;font-size:12px;color:#d1d5db">© ${new Date().getFullYear()} Gustafta. Seluruh hak dilindungi.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  const textContent = `Halo ${greetName},
+
+Terima kasih atas pembelian ${opts.productName}. File Anda siap diunduh:
+
+${opts.downloadUrl}
+
+Link aktif selama ${expiry} jam. Segera unduh dan simpan.
+
+Butuh bantuan? Kunjungi gustafta.my.id
+
+— Tim Gustafta`;
+
+  return sendEmail({
+    to: opts.to,
+    toName: greetName,
+    subject: `📦 File Siap Diunduh: ${opts.productName}`,
+    htmlContent: html,
+    textContent,
+    tags: ["digital-product-delivery", "transactional"],
+  });
+}
