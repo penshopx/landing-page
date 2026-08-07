@@ -161,6 +161,22 @@ function ProdUrlCard({ appUrl, isDevUrl, onSaved }: { appUrl: string; isDevUrl: 
         credentials: "include",
       });
       const data = await res.json();
+      if (res.status === 401) {
+        toast({
+          title: "Sesi habis — silakan login ulang",
+          description: (
+            <span>
+              Input Anda masih tersimpan di form.{" "}
+              <a href="/login" className="underline font-medium">
+                Login ulang
+              </a>{" "}
+              lalu simpan kembali.
+            </span>
+          ) as any,
+          variant: "destructive",
+        });
+        return;
+      }
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan");
       onSaved(data.appUrl);
       setInput("");
