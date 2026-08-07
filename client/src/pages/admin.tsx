@@ -2804,11 +2804,19 @@ export default function AdminPage() {
                       </div>
                       <p className="text-xs text-muted-foreground">{brevoStats.note}</p>
 
-                      {/* Konfigurasi penerima alert bounce — Task #79 */}
-                      <div className="pt-2 border-t border-border/50">
-                        <p className="text-xs font-semibold text-muted-foreground mb-1">Penerima Alert Bounce</p>
-                        <p className="text-xs text-muted-foreground mb-2">
-                          Saat ini: <strong>{brevoStats.alertRecipient}</strong>
+                      {/* Konfigurasi penerima alert bounce */}
+                      <div className="pt-2 border-t border-border/50 space-y-2">
+                        <p className="text-xs font-semibold text-muted-foreground">Penerima Alert Bounce</p>
+                        {/* Document the two-channel alert delivery chain */}
+                        <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-800/40 p-3 text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                          <p className="font-semibold">📣 Urutan pengiriman notifikasi:</p>
+                          <ol className="list-decimal list-inside space-y-0.5">
+                            <li><strong>WhatsApp (Fonnte)</strong> — dikirim ke nomor <code>SUPERADMIN_PHONE</code> (env var). Jika berhasil, email tidak dikirim.</li>
+                            <li><strong>Email fallback</strong> — dikirim ke alamat di bawah ini jika WA gagal atau tidak dikonfigurasi.</li>
+                          </ol>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Penerima email saat ini: <strong>{brevoStats.alertRecipient}</strong>
                         </p>
                         <div className="flex gap-2">
                           <Input
@@ -2830,6 +2838,9 @@ export default function AdminPage() {
                             {saveAlertRecipientMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : "Simpan"}
                           </Button>
                         </div>
+                        <p className="text-xs text-muted-foreground">
+                          Kosongkan <code>BREVO_ALERT_EMAIL</code> env var — nilai di atas disimpan di database dan berlaku tanpa redeploy.
+                        </p>
                       </div>
                     </div>
                   )}
