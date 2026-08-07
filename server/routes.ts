@@ -18563,8 +18563,15 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
 
   // ==================== ADMIN: EMAIL (BREVO) HEALTH CHECK ====================
   // Tests live connectivity to Brevo's API using the configured key.
-  // Returns the server's outbound IP (from the Brevo error body when blocked) so
-  // admins know exactly which IP to add to https://app.brevo.com/security/authorised_ips
+  //
+  // IP restriction note: Brevo's "Authorised IPs" feature must be DISABLED
+  // (Settings → Security → Authorised IPs → remove all entries / Allow all IPs)
+  // when hosting on Replit Autoscale. Each deployment gets a new dynamic IP and
+  // adding individual IPs is a losing battle. The API key is the only auth layer
+  // needed — Brevo docs confirm key-only auth is the standard and safe approach.
+  //
+  // If ip_blocked is returned, the fix is NOT to add the current IP but to open
+  // https://app.brevo.com/security/authorised_ips and remove all allowlist entries.
   app.get("/api/admin/email-health", requireAdmin, async (_req: any, res: any) => {
     const brevoApiKey = process.env.BREVO_API_KEY;
     if (!brevoApiKey) {
@@ -18606,7 +18613,11 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           configured: true,
           reachable: false,
           status: "ip_blocked",
-          detail: `Server IP ${serverIp} is not in Brevo's authorized IP list. Go to https://app.brevo.com/security/authorised_ips and add this IP.`,
+          // Fix: remove ALL IP restrictions in Brevo — do NOT add this IP.
+          // Replit Autoscale assigns a new dynamic IP on every redeploy, so
+          // whitelisting individual IPs will break again after the next deploy.
+          // The API key alone is sufficient authentication.
+          detail: `Server IP ${serverIp} is blocked by Brevo's IP allowlist. Because Replit Autoscale assigns a new dynamic IP on every redeploy, the correct fix is to REMOVE all IP restrictions in Brevo (Settings → Security → Authorised IPs → remove all entries), not to add this IP. The API key is the only auth layer needed.`,
           serverIp,
           timestamp: new Date().toISOString(),
         });

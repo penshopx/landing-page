@@ -2649,16 +2649,22 @@ export default function AdminPage() {
                   {/* ── Brevo API connectivity banner ───────────────────── */}
                   {emailConnectivity && emailConnectivity.status === "ip_blocked" && (
                     <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-sm space-y-2">
-                      <p className="font-semibold text-red-700 dark:text-red-300">🚫 Server IP tidak diizinkan di Brevo</p>
+                      <p className="font-semibold text-red-700 dark:text-red-300">🚫 Brevo IP Allowlist menghalangi pengiriman email</p>
                       <p className="text-xs text-red-600 dark:text-red-400">
                         Brevo memblokir IP server saat ini (<code className="bg-red-100 dark:bg-red-900/40 px-1 rounded font-mono">{emailConnectivity.serverIp}</code>).
-                        Email <strong>tidak dapat terkirim</strong> sampai IP ini ditambahkan ke whitelist.
+                        Email <strong>tidak dapat terkirim</strong>.
                       </p>
+                      <div className="rounded bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 p-3 text-xs text-amber-800 dark:text-amber-200 space-y-1">
+                        <p className="font-bold">⚠️ Jangan tambahkan IP ini — hapus semua IP dari allowlist.</p>
+                        <p>Replit Autoscale memberi IP baru setiap redeploy. Menambahkan IP satu per satu akan terus berulang. Solusi permanen: <strong>nonaktifkan IP restriction sepenuhnya</strong>.</p>
+                      </div>
                       <ol className="text-xs text-red-700 dark:text-red-300 list-decimal list-inside space-y-1">
                         <li>Buka <a href="https://app.brevo.com/security/authorised_ips" target="_blank" rel="noreferrer" className="underline font-semibold">app.brevo.com/security/authorised_ips</a></li>
-                        <li>Klik <strong>Add an IP address</strong> → masukkan <code className="bg-red-100 dark:bg-red-900/40 px-1 rounded font-mono">{emailConnectivity.serverIp}</code></li>
+                        <li><strong>Hapus semua</strong> entri IP yang ada (klik ikon hapus di setiap baris)</li>
+                        <li>Jika ada opsi "Allow all IPs" atau "Disable IP restriction" — aktifkan opsi tersebut</li>
                         <li>Simpan → klik tombol <strong>Refresh</strong> di atas untuk verifikasi</li>
                       </ol>
+                      <p className="text-xs text-muted-foreground">API key sudah cukup sebagai lapisan autentikasi. IP restriction tidak diperlukan dan menambah fragilitas.</p>
                     </div>
                   )}
                   {emailConnectivity && emailConnectivity.status === "not_configured" && (
