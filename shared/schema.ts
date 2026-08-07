@@ -2159,6 +2159,7 @@ export const storeProducts = pgTable("store_products", {
   paymentUrl: text("payment_url").default(""),
   scalevVariantId: integer("scalev_variant_id"),
   priceOverride: integer("price_override"),
+  downloadPath: text("download_path"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   // Store catalog builder filters active products by category.
