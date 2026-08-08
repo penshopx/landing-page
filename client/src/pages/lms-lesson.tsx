@@ -181,6 +181,7 @@ export default function LmsLesson() {
     mutationFn: () => apiRequest("POST", "/api/lms/progress", { lessonId: parseInt(lessonId!), courseId: parseInt(id!) }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/lms/progress", id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lms/my-courses"] });
       setMarkingDone(true);
       toast({ title: "Selesai!", description: "Progress kursus diperbarui." });
     },
