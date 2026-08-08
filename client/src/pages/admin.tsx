@@ -741,14 +741,23 @@ export default function AdminPage() {
   });
 
   const createManualOrderMutation = useMutation({
-    mutationFn: async (data: { agentId: number; name: string; email: string; phone: string }) => {
+    mutationFn: async (data: { agentId?: number; productId?: number; name: string; email: string; phone: string }) => {
       return apiRequest("POST", "/api/store/order/manual", data);
     },
     onSuccess: (data: any) => {
       setManualResult({ accessUrl: data.accessUrl, agentName: data.agentName });
       setManualForm({ name: "", email: "", phone: "", agentId: "" });
       refetchOrders();
-      toast({ title: "Link akses berhasil dibuat!", description: `Order manual untuk ${data.agentName} siap dikirim.` });
+      if (data.type === "digital") {
+        toast({
+          title: data.emailSent ? "📧 Email delivery terkirim!" : "✅ Order dibuat (email gagal)",
+          description: data.emailSent
+            ? `File "${data.agentName}" dikirim ke email pembeli. Link aktif 24 jam.`
+            : `Order tercatat tapi email gagal dikirim. Salin link di bawah dan kirim manual.`,
+        });
+      } else {
+        toast({ title: "Link akses berhasil dibuat!", description: `Order manual untuk ${data.agentName} siap dikirim.` });
+      }
     },
     onError: (err: any) => handle401Error(err, "Gagal buat order manual", err?.message),
   });
@@ -2075,9 +2084,21 @@ export default function AdminPage() {
                         <Input value={manualForm.phone} onChange={(e) => setManualForm(f => ({ ...f, phone: e.target.value }))} placeholder="08xxx" data-testid="input-manual-phone" />
                       </div>
                       <div>
-                        <label className="text-xs font-medium mb-1 block text-muted-foreground">ID Chatbot (Agent ID) *</label>
-                        <Input type="number" value={manualForm.agentId} onChange={(e) => setManualForm(f => ({ ...f, agentId: e.target.value }))} placeholder="mis. 1281" data-testid="input-manual-agent-id" />
-                        <p className="text-xs text-muted-foreground mt-1">Lihat ID di halaman agent di dashboard.</p>
+                        <label className="text-xs font-medium mb-1 block text-muted-foreground">Produk *</label>
+                        <select
+                          className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                          value={manualForm.agentId}
+                          onChange={(e) => setManualForm(f => ({ ...f, agentId: e.target.value }))}
+                          data-testid="select-manual-product"
+                        >
+                          <option value="">— Pilih produk —</option>
+                          {storeProducts.filter(p => p.isActive).map(p => (
+                            <option key={p.id} value={p.downloadPath ? `dp:${p.id}` : String(p.agentId ?? "")}>
+                              {p.emoji} {p.name}{p.downloadPath ? " 📄" : " 🤖"}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="text-xs text-muted-foreground mt-1">🤖 = chatbot akses · 📄 = file digital (email dikirim otomatis)</p>
                       </div>
                     </div>
                   )}
@@ -2086,7 +2107,15 @@ export default function AdminPage() {
                     <Button
                       className="bg-violet-600 hover:bg-violet-700 text-white gap-2"
                       disabled={createManualOrderMutation.isPending || !manualForm.name || !manualForm.email || !manualForm.agentId}
-                      onClick={() => createManualOrderMutation.mutate({ agentId: Number(manualForm.agentId), name: manualForm.name, email: manualForm.email, phone: manualForm.phone })}
+                      onClick={() => {
+                        const val = manualForm.agentId;
+                        if (val.startsWith("dp:")) {
+                          const productId = Number(val.replace("dp:", ""));
+                          createManualOrderMutation.mutate({ productId, name: manualForm.name, email: manualForm.email, phone: manualForm.phone } as any);
+                        } else {
+                          createManualOrderMutation.mutate({ agentId: Number(val), name: manualForm.name, email: manualForm.email, phone: manualForm.phone });
+                        }
+                      }}
                       data-testid="button-create-manual-order"
                     >
                       {createManualOrderMutation.isPending ? <><Loader2 className="h-4 w-4 animate-spin" /> Memproses...</> : <><Plus className="h-4 w-4" /> Generate Link Akses</>}

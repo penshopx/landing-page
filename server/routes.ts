@@ -7851,15 +7851,69 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         return res.status(403).json({ error: "Admin only" });
       }
 
-      const { agentId, name, email, phone } = req.body;
-      if (!name || !email || !agentId) {
-        return res.status(400).json({ error: "name, email, dan agentId wajib diisi" });
+      const { agentId, productId: manualProductId, name, email, phone } = req.body;
+      if (!name || !email || (!agentId && !manualProductId)) {
+        return res.status(400).json({ error: "name, email, dan agentId atau productId wajib diisi" });
       }
 
       const { db } = await import("./db");
-      const { agents: agentsTable } = await import("@shared/schema");
       const { eq } = await import("drizzle-orm");
       const { randomUUID } = await import("crypto");
+
+      // ── Digital product delivery (template file via Supabase Storage) ──────────
+      if (manualProductId) {
+        const { storeProducts: spTbl } = await import("@shared/schema");
+        const spRows = await db.select().from(spTbl).where(eq(spTbl.id, Number(manualProductId))).limit(1);
+        const sp = spRows[0];
+        if (!sp) return res.status(404).json({ error: "Produk tidak ditemukan" });
+
+        if (!sp.downloadPath) {
+          return res.status(400).json({ error: "Produk ini tidak memiliki file digital (downloadPath kosong)" });
+        }
+
+        const orderId = `MANUAL-${Date.now()}-${randomUUID().split("-")[0].toUpperCase()}`;
+
+        // Generate 24-hour Supabase signed URL
+        const { generateSignedDownloadUrl } = await import("./lib/supabase-storage");
+        const { sendDigitalProductDeliveryEmail } = await import("./lib/email");
+        const { storeOrders: soTbl } = await import("@shared/schema");
+
+        const signedUrl = await generateSignedDownloadUrl(sp.downloadPath, 86_400);
+
+        // Send delivery email
+        const emailResult = await sendDigitalProductDeliveryEmail({
+          to: email,
+          customerName: name,
+          productName: sp.name,
+          downloadUrl: signedUrl,
+          expiryHours: 24,
+        });
+        console.log(`[ManualOrder Digital] ${emailResult.sent ? "Email terkirim" : "Email gagal"} ke ${email} untuk "${sp.name}"`);
+
+        // Record order
+        await db.insert(soTbl).values({
+          productId: sp.id,
+          customerName: name,
+          customerEmail: email,
+          customerPhone: phone || "",
+          amount: sp.priceOverride ?? sp.price ?? 0,
+          midtransOrderId: orderId,
+          accessToken: randomUUID(),
+          status: "paid",
+        } as any).onConflictDoNothing();
+
+        return res.json({
+          success: true,
+          accessUrl: signedUrl,
+          orderId,
+          agentName: sp.name,
+          type: "digital",
+          emailSent: emailResult.sent,
+        });
+      }
+
+      // ── Chatbot access link (legacy flow) ────────────────────────────────────
+      const { agents: agentsTable } = await import("@shared/schema");
 
       const rows = await db.select({ id: agentsTable.id, name: agentsTable.name, userId: agentsTable.userId, licensePrice: agentsTable.licensePrice, licenseClass: agentsTable.licenseClass })
         .from(agentsTable).where(eq(agentsTable.id, Number(agentId))).limit(1);
@@ -7892,7 +7946,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       });
 
       const accessUrl = `${getServerBaseUrl(req)}/store/access/${accessToken}`;
-      res.json({ success: true, accessToken, accessUrl, orderId, agentName: agent.name });
+      res.json({ success: true, accessToken, accessUrl, orderId, agentName: agent.name, type: "chatbot" });
     } catch (error) {
       console.error("Manual order error:", error);
       res.status(500).json({ error: "Gagal membuat order manual" });
