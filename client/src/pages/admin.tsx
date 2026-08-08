@@ -1925,7 +1925,7 @@ export default function AdminPage() {
                         <div className="sm:col-span-2">
                           <label className="text-xs font-medium mb-1 block text-muted-foreground">Link Pembayaran Scalev</label>
                           <Input value={productForm.paymentUrl} onChange={(e) => setProductForm(f => ({ ...f, paymentUrl: e.target.value }))}
-                            placeholder="https://bayar.gustafta.my.id/p/nama-slug-produk" data-testid="input-product-payment-url" />
+                            placeholder="https://bayar.dokumenproyek.com/p/nama-slug-produk" data-testid="input-product-payment-url" />
                           <p className="text-xs text-muted-foreground mt-1">Wajib diisi jika produk tidak terhubung ke Agent ID manapun</p>
                         </div>
                         <div className="sm:col-span-2">
@@ -2058,7 +2058,7 @@ export default function AdminPage() {
                                 className="h-7 text-xs flex-1"
                                 value={editPaymentUrlValue}
                                 onChange={(e) => setEditPaymentUrlValue(e.target.value)}
-                                placeholder="https://bayar.gustafta.my.id/p/slug-produk"
+                                placeholder="https://bayar.dokumenproyek.com/p/slug-produk"
                                 autoFocus
                               />
                               <Button size="sm" className="h-7 px-2 text-xs bg-violet-600 hover:bg-violet-700 text-white"

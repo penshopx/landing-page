@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { Link } from "wouter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
@@ -16,8 +17,8 @@ import cover3D from "@assets/Buku_3D_1781288556255.png";
 import mockupDevices from "@assets/1781288755_1781288818548.jpg";
 import { useContactNumbers } from "@/lib/contact";
 
-const SCALEV_BUNDLE = "https://bayar.gustafta.my.id";
-const SCALEV_BUKU1  = "https://bayar.gustafta.my.id";
+const SCALEV_BUNDLE = `${PAYMENT_BASE_URL}`;
+const SCALEV_BUKU1  = `${PAYMENT_BASE_URL}`;
 
 // Data konteks industri konstruksi Indonesia (sumber publik/resmi)
 const STATS_KONSTRUKSI = [

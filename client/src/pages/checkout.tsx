@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreateSubscription } from "@/hooks/use-subscription";
@@ -68,7 +69,7 @@ const SUBSCRIPTION_PLANS: Record<string, {
   },
 };
 
-const SCALEV_BASE = "https://bayar.gustafta.my.id/p";
+const SCALEV_BASE = `${PAYMENT_BASE_URL}/p`;
 
 const JASA_PLANS: Record<string, {
   key: string; name: string; price: string; priceNum: number;

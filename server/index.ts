@@ -2649,6 +2649,24 @@ function startScheduler() {
     log(`[Owner Usage Cleanup] hapus ${deleted} baris owner_monthly_usage sebelum ${cutoffMonth}`);
   });
 
+  // ── Briefing Harian WA — 07:00 WIB ──────────────────────────────────────────
+  scheduleAtWIB("Briefing Harian WA", 7, 0, async () => {
+    const { sendFonnteNotification } = await import("./lib/notify-fonnte");
+    const now = nowWIB();
+    const tanggal = now.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+    let statsLine = "";
+    try {
+      const { pool } = await import("./db");
+      const r = await pool.query(
+        `SELECT count(*)::int AS orders FROM store_orders WHERE created_at > now() - interval '24 hours'`
+      );
+      statsLine = `\n📦 Order 24 jam terakhir: ${r.rows[0]?.orders ?? 0}`;
+    } catch { /* stats opsional */ }
+    const msg = `☀️ *Briefing Harian Gustafta*\n${tanggal}${statsLine}\n\nSemua sistem berjalan. Semangat, Bos! 🏎️`;
+    const res = await sendFonnteNotification(msg);
+    log(res.sent ? "[Briefing] terkirim ke WA" : `[Briefing] gagal: ${res.reason}`);
+  });
+
   // ── Cadangan Database via email — Senin 05:00 WIB (mingguan) ────────────────
   // scheduleAtWIB berjalan harian; kita batasi ke hari Senin agar efektif
   // mingguan. File pg_dump ter-gzip dikirim sebagai lampiran ke admin — salinan

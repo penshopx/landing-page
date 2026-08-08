@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { Button } from "@/components/ui/button";
 import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
@@ -11,7 +12,7 @@ import {
 
 import { trackLead } from "@/lib/meta-pixel";
 import { useContactNumbers } from "@/lib/contact";
-const SCALEV_STARTER_KIT = "https://bayar.gustafta.my.id/p/starter-kit-gustafta";
+const SCALEV_STARTER_KIT = `${PAYMENT_BASE_URL}/p/starter-kit-gustafta`;
 function handleWaClick() {
   trackLead({ content_name: "WhatsApp CTA" });
 }

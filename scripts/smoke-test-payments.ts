@@ -56,7 +56,7 @@ async function checkPaymentLinkCreation(): Promise<void> {
   const json = await res.json() as any;
   if (res.ok && json.code === 200) {
     const product = json.data;
-    const checkoutUrl = `https://bayar.gustafta.my.id/p/${product.slug}`;
+    const checkoutUrl = `https://bayar.dokumenproyek.com/p/${product.slug}`;
     pass(`Payment link created: ${checkoutUrl}`);
     info(`(product id=${product.id} slug=${product.slug} — delete from Scalev dashboard)`);
   } else {

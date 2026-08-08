@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -218,7 +219,7 @@ export default function Store() {
       const qs = new URLSearchParams();
       qs.set("variant_ids", String(agent.scalevVariantId));
       qs.set("qty", "1");
-      window.open(`https://bayar.gustafta.my.id/c/checkout?${qs.toString()}`, "_blank");
+      window.open(`${PAYMENT_BASE_URL}/c/checkout?${qs.toString()}`, "_blank");
       return;
     }
     // Fallback → WA inquiry

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { useContactNumbers } from "@/lib/contact";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -285,7 +286,7 @@ export default function KlinikPage() {
                     ))}
                   </ul>
                   <a
-                    href={`https://bayar.gustafta.my.id/p/${p.scalevSlug}`}
+                    href={`${PAYMENT_BASE_URL}/p/${p.scalevSlug}`}
                     target="_blank" rel="noopener noreferrer"
                   >
                     <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="sm">
@@ -321,7 +322,7 @@ export default function KlinikPage() {
                   <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{s.price}</div>
                   <a
                     href={s.scalevSlug
-                      ? `https://bayar.gustafta.my.id/p/${s.scalevSlug}`
+                      ? `${PAYMENT_BASE_URL}/p/${s.scalevSlug}`
                       : `https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20ingin%20${encodeURIComponent(s.name)}%20Klinik%20AI%20Gustafta`}
                     target="_blank" rel="noopener noreferrer"
                   >
@@ -361,7 +362,7 @@ export default function KlinikPage() {
                   </div>
                   <a
                     href={d.scalevSlug
-                      ? `https://bayar.gustafta.my.id/p/${d.scalevSlug}`
+                      ? `${PAYMENT_BASE_URL}/p/${d.scalevSlug}`
                       : `https://wa.me/${contact.secondary}?text=Halo%2C%20saya%20butuh%20generator%20${encodeURIComponent(d.name)}%20dari%20Klinik%20AI`}
                     target="_blank" rel="noopener noreferrer"
                   >

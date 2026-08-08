@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 
 export interface CartItem {
   id: string;          // sp-{productId} or agent-{agentId}
@@ -85,7 +86,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!selected.length) return null;
     const variantIds = selected.map(i => i.scalevVariantId).join(",");
     const qtys = selected.map(i => String(i.qty)).join(",");
-    return `https://bayar.gustafta.my.id/c/checkout?variant_ids=${variantIds}&qty=${qtys}`;
+    return `${PAYMENT_BASE_URL}/c/checkout?variant_ids=${variantIds}&qty=${qtys}`;
   }, [items]);
 
   const totalItems = items.reduce((sum, i) => sum + i.qty, 0);

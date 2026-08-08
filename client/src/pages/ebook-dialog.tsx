@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { Link } from "wouter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
@@ -10,7 +11,7 @@ import coverFlat from "@assets/Monolog-_cover_1781287565935.jpg";
 import cover3D from "@assets/Buku_3D_1781288556255.png";
 import { useContactNumbers } from "@/lib/contact";
 
-const SCALEV_EBOOK = "https://bayar.gustafta.my.id/p/ebook-buku-i-dialog-gustafta";
+const SCALEV_EBOOK = `${PAYMENT_BASE_URL}/p/ebook-buku-i-dialog-gustafta`;
 
 const BONUS_ICONS = [BookOpen, Sparkles, FileText, Video, Gift];
 

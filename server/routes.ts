@@ -41,7 +41,7 @@ import fs from "fs";
 import { createRequire } from "module";
 import OpenAI from "openai";
 import { GoogleGenAI } from "@google/genai";
-import { subscriptionPlans, type SubscriptionPlanKey } from "./lib/scalev";
+import { subscriptionPlans, PAYMENT_BASE_URL, type SubscriptionPlanKey } from "./lib/scalev";
 import { isAuthenticated, invalidateUserActiveCache } from "./replit_integrations/auth";
 import { registerBlueprintEngineRoutes } from "./blueprint-engine-routes";
 import { registerOrganizationEngineRoutes } from "./organization-engine-routes";
@@ -7104,7 +7104,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         };
         const scalevSlug = SCALEV_SLUG_MAP[selectedPlan];
         const scalevCheckoutUrl = scalevSlug
-          ? `https://bayar.gustafta.my.id/p/${scalevSlug}`
+          ? `${PAYMENT_BASE_URL}/p/${scalevSlug}`
           : null;
 
         // Fallback WA if no Scalev product configured
@@ -7629,7 +7629,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
             if (name)  qs.set("pre_fill[name]",  String(name));
             if (email) qs.set("pre_fill[email]", String(email));
             if (phone) qs.set("pre_fill[phone]", String(phone));
-            scalevUrl = `https://bayar.gustafta.my.id/c/checkout?${qs.toString()}`;
+            scalevUrl = `${PAYMENT_BASE_URL}/c/checkout?${qs.toString()}`;
           }
         } catch {}
       }
@@ -7648,7 +7648,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           if (phone) qs.set("pre_fill[phone]", String(phone));
           qs.set("agent_id", String(resolvedAgentId));
           qs.set("order_ref", orderId);
-          scalevUrl = `https://bayar.gustafta.my.id/p/${effectiveSlug}?${qs.toString()}`;
+          scalevUrl = `${PAYMENT_BASE_URL}/p/${effectiveSlug}?${qs.toString()}`;
         }
       }
       // ──────────────────────────────────────────────────────────────────────
@@ -11162,6 +11162,36 @@ Balas dengan JSON dengan struktur PERSIS ini:
     }
     return await storage.getAgent(agentId);
   }
+
+  // Webhook notifikasi WA internal (briefing/alert) — POST { message } → WA founder via Fonnte.
+  // Keamanan: kunci wajib (header X-Notify-Key atau ?key=), target SELALU NOTIFICATION_PHONE
+  // (tidak bisa dioverride caller), plus rate limit sederhana anti-abuse.
+  const notifyRateWindow: number[] = [];
+  app.post("/api/notify-fonnte", async (req, res) => {
+    try {
+      const expectedKey = process.env.NOTIFY_WEBHOOK_KEY;
+      if (!expectedKey) return res.status(503).json({ success: false, error: "NOTIFY_WEBHOOK_KEY belum diset" });
+      const givenKey = (req.headers["x-notify-key"] as string) || (req.query.key as string) || "";
+      if (givenKey !== expectedKey) return res.status(401).json({ success: false, error: "Kunci notifikasi salah" });
+
+      // Rate limit: maks 30 pesan per jam (in-memory per instance — cukup untuk relay internal)
+      const now = Date.now();
+      while (notifyRateWindow.length && now - notifyRateWindow[0] > 60 * 60 * 1000) notifyRateWindow.shift();
+      if (notifyRateWindow.length >= 30) return res.status(429).json({ success: false, error: "Terlalu banyak notifikasi, coba lagi nanti" });
+
+      const message = typeof req.body?.message === "string" ? req.body.message.trim() : "";
+      if (!message) return res.status(400).json({ success: false, error: "Field 'message' wajib diisi" });
+      if (message.length > 4000) return res.status(400).json({ success: false, error: "Pesan terlalu panjang (maks 4000 karakter)" });
+
+      notifyRateWindow.push(now);
+      const { sendFonnteNotification } = await import("./lib/notify-fonnte");
+      const result = await sendFonnteNotification(message); // target selalu NOTIFICATION_PHONE
+      if (result.sent) return res.json({ success: true });
+      return res.status(502).json({ success: false, error: result.reason || "Gagal mengirim" });
+    } catch (err) {
+      res.status(500).json({ success: false, error: (err as Error).message });
+    }
+  });
 
   // Returns the production base URL so embed codes / widget links are always correct
   app.get("/api/config/app-url", (_req, res) => {

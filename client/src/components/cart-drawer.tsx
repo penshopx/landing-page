@@ -1,4 +1,5 @@
 import { X, ShoppingCart, Trash2, Plus, Minus, CreditCard, CheckSquare, Square, ExternalLink } from "lucide-react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/hooks/use-cart";
@@ -30,7 +31,7 @@ export function CartDrawer() {
 
     // Produk store → variant-specific Scalev checkout
     if (scalevItems.length > 0) {
-      const url = buildCheckoutUrl() ?? "https://bayar.gustafta.my.id";
+      const url = buildCheckoutUrl() ?? `${PAYMENT_BASE_URL}`;
       window.open(url, "_blank");
     }
 

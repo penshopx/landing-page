@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { trackLead } from "@/lib/meta-pixel";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -444,7 +445,7 @@ export default function StoreFeatured() {
     }
     // Scalev variant → Wuryanto Store (no explicit URL set yet)
     if (agent.scalevVariantId) {
-      window.open("https://bayar.gustafta.my.id", "_blank");
+      window.open(`${PAYMENT_BASE_URL}`, "_blank");
       return;
     }
     // Produk non-store (agent) → WA inquiry

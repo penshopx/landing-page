@@ -358,7 +358,7 @@ export function ProductSettingsPanel({ agent }: { agent: any }) {
                     <Input
                       value={settings.paymentUrl}
                       onChange={(e) => set("paymentUrl", e.target.value)}
-                      placeholder="https://bayar.gustafta.my.id/p/... atau tempel link manual"
+                      placeholder="https://bayar.dokumenproyek.com/p/... atau tempel link manual"
                       data-testid="input-payment-url"
                       className="flex-1"
                     />

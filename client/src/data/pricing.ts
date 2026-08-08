@@ -20,6 +20,8 @@
  * - Tidak ada paket "Gratis" permanen — gratis hanya bonus trial 7 hari.
  */
 
+import { PAYMENT_BASE_URL } from "@/lib/payment-base";
+
 // ─── Harga inti ────────────────────────────────────────────────────────────────
 export const PRICING = {
   /** Aktivasi = biaya sekali bayar untuk mengaktifkan hak pakai chatbot (menggantikan "Lisensi") */
@@ -383,7 +385,7 @@ export const RUANG_SIMPAN_PLANS = [
     ],
     limits: [],
     cta: "Pilih Esensial",
-    ctaHref: "https://bayar.gustafta.my.id/p/ruang-simpan-esensial",
+    ctaHref: `${PAYMENT_BASE_URL}/p/ruang-simpan-esensial`,
   },
   {
     key:        "profesional",
@@ -407,7 +409,7 @@ export const RUANG_SIMPAN_PLANS = [
     ],
     limits: [],
     cta: "Pilih Profesional",
-    ctaHref: "https://bayar.gustafta.my.id/p/ruang-simpan-profesional",
+    ctaHref: `${PAYMENT_BASE_URL}/p/ruang-simpan-profesional`,
   },
   {
     key:        "perusahaan",
@@ -431,7 +433,7 @@ export const RUANG_SIMPAN_PLANS = [
     ],
     limits: [],
     cta: "Pilih Perusahaan",
-    ctaHref: "https://bayar.gustafta.my.id/p/ruang-simpan-perusahaan",
+    ctaHref: `${PAYMENT_BASE_URL}/p/ruang-simpan-perusahaan`,
   },
 ] as const;
 

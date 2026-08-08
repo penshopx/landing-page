@@ -1,5 +1,9 @@
 const SCALEV_API_URL = "https://api.scalev.id/v2";
 
+// Base URL toko pembayaran (Scalev storefront). Ganti via env PAYMENT_BASE_URL
+// tanpa perlu sentuh kode saat migrasi domain berikutnya.
+export const PAYMENT_BASE_URL = process.env.PAYMENT_BASE_URL || "https://bayar.dokumenproyek.com";
+
 // ── Subscription plan definitions (moved from mayar.ts, provider-agnostic) ──
 export const subscriptionPlans = {
   free_trial: {
@@ -86,6 +90,6 @@ export async function createScalevProduct(params: {
     id: product.id,
     slug: product.slug,
     name: product.name,
-    checkoutUrl: `https://bayar.gustafta.my.id/p/${product.slug}`,
+    checkoutUrl: `${PAYMENT_BASE_URL}/p/${product.slug}`,
   };
 }
