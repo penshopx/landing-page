@@ -92,7 +92,8 @@ async function seedCourseWithStudentData(): Promise<{
   lessonId: number;
   studentUserId: string;
 }> {
-  const studentUserId = `student-${RUN}`;
+  const seqSuffix = Math.random().toString(36).slice(2, 8);
+  const studentUserId = `student-${RUN}-${seqSuffix}`;
 
   // Insert course
   const [course] = await queryDb(
@@ -130,7 +131,7 @@ async function seedCourseWithStudentData(): Promise<{
   await queryDb(
     `INSERT INTO lms_certificates (user_id, course_id, certificate_code)
      VALUES ($1, $2, $3)`,
-    [studentUserId, cId, `CERT-${RUN}`]
+    [studentUserId, cId, `CERT-${RUN}-${seqSuffix}`]
   );
 
   return { courseId: cId, lessonId: lId, studentUserId };
@@ -252,5 +253,170 @@ test("UI network request: DELETE URL includes ?force=true only after force-confi
   assert.ok(
     src.includes("setForceDeleteConfirm(true)"),
     '"Hapus paksa" button must set forceDeleteConfirm=true (two-step guard)'
+  );
+});
+
+// ── Re-enrollment certificate-survival tests ──────────────────────────────
+
+test(
+  "re-enroll: certificate survives when student calls enroll again on an already-enrolled completed course",
+  { skip: SKIP },
+  async () => {
+    // Seed: completed enrollment + certificate.
+    const { courseId: cId, studentUserId } = await seedCourseWithStudentData();
+
+    // Mark enrollment as completed (progress = 100).
+    await queryDb(
+      `UPDATE lms_enrollments SET progress = 100, completed_at = NOW()
+       WHERE user_id = $1 AND course_id = $2`,
+      [studentUserId, cId]
+    );
+
+    // Act: call POST /api/lms/enroll/:courseId again as the same student.
+    // The test server authenticates every request as TEST_ADMIN_ID, so we
+    // need a second mini-server that impersonates the student instead.
+    const { registerLmsRoutes } = await import("../server/routes-lms");
+    const appStudent = (await import("express")).default();
+    appStudent.use((await import("express")).default.json());
+    appStudent.use((req: any, _res: any, next: any) => {
+      req.user = { id: studentUserId, claims: { sub: studentUserId } };
+      req.isAuthenticated = () => true;
+      next();
+    });
+    registerLmsRoutes(appStudent);
+
+    const { createServer: createSrv } = await import("node:http");
+    const studentSrv = createSrv(appStudent);
+    await new Promise<void>((resolve) => studentSrv.listen(0, "127.0.0.1", resolve));
+    const { port: sPort } = studentSrv.address() as import("node:net").AddressInfo;
+    const studentBase = `http://127.0.0.1:${sPort}`;
+
+    try {
+      const res = await fetch(`${studentBase}/api/lms/enroll/${cId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      // Should succeed (200) — route returns the existing enrollment idempotently.
+      assert.ok(res.status === 200 || res.status === 201, `Expected 200/201, got ${res.status}`);
+
+      // Certificate must still exist — re-enrollment must not touch lms_certificates.
+      const [{ certCount }] = await queryDb(
+        `SELECT COUNT(*) AS "certCount" FROM lms_certificates
+         WHERE user_id = $1 AND course_id = $2`,
+        [studentUserId, cId]
+      );
+      assert.equal(Number(certCount), 1, "Certificate must survive re-enrollment when enrollment already exists");
+
+      // The returned enrollment must still reflect completed state (progress = 100).
+      const enrollment = await res.json() as any;
+      assert.equal(Number(enrollment.progress), 100, "Re-enrollment response must preserve progress = 100");
+    } finally {
+      await new Promise<void>((resolve, reject) =>
+        studentSrv.close((err) => (err ? reject(err) : resolve()))
+      );
+    }
+  }
+);
+
+test(
+  "re-enroll: certificate survives when enrollment row was deleted and student re-enrolls fresh",
+  { skip: SKIP },
+  async () => {
+    // Seed: certificate exists but enrollment row is deleted (admin-cleared scenario).
+    const { courseId: cId, studentUserId } = await seedCourseWithStudentData();
+
+    // Mark the enrollment completed first, then delete it to simulate admin cleanup.
+    await queryDb(
+      `UPDATE lms_enrollments SET progress = 100, completed_at = NOW()
+       WHERE user_id = $1 AND course_id = $2`,
+      [studentUserId, cId]
+    );
+    await queryDb(
+      `DELETE FROM lms_enrollments WHERE user_id = $1 AND course_id = $2`,
+      [studentUserId, cId]
+    );
+
+    // Confirm enrollment is gone but certificate remains.
+    const [{ eCount }] = await queryDb(
+      `SELECT COUNT(*) AS "eCount" FROM lms_enrollments
+       WHERE user_id = $1 AND course_id = $2`,
+      [studentUserId, cId]
+    );
+    assert.equal(Number(eCount), 0, "Enrollment should be absent before re-enrollment");
+
+    const [{ cBefore }] = await queryDb(
+      `SELECT COUNT(*) AS "cBefore" FROM lms_certificates
+       WHERE user_id = $1 AND course_id = $2`,
+      [studentUserId, cId]
+    );
+    assert.equal(Number(cBefore), 1, "Certificate should exist before re-enrollment");
+
+    // Act: re-enroll via the route.
+    const { registerLmsRoutes } = await import("../server/routes-lms");
+    const appStudent = (await import("express")).default();
+    appStudent.use((await import("express")).default.json());
+    appStudent.use((req: any, _res: any, next: any) => {
+      req.user = { id: studentUserId, claims: { sub: studentUserId } };
+      req.isAuthenticated = () => true;
+      next();
+    });
+    registerLmsRoutes(appStudent);
+
+    const { createServer: createSrv } = await import("node:http");
+    const studentSrv = createSrv(appStudent);
+    await new Promise<void>((resolve) => studentSrv.listen(0, "127.0.0.1", resolve));
+    const { port: sPort } = studentSrv.address() as import("node:net").AddressInfo;
+    const studentBase = `http://127.0.0.1:${sPort}`;
+
+    try {
+      const res = await fetch(`${studentBase}/api/lms/enroll/${cId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      assert.ok(res.status === 200 || res.status === 201, `Expected 200/201, got ${res.status}`);
+
+      // Certificate must still exist after the fresh INSERT of a new enrollment row.
+      const [{ cAfter }] = await queryDb(
+        `SELECT COUNT(*) AS "cAfter" FROM lms_certificates
+         WHERE user_id = $1 AND course_id = $2`,
+        [studentUserId, cId]
+      );
+      assert.equal(Number(cAfter), 1, "Certificate must survive fresh re-enrollment after enrollment row was deleted");
+
+      // The new enrollment row must reflect prior completion (progress = 100).
+      const enrollment = await res.json() as any;
+      assert.equal(
+        Number(enrollment.progress),
+        100,
+        "New enrollment row must start at progress = 100 when a prior certificate exists"
+      );
+    } finally {
+      await new Promise<void>((resolve, reject) =>
+        studentSrv.close((err) => (err ? reject(err) : resolve()))
+      );
+    }
+  }
+);
+
+// ── Static code-guard: enrollment INSERT cannot silently clobber completedAt ─
+
+test("static: enroll route checks existing enrollment before INSERT (no blind overwrite)", { skip: false }, async () => {
+  const { readFileSync } = await import("node:fs");
+  const { fileURLToPath } = await import("node:url");
+  const { resolve, dirname } = await import("node:path");
+  const __dir = dirname(fileURLToPath(import.meta.url));
+  const src: string = readFileSync(resolve(__dir, "../server/routes-lms.ts"), "utf8");
+
+  // 1. The enroll handler must guard with an existing-enrollment check.
+  assert.ok(
+    src.includes("if (existing) return res.json(existing)"),
+    "Enroll route must short-circuit and return existing enrollment (no overwrite)"
+  );
+
+  // 2. When a prior certificate exists the route must honour it — it must
+  //    NOT unconditionally insert with progress = 0.
+  assert.ok(
+    src.includes("existingCert") && src.includes("initialProgress"),
+    "Enroll route must detect prior certificate and preserve progress / completedAt on fresh INSERT"
   );
 });
