@@ -7878,7 +7878,18 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         const { sendDigitalProductDeliveryEmail } = await import("./lib/email");
         const { storeOrders: soTbl } = await import("@shared/schema");
 
-        const signedUrl = await generateSignedDownloadUrl(sp.downloadPath, 86_400);
+        let signedUrl: string;
+        try {
+          signedUrl = await generateSignedDownloadUrl(sp.downloadPath, 86_400);
+        } catch (storageErr: any) {
+          const msg: string = storageErr?.message ?? "";
+          if (msg.includes("402") || msg.includes("egress") || msg.includes("quota") || msg.includes("restricted")) {
+            return res.status(503).json({
+              error: "Supabase Storage melebihi batas egress quota. Upgrade plan Supabase di dashboard (supabase.com/dashboard → Billing) untuk mengaktifkan kembali pengiriman file.",
+            });
+          }
+          throw storageErr; // re-throw untuk catch umum di bawah
+        }
 
         // Send delivery email
         const emailResult = await sendDigitalProductDeliveryEmail({
