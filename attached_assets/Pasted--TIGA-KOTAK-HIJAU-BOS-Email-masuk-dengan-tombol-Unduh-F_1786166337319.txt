@@ -1,0 +1,37 @@
+**TIGA KOTAK HIJAU, BOS! 🟩🟩🟩**
+- ✅ **Email masuk** dengan tombol "Unduh File Sekarang" + peringatan expiry + link alternatif Drive
+- ✅ **Halaman akses** menampilkan "File Anda Siap Didownload!" dengan tombol download produk (bukan format chatbot lagi!)
+- ✅ **Teks WA** lengkap dan profesional
+
+**MESIN DELIVERY RESMI BERFUNGSI PENUH!** 🎉 Sisa satu kosmetik: domain link masih `esterkristian26.replit.app`.
+
+### 🔬 Tes Cepat 30 Detik (sambil lalu):
+Copy Link Akses itu → di address bar, **ganti manual** bagian depannya jadi `https://gustafta.my.id` → Enter:
+`https://gustafta.my.id/store/access/0dfe767b-5efd-4e25-b293-c6c2f7c9ff69`
+Kalau halaman yang sama terbuka = routing custom domain **aman**, dan perbaikannya murni hanya "suruh sistem menulis link dengan domain brand".
+
+### 🛠️ Perintah Agent (copy-paste):
+
+```
+Semua URL absolut yang dibuat sistem masih memakai hostname default Replit
+(landing-page-esterkristian26.replit.app) pada field "Link Akses",
+preview/teks WA, dan tempat lain yang serupa.
+
+Perbaikan:
+1. Definisikan env PUBLIC_BASE_URL=https://gustafta.my.id
+2. SEMUA pembuatan URL absolut (store/access/{id}, bot/{slug}, link di
+   email & WA) wajib memakai PUBLIC_BASE_URL — jangan request.host
+   atau default Replit.
+3. Verifikasi route tersebut berfungsi di bawah custom domain.
+```
+
+*(Catatan kecil opsional: teks email "Link aktif 24 jam" itu untuk signed URL Supabase; link Drive sebenarnya permanen. Bisa dibiarkan sebagai urgensi, atau minta agent jadikan teks kondisional. Bukan blocker.)*
+
+### 📊 Keputusan Strategis:
+Domain replit di link **pasca-beli** agak menggerus trust ("ester siapa?"), tapi lihat: **link broadcast kita adalah `bayar.gustafta.my.id/...` — sudah bermerek Gustafta!** ✅ Jadi:
+
+- **Sekarang:** kirim prompt domain ke agent → biarkan dia bekerja.
+- **Paralel:** kita jalan ke **RONDE 1 — INTEL PLATFORM & HARVESTER**. 🎯
+- Broadcast tetap bisa disebar hari ini karena wajah depannya sudah Gustafta semua.
+
+Buka tab **Intel** Bos, screenshot dashboardnya — saya tunjuk tombol mana yang dipencet dulu. GAS! 🏎️💨
