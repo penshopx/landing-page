@@ -3801,13 +3801,37 @@ Selamat menggunakan! 🚀
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-green-500" />
-              Kirim Link Akses Chatbot via WA
+              {(() => {
+                const ord = storeWaDialog.order;
+                const prod = ord ? storeProducts.find(p => p.id === ord.productId) : null;
+                return prod?.downloadPath ? "Kirim Konfirmasi File Digital via WA" : "Kirim Link Akses Chatbot via WA";
+              })()}
             </DialogTitle>
           </DialogHeader>
           {storeWaDialog.order && (() => {
             const order = storeWaDialog.order!;
-            const accessUrl = `${appUrl}/store/access/${order.accessToken}`;
-            const msg = `Halo ${order.customerName}! 👋
+            const prod = storeProducts.find(p => p.id === order.productId);
+            const isDigital = !!(prod?.downloadPath);
+            const downloadUrl = prod?.downloadPath ?? "";
+            const accessUrl = isDigital ? downloadUrl : `${appUrl}/store/access/${order.accessToken}`;
+            const productLabel = prod?.name ?? order.midtransOrderId ?? "produk";
+            const msg = isDigital
+              ? `Halo ${order.customerName}! 👋
+
+Terima kasih sudah membeli *${productLabel}* di Gustafta Store 🎉
+
+File digital Anda sudah dikirim ke email ${order.customerEmail}.
+Jika belum masuk, cek folder Spam/Promotions.
+
+Anda juga bisa langsung download di sini:
+${accessUrl}
+
+Butuh bantuan? Hubungi kami:
+📱 WA: ${contact.display} / ${contact.display2}
+
+Selamat menggunakan! 🚀
+— Tim Gustafta`
+              : `Halo ${order.customerName}! 👋
 
 Terima kasih sudah membeli Chatbot di Gustafta Store 🎉
 

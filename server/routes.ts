@@ -818,7 +818,8 @@ function getServerBaseUrl(req: { protocol: string; get(h: string): string | unde
     !reqHost.includes("localhost") &&
     !reqHost.includes("127.0.0.1") &&
     !reqHost.endsWith(".replit.dev") &&
-    !reqHost.endsWith(".repl.co")
+    !reqHost.endsWith(".repl.co") &&
+    !reqHost.endsWith(".replit.app")
   ) {
     return `https://${reqHost}`;
   }
