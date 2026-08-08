@@ -407,10 +407,13 @@ export function registerLmsRoutes(app: Express) {
       if (validIds.length === 0) {
         return res.status(400).json({ error: "Tidak ada ID valid dalam array ids" });
       }
-      await db.update(lmsCourses)
-        .set({ isActive: false, updatedAt: new Date() })
-        .where(inArray(lmsCourses.id, validIds));
-      res.json({ ok: true, deactivated: validIds.length, ids: validIds });
+      // Only update courses that are currently active so the returned count
+      // reflects how many actually changed state (not the full selection).
+      const updated = await db.update(lmsCourses)
+        .set({ isActive: false })
+        .where(and(inArray(lmsCourses.id, validIds), eq(lmsCourses.isActive, true)))
+        .returning({ id: lmsCourses.id });
+      res.json({ ok: true, deactivated: updated.length, selected: validIds.length, ids: validIds });
     } catch (err: any) {
       console.error("[LMS] Bulk deactivate error:", err?.message);
       res.status(500).json({ error: "Gagal menonaktifkan kursus" });

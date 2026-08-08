@@ -1130,7 +1130,11 @@ export default function AdminAcademyPage() {
     mutationFn: (ids: number[]) =>
       apiRequest("POST", "/api/admin/lms/courses/bulk-deactivate", { ids }),
     onSuccess: (data: any) => {
-      toast({ title: `✅ ${data.deactivated} kursus dinonaktifkan` });
+      const already = (data.selected ?? data.deactivated) - data.deactivated;
+      const msg = already > 0
+        ? `✅ ${data.deactivated} kursus dinonaktifkan (${already} sudah tidak aktif sebelumnya)`
+        : `✅ ${data.deactivated} kursus dinonaktifkan`;
+      toast({ title: msg });
       setSelectedCourseIds(new Set());
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
     },
