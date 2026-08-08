@@ -17437,12 +17437,15 @@ Return JSON format:
       }
       const slug = (agent as any).slug || slugify(agent.name);
 
-      // Cek apakah produk ini Gustafta Official via store_products
-      const spRes = await pool.query<{ is_gustafta: boolean }>(
-        `SELECT is_gustafta FROM store_products WHERE agent_id = $1 AND is_active = true LIMIT 1`,
+      // Cek apakah produk ini Gustafta Official via store_products; juga ambil payment_url dari sana
+      const spRes = await pool.query<{ is_gustafta: boolean; payment_url: string | null }>(
+        `SELECT is_gustafta, payment_url FROM store_products WHERE agent_id = $1 AND is_active = true LIMIT 1`,
         [agent.id]
       );
       const isGustafta = spRes.rows[0]?.is_gustafta === true;
+      // store_products.payment_url takes precedence over agent.paymentUrl so admins can
+      // override the checkout link per-product without touching the agent record.
+      const paymentUrl = spRes.rows[0]?.payment_url || (agent as any).paymentUrl || "";
 
       res.json({
         id: agent.id,
@@ -17471,8 +17474,8 @@ Return JSON format:
         whatsappCta: (agent as any).whatsappCta || "",
         calendlyUrl: (agent as any).calendlyUrl || "",
         metaPixelId: agent.metaPixelId || "",
+        paymentUrl,
         chatUrl: `${getServerBaseUrl(req)}/chat/${slug}`,
-        isGustafta: (agent as any).isGustafta === true,
         isCertified: (agent as any).isCertified === true,
         isCreatorMade: ((agent as any).userId ?? "").trim() !== "",
       });

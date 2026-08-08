@@ -35,6 +35,7 @@ interface LandingData {
   calendlyUrl: string;
   chatUrl: string;
   metaPixelId: string;
+  paymentUrl?: string;
 }
 
 function FaqItem({ q, a }: { q: string; a: string }) {
@@ -113,8 +114,14 @@ export default function AgentLanding() {
   const offers = Array.isArray(data.conversionOffers) ? data.conversionOffers.filter(Boolean) : [];
   const price = data.monthlyPrice ? `Rp ${Number(data.monthlyPrice).toLocaleString("id-ID")}` : null;
 
+  // Prefer the store product's payment URL over the generic chat URL when set
+  const paymentUrl = data.paymentUrl || "";
   const handleCta = () => {
-    if (data.chatUrl) window.open(data.chatUrl, "_blank");
+    if (paymentUrl) {
+      window.open(paymentUrl, "_blank");
+    } else if (data.chatUrl) {
+      window.open(data.chatUrl, "_blank");
+    }
   };
   const handleWhatsapp = () => {
     if (data.whatsappCta) {
@@ -465,13 +472,19 @@ export default function AgentLanding() {
                 ))}
               </ul>
               <button
-                onClick={() => window.open(`${window.location.origin}/login?mode=register`, "_blank")}
+                onClick={() => {
+                  if (paymentUrl) {
+                    window.open(paymentUrl, "_blank");
+                  } else {
+                    window.open(`${window.location.origin}/login?mode=register`, "_blank");
+                  }
+                }}
                 className="w-full bg-white text-indigo-700 font-bold py-3 rounded-xl hover:bg-indigo-50 transition-colors text-sm shadow-lg"
                 data-testid="btn-upgrade-member"
               >
                 <span className="flex items-center justify-center gap-2">
                   <UserPlus className="w-4 h-4" />
-                  Daftar & Aktifkan Akses
+                  {paymentUrl ? "Beli Sekarang" : "Daftar & Aktifkan Akses"}
                 </span>
               </button>
               {data.whatsappCta && (

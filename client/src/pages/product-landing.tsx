@@ -368,6 +368,8 @@ export default function ProductLanding() {
   const authority: Authority = agent.landingAuthority || {};
   const faqItems: FaqItem[] = agent.landingFaq || [];
   const monthlyPrice: number = agent.monthlyPrice || 0;
+  // store_products.payment_url takes precedence (already resolved server-side)
+  const paymentUrl: string = agent.paymentUrl || "";
 
   const hasAuthority =
     authority.title || authority.description || (authority.credentials && authority.credentials.length > 0);
@@ -443,17 +445,23 @@ export default function ProductLanding() {
               </p>
             )}
 
-            <Link href={chatUrl}>
-              <Button
-                size="lg"
-                className="gap-2 text-lg px-8"
-                data-testid="button-hero-cta"
-              >
-                <MessageSquare className="h-5 w-5" />
-                {heroCtaText}
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
+            {paymentUrl ? (
+              <a href={paymentUrl} target="_blank" rel="noopener noreferrer" data-testid="link-hero-beli">
+                <Button size="lg" className="gap-2 text-lg px-8" data-testid="button-hero-cta">
+                  <MessageSquare className="h-5 w-5" />
+                  {heroCtaText}
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </a>
+            ) : (
+              <Link href={chatUrl}>
+                <Button size="lg" className="gap-2 text-lg px-8" data-testid="button-hero-cta">
+                  <MessageSquare className="h-5 w-5" />
+                  {heroCtaText}
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -805,15 +813,21 @@ export default function ProductLanding() {
                         /bulan
                       </span>
                     </div>
-                    <Link href={chatUrl}>
-                      <Button
-                        className="w-full gap-2"
-                        data-testid="button-pricing-cta"
-                      >
-                        Mulai Sekarang
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                    {paymentUrl ? (
+                      <a href={paymentUrl} target="_blank" rel="noopener noreferrer" className="w-full block" data-testid="link-pricing-beli">
+                        <Button className="w-full gap-2" data-testid="button-pricing-cta">
+                          Beli Sekarang
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </a>
+                    ) : (
+                      <Link href={chatUrl}>
+                        <Button className="w-full gap-2" data-testid="button-pricing-cta">
+                          Mulai Sekarang
+                          <ArrowRight className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    )}
                   </CardContent>
                 </Card>
               </div>
@@ -923,17 +937,23 @@ export default function ProductLanding() {
             Jangan tunda lagi. Mulai gunakan {agent.name} sekarang dan rasakan
             perbedaannya.
           </p>
-          <Link href={chatUrl}>
-            <Button
-              size="lg"
-              className="gap-2 text-lg px-8"
-              data-testid="button-final-cta"
-            >
-              <MessageSquare className="h-5 w-5" />
-              {heroCtaText}
-              <ArrowRight className="h-5 w-5" />
-            </Button>
-          </Link>
+          {paymentUrl ? (
+            <a href={paymentUrl} target="_blank" rel="noopener noreferrer" data-testid="link-final-beli">
+              <Button size="lg" className="gap-2 text-lg px-8" data-testid="button-final-cta">
+                <MessageSquare className="h-5 w-5" />
+                {heroCtaText}
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            </a>
+          ) : (
+            <Link href={chatUrl}>
+              <Button size="lg" className="gap-2 text-lg px-8" data-testid="button-final-cta">
+                <MessageSquare className="h-5 w-5" />
+                {heroCtaText}
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
         </div>
       </section>
 
