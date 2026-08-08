@@ -21,6 +21,7 @@ const files = [
   resolve(__dirname, "routes-helper-usage.test.ts"),
   resolve(__dirname, "wa-cta-integrity.test.ts"),
   resolve(__dirname, "store-product-reorder-persistence.test.ts"),
+  resolve(__dirname, "store-catalog-payment-link-clear.test.ts"),
 ];
 
 let hadFailure = false;
