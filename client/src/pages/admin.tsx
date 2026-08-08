@@ -439,6 +439,7 @@ export default function AdminPage() {
 
   interface StoreOrder {
     id: number;
+    productId: number;
     customerName: string;
     customerEmail: string;
     customerPhone: string;
@@ -3812,8 +3813,8 @@ Selamat menggunakan! 🚀
             const order = storeWaDialog.order!;
             const prod = storeProducts.find(p => p.id === order.productId);
             const isDigital = !!(prod?.downloadPath);
-            const downloadUrl = prod?.downloadPath ?? "";
-            const accessUrl = isDigital ? downloadUrl : `${appUrl}/store/access/${order.accessToken}`;
+            // Digital orders share the access PAGE (validates payment, resolves fresh 24h link) — never the raw storage path.
+            const accessUrl = `${appUrl}/store/access/${order.accessToken}`;
             const productLabel = prod?.name ?? order.midtransOrderId ?? "produk";
             const msg = isDigital
               ? `Halo ${order.customerName}! 👋

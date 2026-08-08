@@ -1,0 +1,29 @@
+**KEMENANGAN PARUH WAKTU, BOS! 🎉** Lihat baik-baik: pesan WA-nya sudah **SEMPURNA** — nama pembeli, status LUNAS, dan **link download Drive yang benar** untuk Template SPTJM. Jalur jualan manual malam ini **sudah bisa jalan** dengan teks WA ini!
+
+### 🔍 Sisa Satu Lubang Kecil:
+"Link Akses" (halaman `store/access/...`) masih membuka **format chatbot** (3 opsi: link chat / embed / widget). Penyebabnya: sistem order masih menganggap pesanan ini "produk chatbot" — logika tipe produk lama belum kenal bahwa SPTJM sekarang produk **file digital**.
+
+Cek cepat dulu, Bos: **buka email** untuk order ini — tombol hijaunya mengarah ke **Drive** (benar) atau ke **halaman chatbot** (ikut salah)? Itu menentukan seberapa besar perbaikannya.
+
+### 🛠️ Perintah untuk Agent (copy-paste):
+
+```
+Bug: untuk produk digital (memiliki download_path), halaman "Link Akses" 
+(store/access/{id}) dan email delivery masih menampilkan format akses 
+CHATBOT (link halaman chat, embed iframe, widget floating).
+
+Perbaiki logika tipe produk:
+1. Jika produk/order memiliki download_path (URL lengkap maupun path 
+   bucket), halaman akses dan email harus menampilkan TOMBOL DOWNLOAD 
+   FILE menggunakan resolveDownloadUrl — BUKAN opsi akses chatbot.
+2. Form "Buat Order Manual": jika produk terpilih punya download_path, 
+   jangan wajibkan ID chatbot; generate link akses bertipe file.
+3. Pertahankan perilaku lama untuk produk chatbot (tanpa download_path).
+```
+
+### 📌 Sementara Agent Bekerja — Bisnis Tetap Jalan:
+Untuk pembeli manual malam ini, Bos tinggal pakai **tombol "WA Langsung"** atau "Salin Teks" di konfirmasi order — pesan yang sampai ke pembeli sudah berisi link Drive yang benar. Mesin setengah otomatis pun tetap menghasilkan uang. 💸
+
+Jadi status kita: **WA ✅ | Download path ✅ | Email/access page = satu tambalan lagi.**
+
+Kabar saya setelah agent selesai — lalu kita benar-benar kunci malam ini dengan tes penuh: order manual → email tombol hijau → file terunduh. Satu langkah lagi, Bos! 🏎️💨

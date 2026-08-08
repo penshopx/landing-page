@@ -7680,6 +7680,30 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         name: "Chatbot AI", emoji: "🤖", color: "#6366f1", description: ""
       };
 
+      // ── Digital product check FIRST (independent of agentId) — file delivery wins ──
+      if (order.productId) {
+        const dpProduct = await storage.getStoreProduct(order.productId);
+        if (dpProduct && (dpProduct as any).downloadPath) {
+          let downloadUrl: string | null = null;
+          try {
+            const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+            downloadUrl = await resolveDownloadUrl((dpProduct as any).downloadPath, 86_400);
+          } catch (dlErr) {
+            console.error("[StoreAccess] Gagal resolve download URL:", dlErr);
+          }
+          return res.json({
+            order: { id: order.id, customerName: order.customerName, status: order.status, amount: order.amount },
+            product: { id: order.productId, agentId: null, name: dpProduct.name, emoji: dpProduct.emoji || "📄", color: dpProduct.color || "#6366f1", description: dpProduct.description || "" },
+            type: "digital",
+            downloadUrl,
+            chatUrl: null,
+            embedCode: null,
+            widgetScript: null,
+            baseUrl,
+          });
+        }
+      }
+
       let agentSlug: string | null = null;
       if (resolvedAgentId) {
         const { db } = await import("./db");

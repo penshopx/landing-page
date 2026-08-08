@@ -31,6 +31,8 @@ interface StoreAccessData {
   embedCode: string | null;
   widgetScript: string | null;
   baseUrl: string | null;
+  type?: "digital";
+  downloadUrl?: string | null;
 }
 
 function formatPrice(price: number) {
@@ -197,9 +199,9 @@ export default function StoreAccess() {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/20 border border-green-500/30 mb-4">
                 <CheckCircle2 className="h-10 w-10 text-green-400" />
               </div>
-              <h1 className="text-3xl font-bold mb-2">Chatbot Anda Siap!</h1>
+              <h1 className="text-3xl font-bold mb-2">{data.type === "digital" ? "File Anda Siap Didownload!" : "Chatbot Anda Siap!"}</h1>
               <p className="text-gray-400">
-                Halo <strong>{data.order.customerName}</strong>, berikut semua format akses chatbot Anda.
+                Halo <strong>{data.order.customerName}</strong>, {data.type === "digital" ? "file digital Anda siap didownload di bawah ini." : "berikut semua format akses chatbot Anda."}
               </p>
             </div>
 
@@ -223,8 +225,38 @@ export default function StoreAccess() {
               </CardContent>
             </Card>
 
+            {/* ── Digital Product: Download Button ── */}
+            {data.type === "digital" && (
+              <Card className="bg-green-500/10 border-green-500/30">
+                <CardContent className="p-6 space-y-4 text-center">
+                  <div className="text-5xl">📄</div>
+                  <div>
+                    <h3 className="font-bold text-lg mb-1">Download File Anda</h3>
+                    <p className="text-xs text-gray-400">
+                      Klik tombol di bawah untuk mendownload file. Link download juga sudah dikirim ke email Anda.
+                    </p>
+                  </div>
+                  {data.downloadUrl ? (
+                    <a href={data.downloadUrl} target="_blank" rel="noopener noreferrer" className="block">
+                      <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-12 text-base" data-testid="button-download-file">
+                        <ExternalLink className="h-5 w-5 mr-2" />
+                        Download {data.product.name}
+                      </Button>
+                    </a>
+                  ) : (
+                    <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-300">
+                      Link download sedang bermasalah. Silakan hubungi kami via WhatsApp di bawah — kami kirim filenya langsung.
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500">
+                    Simpan file di perangkat Anda setelah didownload.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* ── Kemasan Produk: 4 Format ── */}
-            {chatUrl && (
+            {data.type !== "digital" && chatUrl && (
               <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-1">
                   <Package className="h-4 w-4 text-violet-400" />
@@ -377,6 +409,7 @@ export default function StoreAccess() {
             )}
 
             {/* ── Panduan Singkat ── */}
+            {data.type !== "digital" && (
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -402,6 +435,7 @@ export default function StoreAccess() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* ── Support ── */}
             <Card className="bg-white/5 border-white/10">
