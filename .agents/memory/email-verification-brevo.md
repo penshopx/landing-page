@@ -24,3 +24,6 @@ the problem so it presents as "email verification stopped working" rather than "
 verifikasi", first check `viewEnvVars({type:"secret", keys:["BREVO_API_KEY"]})`. If false, request it
 — do not go hunting in the auth code. Confirm the fix: a successful register returns
 `{"success":true,"message":"Kode OTP telah dikirim..."}` with NO `otpFallback` field.
+
+## Brevo 401 walau key benar: Authorized IPs
+Brevo punya fitur keamanan "Authorized IPs" (app.brevo.com/security/authorised_ips). Kalau aktif, SEMUA panggilan API dari IP tak terdaftar ditolak 401 dengan pesan "unrecognised IP address". IP Replit (apalagi autoscale) berubah-ubah, jadi fitur ini harus DINONAKTIFKAN ("Deactivate for API keys"), bukan menambah satu IP. Cek body respons 401 — jangan langsung minta key baru.
