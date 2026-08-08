@@ -312,64 +312,152 @@ const SEED_COURSES = [
 ];
 
 // ─── Seed runner ──────────────────────────────────────────────────────────────
-// Reconcile-per-slug: never early-return based on row count alone.
-// This ensures new courses added to SEED_COURSES are inserted even when
-// the table already has older courses from a previous boot.
-// Returns the number of new courses inserted (0 = all slugs already existed).
-async function seedLmsData(): Promise<{ added: number }> {
+// Reconcile-per-slug: upsert courses and lessons so content changes in
+// SEED_COURSES are reflected in an already-seeded database.
+// Returns separate "added" and "updated" counts.
+async function seedLmsData(): Promise<{ added: number; updated: number }> {
   try {
     let added = 0;
+    let updated = 0;
+
     for (const courseData of SEED_COURSES) {
       const { lessons, ...course } = courseData;
 
-      // Skip if this slug already exists
-      const [existing] = await db.select({ id: lmsCourses.id })
+      const [existing] = await db.select()
         .from(lmsCourses)
         .where(eq(lmsCourses.slug, course.slug))
         .limit(1);
-      if (existing) continue;
 
-      const [created] = await db.insert(lmsCourses).values({
-        title: course.title,
-        slug: course.slug,
-        shortDesc: course.shortDesc,
-        description: course.description,
-        category: course.category,
-        subcategory: course.subcategory,
-        color: course.color,
-        emoji: course.emoji,
-        instructor: course.instructor,
-        durationMinutes: course.durationMinutes,
-        price: course.price,
-        level: course.level,
-        isFeatured: course.isFeatured ?? false,
-        sortOrder: course.sortOrder,
-        isPublic: true,
-        isActive: true,
-      }).returning();
+      let courseId: number;
 
-      for (let i = 0; i < lessons.length; i++) {
-        const lesson = lessons[i];
-        await db.insert(lmsLessons).values({
-          courseId: created.id,
-          title: lesson.title,
-          slug: lesson.slug,
-          content: lesson.content,
-          type: lesson.type,
-          durationMinutes: lesson.durationMinutes,
-          isPreview: lesson.isPreview ?? false,
-          sortOrder: i + 1,
+      if (!existing) {
+        // ── New course: insert course + all lessons ──────────────────────────
+        const [created] = await db.insert(lmsCourses).values({
+          title: course.title,
+          slug: course.slug,
+          shortDesc: course.shortDesc,
+          description: course.description,
+          category: course.category,
+          subcategory: course.subcategory,
+          color: course.color,
+          emoji: course.emoji,
+          instructor: course.instructor,
+          durationMinutes: course.durationMinutes,
+          price: course.price,
+          level: course.level,
+          isFeatured: course.isFeatured ?? false,
+          sortOrder: course.sortOrder,
+          isPublic: true,
           isActive: true,
-        });
+        }).returning();
+        courseId = created.id;
+
+        for (let i = 0; i < lessons.length; i++) {
+          const lesson = lessons[i];
+          await db.insert(lmsLessons).values({
+            courseId,
+            title: lesson.title,
+            slug: lesson.slug,
+            content: lesson.content,
+            type: lesson.type,
+            durationMinutes: lesson.durationMinutes,
+            isPreview: lesson.isPreview ?? false,
+            sortOrder: i + 1,
+            isActive: true,
+          });
+        }
+        added++;
+      } else {
+        // ── Existing course: compare and update if anything changed ──────────
+        courseId = existing.id;
+        let courseWasUpdated = false;
+
+        const courseChanged =
+          existing.title !== course.title ||
+          (existing.shortDesc ?? "") !== (course.shortDesc ?? "") ||
+          (existing.description ?? "") !== (course.description ?? "") ||
+          (existing.color ?? "") !== (course.color ?? "") ||
+          (existing.emoji ?? "") !== (course.emoji ?? "") ||
+          (existing.instructor ?? "") !== (course.instructor ?? "") ||
+          existing.durationMinutes !== course.durationMinutes ||
+          existing.price !== course.price ||
+          existing.level !== course.level ||
+          existing.isFeatured !== (course.isFeatured ?? false) ||
+          existing.sortOrder !== course.sortOrder;
+
+        if (courseChanged) {
+          await db.update(lmsCourses)
+            .set({
+              title: course.title,
+              shortDesc: course.shortDesc,
+              description: course.description,
+              color: course.color,
+              emoji: course.emoji,
+              instructor: course.instructor,
+              durationMinutes: course.durationMinutes,
+              price: course.price,
+              level: course.level,
+              isFeatured: course.isFeatured ?? false,
+              sortOrder: course.sortOrder,
+            })
+            .where(eq(lmsCourses.id, courseId));
+          courseWasUpdated = true;
+        }
+
+        // Reconcile lessons by slug
+        const existingLessons = await db.select()
+          .from(lmsLessons)
+          .where(eq(lmsLessons.courseId, courseId));
+        const existingBySlug = new Map(existingLessons.map((l) => [l.slug, l]));
+
+        for (let i = 0; i < lessons.length; i++) {
+          const lesson = lessons[i];
+          const existingLesson = existingBySlug.get(lesson.slug);
+
+          if (!existingLesson) {
+            await db.insert(lmsLessons).values({
+              courseId,
+              title: lesson.title,
+              slug: lesson.slug,
+              content: lesson.content,
+              type: lesson.type,
+              durationMinutes: lesson.durationMinutes,
+              isPreview: lesson.isPreview ?? false,
+              sortOrder: i + 1,
+              isActive: true,
+            });
+            courseWasUpdated = true;
+          } else {
+            const lessonChanged =
+              existingLesson.title !== lesson.title ||
+              (existingLesson.content ?? "") !== (lesson.content ?? "") ||
+              existingLesson.type !== lesson.type ||
+              existingLesson.durationMinutes !== lesson.durationMinutes ||
+              existingLesson.isPreview !== (lesson.isPreview ?? false) ||
+              existingLesson.sortOrder !== i + 1;
+
+            if (lessonChanged) {
+              await db.update(lmsLessons)
+                .set({
+                  title: lesson.title,
+                  content: lesson.content,
+                  type: lesson.type,
+                  durationMinutes: lesson.durationMinutes,
+                  isPreview: lesson.isPreview ?? false,
+                  sortOrder: i + 1,
+                })
+                .where(eq(lmsLessons.id, existingLesson.id));
+              courseWasUpdated = true;
+            }
+          }
+        }
+
+        if (courseWasUpdated) updated++;
       }
-      added++;
     }
-    if (added > 0) {
-      console.log(`[LMS] Seed selesai — ${added} kursus baru ditambahkan (total target: ${SEED_COURSES.length}).`);
-    } else {
-      console.log(`[LMS] Seed dilewati — semua ${SEED_COURSES.length} kursus sudah ada.`);
-    }
-    return { added };
+
+    console.log(`[LMS] Seed selesai — ${added} kursus baru, ${updated} kursus diperbarui (total target: ${SEED_COURSES.length}).`);
+    return { added, updated };
   } catch (e) {
     console.error("[LMS] Seed error:", e);
     throw e; // propagate so seedLmsDataTracked can set error status
@@ -382,10 +470,10 @@ let lmsSeedStatus: SeedStatus = "pending";
 
 async function seedLmsDataTracked() {
   try {
-    const { added } = await seedLmsData();
-    // "skipped" = ran successfully but all slugs already existed, nothing new inserted.
+    const { added, updated } = await seedLmsData();
+    // "skipped" = ran successfully but nothing changed (no inserts, no updates).
     // Admin can still trigger a manual re-seed; the button shows for "skipped" or "error".
-    lmsSeedStatus = added === 0 ? "skipped" : "done";
+    lmsSeedStatus = added === 0 && updated === 0 ? "skipped" : "done";
   } catch (e) {
     lmsSeedStatus = "error";
     console.error("[LMS] Seed fatal:", e);
@@ -450,9 +538,15 @@ export function registerLmsRoutes(app: Express) {
       return res.status(409).json({ error: "Seeding sudah berjalan, tunggu selesai dulu." });
     }
     lmsSeedStatus = "pending";
-    // Jalankan async — jangan tunggu selesai agar response cepat
-    seedLmsDataTracked().catch(e => console.error("[LMS] Manual reseed error:", e));
-    res.json({ ok: true, message: "Reseed dimulai. Status akan berubah ke 'done' atau 'error' dalam beberapa detik." });
+    try {
+      const { added, updated } = await seedLmsData();
+      lmsSeedStatus = added === 0 && updated === 0 ? "skipped" : "done";
+      res.json({ ok: true, added, updated });
+    } catch (e: any) {
+      lmsSeedStatus = "error";
+      console.error("[LMS] Manual reseed error:", e);
+      res.status(500).json({ error: e?.message || "Reseed gagal." });
+    }
   });
 
   // POST /api/lms/retry-seed — public endpoint to retry a failed seed (no auth required)

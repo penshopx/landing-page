@@ -936,11 +936,15 @@ function LmsHealthCard({
 
   const reseedMut = useMutation({
     mutationFn: () => apiRequest("POST", "/api/admin/lms/reseed"),
-    onSuccess: () => {
-      toast({ title: "Reseed dimulai", description: "Status akan berubah menjadi 'done' dalam beberapa detik." });
+    onSuccess: (data: any) => {
+      const added: number = data?.added ?? 0;
+      const upd: number = data?.updated ?? 0;
+      const parts: string[] = [];
+      if (added > 0) parts.push(`${added} kursus baru`);
+      if (upd > 0) parts.push(`${upd} kursus diperbarui`);
+      const description = parts.length > 0 ? parts.join(", ") : "Tidak ada perubahan konten.";
+      toast({ title: "Reseed selesai", description });
       setRetryIn(null);
-      const interval = setInterval(() => onRefresh(), 2000);
-      setTimeout(() => clearInterval(interval), 30_000);
       onRefresh();
     },
     onError: (e: any) => {
