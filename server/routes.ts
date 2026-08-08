@@ -24233,10 +24233,13 @@ POLA KERJA: ELICIT (pahami tahap & niat) â†’ DISPATCH (agen sesuai kebutuhan) â†
       if (!candidateIds?.length) return res.status(400).json({ error: "candidateIds wajib diisi" });
 
       // Fetch the candidate agents
-      const candidatesResult = await db.execute(sql`
-        SELECT id, name FROM agents WHERE id = ANY(${candidateIds}::int[])
-      `);
-      const candidates = candidatesResult.rows as any[];
+      const { sql, inArray: inArr } = await import("drizzle-orm");
+      const { agents: agentsLocalTable } = await import("@shared/schema");
+      const candidateRows = await db
+        .select({ id: agentsLocalTable.id, name: agentsLocalTable.name })
+        .from(agentsLocalTable)
+        .where(inArr(agentsLocalTable.id, candidateIds));
+      const candidates = candidateRows as any[];
 
       // Build agenticSubAgents JSON
       const agenticSubAgents = candidates.map((c: any) => {
