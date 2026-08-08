@@ -366,6 +366,13 @@ export default function AdminPage() {
   const [waContactForm, setWaContactForm] = useState({ primary: "", secondary: "" });
   const [waContactSaving, setWaContactSaving] = useState(false);
 
+  // Pre-fill form from DB/fallback values whenever contact data resolves or updates.
+  // This runs on mount (with static fallbacks) and again when the API response arrives
+  // so the admin always sees the effective numbers rather than blank inputs.
+  useEffect(() => {
+    setWaContactForm({ primary: contact.primary, secondary: contact.secondary });
+  }, [contact.primary, contact.secondary]);
+
   async function handleSaveWaContact() {
     const primary = waContactForm.primary.trim();
     const secondary = waContactForm.secondary.trim();
@@ -386,7 +393,9 @@ export default function AdminPage() {
       }
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan");
       queryClient.invalidateQueries({ queryKey: ["/api/config/contact"] });
-      setWaContactForm({ primary: "", secondary: "" });
+      // Keep the saved values in the form so admin can verify what was stored.
+      // The useEffect on contact.primary/secondary will sync when the query re-resolves.
+      setWaContactForm({ primary: data.primary ?? primary, secondary: data.secondary ?? secondary });
       toast({ title: "✅ Nomor WhatsApp diperbarui!", description: `${data.primary} / ${data.secondary}` });
     } catch (e: any) {
       handle401Error(e, "Error", e.message);
