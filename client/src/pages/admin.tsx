@@ -3688,11 +3688,17 @@ Butuh bantuan? Hubungi kami:
 Selamat menggunakan! 🚀
 — Tim Gustafta`;
             const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            const rawPhone = sub.customerPhone?.replace(/\D/g, "") ?? "";
+            const phoneNum = rawPhone.startsWith("0") ? "62" + rawPhone.slice(1) : rawPhone;
+            // Strict E.164 validation: must start with 62 and have at least 8 trailing digits
+            const validPhone = /^62\d{8,}$/.test(phoneNum);
+            const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : null;
             return (
               <div className="space-y-4">
                 <div className="bg-muted/50 rounded-lg p-3 text-sm">
                   <p className="font-medium">{sub.customerName}</p>
                   <p className="text-xs text-muted-foreground">{sub.customerEmail}</p>
+                  {sub.customerPhone && <p className="text-xs text-muted-foreground">{sub.customerPhone}</p>}
                   <p className="text-xs text-muted-foreground">{isChatbot ? "Chatbot" : "Modul"}: {sub.productName}</p>
                 </div>
                 <div>
@@ -3726,15 +3732,36 @@ Selamat menggunakan! 🚀
                   </Button>
                   <Button
                     className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => window.open(waUrl, "_blank")}
+                    onClick={() => {
+                      if (waDirectUrl) {
+                        window.open(waDirectUrl, "_blank");
+                      } else if (rawPhone) {
+                        // Phone present but not a valid Indonesian E.164 number
+                        toast({
+                          title: "Nomor tidak valid",
+                          description: `"${sub.customerPhone}" bukan nomor WA yang valid. Salin teks dan kirim manual.`,
+                          variant: "destructive",
+                        });
+                      } else {
+                        // No phone stored — open WA with text only
+                        window.open(waUrl, "_blank");
+                      }
+                    }}
                     data-testid="button-open-modul-wa"
                   >
-                    <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> Buka WA
+                    <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> {validPhone ? "WA Langsung" : "Buka WA"}
                   </Button>
                 </div>
-                <p className="text-xs text-muted-foreground text-center">
-                  Link berisi email subscriber — mereka langsung masuk tanpa perlu input email ulang.
-                </p>
+                {validPhone && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    "WA Langsung" membuka chat ke nomor {sub.customerPhone} dengan pesan sudah terisi.
+                  </p>
+                )}
+                {!validPhone && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Link berisi email subscriber — mereka langsung masuk tanpa perlu input email ulang.
+                  </p>
+                )}
               </div>
             );
           })()}
