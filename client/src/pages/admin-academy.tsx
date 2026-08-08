@@ -1142,6 +1142,22 @@ export default function AdminAcademyPage() {
       toast({ title: "Gagal menonaktifkan", description: e?.message, variant: "destructive" }),
   });
 
+  const bulkActivateMutation = useMutation({
+    mutationFn: (ids: number[]) =>
+      apiRequest("POST", "/api/admin/lms/courses/bulk-activate", { ids }),
+    onSuccess: (data: any) => {
+      const already = (data.selected ?? data.activated) - data.activated;
+      const msg = already > 0
+        ? `✅ ${data.activated} kursus diaktifkan (${already} sudah aktif sebelumnya)`
+        : `✅ ${data.activated} kursus diaktifkan`;
+      toast({ title: msg });
+      setSelectedCourseIds(new Set());
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+    },
+    onError: (e: any) =>
+      toast({ title: "Gagal mengaktifkan", description: e?.message, variant: "destructive" }),
+  });
+
   useEffect(() => {
     const prev = document.title;
     document.title = "Kelola Academy | Admin Gustafta";
@@ -1371,9 +1387,21 @@ export default function AdminAcademyPage() {
                 <span className="font-medium">{selectedCourseIds.size} kursus dipilih</span>
                 <Button
                   size="sm"
+                  variant="outline"
+                  className="h-7 px-3 text-xs gap-1.5"
+                  disabled={bulkActivateMutation.isPending || bulkDeactivateMutation.isPending}
+                  onClick={() => bulkActivateMutation.mutate(Array.from(selectedCourseIds))}
+                  data-testid="button-bulk-activate"
+                >
+                  {bulkActivateMutation.isPending
+                    ? <><Loader2 className="h-3 w-3 animate-spin" /> Mengaktifkan...</>
+                    : <><Eye className="h-3 w-3" /> Aktifkan semua</>}
+                </Button>
+                <Button
+                  size="sm"
                   variant="destructive"
                   className="h-7 px-3 text-xs gap-1.5"
-                  disabled={bulkDeactivateMutation.isPending}
+                  disabled={bulkDeactivateMutation.isPending || bulkActivateMutation.isPending}
                   onClick={() => bulkDeactivateMutation.mutate(Array.from(selectedCourseIds))}
                   data-testid="button-bulk-deactivate"
                 >

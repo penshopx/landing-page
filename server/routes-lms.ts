@@ -420,6 +420,30 @@ export function registerLmsRoutes(app: Express) {
     }
   });
 
+  // POST /api/admin/lms/courses/bulk-activate — aktifkan beberapa kursus sekaligus
+  app.post("/api/admin/lms/courses/bulk-activate", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const { ids } = req.body;
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: "Harus menyertakan array ids yang tidak kosong" });
+      }
+      const validIds = ids.map(Number).filter(n => !isNaN(n) && n > 0);
+      if (validIds.length === 0) {
+        return res.status(400).json({ error: "Tidak ada ID valid dalam array ids" });
+      }
+      // Only update courses that are currently inactive so the returned count
+      // reflects how many actually changed state (not the full selection).
+      const updated = await db.update(lmsCourses)
+        .set({ isActive: true })
+        .where(and(inArray(lmsCourses.id, validIds), eq(lmsCourses.isActive, false)))
+        .returning({ id: lmsCourses.id });
+      res.json({ ok: true, activated: updated.length, selected: validIds.length, ids: validIds });
+    } catch (err: any) {
+      console.error("[LMS] Bulk activate error:", err?.message);
+      res.status(500).json({ error: "Gagal mengaktifkan kursus" });
+    }
+  });
+
   // POST /api/admin/lms/reseed — trigger re-seed dari health dashboard (admin only)
   app.post("/api/admin/lms/reseed", isAuthenticated, requireAdminLms, async (_req, res) => {
     if (lmsSeedStatus === "pending") {
