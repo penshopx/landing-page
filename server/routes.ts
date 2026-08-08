@@ -11169,9 +11169,10 @@ Balas dengan JSON dengan struktur PERSIS ini:
     // Prefer CUSTOM domain (e.g. gustafta.my.id) over .replit.app
     const customDomain = domains.find((d) => !d.endsWith(".replit.app") && !d.endsWith(".replit.dev") && !d.endsWith(".repl.co"));
     if (customDomain) return res.json({ appUrl: `https://${customDomain}`, source: "replit_domains_custom" });
+    // PROD_URL (custom domain set by admin) beats the generic .replit.app domain
+    if (process.env.PROD_URL) return res.json({ appUrl: process.env.PROD_URL, source: "env" });
     const prodDomain = domains.find((d) => d.endsWith(".replit.app"));
     if (prodDomain) return res.json({ appUrl: `https://${prodDomain}`, source: "replit_domains" });
-    if (process.env.PROD_URL) return res.json({ appUrl: process.env.PROD_URL, source: "env" });
     if (_cachedProdUrl) return res.json({ appUrl: _cachedProdUrl, source: "db" });
     return res.json({ appUrl: null, source: "none" });
   });
