@@ -380,3 +380,54 @@ test("health: pendingCertificates increments when cert row is deleted", { skip: 
     `pendingCertificates must increase by 1 after cert deletion (expected ${withCert.pendingCertificates + 1}, got ${withoutCert.pendingCertificates})`
   );
 });
+
+// ── Lesson delete decrements totalLessons ─────────────────────────────────────
+
+test("health: totalLessons decrements by exactly 1 after a lesson is deleted mid-course", { skip: SKIP }, async () => {
+  // 1. Seed a course with 2 lessons.
+  const courseId = await seedCourse();
+  const lessonIdA = await seedLesson(courseId);
+  const lessonIdB = await seedLesson(courseId);
+
+  // 2. Read health counts after seeding (both lessons present).
+  const resWithTwo = await getHealth(TEST_ADMIN_ID);
+  assert.equal(resWithTwo.status, 200);
+  const { counts: withTwo } = await resWithTwo.json() as any;
+
+  // Sanity: the two lessons must be reflected.
+  assert.ok(
+    withTwo.totalLessons >= 2,
+    `totalLessons must be at least 2 after seeding 2 lessons, got ${withTwo.totalLessons}`
+  );
+
+  // 3. Delete one lesson via the admin HTTP endpoint.
+  const delRes = await fetch(`${baseUrl}/api/admin/lms/lessons/${lessonIdA}`, {
+    method: "DELETE",
+    headers: { "x-test-user": TEST_ADMIN_ID },
+  });
+  assert.equal(delRes.status, 200, `DELETE lesson expected 200, got ${delRes.status}`);
+  const delBody = await delRes.json() as any;
+  assert.equal(delBody.ok, true, `DELETE lesson body must be { ok: true }, got ${JSON.stringify(delBody)}`);
+
+  // 4. Read health counts again after deletion.
+  const resWithOne = await getHealth(TEST_ADMIN_ID);
+  assert.equal(resWithOne.status, 200);
+  const { counts: withOne } = await resWithOne.json() as any;
+
+  // 5. Assert totalLessons decremented by exactly 1.
+  assert.equal(
+    withOne.totalLessons, withTwo.totalLessons - 1,
+    `totalLessons must decrease by exactly 1 after lesson deletion (expected ${withTwo.totalLessons - 1}, got ${withOne.totalLessons})`
+  );
+
+  // 6. Confirm the remaining lesson (lessonIdB) is still in the DB.
+  const remaining = await queryDb(`SELECT id FROM lms_lessons WHERE id = $1`, [lessonIdB]);
+  assert.equal(remaining.length, 1, `Lesson ${lessonIdB} must still exist after deleting lesson ${lessonIdA}`);
+
+  // 7. Endpoint counts must also match the DB directly.
+  const dbAfter = await dbCounts();
+  assert.equal(
+    withOne.totalLessons, dbAfter.totalLessons,
+    `totalLessons endpoint (${withOne.totalLessons}) must match DB (${dbAfter.totalLessons}) after deletion`
+  );
+});
