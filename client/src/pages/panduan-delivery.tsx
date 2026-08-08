@@ -5,7 +5,7 @@ import { SharedHeader } from "@/components/shared-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { WA_CONTACT_DISPLAY, WA_CONTACT_DISPLAY_2, useContactNumbers } from "@/lib/contact";
+import { useContactNumbers } from "@/lib/contact";
 import {
   ShoppingBag, CreditCard, Package, Building2,
   CheckCircle2, AlertCircle, ArrowRight, Copy,
@@ -43,13 +43,16 @@ interface Product {
 }
 
 /* ── Data ─────────────────────────── */
+type ContactDisplay = { display: string; display2: string };
+
 const WHO_LABELS: Record<Step["who"], { label: string; color: string; dot: string }> = {
   customer: { label: "Customer", color: "text-blue-700 bg-blue-50 border-blue-200", dot: "bg-blue-500" },
   admin: { label: "Admin Anda", color: "text-violet-700 bg-violet-50 border-violet-200", dot: "bg-violet-500" },
   system: { label: "Sistem Otomatis", color: "text-emerald-700 bg-emerald-50 border-emerald-200", dot: "bg-emerald-500" },
 };
 
-const PRODUCTS: Product[] = [
+function getProducts(contact: ContactDisplay): Product[] {
+  return [
   /* ──── 1. STORE ──────────────────── */
   {
     id: "store",
@@ -153,7 +156,7 @@ const PRODUCTS: Product[] = [
       {
         who: "customer",
         label: "Customer konfirmasi & bayar via WA",
-        detail: `Customer kirim bukti transfer ke nomor WA Gustafta (${WA_CONTACT_DISPLAY} / ${WA_CONTACT_DISPLAY_2}) dengan menyebut nama, email, dan paket yang dipilih.`,
+        detail: `Customer kirim bukti transfer ke nomor WA Gustafta (${contact.display} / ${contact.display2}) dengan menyebut nama, email, dan paket yang dipilih.`,
       },
       {
         who: "admin",
@@ -280,7 +283,7 @@ const PRODUCTS: Product[] = [
       {
         who: "customer",
         label: "Customer hubungi via WA / klik CTA di /platform",
-        detail: `Customer klik tombol "Hubungi via WhatsApp" di /platform → diarahkan ke WA ${WA_CONTACT_DISPLAY_2} dengan pesan awal berisi kebutuhan bisnis.`,
+        detail: `Customer klik tombol "Hubungi via WhatsApp" di /platform → diarahkan ke WA ${contact.display2} dengan pesan awal berisi kebutuhan bisnis.`,
       },
       {
         who: "admin",
@@ -333,7 +336,8 @@ const PRODUCTS: Product[] = [
       },
     ],
   },
-];
+  ];
+}
 
 /* ── Component ───────────────────────────── */
 function StepItem({ step, index }: { step: Step; index: number }) {
@@ -494,6 +498,7 @@ function ProductCard({ product }: { product: Product }) {
 /* ── Page ───────────────────────────────── */
 export default function PanduanDeliveryPage() {
   const contact = useContactNumbers();
+  const products = getProducts(contact);
   return (
     <div className="min-h-screen bg-background">
       <SharedHeader />
@@ -515,7 +520,7 @@ export default function PanduanDeliveryPage() {
 
           {/* 4 product quick jump */}
           <div className="flex gap-2 flex-wrap mt-6">
-            {PRODUCTS.map((p) => {
+            {products.map((p) => {
               const Icon = p.icon;
               return (
                 <a key={p.id} href={`#${p.id}`}
@@ -551,7 +556,7 @@ export default function PanduanDeliveryPage() {
 
       {/* Product cards */}
       <section className="max-w-4xl mx-auto px-4 pb-16 space-y-6">
-        {PRODUCTS.map((product) => (
+        {products.map((product) => (
           <div key={product.id} id={product.id}>
             <ProductCard product={product} />
           </div>
