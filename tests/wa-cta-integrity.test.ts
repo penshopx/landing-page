@@ -144,6 +144,107 @@ describe("WA_CONTACT_* imports use @/lib/contact", () => {
   }
 });
 
+// ── 5. admin.tsx phone-validation guard integrity ─────────────────────────────
+//
+// admin.tsx allowlisted as "runtime data" because it reads the customer phone
+// from the DB.  This section makes sure the E.164 guard (the regex that keeps
+// emails, empty strings, and local "08xx" numbers from becoming broken wa.me
+// URLs) is actually present and that every dynamic wa.me link is null-guarded
+// behind that validation.
+
+describe("admin.tsx WA phone validation guard", () => {
+  const adminSrc = readSrc("pages/admin.tsx");
+
+  // ── 5a. The strict E.164 regex must appear in the file ──────────────────
+
+  test("contains /^62\\d{8,}$/ validation regex", () => {
+    // Look for the literal regex pattern — both /^62\d{8,}$/ and the test() call
+    assert.match(
+      adminSrc,
+      /\/\^62\\d\{8,\}\$\/\.test\(/,
+      "admin.tsx must contain the /^62\\d{8,}$/ E.164 validation regex. " +
+        "Removing or weakening it (e.g. to a length-only check) will break this guard.",
+    );
+  });
+
+  test("E.164 validation regex appears for every WA dialog that reads a customer phone", () => {
+    // There are (at minimum) two dialogs that build a per-customer wa.me link:
+    // the Modul WA dialog and the Store WA dialog.  Both must independently
+    // validate the phone so that neither dialog can silently produce a broken
+    // link when the other dialog's guard is present.
+    const occurrences = [...adminSrc.matchAll(/\/\^62\\d\{8,\}\$\/\.test\(/g)];
+    assert.ok(
+      occurrences.length >= 2,
+      `admin.tsx must have the E.164 validation regex in ALL dialogs that build ` +
+        `a customer-phone wa.me link (expected ≥2 occurrences, found ${occurrences.length}).`,
+    );
+  });
+
+  // ── 5b. No bare wa.me/${phoneNum} without a null-guard ──────────────────
+
+  test("waDirectUrl is always null-guarded before being used in wa.me URL", () => {
+    // The pattern `waDirectUrl = validPhone ? \`https://wa.me/...` : null`
+    // must guard every dynamic link.  Verify that every wa.me/${phoneNum}
+    // literal in the file is inside a ternary that checks validPhone.
+    const directLinks = [...adminSrc.matchAll(/`https:\/\/wa\.me\/\$\{phoneNum\}/g)];
+    assert.ok(
+      directLinks.length >= 2,
+      "Expected ≥2 wa.me/${phoneNum} template literals in admin.tsx (one per dialog).",
+    );
+
+    // Each occurrence must be preceded (within the same assignment) by
+    // `validPhone ?` — confirming the ternary guard is in place.
+    const guardedLinks = [...adminSrc.matchAll(/validPhone\s*\?\s*`https:\/\/wa\.me\/\$\{phoneNum\}/g)];
+    assert.strictEqual(
+      guardedLinks.length,
+      directLinks.length,
+      `Every wa.me/\${phoneNum} in admin.tsx must be guarded by "validPhone ?" ` +
+        `(found ${directLinks.length} links but only ${guardedLinks.length} are guarded).`,
+    );
+  });
+
+  // ── 5c. Edge-case coverage: the regex rejects common bad inputs ──────────
+
+  test("E.164 regex /^62\\d{8,}$/ rejects email-as-phone", () => {
+    const re = /^62\d{8,}$/;
+    assert.ok(!re.test("user@example.com"), "regex must reject email addresses");
+    assert.ok(!re.test("admin@gustafta.com"), "regex must reject email addresses");
+  });
+
+  test("E.164 regex /^62\\d{8,}$/ rejects empty string", () => {
+    const re = /^62\d{8,}$/;
+    assert.ok(!re.test(""), "regex must reject empty string");
+  });
+
+  test("E.164 regex /^62\\d{8,}$/ rejects raw local format (08xx)", () => {
+    // admin.tsx normalises 08xx → 628xx before testing, so the raw local
+    // format should NOT pass the regex directly (normalisation is required).
+    const re = /^62\d{8,}$/;
+    assert.ok(!re.test("08123456789"), "regex must reject un-normalised 08xx local format");
+    assert.ok(!re.test("0812345678"), "regex must reject un-normalised 0812345678");
+  });
+
+  test("E.164 regex /^62\\d{8,}$/ rejects too-short Indonesian numbers", () => {
+    const re = /^62\d{8,}$/;
+    assert.ok(!re.test("621234567"), "regex must reject 62 + only 7 digits (too short)");
+  });
+
+  test("E.164 regex /^62\\d{8,}$/ accepts valid Indonesian E.164 numbers", () => {
+    const re = /^62\d{8,}$/;
+    assert.ok(re.test("6281234567890"), "regex must accept valid 628… number");
+    assert.ok(re.test("62812345678"), "regex must accept 62 + 9 digits");
+    assert.ok(re.test("6281234567"), "regex must accept 62 + 8 digits (minimum)");
+  });
+
+  test("E.164 regex /^62\\d{8,}$/ rejects garbage strings", () => {
+    const re = /^62\d{8,}$/;
+    assert.ok(!re.test("undefined"), "regex must reject the literal string 'undefined'");
+    assert.ok(!re.test("null"), "regex must reject the literal string 'null'");
+    assert.ok(!re.test("garbage"), "regex must reject arbitrary garbage");
+    assert.ok(!re.test("+6281234567890"), "regex must reject E.164 with leading + (not normalised)");
+  });
+});
+
 // ── 4. Snapshot: expected set of files that use WA_CONTACT_* ─────────────────
 // This catches any new file that forgets to import from contact.ts and instead
 // tries to inline a phone number directly in a wa.me URL.
