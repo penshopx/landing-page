@@ -628,7 +628,7 @@ export function registerLmsRoutes(app: Express) {
           (async () => {
             try {
               const uRows = await db.execute(sql.raw(
-                `SELECT email, full_name FROM users WHERE id = '${userId.replace(/'/g, "''")}'`
+                `SELECT email, first_name, last_name FROM users WHERE id = '${userId.replace(/'/g, "''")}'`
               ));
               const uRow = (uRows as any).rows?.[0] ?? (uRows as any)[0];
               const email = uRow?.email as string | undefined;
@@ -636,7 +636,8 @@ export function registerLmsRoutes(app: Express) {
               const [course] = await db.select({ title: lmsCourses.title })
                 .from(lmsCourses).where(eq(lmsCourses.id, courseId));
               const courseTitle = course?.title ?? "Kursus";
-              const studentName = (uRow?.full_name as string) || "Peserta";
+              const rawName = [uRow?.first_name, uRow?.last_name].filter(Boolean).join(" ").trim();
+              const studentName = rawName || "Peserta";
               const issueDate = now.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
               const appBase = process.env.REPLIT_DEV_DOMAIN
                 ? `https://${process.env.REPLIT_DEV_DOMAIN}`
