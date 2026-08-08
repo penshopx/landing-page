@@ -644,7 +644,7 @@ export default function AdminPage() {
     mutationFn: ({ userId, plan, durationDays }: { userId: string; plan: string; durationDays: number }) =>
       apiRequest("POST", `/api/admin/users/${userId}/early-adopter`, { plan, durationDays }),
     onSuccess: async (data: any) => {
-      const result = await data.json().catch(() => ({}));
+      const result = data ?? {};
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/subscriptions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
