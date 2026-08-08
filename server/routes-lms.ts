@@ -639,9 +639,7 @@ export function registerLmsRoutes(app: Express) {
               const rawName = [uRow?.first_name, uRow?.last_name].filter(Boolean).join(" ").trim();
               const studentName = rawName || "Peserta";
               const issueDate = now.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
-              const appBase = process.env.REPLIT_DEV_DOMAIN
-                ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-                : "https://gustafta.my.id";
+              const appBase = (process.env.APP_URL || "https://gustafta.my.id").replace(/\/$/, "");
               const certsUrl = `${appBase}/lms/certificates`;
               const verifyUrl = `${appBase}/lms/verify/${certificateCode}`;
 

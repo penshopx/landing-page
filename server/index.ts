@@ -558,6 +558,16 @@ for (const envVar of requiredEnvVars) {
   await registerRoutes(httpServer, app);
 
   // ── Boot-time channel health check ──────────────────────────────────────────
+  if (!process.env.APP_URL) {
+    console.warn(
+      `${new Date().toLocaleTimeString()} [LMS] ⚠️  APP_URL tidak terkonfigurasi — ` +
+      `link verifikasi sertifikat di email akan menggunakan URL produksi default (gustafta.my.id). ` +
+      `Tambahkan secret APP_URL di Replit Secrets jika domain berbeda.`
+    );
+  } else {
+    console.log(`${new Date().toLocaleTimeString()} [LMS] ✓ APP_URL: ${process.env.APP_URL}`);
+  }
+
   if (!process.env.BREVO_API_KEY) {
     console.warn(
       `${new Date().toLocaleTimeString()} [Email] ⚠️  BREVO_API_KEY tidak terkonfigurasi — ` +
