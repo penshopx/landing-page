@@ -28,7 +28,7 @@ export async function sendEmail(opts: SendEmailOptions): Promise<SendEmailResult
     console.log(`[Email] BREVO_API_KEY not set — skipping email "${opts.subject}" to ${opts.to}`);
     return { sent: false, reason: "not_configured" };
   }
-  const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.com";
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.my.id";
 
   try {
     const resp = await fetch("https://api.brevo.com/v3/smtp/email", {
