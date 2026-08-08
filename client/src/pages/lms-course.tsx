@@ -400,6 +400,20 @@ export default function LmsCourse() {
                   {course.price === 0 ? "Gratis" : `Rp ${course.price.toLocaleString("id-ID")}`}
                 </span>
               </div>
+              {isEnrolled && totalLessons > 0 && (
+                <div className="space-y-1.5 pt-1" data-testid="header-progress-bar">
+                  <div className="flex items-center justify-between text-xs text-white/70">
+                    <span>{completedCount} dari {totalLessons} lesson selesai</span>
+                    <span className="font-semibold text-white">{progressPct}%</span>
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-1.5">
+                    <div
+                      className="h-1.5 rounded-full bg-white transition-all duration-500"
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Enroll / Progress card */}
