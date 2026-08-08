@@ -381,6 +381,102 @@ test("health: pendingCertificates increments when cert row is deleted", { skip: 
   );
 });
 
+// ── Reseed resets seedStatus to "done" ───────────────────────────────────────
+
+/**
+ * Verifies that POST /api/admin/lms/reseed synchronously updates lmsSeedStatus
+ * so that a subsequent GET /api/admin/lms/health immediately reflects the new
+ * terminal state ("done", seeding=false) — not the stale "pending" value.
+ *
+ * Uses an isolated Express app + seed-fn override (always adds 1 course) so the
+ * status is guaranteed to be "done" rather than "skipped".
+ */
+test("reseed: POST reseed resets seedStatus to 'done' and seeding to false immediately", { skip: SKIP }, async () => {
+  const { registerLmsRoutes } = await import("../server/routes-lms");
+
+  // Seed override: always reports 1 added course so status flips to "done".
+  const mockSeedFn = async () => ({ added: 1, updated: 0 });
+
+  const reseedApp = express();
+  reseedApp.use(express.json());
+
+  // Auth shim reused from the main before() setup.
+  reseedApp.use((req: any, _res: any, next: any) => {
+    const uid = req.headers["x-test-user"];
+    if (uid) {
+      req.user = { id: String(uid), claims: { sub: String(uid) } };
+      req.isAuthenticated = () => true;
+    } else {
+      req.isAuthenticated = () => false;
+    }
+    next();
+  });
+
+  // Register routes with the mock seed function.
+  registerLmsRoutes(reseedApp, mockSeedFn);
+
+  const reseedServer: Server = createServer(reseedApp);
+  await new Promise<void>((resolve) => reseedServer.listen(0, "127.0.0.1", resolve));
+  const { port } = reseedServer.address() as AddressInfo;
+  const rsBase = `http://127.0.0.1:${port}`;
+
+  try {
+    // 1. Wait for the boot-time async seed to settle (it fires inside registerLmsRoutes).
+    const TERMINAL = new Set(["done", "skipped", "error"]);
+    const deadline = Date.now() + 15_000;
+    while (Date.now() < deadline) {
+      const r = await fetch(`${rsBase}/api/admin/lms/health`, {
+        headers: { "x-test-user": TEST_ADMIN_ID },
+      });
+      if (r.status === 200) {
+        const b = await r.json() as any;
+        if (TERMINAL.has(b.seedStatus)) break;
+      }
+      await new Promise((r) => setTimeout(r, 200));
+    }
+
+    // 2. Call POST /api/admin/lms/reseed as admin and await it.
+    const reseedRes = await fetch(`${rsBase}/api/admin/lms/reseed`, {
+      method: "POST",
+      headers: {
+        "x-test-user": TEST_ADMIN_ID,
+        "Content-Type": "application/json",
+      },
+    });
+    assert.equal(
+      reseedRes.status, 200,
+      `POST /api/admin/lms/reseed expected 200, got ${reseedRes.status}`
+    );
+    const reseedBody = await reseedRes.json() as any;
+    assert.equal(reseedBody.ok, true, `Reseed response must have ok:true, got ${JSON.stringify(reseedBody)}`);
+
+    // 3. Immediately call GET /api/admin/lms/health — no poll needed because
+    //    the reseed endpoint awaits the seed function before responding.
+    const healthRes = await fetch(`${rsBase}/api/admin/lms/health`, {
+      headers: { "x-test-user": TEST_ADMIN_ID },
+    });
+    assert.equal(
+      healthRes.status, 200,
+      `GET /api/admin/lms/health expected 200, got ${healthRes.status}`
+    );
+    const healthBody = await healthRes.json() as any;
+
+    // 4. Assert seedStatus is "done" and seeding is false.
+    assert.equal(
+      healthBody.seedStatus, "done",
+      `seedStatus must be "done" immediately after reseed, got "${healthBody.seedStatus}"`
+    );
+    assert.equal(
+      healthBody.seeding, false,
+      `seeding must be false immediately after reseed, got ${healthBody.seeding}`
+    );
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      reseedServer.close((err) => (err ? reject(err) : resolve()))
+    );
+  }
+});
+
 // ── Lesson delete decrements totalLessons ─────────────────────────────────────
 
 test("health: totalLessons decrements by exactly 1 after a lesson is deleted mid-course", { skip: SKIP }, async () => {
