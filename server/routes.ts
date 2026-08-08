@@ -811,12 +811,24 @@ import {
  *   4. req host — dev/local fallback (NEVER safe for customer-facing links)
  */
 function getServerBaseUrl(req: { protocol: string; get(h: string): string | undefined }): string {
+  // 1. If request came in via a real custom domain, use it (e.g. gustafta.my.id)
+  const reqHost = req.get("host") ?? "";
+  if (
+    reqHost &&
+    !reqHost.includes("localhost") &&
+    !reqHost.includes("127.0.0.1") &&
+    !reqHost.endsWith(".replit.dev") &&
+    !reqHost.endsWith(".repl.co")
+  ) {
+    return `https://${reqHost}`;
+  }
+  // 2. REPLIT_DOMAINS — prefer non-Replit custom domain
   const domains = (process.env.REPLIT_DOMAINS || "").split(",").map((d) => d.trim()).filter(Boolean);
-  // Prefer custom domain (e.g. gustafta.my.id) over replit.app
   const customDomain = domains.find((d) => !d.endsWith(".replit.app") && !d.endsWith(".replit.dev") && !d.endsWith(".repl.co"));
   if (customDomain) return `https://${customDomain}`;
   const replitAppDomain = domains.find((d) => d.endsWith(".replit.app"));
   if (replitAppDomain) return `https://${replitAppDomain}`;
+  // 3. Explicit overrides
   if (process.env.PROD_URL) return process.env.PROD_URL.replace(/\/$/, "");
   if (_cachedProdUrl) return _cachedProdUrl;
   return `${req.protocol}://${req.get("host")}`;
