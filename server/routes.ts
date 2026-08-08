@@ -812,8 +812,11 @@ import {
  */
 function getServerBaseUrl(req: { protocol: string; get(h: string): string | undefined }): string {
   const domains = (process.env.REPLIT_DOMAINS || "").split(",").map((d) => d.trim()).filter(Boolean);
-  const prodDomain = domains.find((d) => d.endsWith(".replit.app"));
-  if (prodDomain) return `https://${prodDomain}`;
+  // Prefer custom domain (e.g. gustafta.my.id) over replit.app
+  const customDomain = domains.find((d) => !d.endsWith(".replit.app") && !d.endsWith(".replit.dev") && !d.endsWith(".repl.co"));
+  if (customDomain) return `https://${customDomain}`;
+  const replitAppDomain = domains.find((d) => d.endsWith(".replit.app"));
+  if (replitAppDomain) return `https://${replitAppDomain}`;
   if (process.env.PROD_URL) return process.env.PROD_URL.replace(/\/$/, "");
   if (_cachedProdUrl) return _cachedProdUrl;
   return `${req.protocol}://${req.get("host")}`;
