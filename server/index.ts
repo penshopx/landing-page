@@ -382,6 +382,39 @@ for (const envVar of requiredEnvVars) {
   registerAuthRoutes(app);
   registerAudioRoutes(app);
 
+  // ── lms_lesson_progress → lms_lessons FK (ON DELETE CASCADE) ─────────────
+  // Ensures that deleting a lesson atomically removes all progress rows for
+  // that lesson at the DB level, preventing orphaned rows regardless of
+  // concurrent writes or application-layer failures.
+  try {
+    // 1. Clean any pre-existing orphaned rows (no matching lesson).
+    const { rowCount: orphans } = await pool.query(`
+      DELETE FROM lms_lesson_progress
+      WHERE lesson_id NOT IN (SELECT id FROM lms_lessons)
+    `);
+    if (orphans && orphans > 0) {
+      console.log(`${new Date().toLocaleTimeString()} [express] lms_lesson_progress: removed ${orphans} orphaned rows`);
+    }
+    // 2. Add the FK constraint idempotently.
+    await pool.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.table_constraints
+          WHERE constraint_name = 'lms_lesson_progress_lesson_id_fkey'
+            AND table_name = 'lms_lesson_progress'
+        ) THEN
+          ALTER TABLE lms_lesson_progress
+            ADD CONSTRAINT lms_lesson_progress_lesson_id_fkey
+            FOREIGN KEY (lesson_id) REFERENCES lms_lessons(id) ON DELETE CASCADE;
+        END IF;
+      END$$;
+    `);
+    console.log(`${new Date().toLocaleTimeString()} [express] lms_lesson_progress FK (ON DELETE CASCADE) ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] lms_lesson_progress FK migration error:`, e);
+  }
+
   // ── LMS Certificates table (idempotent DDL) ─────────────────────────────
   try {
     await pool.query(`

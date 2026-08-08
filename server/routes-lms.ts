@@ -953,11 +953,24 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
   });
 
   // DELETE /api/admin/lms/lessons/:id — delete a lesson
+  // The lms_lesson_progress table has a FK (ON DELETE CASCADE) on lesson_id →
+  // lms_lessons.id, so deleting the lesson row atomically removes all progress
+  // rows at the DB level.  The explicit progress delete below is defence-in-depth
+  // for environments where the FK migration has not yet run; both operations
+  // execute inside a single transaction so no partial state is ever committed.
   app.delete("/api/admin/lms/lessons/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
-      const [deleted] = await db.delete(lmsLessons).where(eq(lmsLessons.id, id)).returning();
+
+      let deleted: typeof lmsLessons.$inferSelect | undefined;
+      await db.transaction(async (tx) => {
+        // Explicit cleanup (defence-in-depth / pre-FK environments).
+        await tx.delete(lmsLessonProgress).where(eq(lmsLessonProgress.lessonId, id));
+        const [row] = await tx.delete(lmsLessons).where(eq(lmsLessons.id, id)).returning();
+        deleted = row;
+      });
+
       if (!deleted) return res.status(404).json({ error: "Lesson tidak ditemukan" });
       res.json({ ok: true });
     } catch (e: any) {
