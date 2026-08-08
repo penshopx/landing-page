@@ -291,3 +291,92 @@ test("health: activeCourses ≤ totalCourses invariant holds", { skip: SKIP }, a
     `activeCourses (${counts.activeCourses}) must be ≤ totalCourses (${counts.totalCourses})`
   );
 });
+
+// ── Certificate count tests ───────────────────────────────────────────────────
+
+/**
+ * Creates a completed enrollment (progress=100, completed_at set) for the given
+ * user + course and inserts a certificate row.  Returns the certificate_code so
+ * the caller can delete the cert to test the pendingCertificates path.
+ */
+async function seedCompletedEnrollmentWithCert(userId: string, courseId: number): Promise<string> {
+  // Insert a 100%-complete enrollment (each test uses a fresh course so no conflict).
+  await queryDb(
+    `INSERT INTO lms_enrollments (user_id, course_id, progress, completed_at)
+     VALUES ($1, $2, 100, NOW())`,
+    [userId, courseId]
+  );
+
+  // Insert a certificate for this completion.
+  const certCode = `TEST-CERT-${RUN}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  await queryDb(
+    `INSERT INTO lms_certificates (user_id, course_id, certificate_code)
+     VALUES ($1, $2, $3)`,
+    [userId, courseId, certCode]
+  );
+  return certCode;
+}
+
+test("health: totalCertificates reflects a newly issued certificate", { skip: SKIP }, async () => {
+  // Snapshot counts before inserting fixture data.
+  const res0 = await getHealth(TEST_ADMIN_ID);
+  assert.equal(res0.status, 200);
+  const { counts: before } = await res0.json() as any;
+  assert.equal(typeof before.totalCertificates, "number", "totalCertificates must be a number");
+  assert.equal(typeof before.pendingCertificates, "number", "pendingCertificates must be a number");
+
+  // Create a course, enrollment (100%), and certificate.
+  const courseId  = await seedCourse();
+  await seedLesson(courseId);
+  const studentId = `cert-student-${RUN}`;
+  await seedCompletedEnrollmentWithCert(studentId, courseId);
+
+  // Health endpoint must reflect the new certificate immediately.
+  const res1 = await getHealth(TEST_ADMIN_ID);
+  assert.equal(res1.status, 200);
+  const { counts: after } = await res1.json() as any;
+
+  assert.equal(
+    after.totalCertificates, before.totalCertificates + 1,
+    `totalCertificates must increase by 1 (expected ${before.totalCertificates + 1}, got ${after.totalCertificates})`
+  );
+
+  // A completed enrollment that already has a certificate must NOT be counted as pending.
+  assert.equal(
+    after.pendingCertificates, before.pendingCertificates,
+    `pendingCertificates must stay the same when a certificate exists (expected ${before.pendingCertificates}, got ${after.pendingCertificates})`
+  );
+});
+
+test("health: pendingCertificates increments when cert row is deleted", { skip: SKIP }, async () => {
+  // Create a course with a completed enrollment + certificate.
+  const courseId  = await seedCourse();
+  await seedLesson(courseId);
+  const studentId = `cert-del-student-${RUN}`;
+  const certCode  = await seedCompletedEnrollmentWithCert(studentId, courseId);
+
+  // Snapshot counts with the certificate present.
+  const res0 = await getHealth(TEST_ADMIN_ID);
+  assert.equal(res0.status, 200);
+  const { counts: withCert } = await res0.json() as any;
+
+  // Remove the certificate row — the enrollment stays completed_at/progress=100.
+  await queryDb(
+    `DELETE FROM lms_certificates WHERE certificate_code = $1`,
+    [certCode]
+  );
+
+  // Health endpoint must now report one more pendingCertificates.
+  const res1 = await getHealth(TEST_ADMIN_ID);
+  assert.equal(res1.status, 200);
+  const { counts: withoutCert } = await res1.json() as any;
+
+  assert.equal(
+    withoutCert.totalCertificates, withCert.totalCertificates - 1,
+    `totalCertificates must decrease by 1 after cert deletion (expected ${withCert.totalCertificates - 1}, got ${withoutCert.totalCertificates})`
+  );
+  assert.equal(
+    withoutCert.pendingCertificates, withCert.pendingCertificates + 1,
+    `pendingCertificates must increase by 1 after cert deletion (expected ${withCert.pendingCertificates + 1}, got ${withoutCert.pendingCertificates})`
+  );
+});
