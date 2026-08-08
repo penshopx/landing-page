@@ -18865,7 +18865,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(users).where(eq(users.isActive, true)),
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(trialRequests).where(eq(trialRequests.status, "pending")),
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(subscriptionsTable).where(eq(subscriptionsTable.status, "active")),
-        db.select({ count: sqlExpr<number>`count(*)::int` }).from(lmsCourses).where(eq(lmsCourses.isActive, true)),
+        db.select({ count: sqlExpr<number>`count(*)::int` }).from(lmsCourses).where(and(eq(lmsCourses.isActive, true), eq(lmsCourses.isPublic, true))),
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(lmsEnrollments),
         db.select({ count: sqlExpr<number>`count(*)::int` }).from(agentsTable).where(eq(agentsTable.isActive, true)),
       ]);

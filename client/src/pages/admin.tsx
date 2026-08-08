@@ -872,6 +872,37 @@ export default function AdminPage() {
     retry: false,
   });
 
+  interface LmsHealthCounts {
+    totalCourses: number;
+    activeCourses: number;
+    totalLessons: number;
+    totalEnrollments: number;
+    totalCertificates: number;
+    pendingCertificates: number;
+  }
+  interface LmsHealth {
+    seedStatus: "pending" | "done" | "skipped" | "error";
+    seeding: boolean;
+    counts: LmsHealthCounts;
+    lastBackfill: { backfilled: number; total: number; at: string } | null;
+  }
+  const { data: lmsHealth, isLoading: lmsHealthLoading, refetch: refetchLmsHealth } = useQuery<LmsHealth>({
+    queryKey: ["/api/admin/lms/health"],
+    enabled: isAdmin && activeTab === "tools",
+    refetchInterval: (query) => (query.state.data?.seedStatus === "pending" ? 3000 : false),
+    retry: false,
+  });
+
+  const reseedLmsMutation = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/admin/lms/reseed", {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/stats"] });
+      toast({ title: "Re-seed LMS dimulai…", description: "Halaman akan diperbarui otomatis." });
+    },
+    onError: (err: any) => handle401Error(err, "Gagal memulai re-seed", err?.message),
+  });
+
   const [alertRecipientInput, setAlertRecipientInput] = useState("");
   const saveAlertRecipientMutation = useMutation({
     mutationFn: (email: string) => apiRequest("POST", "/api/admin/brevo-alert-recipient", { email }),
@@ -1117,7 +1148,7 @@ export default function AdminPage() {
             <CardContent className="pt-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">Kursus Aktif</p>
+                  <p className="text-xs text-muted-foreground">Kursus Aktif-Publik</p>
                   <p className="text-3xl font-bold mt-1 text-emerald-600">{statsLoading ? "—" : (stats?.totalCourses ?? 0)}</p>
                 </div>
                 <BookOpen className="h-8 w-8 text-emerald-500 opacity-80" />
@@ -3100,6 +3131,127 @@ export default function AdminPage() {
                       <a href="/admin/academy">Buka Academy →</a>
                     </Button>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* ── LMS Health ── */}
+              <Card data-testid="card-lms-health">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="h-5 w-5 text-emerald-500" />
+                      <CardTitle className="text-base">LMS Health — Status Kursus Academy</CardTitle>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => refetchLmsHealth()}
+                      disabled={lmsHealthLoading}
+                      className="gap-1.5"
+                      data-testid="button-refresh-lms-health"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${lmsHealthLoading ? "animate-spin" : ""}`} />
+                      Refresh
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Verifikasi bahwa katalog kursus telah seeded dan jumlah kursus/enrollment sesuai dengan stats grid di atas.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {lmsHealthLoading ? (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <RefreshCw className="h-4 w-4 animate-spin" /> Memuat status LMS…
+                    </div>
+                  ) : !lmsHealth ? (
+                    <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-sm text-red-700 dark:text-red-300">
+                      Gagal memuat status LMS. Pastikan Anda admin.
+                    </div>
+                  ) : (
+                    <>
+                      {/* ── Seed status banner ── */}
+                      {lmsHealth.seedStatus === "pending" && (
+                        <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 flex items-center gap-3 text-sm text-amber-700 dark:text-amber-200">
+                          <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
+                          <span>Seeding katalog kursus sedang berjalan… Halaman akan diperbarui otomatis.</span>
+                        </div>
+                      )}
+                      {lmsHealth.seedStatus === "error" && (
+                        <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-sm text-red-700 dark:text-red-300 space-y-2">
+                          <p className="font-semibold">⚠️ Seed LMS gagal — catalog mungkin kosong atau tidak lengkap</p>
+                          <p className="text-xs">Klik <strong>Re-seed</strong> untuk mencoba lagi.</p>
+                        </div>
+                      )}
+                      {(lmsHealth.seedStatus === "done" || lmsHealth.seedStatus === "skipped") && lmsHealth.counts.activeCourses === 0 && (
+                        <div className="rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 text-sm text-amber-700 dark:text-amber-200">
+                          <p className="font-semibold">⚠️ Seed {lmsHealth.seedStatus === "skipped" ? "dilewati" : "selesai"} tapi tidak ada kursus aktif</p>
+                          <p className="text-xs mt-1">Seed tidak menambahkan kursus baru karena semua sudah ada, tapi tidak ada yang aktif-publik. Periksa status kursus di Academy admin.</p>
+                        </div>
+                      )}
+                      {(lmsHealth.seedStatus === "done" || lmsHealth.seedStatus === "skipped") && lmsHealth.counts.activeCourses > 0 && (
+                        <div className="rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-3 text-xs text-green-700 dark:text-green-300 flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 shrink-0" />
+                          <span>Katalog kursus aktif — seed {lmsHealth.seedStatus === "skipped" ? "dilewati (sudah ada)" : "berhasil"}.</span>
+                        </div>
+                      )}
+
+                      {/* ── Counts grid ── */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="rounded-lg border bg-muted/40 p-3 text-center" data-testid="lms-health-active-courses">
+                          <p className="text-2xl font-bold text-emerald-600">{lmsHealth.counts.activeCourses}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Kursus Aktif-Publik</p>
+                        </div>
+                        <div className="rounded-lg border bg-muted/40 p-3 text-center" data-testid="lms-health-total-courses">
+                          <p className="text-2xl font-bold">{lmsHealth.counts.totalCourses}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Total Kursus (DB)</p>
+                        </div>
+                        <div className="rounded-lg border bg-muted/40 p-3 text-center" data-testid="lms-health-total-lessons">
+                          <p className="text-2xl font-bold text-blue-600">{lmsHealth.counts.totalLessons}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Total Lesson</p>
+                        </div>
+                        <div className="rounded-lg border bg-muted/40 p-3 text-center" data-testid="lms-health-total-enrollments">
+                          <p className="text-2xl font-bold text-violet-600">{lmsHealth.counts.totalEnrollments}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Total Enrollment</p>
+                        </div>
+                      </div>
+
+                      {/* ── Consistency check ── */}
+                      {stats && !statsLoading && (() => {
+                        const statsCoursesOk = stats.totalCourses === lmsHealth.counts.activeCourses;
+                        const statsEnrollmentsOk = stats.totalEnrollments === lmsHealth.counts.totalEnrollments;
+                        const allOk = statsCoursesOk && statsEnrollmentsOk;
+                        return (
+                          <div className={`rounded-lg border p-3 text-xs space-y-1 ${allOk ? "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300" : "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-200"}`}>
+                            <p className="font-semibold">{allOk ? "✅ Stats grid cocok dengan health card" : "⚠️ Tidak konsisten antara stats grid dan health card"}</p>
+                            <p>Kursus Aktif — stats grid: <strong>{stats.totalCourses}</strong> / health card: <strong>{lmsHealth.counts.activeCourses}</strong> {statsCoursesOk ? "✓" : "✗"}</p>
+                            <p>Total Enrollment — stats grid: <strong>{stats.totalEnrollments}</strong> / health card: <strong>{lmsHealth.counts.totalEnrollments}</strong> {statsEnrollmentsOk ? "✓" : "✗"}</p>
+                            {!allOk && <p className="mt-1">Klik <strong>Refresh</strong> di atas untuk muat ulang. Jika masih berbeda, klik <strong>Re-seed</strong>.</p>}
+                          </div>
+                        );
+                      })()}
+
+                      {/* ── Re-seed action ── */}
+                      <div className="flex items-center gap-3 pt-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => reseedLmsMutation.mutate()}
+                          disabled={reseedLmsMutation.isPending || lmsHealth.seeding}
+                          className="gap-1.5"
+                          data-testid="button-reseed-lms"
+                        >
+                          {(reseedLmsMutation.isPending || lmsHealth.seeding) ? (
+                            <><RefreshCw className="h-3.5 w-3.5 animate-spin" /> Seeding…</>
+                          ) : (
+                            <><Database className="h-3.5 w-3.5" /> Re-seed Katalog</>
+                          )}
+                        </Button>
+                        <p className="text-xs text-muted-foreground">
+                          Idempotent — aman dijalankan ulang. Hanya menambah kursus yang belum ada.
+                        </p>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
