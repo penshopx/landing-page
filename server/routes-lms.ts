@@ -766,12 +766,20 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
         color: lmsCourses.color, category: lmsCourses.category,
         instructor: lmsCourses.instructor,
       }).from(lmsCourses).where(eq(lmsCourses.id, cert.courseId));
-      // Get student display name
+      // Get student name — prefer first_name+last_name from users (matches congrats email),
+      // fall back to display_name from user_profiles, then email prefix.
       const nameRows = await db.execute(sql.raw(
-        `SELECT display_name FROM user_profiles WHERE user_id = '${cert.userId.replace(/'/g, "''")}' LIMIT 1`
+        `SELECT u.first_name, u.last_name, u.email, up.display_name
+         FROM users u
+         LEFT JOIN user_profiles up ON up.user_id = u.id
+         WHERE u.id = '${cert.userId.replace(/'/g, "''")}'
+         LIMIT 1`
       ));
       const nameArr = (nameRows.rows ?? nameRows) as any[];
-      const studentName = nameArr[0]?.display_name || "Peserta";
+      const nr = nameArr[0] as any;
+      const fullName = [nr?.first_name, nr?.last_name].filter(Boolean).join(" ").trim();
+      const emailPrefix = (nr?.email as string | undefined)?.split("@")[0] ?? "";
+      const studentName = fullName || nr?.display_name || emailPrefix || "Peserta";
       res.json({ ...cert, course, studentName });
     } catch (e) {
       res.status(500).json({ error: "Gagal verifikasi sertifikat" });
