@@ -28,9 +28,10 @@ export function CartDrawer() {
     const scalevItems = selected.filter(i => i.scalevVariantId);
     const waItems = selected.filter(i => !i.scalevVariantId);
 
-    // Produk store → Wuryanto Store
+    // Produk store → variant-specific Scalev checkout
     if (scalevItems.length > 0) {
-      window.open("https://bayar.gustafta.my.id", "_blank");
+      const url = buildCheckoutUrl() ?? "https://bayar.gustafta.my.id";
+      window.open(url, "_blank");
     }
 
     // Produk non-store → WA inquiry
