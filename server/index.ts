@@ -464,6 +464,14 @@ for (const envVar of requiredEnvVars) {
         } catch (_) { /* skip individual failures */ }
       }
       console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates backfill: ${backfilled}/${pending.rows.length} inserted`);
+      const stillPending = pending.rows.length - backfilled;
+      if (stillPending > 0) {
+        console.warn(
+          `${new Date().toLocaleTimeString()} [express] lms_certificates backfill INCOMPLETE: ` +
+          `${stillPending} completion(s) still have no certificate after backfill. ` +
+          `Use POST /api/admin/lms/cert-repair to retry.`
+        );
+      }
       // Persist backfill result so the health dashboard can surface it
       try {
         await pool.query(

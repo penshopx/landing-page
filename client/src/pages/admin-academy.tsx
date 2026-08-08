@@ -949,6 +949,28 @@ function LmsHealthCard({
     },
   });
 
+  const certRepairMut = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/admin/lms/cert-repair"),
+    onSuccess: (data: any) => {
+      if (data.stillPending > 0) {
+        toast({
+          title: `Perbaikan sebagian: ${data.backfilled}/${data.total} sertifikat diterbitkan`,
+          description: `${data.stillPending} pendaftaran masih belum punya sertifikat.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: data.total === 0 ? "Tidak ada yang perlu diperbaiki" : `✅ ${data.backfilled} sertifikat diterbitkan`,
+          description: data.total > 0 ? "Semua pendaftaran selesai sudah memiliki sertifikat." : undefined,
+        });
+      }
+      onRefresh();
+    },
+    onError: (e: any) => {
+      toast({ title: "Gagal perbaikan sertifikat", description: e?.message || "Coba lagi.", variant: "destructive" });
+    },
+  });
+
   // Start / reset countdown whenever error state appears or disappears
   useEffect(() => {
     const isError = health?.seedStatus === "error" && !health?.seeding && !reseedMut.isPending;
@@ -1060,7 +1082,7 @@ function LmsHealthCard({
                 </div>
                 <div className={`rounded-lg px-4 py-3 text-center ${
                   (health.counts.pendingCertificates ?? 0) > 0
-                    ? "bg-red-50 dark:bg-red-950/30"
+                    ? "bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800"
                     : "bg-muted/50"
                 }`}>
                   <p className={`text-2xl font-bold ${
@@ -1071,6 +1093,19 @@ function LmsHealthCard({
                     {health.counts.pendingCertificates ?? "—"}
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">Selesai Tanpa Sertifikat</p>
+                  {(health.counts.pendingCertificates ?? 0) > 0 && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="mt-2 h-6 text-xs px-2 py-0 gap-1"
+                      onClick={() => certRepairMut.mutate()}
+                      disabled={certRepairMut.isPending}
+                      data-testid="button-lms-cert-repair"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${certRepairMut.isPending ? "animate-spin" : ""}`} />
+                      {certRepairMut.isPending ? "Memproses…" : "Perbaiki"}
+                    </Button>
+                  )}
                 </div>
                 <div className="bg-muted/50 rounded-lg px-4 py-3 text-center">
                   {health.lastBackfill ? (

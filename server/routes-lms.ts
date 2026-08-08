@@ -1079,6 +1079,60 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
     }
   });
 
+  // POST /api/admin/lms/cert-repair — on-demand retry of the certificate backfill
+  app.post("/api/admin/lms/cert-repair", isAuthenticated, requireAdminLms, async (_req, res) => {
+    try {
+      const pendingRows = await db.execute(sql.raw(`
+        SELECT e.user_id, e.course_id
+        FROM lms_enrollments e
+        WHERE e.progress = 100
+          AND e.completed_at IS NOT NULL
+          AND NOT EXISTS (
+            SELECT 1 FROM lms_certificates c
+            WHERE c.user_id = e.user_id AND c.course_id = e.course_id
+          )
+      `));
+      const rows = pendingRows.rows ?? [];
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      let backfilled = 0;
+      for (const row of rows as Array<{ user_id: string; course_id: number }>) {
+        const year = new Date().getFullYear();
+        let code = "";
+        for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+        const certCode = `GUSTAFTA-${year}-${code}`;
+        try {
+          await db.execute(sql.raw(
+            `INSERT INTO lms_certificates (user_id, course_id, certificate_code)
+             VALUES ('${row.user_id.replace(/'/g, "''")}', ${row.course_id}, '${certCode}')
+             ON CONFLICT (user_id, course_id) DO NOTHING`
+          ));
+          backfilled++;
+        } catch (_) { /* skip individual failures */ }
+      }
+      // Persist so health card reflects latest repair
+      try {
+        await db.execute(sql.raw(
+          `INSERT INTO system_config (key, value) VALUES ('lms_cert_backfill_last', '${
+            JSON.stringify({ backfilled, total: rows.length, at: new Date().toISOString() }).replace(/'/g, "''")
+          }')
+           ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`
+        ));
+      } catch (_) { /* non-critical */ }
+
+      const stillPending = rows.length - backfilled;
+      if (stillPending > 0) {
+        console.warn(`[LMS-ADMIN] cert-repair: ${stillPending} completion(s) still have no certificate after repair.`);
+      } else {
+        console.log(`[LMS-ADMIN] cert-repair: ${backfilled}/${rows.length} certificates issued (all clear).`);
+      }
+
+      res.json({ ok: true, backfilled, total: rows.length, stillPending });
+    } catch (e) {
+      console.error("[LMS-ADMIN] POST cert-repair:", e);
+      res.status(500).json({ error: "Gagal menjalankan perbaikan sertifikat" });
+    }
+  });
+
   // GET /api/admin/lms/courses — list all courses (admin view, includes inactive)
   app.get("/api/admin/lms/courses", isAuthenticated, requireAdminLms, async (req: any, res) => {
     try {
