@@ -7880,7 +7880,8 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
         let signedUrl: string;
         try {
-          signedUrl = await generateSignedDownloadUrl(sp.downloadPath, 86_400);
+          const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+          signedUrl = await resolveDownloadUrl(sp.downloadPath, 86_400);
         } catch (storageErr: any) {
           const msg: string = storageErr?.message ?? "";
           if (msg.includes("402") || msg.includes("egress") || msg.includes("quota") || msg.includes("restricted")) {
@@ -20175,14 +20176,14 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 `[Scalev] Digital product matched: "${matched.name}" → ${matched.downloadPath}`,
               );
               try {
-                const { generateSignedDownloadUrl } = await import("./lib/supabase-storage");
+                const { resolveDownloadUrl } = await import("./lib/supabase-storage");
                 const { sendDigitalProductDeliveryEmail } = await import("./lib/email");
                 const { randomUUID: dpUUID } = await import("crypto");
                 const { db: dbOrd } = await import("./db");
                 const { storeOrders: soTbl } = await import("@shared/schema");
 
-                // Generate 24-hour signed URL
-                const signedUrl = await generateSignedDownloadUrl(matched.downloadPath, 86_400);
+                // Resolve download URL — full URL (Google Drive etc.) or Supabase signed URL
+                const signedUrl = await resolveDownloadUrl(matched.downloadPath, 86_400);
 
                 // Send delivery email (fire-and-forget)
                 sendDigitalProductDeliveryEmail({

@@ -4,6 +4,22 @@
  * NEVER import this from client-side code; service role key lives here.
  */
 
+/**
+ * Resolve a download_path to a usable URL.
+ * - If download_path is already a full URL (http/https), return it directly.
+ *   This supports Google Drive, Dropbox, or any external host as delivery.
+ * - Otherwise treat it as a Supabase Storage bucket path and generate a signed URL.
+ */
+export async function resolveDownloadUrl(
+  downloadPath: string,
+  expiresInSeconds = 86_400,
+): Promise<string> {
+  if (downloadPath.startsWith("http://") || downloadPath.startsWith("https://")) {
+    return downloadPath;
+  }
+  return generateSignedDownloadUrl(downloadPath, expiresInSeconds);
+}
+
 const BUCKET = "digital-products";
 
 /**
