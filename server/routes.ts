@@ -18716,6 +18716,20 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   // If ip_blocked is returned, the fix is NOT to add the current IP but to open
   // https://app.brevo.com/security/authorised_ips and remove all allowlist entries.
   app.get("/api/admin/email-health", requireAdmin, async (_req: any, res: any) => {
+    // Load persisted "last test email" metadata from system_config (non-blocking).
+    let lastTestedAt: string | null = null;
+    let lastTestedTo: string | null = null;
+    try {
+      const rows = await db
+        .select({ key: systemConfig.key, value: systemConfig.value })
+        .from(systemConfig)
+        .where(inArray(systemConfig.key, ["email_test_last_sent_at", "email_test_last_sent_to"]));
+      for (const r of rows) {
+        if (r.key === "email_test_last_sent_at") lastTestedAt = r.value as string | null;
+        if (r.key === "email_test_last_sent_to") lastTestedTo = r.value as string | null;
+      }
+    } catch (_e) { /* non-fatal */ }
+
     const brevoApiKey = process.env.BREVO_API_KEY;
     if (!brevoApiKey) {
       return res.json({
@@ -18724,6 +18738,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         status: "not_configured",
         detail: "BREVO_API_KEY is not set in Replit Secrets.",
         serverIp: null,
+        lastTestedAt,
+        lastTestedTo,
         timestamp: new Date().toISOString(),
       });
     }
@@ -18742,6 +18758,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           senderName: body?.companyName || body?.email || null,
           detail: "Brevo API key valid and reachable.",
           serverIp: null,
+          lastTestedAt,
+          lastTestedTo,
           timestamp: new Date().toISOString(),
         });
       }
@@ -18762,6 +18780,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           // The API key alone is sufficient authentication.
           detail: `Server IP ${serverIp} is blocked by Brevo's IP allowlist. Because Replit Autoscale assigns a new dynamic IP on every redeploy, the correct fix is to REMOVE all IP restrictions in Brevo (Settings → Security → Authorised IPs → remove all entries), not to add this IP. The API key is the only auth layer needed.`,
           serverIp,
+          lastTestedAt,
+          lastTestedTo,
           timestamp: new Date().toISOString(),
         });
       }
@@ -18772,6 +18792,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         status: "api_error",
         detail: `Brevo returned HTTP ${resp.status}: ${rawMsg.slice(0, 300)}`,
         serverIp,
+        lastTestedAt,
+        lastTestedTo,
         timestamp: new Date().toISOString(),
       });
     } catch (err: any) {
@@ -18781,6 +18803,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         status: "network_error",
         detail: err?.message || "Network error reaching Brevo.",
         serverIp: null,
+        lastTestedAt,
+        lastTestedTo,
         timestamp: new Date().toISOString(),
       });
     }
@@ -18833,6 +18857,20 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       });
 
       if (result.sent) {
+        // Persist the timestamp and recipient so the GET /api/admin/email-health
+        // endpoint can surface "last tested" info after a page reload.
+        const now = new Date().toISOString();
+        await db
+          .insert(systemConfig)
+          .values([
+            { key: "email_test_last_sent_at", value: now },
+            { key: "email_test_last_sent_to", value: adminEmail },
+          ])
+          .onConflictDoUpdate({
+            target: systemConfig.key,
+            set: { value: sqlExpr`excluded.value` },
+          })
+          .catch((e: any) => console.error("[email-test] failed to persist last-sent:", e));
         return res.json({ sent: true, to: adminEmail });
       } else {
         return res.status(502).json({ sent: false, reason: result.reason, detail: result.detail || null, to: adminEmail });

@@ -112,6 +112,8 @@ type EmailHealthData = {
   detail: string;
   serverIp: string | null;
   senderName?: string | null;
+  lastTestedAt?: string | null;
+  lastTestedTo?: string | null;
   timestamp: string;
 };
 
@@ -325,6 +327,13 @@ export default function AdminAiHealthPage() {
 
                 {emailHealth.status === "ok" && emailHealth.senderName && (
                   <p className="text-xs text-gray-500 dark:text-gray-400">Akun Brevo: <span className="font-medium">{emailHealth.senderName}</span></p>
+                )}
+
+                {emailHealth.lastTestedAt && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400" data-testid="text-last-tested">
+                    Terakhir diuji: <span className="font-medium">{new Date(emailHealth.lastTestedAt).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short" })}</span>
+                    {emailHealth.lastTestedTo ? <> oleh <span className="font-medium">{emailHealth.lastTestedTo}</span></> : null}
+                  </p>
                 )}
 
                 <p className="text-xs text-gray-400">Dicek pada {new Date(emailHealth.timestamp).toLocaleTimeString("id-ID")}</p>
