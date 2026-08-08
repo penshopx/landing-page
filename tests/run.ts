@@ -22,6 +22,9 @@ const files = [
   resolve(__dirname, "wa-cta-integrity.test.ts"),
   resolve(__dirname, "store-product-reorder-persistence.test.ts"),
   resolve(__dirname, "store-catalog-payment-link-clear.test.ts"),
+  // DB integration: confirms superadmin bootstrap guard survives server restarts.
+  // Skipped automatically (process.exit 0) when DATABASE_URL is absent.
+  resolve(__dirname, "bootstrap-superadmin-db.test.ts"),
 ];
 
 let hadFailure = false;

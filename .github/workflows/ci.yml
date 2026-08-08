@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run test suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        # DATABASE_URL is optional: when absent the DB integration test
+        # (bootstrap-superadmin-db.test.ts) exits 0 gracefully so the job
+        # still passes. Supply the secret in repository settings to enable
+        # the full DB-backed suite on CI.
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm test
