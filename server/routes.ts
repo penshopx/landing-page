@@ -20048,9 +20048,10 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       // ─────────────────────────────────────────────────────────────────────────
 
       // ── Digital Product Delivery (download_path via Supabase Storage) ─────────
-      // Cek apakah ada store_product dengan download_path yang cocok dengan
-      // nama produk Scalev (scalev_product_name) atau nama produk webhook.
-      // Jika cocok: generate signed URL → kirim email ke pembeli → catat order.
+      // Matching priority:
+      //   1. product_ref param (store product ID) — set by frontend when buyer clicks Beli
+      //   2. scalev_product_name exact match (admin-configured)
+      //   3. store product name match (fallback)
       {
         const webhookProductNames: string[] = [
           data.product_name || "",
@@ -20058,24 +20059,51 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           ...Object.keys(finalVariants),
         ].map((s: string) => s.trim().toLowerCase()).filter(Boolean);
 
-        if (webhookProductNames.length > 0 && customerEmail) {
+        // product_ref is the store_products.id appended to checkout URL by the frontend
+        const productRefRaw: string | undefined =
+          data.custom_fields?.product_ref ||
+          data.metadata?.product_ref ||
+          data.product_ref ||
+          undefined;
+        const productRefId: number | null = productRefRaw ? parseInt(String(productRefRaw), 10) : null;
+
+        if ((webhookProductNames.length > 0 || productRefId) && customerEmail) {
           try {
             const { db: dbDp } = await import("./db");
             const { storeProducts: spTbl } = await import("@shared/schema");
-            const { isNotNull: dpNotNull } = await import("drizzle-orm");
-            const allDigital = await dbDp
-              .select()
-              .from(spTbl)
-              .where(dpNotNull(spTbl.downloadPath));
+            const { isNotNull: dpNotNull, eq: dpEq } = await import("drizzle-orm");
 
-            const matched = allDigital.find((p: any) => {
-              const scalevName = (p.scalevProductName || "").trim().toLowerCase();
-              const storeName = (p.name || "").trim().toLowerCase();
-              return webhookProductNames.some(
-                (wn: string) =>
-                  (scalevName && wn === scalevName) || wn === storeName,
-              );
-            });
+            let matched: any = null;
+
+            // Priority 1: match by store product ID (most reliable)
+            if (productRefId && !isNaN(productRefId)) {
+              const byId = await dbDp
+                .select()
+                .from(spTbl)
+                .where(dpEq(spTbl.id, productRefId))
+                .limit(1);
+              if (byId[0]?.downloadPath) {
+                matched = byId[0];
+                console.log(`[DigitalDelivery] Matched by product_ref ID ${productRefId}: "${matched.name}"`);
+              }
+            }
+
+            // Priority 2 & 3: name-based matching
+            if (!matched && webhookProductNames.length > 0) {
+              const allDigital = await dbDp
+                .select()
+                .from(spTbl)
+                .where(dpNotNull(spTbl.downloadPath));
+
+              matched = allDigital.find((p: any) => {
+                const scalevName = (p.scalevProductName || "").trim().toLowerCase();
+                const storeName = (p.name || "").trim().toLowerCase();
+                return webhookProductNames.some(
+                  (wn: string) =>
+                    (scalevName && wn === scalevName) || wn === storeName,
+                );
+              });
+            }
 
             if (matched && matched.downloadPath) {
               console.log(

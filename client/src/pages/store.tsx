@@ -202,8 +202,15 @@ export default function Store() {
   const handleBuyNow = (agent: AgentProduct) => {
     trackViewContent({ content_name: agent.name, content_category: agent.category ?? "chatbot" });
     // Direct checkout link (set by admin per-product)
+    // Append product_ref so Scalev webhook can identify the exact product by ID
     if (agent.paymentUrl) {
-      window.open(agent.paymentUrl, "_blank");
+      try {
+        const url = new URL(agent.paymentUrl);
+        if (agent.productId) url.searchParams.set("product_ref", String(agent.productId));
+        window.open(url.toString(), "_blank");
+      } catch {
+        window.open(agent.paymentUrl, "_blank");
+      }
       return;
     }
     // Scalev-integrated product → variant-specific checkout URL
