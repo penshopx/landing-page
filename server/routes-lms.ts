@@ -481,8 +481,27 @@ async function seedLmsDataTracked() {
 }
 
 // ─── Route registration ───────────────────────────────────────────────────────
-export function registerLmsRoutes(app: Express) {
-  seedLmsDataTracked();
+export function registerLmsRoutes(
+  app: Express,
+  // Optional override for seedLmsData — used in tests to inject failures
+  // without touching the real DB connection pool.
+  _seedFnOverride?: () => Promise<{ added: number; updated: number }>
+) {
+  // When an override is provided the tracked-seed wrapper must use it.
+  const activeSeedFn = _seedFnOverride ?? seedLmsData;
+
+  // Re-wrap the tracked helper so the override is picked up.
+  const trackedSeed = async () => {
+    try {
+      const { added, updated } = await activeSeedFn();
+      lmsSeedStatus = added === 0 && updated === 0 ? "skipped" : "done";
+    } catch (e) {
+      lmsSeedStatus = "error";
+      console.error("[LMS] Seed fatal:", e);
+    }
+  };
+
+  trackedSeed();
 
   // POST /api/admin/lms/courses/bulk-deactivate — nonaktifkan beberapa kursus sekaligus
   app.post("/api/admin/lms/courses/bulk-deactivate", isAuthenticated, requireAdminLms, async (req: any, res) => {
@@ -539,7 +558,7 @@ export function registerLmsRoutes(app: Express) {
     }
     lmsSeedStatus = "pending";
     try {
-      const { added, updated } = await seedLmsData();
+      const { added, updated } = await activeSeedFn();
       lmsSeedStatus = added === 0 && updated === 0 ? "skipped" : "done";
       res.json({ ok: true, added, updated });
     } catch (e: any) {
@@ -562,7 +581,7 @@ export function registerLmsRoutes(app: Express) {
     }
     lastPublicRetrySeedAt = now;
     lmsSeedStatus = "pending";
-    seedLmsDataTracked().catch(e => console.error("[LMS] Public retry-seed error:", e));
+    trackedSeed().catch(e => console.error("[LMS] Public retry-seed error:", e));
     res.json({ ok: true, message: "Retry dimulai. Halaman akan diperbarui otomatis." });
   });
 
