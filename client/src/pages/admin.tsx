@@ -1144,7 +1144,12 @@ export default function AdminPage() {
             </CardContent>
           </Card>
 
-          <Card data-testid="stat-total-courses">
+          <Card
+            data-testid="stat-total-courses"
+            className="cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all"
+            onClick={() => setActiveTab("tools")}
+            title="Buka tab Tools → Academy"
+          >
             <CardContent className="pt-5">
               <div className="flex items-center justify-between">
                 <div>
@@ -1153,10 +1158,18 @@ export default function AdminPage() {
                 </div>
                 <BookOpen className="h-8 w-8 text-emerald-500 opacity-80" />
               </div>
+              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                <ExternalLink className="h-3 w-3" /> Lihat Academy
+              </p>
             </CardContent>
           </Card>
 
-          <Card data-testid="stat-total-enrollments">
+          <Card
+            data-testid="stat-total-enrollments"
+            className="cursor-pointer hover:border-violet-400 hover:shadow-md transition-all"
+            onClick={() => setActiveTab("tools")}
+            title="Buka tab Tools → Academy"
+          >
             <CardContent className="pt-5">
               <div className="flex items-center justify-between">
                 <div>
@@ -1165,6 +1178,9 @@ export default function AdminPage() {
                 </div>
                 <GraduationCap className="h-8 w-8 text-violet-500 opacity-80" />
               </div>
+              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                <ExternalLink className="h-3 w-3" /> Lihat Academy
+              </p>
             </CardContent>
           </Card>
 
