@@ -134,7 +134,18 @@ export function makeBootstrapHandler(db: BootstrapDb) {
       }
 
       // Guard: reject if a superadmin already exists — token must be single-use.
-      const existingSuperadmins = await db.findSuperadmin();
+      // If the DB is unreachable at this point, return 503 rather than a
+      // confusing 500, and never fall through to the promotion path.
+      let existingSuperadmins: Array<{ id: string | number }>;
+      try {
+        existingSuperadmins = await db.findSuperadmin();
+      } catch (dbErr: any) {
+        console.error("[bootstrap-superadmin] DB unavailable during guard read:", dbErr);
+        res.status(503).json({
+          error: "Database tidak dapat dijangkau saat ini. Coba lagi dalam beberapa saat.",
+        });
+        return;
+      }
       if (existingSuperadmins.length > 0) {
         console.warn(
           "[bootstrap-superadmin] Blocked reuse attempt — superadmin already exists (id=%s)",

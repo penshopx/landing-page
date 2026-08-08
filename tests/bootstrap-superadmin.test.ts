@@ -321,3 +321,62 @@ test("403 — second call with a DIFFERENT email is also blocked (guard is globa
     "global superadmin guard must block even when targeting a different user"
   );
 });
+
+// ── DB-unavailable path ───────────────────────────────────────────────────────
+
+test("503 when findSuperadmin() throws (DB unreachable) — user must NOT be promoted", async () => {
+  // Build a fresh app with a db stub that always throws on findSuperadmin.
+  const throwingDb: BootstrapDb = {
+    async findSuperadmin() {
+      throw new Error("connect ECONNREFUSED 127.0.0.1:5432");
+    },
+    async promoteToSuperadmin(_email: string) {
+      // This must never be called when the guard read fails.
+      throw new Error("promoteToSuperadmin must not be called when DB guard fails");
+    },
+  };
+
+  // Mount a separate minimal server so it doesn't share state with the main app.
+  const throwingApp = express();
+  throwingApp.use(express.json());
+  throwingApp.post(
+    "/api/admin/bootstrap-superadmin",
+    makeBootstrapHandler(throwingDb)
+  );
+
+  const throwingServer = await new Promise<ReturnType<typeof createServer>>(
+    (resolve) => {
+      const s = createServer(throwingApp).listen(0, "127.0.0.1", () =>
+        resolve(s)
+      );
+    }
+  );
+  const throwingPort = (throwingServer.address() as any).port;
+
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:${throwingPort}/api/admin/bootstrap-superadmin`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-bootstrap-token": TOKEN,
+        },
+        body: JSON.stringify({ email: "founder@example.com" }),
+      }
+    );
+    const json = await res.json();
+
+    assert.equal(
+      res.status,
+      503,
+      `expected 503 when DB is unreachable, got ${res.status}: ${JSON.stringify(json)}`
+    );
+    assert.ok(
+      typeof json.error === "string" && json.error.length > 0,
+      "response body must contain an error message"
+    );
+  } finally {
+    await new Promise<void>((resolve) => throwingServer.close(() => resolve()));
+  }
+});
