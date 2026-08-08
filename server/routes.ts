@@ -11165,7 +11165,10 @@ Balas dengan JSON dengan struktur PERSIS ini:
 
   // Returns the production base URL so embed codes / widget links are always correct
   app.get("/api/config/app-url", (_req, res) => {
-    const domains = (process.env.REPLIT_DOMAINS || "").split(",").map((d) => d.trim());
+    const domains = (process.env.REPLIT_DOMAINS || "").split(",").map((d) => d.trim()).filter(Boolean);
+    // Prefer CUSTOM domain (e.g. gustafta.my.id) over .replit.app
+    const customDomain = domains.find((d) => !d.endsWith(".replit.app") && !d.endsWith(".replit.dev") && !d.endsWith(".repl.co"));
+    if (customDomain) return res.json({ appUrl: `https://${customDomain}`, source: "replit_domains_custom" });
     const prodDomain = domains.find((d) => d.endsWith(".replit.app"));
     if (prodDomain) return res.json({ appUrl: `https://${prodDomain}`, source: "replit_domains" });
     if (process.env.PROD_URL) return res.json({ appUrl: process.env.PROD_URL, source: "env" });
