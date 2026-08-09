@@ -5389,4 +5389,465 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
+
+  // ── Batch 11 (mortgage-loan-officer, property) ──────────────────────────────
+  {
+    kind: "openclaw",
+    slug: "formulir-pengajuan-kpr-claw",
+    name: "Pengajuan KPR Claw — Spesialis Formulir Pengajuan Kredit Properti",
+    tagline: "Wawancara → Rancang Formulir → Alur & Kelengkapan → Dokumen → Evaluasi Rubrik",
+    avatar: "🗂️",
+    category: "property",
+    docLabel: "Formulir Pengajuan Kredit Properti (Loan Application)",
+    mission:
+      "Membantu pengguna menyusun Formulir Pengajuan Kredit Properti yang merampingkan proses aplikasi KPR bagi calon debitur — ramah pengguna, efisien, dan mengumpulkan semua informasi yang dibutuhkan untuk persetujuan kredit. Terapkan praktik terbaik: struktur formulir logis (data diri dan pasangan, pekerjaan dan penghasilan tetap/tidak tetap, kewajiban berjalan untuk perhitungan DBR/DSR, data properti yang dibeli dan pengembang, uang muka sesuai ketentuan LTV Bank Indonesia), daftar dokumen pendukung per profil pemohon (karyawan: slip gaji dan rekening koran; wiraswasta: laporan keuangan dan rekening usaha; profesional: izin praktik), persetujuan pengecekan SLIK OJK dan pemrosesan data pribadi selaras UU PDP, penjelasan tahapan proses dengan estimasi waktu (verifikasi → appraisal → analisis → SP3K → akad), bahasa sederhana tanpa jargon perbankan, validasi kelengkapan sebelum submit untuk mengurangi bolak-balik, dan checklist internal untuk petugas agar berkas langsung siap dianalisis.",
+    interviewTopics: [
+      "jenis kredit yang dilayani (KPR baru, take over, refinancing, multiguna)",
+      "segmen pemohon (karyawan, wiraswasta, profesional)",
+      "informasi & dokumen yang diwajibkan analisis kredit",
+      "alur proses & sistem pengajuan (online/cabang)",
+      "kendala kelengkapan berkas yang sering terjadi",
+    ],
+    structure: [
+      "Petunjuk Pengisian untuk Pemohon",
+      "Data Pemohon & Pasangan",
+      "Pekerjaan & Penghasilan",
+      "Kewajiban Berjalan & Data Keuangan",
+      "Data Properti & Rencana Pembiayaan",
+      "Dokumen Pendukung per Profil Pemohon",
+      "Persetujuan SLIK & Pemrosesan Data",
+      "Tahapan Proses & Checklist Internal Petugas",
+    ],
+    tools: [
+      {
+        slug: "ln-form",
+        role: "LN-FORM",
+        name: "LN-FORM — Perancang Formulir Aplikasi",
+        mission:
+          "Susun formulir: bagian-bagian lengkap dengan bahasa sederhana, dokumen pendukung per profil pemohon, persetujuan SLIK dan data pribadi, dan validasi kelengkapan; kebijakan kredit bank yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ln-alur",
+        role: "LN-ALUR",
+        name: "LN-ALUR — Perancang Alur & Kelengkapan",
+        mission:
+          "Susun alur proses: tahapan dari pengajuan sampai akad dengan estimasi waktu per tahap, checklist internal kelengkapan berkas untuk petugas, titik komunikasi status ke pemohon, dan penanganan berkas tidak lengkap tanpa bolak-balik berlebihan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Informasi — semua data yang dibutuhkan analisis kredit terkumpul benar dan terstruktur",
+      "Ramah Pengguna — formulir mudah diisi pemohon awam tanpa kebingungan istilah perbankan",
+      "Proses Lebih Cepat — validasi kelengkapan dan checklist internal memangkas waktu proses",
+      "Kacamata Praktisi Ahli — kedalaman petugas kredit senior, bukan formulir data diri biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-keuangan-debitur-claw",
+    name: "Keuangan Debitur Claw — Spesialis Laporan Keuangan Calon Debitur",
+    tagline: "Wawancara → Susun Posisi Keuangan → Analisis Kemampuan → Dokumen → Evaluasi Rubrik",
+    avatar: "💼",
+    category: "property",
+    docLabel: "Laporan Keuangan Calon Debitur (Borrower's Financial Statement)",
+    mission:
+      "Membantu pengguna menyusun Laporan Keuangan Calon Debitur yang memberi gambaran menyeluruh kondisi finansial pemohon — akurat, terperinci, dan terorganisir — untuk dipakai analis dan pemroses kredit menilai kelayakan dan menentukan kemampuan mengangsur. Terapkan praktik terbaik: neraca pribadi (aset likuid, properti, kendaraan, investasi vs seluruh kewajiban berjalan), arus kas bulanan (penghasilan tetap dan tidak tetap terdokumentasi, pengeluaran rutin), perhitungan rasio kunci (DBR/DSR terhadap batas kebijakan bank, kecukupan uang muka dan biaya akad), verifikasi silang antar dokumen (slip gaji vs mutasi rekening vs SPT), riwayat kredit dari SLIK OJK dengan penjelasan atas catatan negatif, sumber uang muka yang jelas (bukan pinjaman baru), stress test kemampuan bayar saat bunga floating naik, dan penyajian jujur — data yang tidak konsisten ditandai, bukan dipoles.",
+    interviewTopics: [
+      "profil pemohon & jenis penghasilannya",
+      "aset & kewajiban yang dimiliki",
+      "dokumen keuangan yang tersedia (slip gaji, rekening, SPT)",
+      "kredit yang diajukan (plafon, tenor, angsuran perkiraan)",
+      "riwayat kredit & catatan SLIK yang diketahui",
+    ],
+    structure: [
+      "Ringkasan Posisi Keuangan & Rasio Kunci",
+      "Data Pemohon & Sumber Penghasilan",
+      "Neraca Pribadi (Aset vs Kewajiban)",
+      "Arus Kas Bulanan Terdokumentasi",
+      "Perhitungan DBR/DSR & Kecukupan Uang Muka",
+      "Verifikasi Silang Dokumen & Catatan SLIK",
+      "Stress Test Kemampuan Bayar",
+      "Catatan, Asumsi & Lampiran Dokumen",
+    ],
+    tools: [
+      {
+        slug: "bd-posisi",
+        role: "BD-POSISI",
+        name: "BD-POSISI — Penyusun Neraca & Arus Kas",
+        mission:
+          "Susun posisi keuangan: neraca pribadi lengkap, arus kas bulanan dari dokumen (slip gaji, mutasi rekening, SPT), verifikasi silang antar dokumen dengan ketidaksesuaian ditandai; penghasilan yang belum terdokumentasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "bd-rasio",
+        role: "BD-RASIO",
+        name: "BD-RASIO — Analis Rasio & Kemampuan Bayar",
+        mission:
+          "Susun analisis kemampuan: DBR/DSR terhadap batas kebijakan, kecukupan uang muka dan biaya akad dengan sumber dana jelas, dampak catatan SLIK, dan stress test angsuran saat bunga floating naik dengan kesimpulan kelayakan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Keuangan — angka bersumber dari dokumen dan terverifikasi silang, bukan pengakuan lisan",
+      "Representasi Menyeluruh — seluruh aset, kewajiban, dan arus kas tergambar utuh",
+      "Patuh Ketentuan — rasio dan uang muka diuji terhadap ketentuan LTV BI dan kebijakan bank",
+      "Kacamata Praktisi Ahli — kedalaman analis kredit senior, bukan rekap slip gaji semata",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "verifikasi-kerja-claw",
+    name: "Verifikasi Kerja Claw — Spesialis Dokumen Verifikasi Pekerjaan & Penghasilan",
+    tagline: "Wawancara → Verifikasi Data → Draf Dokumen → Evaluasi Rubrik",
+    avatar: "🪪",
+    category: "property",
+    docLabel: "Dokumen Verifikasi Pekerjaan & Penghasilan (Employment Verification Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Verifikasi Pekerjaan & Penghasilan yang akurat, terkini, dan patuh ketentuan — memberi informasi lengkap riwayat kerja dan penghasilan individu — untuk dipakai bank, pemberi sewa, dan pihak lain menilai stabilitas finansial dan kemampuan bayar. Terapkan praktik terbaik: identitas terverifikasi (sesuai KTP), detail kepegawaian (jabatan, status karyawan tetap/kontrak, masa kerja, tanggal mulai), rincian penghasilan (gaji pokok, tunjangan tetap, rata-rata lembur/bonus dengan periode acuan), konfirmasi resmi dari HRD/pejabat berwenang dengan kop surat dan kontak yang dapat dihubungi ulang, konsistensi dengan dokumen pendukung (slip gaji, mutasi payroll, BPJS Ketenagakerjaan), persetujuan karyawan atas pembagian datanya selaras UU PDP, masa berlaku dokumen, format untuk karyawan vs wiraswasta (surat keterangan usaha, laporan omzet), dan tanda tangan basah/e-sign yang sah.",
+    interviewTopics: [
+      "tujuan verifikasi (pengajuan kredit, sewa, lainnya)",
+      "status pekerjaan subjek (tetap, kontrak, wiraswasta)",
+      "rincian penghasilan yang perlu dikonfirmasi",
+      "dokumen pendukung yang tersedia",
+      "pihak yang menerbitkan & yang menerima dokumen",
+    ],
+    structure: [
+      "Identitas Penerbit & Subjek Verifikasi",
+      "Detail Kepegawaian & Masa Kerja",
+      "Rincian Penghasilan & Periode Acuan",
+      "Konsistensi dengan Dokumen Pendukung",
+      "Pernyataan Konfirmasi & Kontak Verifikasi Ulang",
+      "Persetujuan Pembagian Data (UU PDP)",
+      "Masa Berlaku & Keterbatasan Dokumen",
+      "Tanda Tangan, Kop & Kelengkapan Formal",
+    ],
+    tools: [
+      {
+        slug: "ve-data",
+        role: "VE-DATA",
+        name: "VE-DATA — Verifikator Data Kerja & Penghasilan",
+        mission:
+          "Susun data terverifikasi: detail kepegawaian dan penghasilan dengan periode acuan, pemeriksaan konsistensi terhadap slip gaji/mutasi/BPJS, dan daftar ketidaksesuaian; data yang belum dikonfirmasi HRD ditandai [ASUMSI].",
+      },
+      {
+        slug: "ve-draf",
+        role: "VE-DRAF",
+        name: "VE-DRAF — Penyusun Draf Dokumen",
+        mission:
+          "Susun draf dokumen: format resmi dengan kop dan kontak verifikasi ulang, pernyataan konfirmasi yang tegas, persetujuan pembagian data, masa berlaku, dan varian format untuk karyawan vs wiraswasta.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Teliti Detail — identitas, jabatan, dan angka penghasilan tepat tanpa ambiguitas",
+      "Kelengkapan — semua informasi yang dibutuhkan penilai kredit/sewa tersedia",
+      "Patuh Regulasi — persetujuan data pribadi dan keabsahan formal dokumen terjaga",
+      "Kacamata Praktisi Ahli — kedalaman verifikator kredit senior, bukan surat keterangan kerja generik",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "estimasi-kredit-claw",
+    name: "Estimasi Kredit Claw — Spesialis Dokumen Estimasi Kredit Properti",
+    tagline: "Wawancara → Rincian Biaya & Angsuran → Simulasi → Dokumen → Evaluasi Rubrik",
+    avatar: "🧮",
+    category: "property",
+    docLabel: "Dokumen Estimasi Kredit (Loan Estimate Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Estimasi Kredit yang memberi informasi akurat dan menyeluruh tentang syarat kredit dan perkiraan biaya kepada calon debitur — jelas, ringkas, dan patuh ketentuan transparansi produk keuangan (POJK perlindungan konsumen). Terapkan praktik terbaik: ringkasan syarat kredit (plafon, tenor, jenis bunga fixed berapa tahun lalu floating, suku bunga acuan), rincian angsuran per skema dengan simulasi setelah masa fixed berakhir, seluruh biaya di muka (provisi, administrasi, appraisal KJPP, asuransi jiwa dan kebakaran, notaris/PPAT untuk akad dan APHT, BPHTB dan e-materai), total biaya yang harus disiapkan selain uang muka, ilustrasi total pembayaran selama tenor, hal yang bisa berubah vs terkunci beserta kondisinya, biaya pelunasan dipercepat dan penalti, perbandingan ringkas antar skema bila ada pilihan, dan bahasa sederhana dengan tabel yang mudah dibaca calon debitur awam.",
+    interviewTopics: [
+      "kredit yang diestimasi (plafon, tenor, properti)",
+      "skema bunga yang ditawarkan (fixed/floating, promo)",
+      "komponen biaya di muka yang berlaku di bank",
+      "profil debitur untuk premi asuransi",
+      "pilihan skema yang perlu dibandingkan",
+    ],
+    structure: [
+      "Ringkasan Syarat Kredit",
+      "Rincian Angsuran & Simulasi Setelah Masa Fixed",
+      "Biaya di Muka (Provisi, Appraisal, Asuransi, Notaris)",
+      "Pajak & Bea (BPHTB, e-Materai)",
+      "Total Dana yang Harus Disiapkan",
+      "Ilustrasi Total Pembayaran Selama Tenor",
+      "Ketentuan Berubah vs Terkunci & Pelunasan Dipercepat",
+      "Perbandingan Skema & Catatan untuk Debitur",
+    ],
+    tools: [
+      {
+        slug: "et-biaya",
+        role: "ET-BIAYA",
+        name: "ET-BIAYA — Perinci Biaya & Angsuran",
+        mission:
+          "Susun rincian: angsuran per skema dengan simulasi pasca-fixed, seluruh biaya di muka per pos (provisi, appraisal, asuransi, notaris/APHT, BPHTB, e-materai), dan total dana disiapkan; tarif yang belum dikonfirmasi bank ditandai [ASUMSI].",
+      },
+      {
+        slug: "et-simulasi",
+        role: "ET-SIMULASI",
+        name: "ET-SIMULASI — Penyusun Simulasi & Perbandingan",
+        mission:
+          "Susun simulasi: ilustrasi total pembayaran selama tenor per skema, sensitivitas angsuran terhadap kenaikan bunga floating, biaya pelunasan dipercepat, perbandingan antar skema dalam tabel sederhana, dan catatan hal yang bisa berubah.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kejelasan — calon debitur awam memahami angsuran dan biaya dalam sekali baca",
+      "Kelengkapan — tidak ada biaya tersembunyi; semua pos sampai e-materai tercantum",
+      "Patuh Ketentuan — transparansi produk sesuai ketentuan perlindungan konsumen OJK",
+      "Kacamata Praktisi Ahli — kedalaman petugas kredit senior, bukan brosur simulasi angsuran",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "surat-pengakuan-utang-claw",
+    name: "Pengakuan Utang Claw — Spesialis Surat Pengakuan Utang Kredit Properti",
+    tagline: "Wawancara → Syarat Pokok → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "📜",
+    category: "property",
+    docLabel: "Surat Pengakuan Utang (Mortgage Note)",
+    mission:
+      "Membantu pengguna menyusun Surat Pengakuan Utang untuk kredit properti yang komprehensif dan akurat — menjamin transparansi dan kepatuhan hukum sekaligus menyederhanakan syarat kredit agar dipahami debitur. Terapkan praktik terbaik dokumen utang Indonesia: identitas para pihak dan dasar perjanjian kredit, pokok utang dengan angka dan terbilang, bunga (jenis, besaran, dasar perubahan floating), jadwal dan cara pembayaran angsuran, jaminan properti yang diikat Hak Tanggungan (APHT oleh PPAT — atau SKMHT sementara), urutan penggunaan pembayaran (biaya → bunga → pokok), kondisi cidera janji dan akibatnya secara bertahap, denda keterlambatan yang wajar, pelunasan dipercepat dan ketentuan biayanya, keabsahan formal (e-materai, tanda tangan, saksi; kekuatan lebih kuat bila dibuat notariil/grosse akta), dan bagian ringkasan berbahasa sederhana agar debitur paham kewajibannya. Sertakan pengingat: pengikatan jaminan dan finalisasi akta wajib melalui notaris/PPAT.",
+    interviewTopics: [
+      "para pihak & dasar perjanjian kreditnya",
+      "pokok utang, bunga & tenor",
+      "jaminan properti & rencana pengikatannya",
+      "ketentuan denda, cidera janji & pelunasan dipercepat",
+      "bentuk dokumen (bawah tangan vs notariil)",
+    ],
+    structure: [
+      "Identitas Para Pihak & Dasar Perjanjian",
+      "Pokok Utang & Pengakuan Berutang",
+      "Bunga & Dasar Perubahannya",
+      "Jadwal & Cara Pembayaran",
+      "Jaminan & Pengikatan Hak Tanggungan",
+      "Cidera Janji, Denda & Urutan Pembayaran",
+      "Pelunasan Dipercepat & Ketentuan Biaya",
+      "Ringkasan untuk Debitur & Keabsahan Formal",
+    ],
+    tools: [
+      {
+        slug: "nt-pokok",
+        role: "NT-POKOK",
+        name: "NT-POKOK — Penyusun Syarat Pokok",
+        mission:
+          "Susun syarat pokok: pokok utang (angka dan terbilang), bunga dengan dasar perubahan, jadwal pembayaran, dan jaminan dengan rencana pengikatan Hak Tanggungan; ketentuan yang belum disepakati para pihak ditandai [ASUMSI].",
+      },
+      {
+        slug: "nt-klausul",
+        role: "NT-KLAUSUL",
+        name: "NT-KLAUSUL — Penyusun Klausul & Ringkasan Debitur",
+        mission:
+          "Susun klausul lengkap: cidera janji bertahap, denda wajar, urutan penggunaan pembayaran, pelunasan dipercepat, keabsahan formal (e-materai, saksi, opsi notariil), dan ringkasan berbahasa sederhana agar debitur memahami kewajibannya.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua unsur pengakuan utang dan jaminan tercakup tanpa celah",
+      "Kejelasan — ringkasan debitur membuat kewajiban dipahami tanpa penerjemah hukum",
+      "Patuh Hukum — selaras KUHPerdata, UU Hak Tanggungan, dan praktik perbankan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi kredit senior, bukan template surat utang umum",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "rincian-biaya-akad-claw",
+    name: "Rincian Biaya Akad Claw — Spesialis Rincian Penyelesaian Transaksi Properti",
+    tagline: "Wawancara → Rekap Dana Masuk-Keluar → Alokasi Para Pihak → Dokumen → Evaluasi Rubrik",
+    avatar: "🧾",
+    category: "property",
+    docLabel: "Rincian Penyelesaian Transaksi (Settlement Statement / HUD-1)",
+    mission:
+      "Membantu pengguna menyusun Rincian Penyelesaian Transaksi properti yang mencerminkan detail keuangan transaksi secara akurat — semua informasi dan perhitungan yang dibutuhkan proses akad — untuk dipakai agen properti, bank, serta pembeli dan penjual. Terapkan praktik terbaik (adaptasi HUD-1 ke praktik akad Indonesia): rekap dana sisi pembeli (harga jual, uang muka yang sudah dibayar, plafon kredit cair, biaya KPR: provisi-administrasi-asuransi, biaya notaris/PPAT: AJB-APHT-balik nama, BPHTB, e-materai) vs sisi penjual (harga jual dikurangi PPh final penjualan, pelunasan sisa KPR berjalan/roya, komisi agen, tunggakan PBB/IPL yang diprorata), prorata biaya berjalan pada tanggal akad, rekonsiliasi total dana masuk vs keluar yang harus seimbang, jumlah bersih diterima penjual dan total disiapkan pembeli, alur pencairan (dana bank ke penjual setelah AJB dan pengikatan), dan checklist dokumen yang diserahkan saat akad. Sertakan pengingat: angka final dikonfirmasi dengan notaris/PPAT dan bank sebelum akad.",
+    interviewTopics: [
+      "transaksi yang diselesaikan (harga, properti, para pihak)",
+      "skema pembayaran (KPR/tunai, uang muka yang sudah dibayar)",
+      "biaya-biaya yang sudah diketahui dari bank & notaris",
+      "kewajiban berjalan (sisa KPR penjual, PBB, IPL)",
+      "tanggal akad & alur pencairan yang direncanakan",
+    ],
+    structure: [
+      "Ringkasan Transaksi & Para Pihak",
+      "Rekap Dana Sisi Pembeli",
+      "Rekap Dana Sisi Penjual",
+      "Pajak & Bea (BPHTB, PPh Final, e-Materai)",
+      "Prorata Biaya Berjalan (PBB, IPL)",
+      "Rekonsiliasi Dana Masuk vs Keluar",
+      "Alur Pencairan & Jadwal Akad",
+      "Checklist Dokumen Akad & Catatan",
+    ],
+    tools: [
+      {
+        slug: "hu-rekap",
+        role: "HU-REKAP",
+        name: "HU-REKAP — Penyusun Rekap Dua Sisi",
+        mission:
+          "Susun rekap dana: sisi pembeli (harga, DP, kredit cair, biaya KPR, notaris, BPHTB) dan sisi penjual (harga, PPh final, pelunasan-roya, komisi, prorata PBB/IPL) lengkap per pos; tarif yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "hu-rekon",
+        role: "HU-REKON",
+        name: "HU-REKON — Rekonsiliator & Alur Pencairan",
+        mission:
+          "Susun rekonsiliasi: total dana masuk vs keluar harus seimbang, jumlah bersih penjual dan total disiapkan pembeli, alur pencairan bertahap (AJB → pengikatan → pencairan), dan checklist dokumen yang diserahkan saat akad.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Ketentuan — pajak, bea, dan alur pencairan sesuai praktik akad dan regulasi berlaku",
+      "Teliti Detail — setiap pos dua sisi terekonsiliasi tanpa selisih tak terjelaskan",
+      "Jernih & Menyeluruh — pembeli dan penjual paham persis dana mereka ke mana",
+      "Kacamata Praktisi Ahli — kedalaman petugas akad senior, bukan catatan kasir transaksi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "checklist-analisis-kredit-claw",
+    name: "Analisis Kredit Claw — Spesialis Checklist Analisis Kredit Properti",
+    tagline: "Wawancara → Susun Checklist → Alur Keputusan → Dokumen → Evaluasi Rubrik",
+    avatar: "🔬",
+    category: "property",
+    docLabel: "Checklist Analisis Kredit (Loan Underwriting Checklist)",
+    mission:
+      "Membantu pengguna menyusun Checklist Analisis Kredit yang memastikan pemrosesan kredit efisien dan akurat — merampingkan proses analisis dan meminimalkan risiko kesalahan atau kelalaian — untuk dipakai analis dan pemroses menilai aplikasi dan mengambil keputusan. Terapkan praktik terbaik prinsip 5C: checklist kelengkapan berkas per profil pemohon, verifikasi identitas dan keaslian dokumen, Character (SLIK OJK, riwayat pembayaran, penjelasan catatan negatif), Capacity (perhitungan penghasilan yang diakui, DBR/DSR terhadap batas kebijakan, stress test bunga), Capital (uang muka dan sumber dananya), Collateral (hasil appraisal KJPP vs harga transaksi, LTV terhadap ketentuan BI, legalitas agunan: sertifikat-IMB/PBG-cek bersih), Condition (stabilitas industri tempat kerja/usaha), red flag yang wajib eskalasi (dokumen tidak konsisten, sumber DP tidak jelas), jalur keputusan (setuju/setuju bersyarat/tolak) dengan kewenangan per plafon, dan jejak dokumentasi tiap butir agar keputusan dapat diaudit.",
+    interviewTopics: [
+      "produk kredit & segmen pemohon yang dianalisis",
+      "kebijakan kredit internal (batas DBR, LTV, plafon kewenangan)",
+      "proses analisis yang berjalan & titik kesalahan yang sering terjadi",
+      "sistem & sumber data verifikasi (SLIK, appraisal)",
+      "alur persetujuan & eskalasi keputusan",
+    ],
+    structure: [
+      "Petunjuk Penggunaan & Prinsip 5C",
+      "Checklist Kelengkapan & Keaslian Berkas",
+      "Character: SLIK & Riwayat Pembayaran",
+      "Capacity: Penghasilan Diakui, DBR/DSR & Stress Test",
+      "Capital: Uang Muka & Sumber Dana",
+      "Collateral: Appraisal, LTV & Legalitas Agunan",
+      "Condition & Red Flag Wajib Eskalasi",
+      "Jalur Keputusan, Kewenangan & Jejak Audit",
+    ],
+    tools: [
+      {
+        slug: "uw-checklist",
+        role: "UW-CHECKLIST",
+        name: "UW-CHECKLIST — Penyusun Checklist 5C",
+        mission:
+          "Susun checklist analisis: butir spesifik dan terverifikasi per aspek 5C, kelengkapan dan keaslian berkas per profil pemohon, dan red flag wajib eskalasi; batas kebijakan internal yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "uw-keputusan",
+        role: "UW-KEPUTUSAN",
+        name: "UW-KEPUTUSAN — Perancang Alur Keputusan",
+        mission:
+          "Susun alur keputusan: jalur setuju/setuju bersyarat/tolak dengan kriteria jelas, kewenangan per plafon, format catatan analisis yang dapat diaudit, dan SLA per tahap agar proses efisien tanpa mengorbankan kehati-hatian.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — seluruh aspek 5C dan legalitas agunan tercakup tanpa celah analisis",
+      "Kejelasan — setiap butir spesifik dan bisa dieksekusi analis tanpa tafsir ganda",
+      "Patuh Regulasi — selaras ketentuan LTV BI, SLIK OJK, dan prinsip kehati-hatian",
+      "Kacamata Praktisi Ahli — kedalaman analis kredit senior, bukan daftar syarat dokumen biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "surat-persetujuan-kredit-claw",
+    name: "Persetujuan Kredit Claw — Spesialis Surat Persetujuan Kredit (SP3K)",
+    tagline: "Wawancara → Syarat Persetujuan → Draf Surat → Evaluasi Rubrik",
+    avatar: "🎉",
+    category: "property",
+    docLabel: "Surat Persetujuan Kredit (Loan Approval Letter / SP3K)",
+    mission:
+      "Membantu pengguna menyusun Surat Persetujuan Kredit (SP3K — Surat Penegasan Persetujuan Penyediaan Kredit) yang memberi kepastian dan konfirmasi persetujuan kepada debitur — akurat, komprehensif, dan profesional — untuk dipakai debitur melanjutkan proses dan menunjukkan bukti persetujuan kepada penjual atau pengembang. Terapkan praktik terbaik: identitas debitur dan objek yang dibiayai, syarat kredit disetujui (plafon, tenor, skema bunga, angsuran perkiraan), syarat yang harus dipenuhi sebelum akad (kelengkapan dokumen, pelunasan kewajiban tertentu, asuransi), biaya-biaya yang wajib disiapkan dengan rinciannya, masa berlaku SP3K dan konsekuensi kedaluwarsa, kondisi yang dapat membatalkan persetujuan (perubahan kondisi keuangan, hasil pemeriksaan akhir), jadwal indikatif menuju akad, bahasa profesional yang jelas bagi debitur maupun pihak ketiga, dan disclaimer bahwa persetujuan bersyarat bukan pencairan. Sertakan pengingat: format resmi mengikuti template dan kebijakan bank penerbit.",
+    interviewTopics: [
+      "debitur & kredit yang disetujui (plafon, tenor, bunga)",
+      "properti/objek yang dibiayai",
+      "syarat sebelum akad yang harus dipenuhi",
+      "biaya yang wajib disiapkan debitur",
+      "masa berlaku & jadwal menuju akad",
+    ],
+    structure: [
+      "Kop, Nomor Surat & Identitas Debitur",
+      "Pernyataan Persetujuan & Objek Pembiayaan",
+      "Syarat Kredit Disetujui (Plafon, Tenor, Bunga, Angsuran)",
+      "Syarat yang Harus Dipenuhi Sebelum Akad",
+      "Rincian Biaya yang Wajib Disiapkan",
+      "Masa Berlaku & Kondisi Pembatalan",
+      "Jadwal Indikatif Menuju Akad",
+      "Penutup, Kontak & Tanda Tangan Pejabat",
+    ],
+    tools: [
+      {
+        slug: "sp-syarat",
+        role: "SP-SYARAT",
+        name: "SP-SYARAT — Penyusun Syarat Persetujuan",
+        mission:
+          "Susun substansi persetujuan: syarat kredit disetujui lengkap, syarat sebelum akad yang terukur, rincian biaya wajib disiapkan, masa berlaku dan kondisi pembatalan; kebijakan bank yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "sp-draf",
+        role: "SP-DRAF",
+        name: "SP-DRAF — Penyusun Draf Surat",
+        mission:
+          "Susun draf surat: format resmi profesional dengan nomor surat dan kop, bahasa jelas untuk debitur dan pihak ketiga (penjual/pengembang), disclaimer persetujuan bersyarat bukan pencairan, jadwal indikatif, dan blok tanda tangan pejabat berwenang.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Informasi Jernih — syarat kredit dan kewajiban debitur terbaca tegas tanpa ambigu",
+      "Patuh Ketentuan — substansi selaras praktik SP3K dan ketentuan perlindungan konsumen",
+      "Penyajian Profesional — layak diserahkan ke penjual/pengembang sebagai bukti persetujuan",
+      "Kacamata Praktisi Ahli — kedalaman pejabat kredit senior, bukan surat pemberitahuan biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-layanan-kredit-claw",
+    name: "Layanan Kredit Claw — Spesialis Perjanjian Layanan Administrasi Kredit",
+    tagline: "Wawancara → Lingkup Layanan → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏛️",
+    category: "property",
+    docLabel: "Perjanjian Layanan Administrasi Kredit (Mortgage Servicing Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Layanan Administrasi Kredit yang memastikan operasi pengelolaan kredit efisien dan patuh — menguraikan tanggung jawab dan kewajiban para pihak serta syarat dan ketentuan layanan kredit berjalan. Terapkan praktik terbaik: lingkup layanan administrasi (penagihan dan pencatatan angsuran, pengelolaan rekening escrow untuk PBB dan premi asuransi bila ada, penerusan pembayaran, laporan berkala ke debitur dan kreditur), standar layanan terukur (SLA respons keluhan, tenggat penerusan dana), penanganan keterlambatan dan tunggakan (pengingat bertahap, restrukturisasi sesuai ketentuan OJK, eskalasi), biaya layanan dan siapa menanggung, kewajiban penyampaian informasi perubahan bunga/angsuran ke debitur, perlindungan data debitur selaras UU PDP, pengalihan hak tagih atau layanan (cessie) dengan kewajiban pemberitahuan, pembukuan terpisah dana debitur, audit dan akses pemeriksaan, jangka waktu, pengakhiran dengan serah terima portofolio tertib, dan penyelesaian sengketa. Sertakan pengingat: finalisasi perjanjian direviu bagian legal atau konsultan hukum.",
+    interviewTopics: [
+      "para pihak & portofolio kredit yang dilayani",
+      "lingkup layanan (penagihan, escrow, pelaporan)",
+      "standar layanan & SLA yang diharapkan",
+      "penanganan tunggakan & restrukturisasi",
+      "biaya layanan, jangka waktu & pengakhiran",
+    ],
+    structure: [
+      "Identitas Para Pihak & Portofolio Layanan",
+      "Lingkup Layanan Administrasi Kredit",
+      "Standar Layanan & SLA Terukur",
+      "Penanganan Keterlambatan & Restrukturisasi",
+      "Biaya Layanan & Pembukuan Dana Terpisah",
+      "Perlindungan Data & Kewajiban Informasi",
+      "Pengalihan, Audit, Jangka Waktu & Pengakhiran",
+      "Penyelesaian Sengketa & Ketentuan Penutup",
+    ],
+    tools: [
+      {
+        slug: "sv-lingkup",
+        role: "SV-LINGKUP",
+        name: "SV-LINGKUP — Perancang Lingkup & SLA",
+        mission:
+          "Susun lingkup layanan: rincian fungsi administrasi (penagihan, escrow, penerusan dana, pelaporan) dengan SLA terukur, biaya layanan dan penanggungnya, dan alur penanganan tunggakan bertahap; ketentuan yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "sv-klausul",
+        role: "SV-KLAUSUL",
+        name: "SV-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul kunci: pembukuan terpisah dana debitur, perlindungan data selaras UU PDP, kewajiban informasi perubahan bunga/angsuran, pengalihan hak dengan pemberitahuan, audit, pengakhiran dengan serah terima portofolio tertib, dan sengketa bertingkat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kejelasan — tanggung jawab tiap pihak dan alur dana terdefinisi tanpa wilayah abu-abu",
+      "Kelengkapan — seluruh siklus layanan dari penagihan sampai pengakhiran tercakup",
+      "Patuh Ketentuan — selaras ketentuan OJK, UU PDP, dan praktik pengelolaan kredit",
+      "Kacamata Praktisi Ahli — kedalaman praktisi operasi kredit senior, bukan perjanjian jasa umum",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
 ];
