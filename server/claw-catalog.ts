@@ -4826,4 +4826,567 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
+
+  // ── Batch 10 (property-manager, property) ───────────────────────────────────
+  {
+    kind: "openclaw",
+    slug: "aplikasi-penyewa-claw",
+    name: "Aplikasi Penyewa Claw — Spesialis Formulir Aplikasi Penyewa",
+    tagline: "Wawancara → Rancang Formulir → Alur Proses → Dokumen → Evaluasi Rubrik",
+    avatar: "📝",
+    category: "property",
+    docLabel: "Formulir Aplikasi Penyewa (Tenant Application)",
+    mission:
+      "Membantu pengguna menyusun Formulir Aplikasi Penyewa yang ramah pengguna dan komprehensif — merampingkan proses lamaran sewa bagi calon penyewa sekaligus mempercepat evaluasi oleh tim pengelola properti. Terapkan praktik terbaik: struktur formulir logis (data diri, pekerjaan & penghasilan, riwayat sewa, referensi, penghuni & kendaraan, hewan peliharaan), dokumen pendukung proporsional (KTP/KK, slip gaji atau bukti penghasilan, NPWP bila perlu), pernyataan persetujuan verifikasi dan pemrosesan data pribadi selaras UU PDP, kriteria penyaringan yang objektif dan konsisten (rasio penghasilan terhadap sewa, riwayat pembayaran), alur proses dari terima aplikasi → verifikasi → keputusan dengan SLA jelas, bahasa formulir sederhana tanpa jargon, dan lembar penilaian internal agar keputusan antar-aplikasi konsisten dan terdokumentasi.",
+    interviewTopics: [
+      "jenis properti yang disewakan (rumah, apartemen, ruko, kos)",
+      "profil target penyewa & syarat minimum",
+      "dokumen pendukung yang diwajibkan",
+      "alur evaluasi & siapa pengambil keputusan",
+      "kebijakan khusus (hewan, jumlah penghuni, sub-sewa)",
+    ],
+    structure: [
+      "Petunjuk Pengisian untuk Calon Penyewa",
+      "Data Diri & Kontak Darurat",
+      "Pekerjaan & Penghasilan",
+      "Riwayat Sewa & Referensi",
+      "Penghuni, Kendaraan & Hewan Peliharaan",
+      "Dokumen Pendukung & Checklist Kelengkapan",
+      "Pernyataan Persetujuan & Verifikasi Data",
+      "Lembar Penilaian Internal & Alur Keputusan",
+    ],
+    tools: [
+      {
+        slug: "ta-form",
+        role: "TA-FORM",
+        name: "TA-FORM — Perancang Formulir",
+        mission:
+          "Susun formulir aplikasi: bagian-bagian lengkap dengan bahasa sederhana, dokumen pendukung proporsional per jenis properti, pernyataan persetujuan pemrosesan data selaras UU PDP; kebijakan pemilik yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ta-proses",
+        role: "TA-PROSES",
+        name: "TA-PROSES — Perancang Alur Evaluasi",
+        mission:
+          "Susun alur proses: kriteria penyaringan objektif (rasio penghasilan-sewa, riwayat pembayaran, referensi), lembar penilaian internal berbobot, tahapan verifikasi dengan SLA, dan template komunikasi keputusan (diterima/ditolak/perlu dokumen tambahan).",
+      },
+    ],
+    evaluatorCriteria: [
+      "Ramah Pengguna — formulir mudah diisi calon penyewa awam tanpa kebingungan",
+      "Informasi Komprehensif — semua data yang dibutuhkan evaluasi tercakup tanpa berlebihan",
+      "Proses Ramping — alur dari aplikasi sampai keputusan jelas, cepat, dan konsisten",
+      "Kacamata Praktisi Ahli — kedalaman pengelola properti senior, bukan formulir biodata biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-penagihan-sewa-claw",
+    name: "Penagihan Sewa Claw — Spesialis Laporan Penagihan Sewa",
+    tagline: "Wawancara → Rekap Pembayaran → Analisis Tunggakan → Dokumen → Evaluasi Rubrik",
+    avatar: "🧾",
+    category: "property",
+    docLabel: "Laporan Penagihan Sewa (Rent Collection Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Penagihan Sewa yang melacak dan mendokumentasikan pembayaran sewa secara akurat — memberi gambaran jelas aktivitas penagihan dan mengidentifikasi tunggakan atau keterlambatan — untuk dipakai tim pengelola menjaga penagihan tepat waktu dan catatan keuangan rapi. Terapkan praktik terbaik: rekap per unit/penyewa (jatuh tempo, tanggal bayar, jumlah, metode, denda keterlambatan sesuai kontrak), status kategori jelas (lunas, terlambat, menunggak, cicilan), aging tunggakan (1–30, 31–60, >60 hari), tingkat kolektibilitas bulanan dan trennya, rekonsiliasi dengan rekening penerimaan, catatan tindak lanjut per tunggakan (pengingat, somasi bertahap sesuai kontrak), proyeksi penerimaan bulan berikutnya, dan ringkasan eksekutif untuk pemilik properti termasuk potongan PPh final sewa bila dikelola.",
+    interviewTopics: [
+      "portofolio unit & penyewa yang dilaporkan",
+      "ketentuan sewa (jatuh tempo, denda, metode bayar)",
+      "data pembayaran periode berjalan",
+      "tunggakan yang ada & riwayat tindak lanjutnya",
+      "format pelaporan ke pemilik & periode laporan",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Tingkat Kolektibilitas",
+      "Rekap Pembayaran per Unit/Penyewa",
+      "Status Kategori & Aging Tunggakan",
+      "Denda Keterlambatan & Rekonsiliasi Penerimaan",
+      "Analisis Tren Kolektibilitas",
+      "Tindak Lanjut Tunggakan & Eskalasi",
+      "Proyeksi Penerimaan Periode Berikutnya",
+      "Catatan, Asumsi & Lampiran Detail",
+    ],
+    tools: [
+      {
+        slug: "rc-rekap",
+        role: "RC-REKAP",
+        name: "RC-REKAP — Penyusun Rekap & Aging",
+        mission:
+          "Susun rekap penagihan: tabel per unit/penyewa (jatuh tempo, bayar, jumlah, metode, denda), status kategori, aging tunggakan 1–30/31–60/>60 hari, dan rekonsiliasi penerimaan; data pembayaran yang belum terkonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "rc-analisis",
+        role: "RC-ANALISIS",
+        name: "RC-ANALISIS — Analis Kolektibilitas & Tindak Lanjut",
+        mission:
+          "Susun analisis: tingkat kolektibilitas dan tren, akar masalah tunggakan berulang, rencana tindak lanjut bertahap per tunggakan (pengingat → surat peringatan → somasi sesuai kontrak), dan proyeksi penerimaan periode berikutnya.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Informasi Jernih — status setiap unit terbaca sekilas dengan kategori dan aging yang tegas",
+      "Data Menyeluruh — semua pembayaran, denda, dan tunggakan terekam dan terekonsiliasi",
+      "Wawasan Analitis — tren kolektibilitas dan akar masalah tunggakan teranalisis dengan tindak lanjut",
+      "Kacamata Praktisi Ahli — kedalaman pengelola keuangan properti senior, bukan tabel setoran biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "checklist-inspeksi-properti-claw",
+    name: "Inspeksi Properti Claw — Spesialis Checklist Inspeksi Properti",
+    tagline: "Wawancara → Susun Checklist → Prosedur & Temuan → Dokumen → Evaluasi Rubrik",
+    avatar: "✅",
+    category: "property",
+    docLabel: "Checklist Inspeksi Properti (Property Inspection Checklist)",
+    mission:
+      "Membantu pengguna menyusun Checklist Inspeksi Properti yang memastikan pemeriksaan menyeluruh dan efisien — merampingkan proses inspeksi, mengidentifikasi kebutuhan perbaikan/pemeliharaan, dan menjaga kepatuhan pada regulasi dan standar (SLF, proteksi kebakaran, instalasi listrik PUIL). Terapkan praktik terbaik: checklist terorganisir per area (eksterior, atap & talang, struktur, interior per ruangan, MEP, sanitasi, keamanan & proteksi kebakaran, area bersama untuk apartemen/IPL), item spesifik yang dapat diverifikasi (bukan 'cek kondisi' generik), skala kondisi konsisten (baik/perlu perhatian/rusak) dengan kolom foto bukti, frekuensi inspeksi per jenis (rutin bulanan, musiman pra-hujan, pra-sewa, insidental), estimasi prioritas tindak lanjut per temuan, format ringkas yang bisa dipakai di lapangan, dan rekap temuan yang otomatis menjadi daftar kerja pemeliharaan.",
+    interviewTopics: [
+      "jenis properti & area yang diinspeksi",
+      "tujuan inspeksi (rutin, pra-sewa, serah terima, kepatuhan)",
+      "sistem terpasang (listrik, air, AC, lift, proteksi kebakaran)",
+      "masalah berulang yang selama ini ditemukan",
+      "frekuensi inspeksi & siapa pelaksananya",
+    ],
+    structure: [
+      "Petunjuk Penggunaan & Skala Kondisi",
+      "Checklist Eksterior, Atap & Struktur",
+      "Checklist Interior per Ruangan",
+      "Checklist MEP & Sanitasi",
+      "Checklist Keamanan & Proteksi Kebakaran",
+      "Checklist Area Bersama (bila ada)",
+      "Rekap Temuan & Prioritas Tindak Lanjut",
+      "Jadwal Frekuensi Inspeksi & Penanggung Jawab",
+    ],
+    tools: [
+      {
+        slug: "pi-checklist",
+        role: "PI-CHECKLIST",
+        name: "PI-CHECKLIST — Penyusun Checklist per Area",
+        mission:
+          "Susun checklist: item spesifik dan terverifikasi per area (eksterior, interior, MEP, keamanan, area bersama), skala kondisi konsisten dengan kolom foto, disesuaikan jenis properti; item yang butuh ahli spesialis ditandai [ASUMSI].",
+      },
+      {
+        slug: "pi-tindak",
+        role: "PI-TINDAK",
+        name: "PI-TINDAK — Perancang Prosedur & Tindak Lanjut",
+        mission:
+          "Susun prosedur: jadwal frekuensi inspeksi per jenis (rutin, musiman, pra-sewa), alur dari temuan → prioritas → daftar kerja pemeliharaan, format rekap temuan untuk pemilik, dan keterkaitan dengan kepatuhan (SLF, proteksi kebakaran).",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua area dan sistem penting tercakup tanpa celah pemeriksaan",
+      "Terorganisir — urutan checklist logis mengikuti alur jalan inspeksi di lapangan",
+      "Kejelasan — setiap item spesifik, terverifikasi, dan bisa diisi petugas non-teknis",
+      "Kacamata Praktisi Ahli — kedalaman pengelola gedung senior, bukan daftar 'cek kondisi' generik",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "surat-pengembalian-deposit-claw",
+    name: "Pengembalian Deposit Claw — Spesialis Surat Pengembalian Deposit",
+    tagline: "Wawancara → Rincian Potongan → Draf Surat → Dokumen → Evaluasi Rubrik",
+    avatar: "💌",
+    category: "property",
+    docLabel: "Surat Pengembalian Deposit (Security Deposit Refund Letter)",
+    mission:
+      "Membantu pengguna menyusun Surat Pengembalian Deposit yang memastikan proses transparan dan mulus bagi penyewa maupun pemilik — menjelaskan alasan setiap potongan dan rincian jumlah yang dikembalikan. Terapkan praktik terbaik: dasar potongan mengacu klausul kontrak sewa dan berita acara serah terima (move-out checklist), pembedaan tegas kerusakan akibat penyewa vs keausan wajar (wear and tear) yang tidak boleh dipotong, rincian potongan per item dengan bukti (foto, kuitansi perbaikan, tagihan utilitas tertunggak), perhitungan jelas (deposit awal − total potongan = jumlah dikembalikan), metode dan batas waktu pengembalian sesuai kontrak, nada profesional yang menjaga hubungan baik, langkah bila penyewa keberatan (musyawarah dulu sesuai kontrak), dan lampiran bukti lengkap agar meminimalkan sengketa.",
+    interviewTopics: [
+      "kontrak sewa & klausul deposit yang berlaku",
+      "hasil pemeriksaan saat serah terima keluar",
+      "potongan yang akan dikenakan & buktinya",
+      "tunggakan sewa/utilitas yang belum lunas",
+      "metode & batas waktu pengembalian",
+    ],
+    structure: [
+      "Identitas Para Pihak & Referensi Kontrak",
+      "Ringkasan Deposit & Jumlah Dikembalikan",
+      "Hasil Pemeriksaan Serah Terima Keluar",
+      "Rincian Potongan per Item dengan Dasar Kontrak",
+      "Pembedaan Kerusakan vs Keausan Wajar",
+      "Perhitungan Akhir & Metode Pengembalian",
+      "Prosedur Bila Ada Keberatan",
+      "Lampiran Bukti (Foto, Kuitansi, Berita Acara)",
+    ],
+    tools: [
+      {
+        slug: "sd-potongan",
+        role: "SD-POTONGAN",
+        name: "SD-POTONGAN — Analis Potongan & Bukti",
+        mission:
+          "Susun rincian potongan: item per item dengan dasar klausul kontrak dan bukti (foto, kuitansi), pembedaan kerusakan penyewa vs keausan wajar, tunggakan yang ikut diperhitungkan, dan perhitungan akhir; biaya perbaikan yang masih estimasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "sd-surat",
+        role: "SD-SURAT",
+        name: "SD-SURAT — Penyusun Draf Surat",
+        mission:
+          "Susun draf surat: nada profesional dan menjaga hubungan baik, struktur jelas dari ringkasan sampai rincian, metode dan batas waktu pengembalian, prosedur keberatan, dan daftar lampiran bukti yang menyertai surat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi — perhitungan deposit, potongan, dan jumlah kembali benar dan konsisten dengan bukti",
+      "Kejelasan — alasan setiap potongan dipahami penyewa tanpa penjelasan tambahan",
+      "Transparansi — semua potongan berdasar kontrak dengan bukti terlampir, keausan wajar tidak dipotong",
+      "Kacamata Praktisi Ahli — kedalaman pengelola properti senior yang meminimalkan sengketa, bukan surat tagihan sepihak",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kontrak-pengelolaan-properti-claw",
+    name: "Kontrak Pengelolaan Claw — Spesialis Kontrak Pengelolaan Properti",
+    tagline: "Wawancara → Lingkup & Fee → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🤝",
+    category: "property",
+    docLabel: "Kontrak Pengelolaan Properti (Property Management Contract)",
+    mission:
+      "Membantu pengguna menyusun Kontrak Pengelolaan Properti yang komprehensif — menetapkan hubungan profesional yang jelas antara pemilik dan pengelola dengan hak-kewajiban, lingkup jasa, dan imbalan yang tegas. Terapkan praktik terbaik kontrak Indonesia (syarat sah Pasal 1320 KUHPerdata): identitas para pihak dan objek kelolaan, lingkup jasa terperinci (pemasaran unit, seleksi penyewa, penagihan, pemeliharaan, pelaporan keuangan berkala), struktur imbalan jelas (persentase dari sewa terkumpul vs fee tetap, biaya yang dapat ditagihkan kembali), batas wewenang pengelola (plafon pengeluaran tanpa persetujuan, tanda tangan kontrak sewa), kewajiban rekening terpisah untuk dana pemilik, standar pelaporan dan frekuensinya, tanggung jawab pajak (PPh final sewa milik pemilik), asuransi dan pembagian risiko, jangka waktu, pengakhiran dan serah terima kelolaan, serta penyelesaian sengketa bertingkat. Sertakan pengingat: finalisasi kontrak sebaiknya direviu konsultan hukum atau notaris.",
+    interviewTopics: [
+      "properti yang dikelola & para pihak",
+      "lingkup jasa yang disepakati",
+      "struktur imbalan & biaya yang bisa ditagihkan kembali",
+      "batas wewenang pengelola & pelaporan",
+      "jangka waktu, pengakhiran & penyelesaian sengketa",
+    ],
+    structure: [
+      "Identitas Para Pihak & Objek Kelolaan",
+      "Lingkup Jasa Pengelolaan Terperinci",
+      "Imbalan, Biaya & Mekanisme Pembayaran",
+      "Wewenang, Batasan & Rekening Terpisah",
+      "Pelaporan, Pajak & Asuransi",
+      "Jangka Waktu, Perpanjangan & Pengakhiran",
+      "Wanprestasi & Penyelesaian Sengketa",
+      "Ketentuan Penutup & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "pg-lingkup",
+        role: "PG-LINGKUP",
+        name: "PG-LINGKUP — Perancang Lingkup & Imbalan",
+        mission:
+          "Susun lingkup dan imbalan: rincian jasa per fungsi (pemasaran, seleksi, penagihan, pemeliharaan, pelaporan), struktur fee dengan basis perhitungan jelas, biaya yang dapat ditagihkan kembali, dan batas wewenang dengan plafon; angka yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "pg-klausul",
+        role: "PG-KLAUSUL",
+        name: "PG-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul kunci: rekening terpisah dana pemilik, standar pelaporan, tanggung jawab pajak dan asuransi, wanprestasi dan pengakhiran dengan serah terima kelolaan yang tertib, dan penyelesaian sengketa bertingkat (musyawarah → mediasi → pengadilan/arbitrase).",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua aspek hubungan pemilik-pengelola tercakup tanpa celah abu-abu",
+      "Kejelasan Kewajiban — hak, kewajiban, dan batas wewenang tiap pihak tegas dan terukur",
+      "Perlindungan Seimbang — klausul melindungi dana pemilik sekaligus adil bagi pengelola",
+      "Kacamata Praktisi Ahli — kedalaman praktisi kontrak pengelolaan senior, bukan template perjanjian umum",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "prakiraan-anggaran-properti-claw",
+    name: "Anggaran Properti Claw — Spesialis Prakiraan Anggaran Properti",
+    tagline: "Wawancara → Proyeksi Pendapatan-Biaya → Skenario → Dokumen → Evaluasi Rubrik",
+    avatar: "📊",
+    category: "property",
+    docLabel: "Dokumen Prakiraan Anggaran (Budget Forecast Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Prakiraan Anggaran properti yang komprehensif dan analitis — memproyeksikan pendapatan dan biaya operasional untuk perencanaan keuangan pengelolaan. Terapkan praktik terbaik: proyeksi pendapatan berbasis data (sewa kontrak berjalan, asumsi perpanjangan dan kenaikan, kekosongan realistis, pendapatan lain seperti parkir/service charge), biaya operasional per pos dengan basis historis (pemeliharaan rutin, utilitas area bersama, kebersihan-keamanan, PBB, asuransi, honor pengelola), pemisahan biaya operasional vs belanja modal (capex) dengan rencana penggantian komponen besar, cadangan pemeliharaan (replacement reserve) yang memadai, penyusunan bulanan dengan pola musiman, skenario dasar-optimis-pesimis, indikator kinerja (rasio biaya operasional terhadap pendapatan, NOI), dan mekanisme monitoring realisasi vs anggaran dengan ambang varians.",
+    interviewTopics: [
+      "properti & portofolio yang dianggarkan",
+      "data historis pendapatan & biaya",
+      "kontrak sewa berjalan & rencana penyesuaian tarif",
+      "rencana perbaikan besar / penggantian komponen",
+      "periode anggaran & format pelaporan pemilik",
+    ],
+    structure: [
+      "Ringkasan Anggaran & Indikator Kunci",
+      "Asumsi Dasar & Sumber Data",
+      "Proyeksi Pendapatan per Sumber",
+      "Proyeksi Biaya Operasional per Pos",
+      "Belanja Modal & Cadangan Pemeliharaan",
+      "Anggaran Bulanan & Pola Musiman",
+      "Skenario Dasar–Optimis–Pesimis",
+      "Monitoring Realisasi & Ambang Varians",
+    ],
+    tools: [
+      {
+        slug: "bf-proyeksi",
+        role: "BF-PROYEKSI",
+        name: "BF-PROYEKSI — Penyusun Proyeksi Pendapatan-Biaya",
+        mission:
+          "Susun proyeksi: pendapatan per sumber dengan asumsi kekosongan dan kenaikan realistis, biaya operasional per pos berbasis historis, pemisahan opex vs capex, dan cadangan pemeliharaan; asumsi tanpa data historis ditandai [ASUMSI].",
+      },
+      {
+        slug: "bf-skenario",
+        role: "BF-SKENARIO",
+        name: "BF-SKENARIO — Analis Skenario & Monitoring",
+        mission:
+          "Susun analisis: anggaran bulanan dengan pola musiman, skenario dasar-optimis-pesimis dengan pemicu masing-masing, indikator kinerja (NOI, rasio biaya), dan mekanisme monitoring realisasi vs anggaran dengan ambang varians dan tindakan korektif.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua sumber pendapatan dan pos biaya termasuk capex dan cadangan tercakup",
+      "Ketelitian Analitis — proyeksi berbasis data historis dengan asumsi yang dapat dipertanggungjawabkan",
+      "Komunikasi Jernih — anggaran mudah dipahami pemilik dan siap dipakai monitoring bulanan",
+      "Kacamata Praktisi Ahli — kedalaman pengelola keuangan properti senior, bukan tabel perkiraan kasar",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "checklist-serah-terima-unit-claw",
+    name: "Serah Terima Unit Claw — Spesialis Checklist Serah Terima Masuk-Keluar",
+    tagline: "Wawancara → Checklist per Ruangan → Prosedur & Bukti → Dokumen → Evaluasi Rubrik",
+    avatar: "🔑",
+    category: "property",
+    docLabel: "Checklist Serah Terima Masuk-Keluar (Move-In/Move-Out Checklist)",
+    mission:
+      "Membantu pengguna menyusun Checklist Serah Terima Masuk-Keluar yang memastikan transisi penyewa berjalan mulus dan kondisi properti terlindungi — komprehensif, terorganisir, dan mudah diikuti staf pengelola maupun penyewa. Terapkan praktik terbaik: checklist kondisi per ruangan dengan item spesifik (dinding, lantai, plafon, pintu-jendela, fixture, perabot bila furnished), pencatatan meteran (listrik, air, gas) saat masuk dan keluar, dokumentasi foto/video bertanggal sebagai bukti kondisi, kolom kondisi masuk vs keluar berdampingan untuk perbandingan langsung, daftar kunci dan akses yang diserahkan, pembedaan kerusakan vs keausan wajar sebagai dasar potongan deposit yang adil, tanda tangan kedua pihak sebagai berita acara, dan keterkaitan langsung dengan proses pengembalian deposit agar sengketa minimal.",
+    interviewTopics: [
+      "jenis unit & kelengkapannya (kosong/semi/full furnished)",
+      "proses serah terima yang berjalan sekarang",
+      "masalah sengketa deposit yang pernah terjadi",
+      "utilitas & akses yang dicatat saat serah terima",
+      "siapa yang mendampingi proses & format dokumentasi",
+    ],
+    structure: [
+      "Petunjuk Penggunaan & Skala Kondisi",
+      "Data Unit, Penyewa & Tanggal Serah Terima",
+      "Checklist Kondisi per Ruangan (Masuk vs Keluar)",
+      "Perabot & Kelengkapan (bila Furnished)",
+      "Pencatatan Meteran & Utilitas",
+      "Daftar Kunci & Akses",
+      "Dokumentasi Foto & Catatan Khusus",
+      "Berita Acara & Tanda Tangan Kedua Pihak",
+    ],
+    tools: [
+      {
+        slug: "mo-ruangan",
+        role: "MO-RUANGAN",
+        name: "MO-RUANGAN — Penyusun Checklist Kondisi",
+        mission:
+          "Susun checklist kondisi: item spesifik per ruangan dengan kolom masuk vs keluar berdampingan, kelengkapan perabot bila furnished, pencatatan meteran dan kunci; kelengkapan unit yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "mo-prosedur",
+        role: "MO-PROSEDUR",
+        name: "MO-PROSEDUR — Perancang Prosedur & Bukti",
+        mission:
+          "Susun prosedur serah terima: urutan langkah masuk dan keluar, standar dokumentasi foto bertanggal, pembedaan kerusakan vs keausan wajar, format berita acara dengan tanda tangan, dan keterkaitan hasil checklist ke perhitungan pengembalian deposit.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua ruangan, kelengkapan, meteran, dan akses tercatat tanpa celah",
+      "Terorganisir — format masuk vs keluar berdampingan memudahkan perbandingan langsung",
+      "Kejelasan — checklist bisa diikuti staf dan penyewa tanpa pelatihan khusus",
+      "Kacamata Praktisi Ahli — kedalaman pengelola properti senior yang mencegah sengketa deposit, bukan daftar barang biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "rencana-pemasaran-properti-claw",
+    name: "Pemasaran Properti Claw — Spesialis Rencana Pemasaran Properti",
+    tagline: "Wawancara → Riset Pasar → Strategi Kanal → Dokumen → Evaluasi Rubrik",
+    avatar: "📣",
+    category: "property",
+    docLabel: "Rencana Pemasaran Properti (Property Marketing Plan)",
+    mission:
+      "Membantu pengguna menyusun Rencana Pemasaran Properti yang efektif mempromosikan properti dan menarik calon pembeli atau penyewa — komprehensif dan terancang baik dengan strategi iklan, penonjolan keunggulan properti, dan penjangkauan audiens target. Terapkan praktik terbaik: riset pasar lokal (harga pasaran koridor, pesaing aktif, profil pencari di area), segmentasi audiens target dengan persona jelas, positioning dan unique selling points properti (lokasi, akses, legalitas lengkap, fasilitas), strategi kanal sesuai pasar Indonesia (portal properti seperti listing online, media sosial dan video singkat, WhatsApp Business untuk follow-up, papan/spanduk lokal, jaringan agen dengan skema komisi), materi pemasaran berkualitas (foto profesional, denah, video tur virtual), penetapan harga dan strategi negosiasi, kalender kampanye dengan anggaran per kanal, target metrik (jumlah inquiry, viewing, konversi), dan evaluasi mingguan untuk realokasi anggaran ke kanal terbaik.",
+    interviewTopics: [
+      "properti yang dipasarkan (jenis, lokasi, kondisi, legalitas)",
+      "target pasar (jual/sewa, segmen pembeli/penyewa)",
+      "harga yang diinginkan & pembanding pasar",
+      "anggaran pemasaran & kanal yang pernah dipakai",
+      "tenggat waktu & target closing",
+    ],
+    structure: [
+      "Ringkasan Strategi & Target",
+      "Riset Pasar & Analisis Pesaing",
+      "Segmentasi Audiens & Persona Target",
+      "Positioning & Keunggulan Properti",
+      "Strategi Kanal & Materi Pemasaran",
+      "Harga, Skema Negosiasi & Insentif",
+      "Kalender Kampanye & Anggaran per Kanal",
+      "Target Metrik & Evaluasi Mingguan",
+    ],
+    tools: [
+      {
+        slug: "mm-riset",
+        role: "MM-RISET",
+        name: "MM-RISET — Periset Pasar & Audiens",
+        mission:
+          "Susun riset: harga pasaran koridor dan pesaing aktif, profil pencari properti di area, segmentasi audiens dengan persona, dan positioning serta USP properti; data pasar yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "mm-kanal",
+        role: "MM-KANAL",
+        name: "MM-KANAL — Perancang Kanal & Kampanye",
+        mission:
+          "Susun strategi eksekusi: pemilihan kanal sesuai segmen (portal listing, media sosial, WhatsApp, agen, spanduk lokal), spesifikasi materi pemasaran, kalender kampanye dengan anggaran per kanal, target metrik, dan mekanisme evaluasi-realokasi mingguan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Pasar — harga, pesaing, dan profil audiens dianalisis dengan data lokal",
+      "Strategi Inovatif — kombinasi kanal kreatif dan tepat sasaran untuk segmen target",
+      "Komunikasi Keunggulan — USP properti tersampaikan jelas dan menarik di setiap materi",
+      "Kacamata Praktisi Ahli — kedalaman pemasar properti senior, bukan sekadar pasang iklan di satu portal",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "surat-perpanjangan-sewa-claw",
+    name: "Perpanjangan Sewa Claw — Spesialis Surat Penawaran Perpanjangan Sewa",
+    tagline: "Wawancara → Analisis Syarat → Draf Persuasif → Dokumen → Evaluasi Rubrik",
+    avatar: "✉️",
+    category: "property",
+    docLabel: "Surat Penawaran Perpanjangan Sewa (Tenant Renewal Letter)",
+    mission:
+      "Membantu pengguna menyusun Surat Penawaran Perpanjangan Sewa yang mengkomunikasikan syarat dan manfaat perpanjangan secara jelas, ringkas, dan persuasif — dikirim tim pengelola kepada penyewa yang layak diperpanjang. Terapkan praktik terbaik: pengiriman cukup awal sebelum kontrak berakhir (60–90 hari) agar ada waktu negosiasi, apresiasi atas riwayat sewa yang baik, syarat perpanjangan jelas (durasi baru, harga sewa dan dasar penyesuaian yang wajar terhadap pasar, deposit, perubahan ketentuan bila ada), manfaat memperpanjang bagi penyewa (tanpa biaya pindah, prioritas perbaikan, harga lebih baik dari penawaran ke pasar), opsi yang ditawarkan (durasi alternatif bila ada), batas waktu tanggapan dan cara konfirmasi yang mudah, nada hangat namun profesional, dan langkah berikutnya bila penyewa menolak (jadwal pengembalian unit) tanpa nada mengancam.",
+    interviewTopics: [
+      "penyewa & kontrak yang akan berakhir (tanggal, harga sekarang)",
+      "riwayat penyewa (pembayaran, perawatan unit)",
+      "syarat perpanjangan yang ditawarkan (harga baru, durasi)",
+      "dasar penyesuaian harga vs pasar",
+      "batas waktu tanggapan & alur konfirmasi",
+    ],
+    structure: [
+      "Pembuka & Apresiasi Penyewa",
+      "Informasi Kontrak Berjalan & Tanggal Berakhir",
+      "Penawaran Perpanjangan & Syarat Baru",
+      "Dasar Penyesuaian Harga",
+      "Manfaat Memperpanjang bagi Penyewa",
+      "Opsi Durasi & Batas Waktu Tanggapan",
+      "Cara Konfirmasi & Langkah Berikutnya",
+      "Penutup & Kontak Pengelola",
+    ],
+    tools: [
+      {
+        slug: "tn-syarat",
+        role: "TN-SYARAT",
+        name: "TN-SYARAT — Analis Syarat & Penyesuaian",
+        mission:
+          "Susun analisis penawaran: perbandingan harga sekarang vs pasar sebagai dasar penyesuaian wajar, opsi durasi dengan insentif masing-masing, dan perubahan ketentuan yang perlu disorot; harga pasar yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "tn-draf",
+        role: "TN-DRAF",
+        name: "TN-DRAF — Penyusun Draf Surat",
+        mission:
+          "Susun draf surat: nada hangat-profesional dengan apresiasi tulus, syarat jelas tanpa ambigu, manfaat memperpanjang yang persuasif, batas waktu dan cara konfirmasi mudah, dan penutup yang menjaga hubungan baik apa pun keputusan penyewa.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Informasi — tanggal, harga, dan syarat perpanjangan benar dan konsisten dengan kontrak",
+      "Jelas & Ringkas — penyewa memahami penawaran lengkap dalam sekali baca",
+      "Persuasif — manfaat memperpanjang terasa nyata tanpa nada menekan",
+      "Kacamata Praktisi Ahli — kedalaman pengelola yang menjaga retensi penyewa, bukan surat pemberitahuan kenaikan harga",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "log-pemeliharaan-properti-claw",
+    name: "Log Pemeliharaan Claw — Spesialis Log Pemeliharaan Properti",
+    tagline: "Wawancara → Struktur Log → Alur & Jadwal → Dokumen → Evaluasi Rubrik",
+    avatar: "🛠️",
+    category: "property",
+    docLabel: "Log Pemeliharaan Properti (Property Maintenance Log)",
+    mission:
+      "Membantu pengguna menyusun Log Pemeliharaan Properti yang komprehensif dan mudah dipakai — merekam semua pekerjaan pemeliharaan beserta statusnya secara akurat — untuk dipakai pemilik, staf pemeliharaan, dan penyewa memastikan pemeliharaan tepat waktu dan efisien. Terapkan praktik terbaik: format entri baku (tanggal lapor, pelapor, lokasi/unit, deskripsi masalah, kategori, prioritas, penanggung jawab/vendor, biaya, tanggal selesai, status), alur dari laporan penyewa → triase prioritas (darurat/mendesak/rutin) → penugasan → verifikasi selesai → konfirmasi pelapor, jadwal pemeliharaan preventif per komponen (servis AC berkala, kuras toren, pengecekan listrik, pest control) terpisah dari perbaikan reaktif, riwayat per unit/aset untuk melihat masalah berulang, rekap biaya bulanan per kategori untuk anggaran, SLA respons per tingkat prioritas, dan format yang bisa dipakai di lapangan maupun direkap untuk pelaporan pemilik.",
+    interviewTopics: [
+      "properti & jumlah unit yang dikelola",
+      "cara penyewa melaporkan masalah sekarang",
+      "tim/vendor pemeliharaan yang menangani",
+      "komponen yang butuh pemeliharaan preventif berkala",
+      "format pelaporan biaya ke pemilik",
+    ],
+    structure: [
+      "Petunjuk Penggunaan & Kategori Prioritas",
+      "Format Entri Log Baku",
+      "Alur Laporan → Triase → Penugasan → Verifikasi",
+      "Jadwal Pemeliharaan Preventif per Komponen",
+      "Riwayat per Unit & Deteksi Masalah Berulang",
+      "Rekap Biaya Bulanan per Kategori",
+      "SLA Respons per Tingkat Prioritas",
+      "Format Rekap untuk Laporan Pemilik",
+    ],
+    tools: [
+      {
+        slug: "lm-log",
+        role: "LM-LOG",
+        name: "LM-LOG — Perancang Struktur Log",
+        mission:
+          "Susun struktur log: format entri baku lengkap (pelapor, lokasi, kategori, prioritas, vendor, biaya, status), kategori dan tingkat prioritas dengan definisi jelas, dan riwayat per unit; kebutuhan khusus properti yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "lm-alur",
+        role: "LM-ALUR",
+        name: "LM-ALUR — Perancang Alur & Jadwal Preventif",
+        mission:
+          "Susun alur kerja: proses laporan sampai verifikasi selesai dengan SLA per prioritas, jadwal preventif per komponen (AC, toren, listrik, pest control), deteksi masalah berulang, dan rekap biaya bulanan untuk pelaporan pemilik.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Pencatatan Komprehensif — semua pekerjaan terekam dengan status dan biaya yang akurat",
+      "Mudah Dipakai — format sederhana untuk staf lapangan tanpa pelatihan khusus",
+      "Peningkatan Efisiensi — triase, SLA, dan jadwal preventif mengurangi perbaikan darurat",
+      "Kacamata Praktisi Ahli — kedalaman kepala pemeliharaan senior, bukan buku catatan tukang",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kontrak-vendor-claw",
+    name: "Kontrak Vendor Claw — Spesialis Kontrak Vendor Properti",
+    tagline: "Wawancara → Lingkup & SLA → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "📎",
+    category: "property",
+    docLabel: "Kontrak Vendor (Vendor Contract)",
+    mission:
+      "Membantu pengguna menyusun Kontrak Vendor yang komprehensif dan mengikat secara hukum — menetapkan syarat dan ketentuan kerja sama vendor secara jelas — untuk dipakai tim pengelola properti dan bagian legal membakukan proses manajemen vendor yang profesional. Terapkan praktik terbaik kontrak Indonesia (syarat sah Pasal 1320 KUHPerdata): identitas dan legalitas vendor (NIB, NPWP, sertifikasi teknis bila relevan seperti instalasi listrik), lingkup pekerjaan terperinci dengan spesifikasi dan standar mutu, SLA terukur (waktu respons, jadwal, hasil) dengan konsekuensi keterlambatan, harga dan cara pembayaran (termin, retensi bila perlu, kewajiban faktur pajak), K3 dan tanggung jawab atas kerusakan/kecelakaan di lokasi, asuransi vendor, kerahasiaan dan larangan pengalihan tanpa izin, jangka waktu dan evaluasi kinerja berkala sebagai dasar perpanjangan, pengakhiran (termasuk pemutusan karena kinerja buruk), dan penyelesaian sengketa bertingkat. Sertakan pengingat: finalisasi kontrak sebaiknya direviu bagian legal atau konsultan hukum.",
+    interviewTopics: [
+      "jenis jasa vendor (kebersihan, keamanan, AC, lift, lanskap)",
+      "lingkup & standar hasil yang diharapkan",
+      "harga, termin pembayaran & masa kontrak",
+      "SLA & sanksi keterlambatan yang diinginkan",
+      "persyaratan legalitas & asuransi vendor",
+    ],
+    structure: [
+      "Identitas Para Pihak & Legalitas Vendor",
+      "Lingkup Pekerjaan & Spesifikasi Mutu",
+      "SLA, Jadwal & Konsekuensi Keterlambatan",
+      "Harga, Pembayaran & Perpajakan",
+      "K3, Tanggung Jawab & Asuransi",
+      "Kerahasiaan & Larangan Pengalihan",
+      "Jangka Waktu, Evaluasi Kinerja & Pengakhiran",
+      "Penyelesaian Sengketa & Ketentuan Penutup",
+    ],
+    tools: [
+      {
+        slug: "vc-lingkup",
+        role: "VC-LINGKUP",
+        name: "VC-LINGKUP — Perancang Lingkup & SLA",
+        mission:
+          "Susun lingkup dan SLA: rincian pekerjaan dengan spesifikasi dan standar mutu terukur, SLA respons dan jadwal dengan konsekuensi jelas, harga dan termin pembayaran, dan checklist legalitas vendor; standar yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "vc-klausul",
+        role: "VC-KLAUSUL",
+        name: "VC-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul kunci: K3 dan tanggung jawab kerusakan/kecelakaan, asuransi vendor, kerahasiaan, larangan pengalihan tanpa izin, evaluasi kinerja berkala sebagai dasar perpanjangan, pengakhiran karena kinerja buruk, dan penyelesaian sengketa bertingkat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi — syarat, harga, dan SLA terdefinisi benar tanpa klausul saling bertentangan",
+      "Kelengkapan — semua risiko kerja vendor di properti tercakup dengan mitigasi kontraktual",
+      "Standar Profesional — kontrak layak dipakai sebagai template baku manajemen vendor",
+      "Kacamata Praktisi Ahli — kedalaman praktisi pengadaan jasa properti senior, bukan surat perintah kerja sederhana",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
 ];
