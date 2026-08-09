@@ -708,28 +708,53 @@ export default function Store() {
                   </div>
                 )}
 
-                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-xs text-gray-400">Biaya Aktivasi</p>
-                      {detailAgent.licenseClass ? (
-                        <Badge className="bg-violet-100 text-violet-700 border-violet-200 text-[10px] px-1.5 py-0 flex items-center gap-0.5"
-                          data-testid={`badge-detail-kelas-premium-${detailAgent.id}`}>
-                          <Sparkles className="h-2.5 w-2.5" />Kelas Premium {detailAgent.licenseClass}
+                <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
+                  {(detailAgent.isGustafta || detailAgent.isCertified || detailAgent.isCreatorMade) && (
+                    <div className="flex mb-3">
+                      {detailAgent.isGustafta ? (
+                        <Badge className="bg-violet-600 text-white border-violet-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                          data-testid={`badge-beli-gustafta-official-${detailAgent.id}`}
+                          title="Dibuat dan dikurasi langsung oleh tim Gustafta — kualitas terjamin.">
+                          <ShieldCheck className="h-3 w-3" />Gustafta Official
                         </Badge>
-                      ) : null}
+                      ) : detailAgent.isCertified ? (
+                        <Badge className="bg-emerald-600 text-white border-emerald-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                          data-testid={`badge-beli-bersertifikat-${detailAgent.id}`}
+                          title="Kreator telah lulus workshop & sertifikasi Gustafta.">
+                          <ShieldCheck className="h-3 w-3" />Bersertifikat
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-amber-600 text-white border-amber-700 text-xs px-3 py-1 flex items-center gap-1.5"
+                          data-testid={`badge-beli-pra-sertifikasi-${detailAgent.id}`}
+                          title="Dibuat Fasilitator independen — belum melalui sertifikasi Gustafta.">
+                          <ShieldAlert className="h-3 w-3" />Pra-Sertifikasi
+                        </Badge>
+                      )}
                     </div>
-                    {detailAgent.originalPrice && detailAgent.originalPrice > detailAgent.price && (
-                      <p className="text-sm text-gray-400 line-through leading-none mb-0.5">{formatPrice(detailAgent.originalPrice)}</p>
-                    )}
-                    <p className="text-2xl font-bold text-gray-900">{formatPrice(detailAgent.price)}</p>
-                    <p className="text-[11px] text-gray-400 mt-0.5">Sekali bayar · install mandiri</p>
+                  )}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-xs text-gray-400">Biaya Aktivasi</p>
+                        {detailAgent.licenseClass ? (
+                          <Badge className="bg-violet-100 text-violet-700 border-violet-200 text-[10px] px-1.5 py-0 flex items-center gap-0.5"
+                            data-testid={`badge-detail-kelas-premium-${detailAgent.id}`}>
+                            <Sparkles className="h-2.5 w-2.5" />Kelas Premium {detailAgent.licenseClass}
+                          </Badge>
+                        ) : null}
+                      </div>
+                      {detailAgent.originalPrice && detailAgent.originalPrice > detailAgent.price && (
+                        <p className="text-sm text-gray-400 line-through leading-none mb-0.5">{formatPrice(detailAgent.originalPrice)}</p>
+                      )}
+                      <p className="text-2xl font-bold text-gray-900">{formatPrice(detailAgent.price)}</p>
+                      <p className="text-[11px] text-gray-400 mt-0.5">Sekali bayar · install mandiri</p>
+                    </div>
+                    <Button onClick={() => handleBuy(detailAgent)}
+                      className="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6"
+                      data-testid={`button-buy-detail-${detailAgent.id}`}>
+                      <ShoppingCart className="h-4 w-4 mr-2" />Beli Sekarang
+                    </Button>
                   </div>
-                  <Button onClick={() => handleBuy(detailAgent)}
-                    className="bg-violet-600 hover:bg-violet-700 text-white font-semibold px-6"
-                    data-testid={`button-buy-detail-${detailAgent.id}`}>
-                    <ShoppingCart className="h-4 w-4 mr-2" />Beli Sekarang
-                  </Button>
                 </div>
               </div>
             </>
