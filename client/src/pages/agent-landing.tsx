@@ -31,6 +31,7 @@ interface LandingData {
   productFeatures: string[];
   conversionOffers: Array<{ title: string; description: string; value: string }>;
   monthlyPrice: number | null;
+  resolvedPrice?: number | null;
   whatsappCta: string;
   calendlyUrl: string;
   chatUrl: string;
@@ -112,7 +113,9 @@ export default function AgentLanding() {
   const guarantees = Array.isArray(data.landingGuarantees) ? data.landingGuarantees.filter(Boolean) : [];
   const authority = data.landingAuthority || {};
   const offers = Array.isArray(data.conversionOffers) ? data.conversionOffers.filter(Boolean) : [];
-  const price = data.monthlyPrice ? `Rp ${Number(data.monthlyPrice).toLocaleString("id-ID")}` : null;
+  // resolvedPrice: store_products effective price (override → team-tier → fallback to monthlyPrice)
+  const displayPrice = data.resolvedPrice ?? data.monthlyPrice;
+  const price = displayPrice ? `Rp ${Number(displayPrice).toLocaleString("id-ID")}` : null;
 
   // Prefer the store product's payment URL over the generic chat URL when set
   const paymentUrl = data.paymentUrl || "";

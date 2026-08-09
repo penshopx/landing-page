@@ -367,7 +367,8 @@ export default function ProductLanding() {
   const guarantees: string[] = agent.landingGuarantees || [];
   const authority: Authority = agent.landingAuthority || {};
   const faqItems: FaqItem[] = agent.landingFaq || [];
-  const monthlyPrice: number = agent.monthlyPrice || 0;
+  // resolvedPrice: store_products.price_override → agent.monthlyPrice (resolved server-side)
+  const monthlyPrice: number = (agent as any).resolvedPrice ?? agent.monthlyPrice ?? 0;
   // store_products.payment_url takes precedence (already resolved server-side)
   const paymentUrl: string = agent.paymentUrl || "";
 
