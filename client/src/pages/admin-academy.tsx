@@ -175,6 +175,7 @@ function CourseDialog({
     onSuccess: () => {
       toast({ title: isEdit ? "Kursus diperbarui" : "Kursus dibuat" });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
       onSaved();
       onClose();
     },
@@ -1176,6 +1177,7 @@ export default function AdminAcademyPage() {
       toast({ title: msg });
       setSelectedCourseIds(new Set());
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
     },
     onError: (e: any) =>
       toast({ title: "Gagal menonaktifkan", description: e?.message, variant: "destructive" }),
@@ -1192,6 +1194,7 @@ export default function AdminAcademyPage() {
       toast({ title: msg });
       setSelectedCourseIds(new Set());
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
     },
     onError: (e: any) =>
       toast({ title: "Gagal mengaktifkan", description: e?.message, variant: "destructive" }),
@@ -1281,6 +1284,7 @@ export default function AdminAcademyPage() {
     onSuccess: () => {
       toast({ title: "Kursus dihapus" });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
       setDeleteCourse(null);
       setForceDeleteConfirm(false);
     },
@@ -1294,6 +1298,7 @@ export default function AdminAcademyPage() {
     onSuccess: () => {
       toast({ title: "Kursus dinonaktifkan", description: "Data siswa tetap aman." });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
       setDeleteCourse(null);
     },
     onError: (e: any) =>
