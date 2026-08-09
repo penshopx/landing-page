@@ -8,6 +8,8 @@ description: How to seed an orchestrator agent that must appear in the Store and
 To make a seeded orchestrator both a native claw AND a product that shows in the Store and sells hands-off:
 
 - **Store visibility fields**: the product must be `isPublic=true`, `isListed=true`, `isActive=true`. The Store query filters on `isListed=true` — if it's false the product never appears.
+- **createAgent drops `isPublic` too** (not just isListed/premiumClass) — the post-create `updateAgent` must set all three: `{ isPublic: true, isListed: true, premiumClass: "private" }`.
+- **Catalog lists only bundles (2+ components)**: `1 + max(agenticSubAgents.length, childCount) >= 2` — a single agent never appears; give every sellable claw at least one alat-bantu sub-agent.
 - **Zero-setup selling** rides the existing Premium-Private path: set `premiumClass='private'` so purchase triggers clone-per-buyer + Scalev webhook. The cloned orchestrator references the SAME shared sub-agent (division) rows, so the buyer needs no configuration. This works at runtime because sub-agent dispatch (`callAgentInternal`) does a direct `storage.getAgent()` with NO owner/visibility check — a private buyer clone can still call `isPublic:false` shared divisions.
 - **Pricing**: `licenseClass` (premium band K1–K4) forces `licensePrice` to the band via the storage backstop; `monthlyPrice` is separate (hosting/token). Set `category` for Store grouping.
 

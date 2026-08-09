@@ -177,6 +177,6 @@ export async function seedStudiKelayakanClaw() {
   } as any);
   // createAgent mengabaikan isListed/premiumClass — set eksplisit agar tampil di
   // Store (isListed) & memakai jalur clone-per-pembeli (premiumClass: private).
-  await storage.updateAgent(String(orch.id), { isListed: true, premiumClass: "private" } as any);
+  await storage.updateAgent(String(orch.id), { isPublic: true, isListed: true, premiumClass: "private" } as any);
   console.log(`[Seed StudiKelayakanClaw] Created Orchestrator (ID ${orch.id}) — listed & sellable (Premium K2).`);
 }
