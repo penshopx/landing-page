@@ -329,3 +329,90 @@ test(
     );
   }
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEST 7: auto-connect dengan ID campuran (valid + tidak ada) → 207 Multi-Status
+//         Response harus membedakan wired vs. skipped IDs secara eksplisit.
+// ─────────────────────────────────────────────────────────────────────────────
+test(
+  "hub-audit HTTP: auto-connect ID campuran (valid + tidak ada) → 207 + skipped list",
+  { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
+  async () => {
+    // Gunakan 1 ID valid (kandidat pertama) dan 2 ID palsu yang pasti tidak ada.
+    const FAKE_ID_1 = 999_999_991;
+    const FAKE_ID_2 = 999_999_992;
+    const mixedIds = [candidateIds[0], FAKE_ID_1, FAKE_ID_2];
+
+    const { status, json } = await req(
+      "POST",
+      `/api/admin/hub-audit/${hubAgentId}/auto-connect`,
+      { user: adminId, body: { candidateIds: mixedIds } }
+    );
+
+    // Harus 207 Multi-Status karena ada sebagian ID yang tidak ditemukan.
+    assert.equal(
+      status, 207,
+      `auto-connect ID campuran harus 207, dapat ${status}: ${JSON.stringify(json)}`
+    );
+    assert.ok(json.ok === true, "Response harus { ok: true }");
+
+    // agenticSubAgents hanya berisi 1 agen valid.
+    assert.ok(
+      Array.isArray(json.agenticSubAgents) && json.agenticSubAgents.length === 1,
+      `agenticSubAgents harus berisi 1 entri (hanya yang valid), dapat: ${JSON.stringify(json.agenticSubAgents)}`
+    );
+    assert.equal(
+      json.agenticSubAgents[0].agentId,
+      candidateIds[0],
+      `agenticSubAgents harus berisi kandidat valid (id=${candidateIds[0]})`
+    );
+
+    // skipped harus berisi kedua ID palsu.
+    assert.ok(
+      Array.isArray(json.skipped),
+      `Response harus memiliki field 'skipped' berupa array, dapat: ${JSON.stringify(json.skipped)}`
+    );
+    const skippedSorted = [...json.skipped].sort((a: number, b: number) => a - b);
+    assert.deepEqual(
+      skippedSorted,
+      [FAKE_ID_1, FAKE_ID_2],
+      `skipped harus berisi [${FAKE_ID_1}, ${FAKE_ID_2}], dapat: ${JSON.stringify(skippedSorted)}`
+    );
+
+    // warning harus ada dan menyebut jumlah yang dilewati.
+    assert.ok(
+      typeof json.warning === "string" && json.warning.length > 0,
+      `Response harus memiliki field 'warning' non-kosong, dapat: ${JSON.stringify(json.warning)}`
+    );
+  }
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEST 8: auto-connect dengan semua ID valid → 200 (bukan 207) + skipped kosong
+// ─────────────────────────────────────────────────────────────────────────────
+test(
+  "hub-audit HTTP: auto-connect semua ID valid → 200 + skipped kosong",
+  { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
+  async () => {
+    // Gunakan kembali semua candidateIds (semua valid).
+    const { status, json } = await req(
+      "POST",
+      `/api/admin/hub-audit/${hubAgentId}/auto-connect`,
+      { user: adminId, body: { candidateIds } }
+    );
+    assert.equal(
+      status, 200,
+      `auto-connect semua valid harus 200, dapat ${status}: ${JSON.stringify(json)}`
+    );
+    assert.ok(json.ok === true, "Response harus { ok: true }");
+    assert.deepEqual(
+      json.skipped,
+      [],
+      `skipped harus kosong ketika semua ID valid, dapat: ${JSON.stringify(json.skipped)}`
+    );
+    assert.ok(
+      Array.isArray(json.agenticSubAgents) && json.agenticSubAgents.length === candidateIds.length,
+      `agenticSubAgents harus berisi ${candidateIds.length} entri`
+    );
+  }
+);

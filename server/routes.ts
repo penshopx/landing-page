@@ -24655,6 +24655,10 @@ POLA KERJA: ELICIT (pahami tahap & niat) → DISPATCH (agen sesuai kebutuhan) �
         .where(inArr(agentsLocalTable.id, candidateIds));
       const candidates = candidateRows as any[];
 
+      // Detect which requested IDs were not found in the DB
+      const foundIds = new Set(candidates.map((c: any) => c.id));
+      const skippedIds = candidateIds.filter((id) => !foundIds.has(id));
+
       // Build agenticSubAgents JSON
       const agenticSubAgents = candidates.map((c: any) => {
         const role = c.name
@@ -24675,7 +24679,17 @@ POLA KERJA: ELICIT (pahami tahap & niat) → DISPATCH (agen sesuai kebutuhan) �
 
       // Wiring changes team size → store price changes → invalidate catalog cache.
       invalidateStoreCatalog();
-      res.json({ ok: true, agenticSubAgents });
+
+      if (skippedIds.length > 0) {
+        // 207 Multi-Status: some IDs were wired, some were not found
+        return res.status(207).json({
+          ok: true,
+          agenticSubAgents,
+          skipped: skippedIds,
+          warning: `${skippedIds.length} candidateId(s) tidak ditemukan di database dan dilewati: [${skippedIds.join(', ')}]`,
+        });
+      }
+      res.json({ ok: true, agenticSubAgents, skipped: [] });
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
 
