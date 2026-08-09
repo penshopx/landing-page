@@ -277,3 +277,55 @@ test(
     );
   }
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEST 5: auto-connect ulang dengan hanya 1 kandidat → 200 + agenticSubAgents
+//         berisi 1 entri (tim diciutkan dari 3 → 1)
+// ─────────────────────────────────────────────────────────────────────────────
+test(
+  "hub-audit HTTP: auto-connect ulang (1 kandidat) → 200 + agenticSubAgents berisi 1 entri",
+  { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
+  async () => {
+    // Panggil ulang auto-connect hanya dengan 1 kandidat pertama.
+    const { status, json } = await req(
+      "POST",
+      `/api/admin/hub-audit/${hubAgentId}/auto-connect`,
+      { user: adminId, body: { candidateIds: [candidateIds[0]] } }
+    );
+    assert.equal(
+      status, 200,
+      `auto-connect ulang harus 200, dapat ${status}: ${JSON.stringify(json)}`
+    );
+    assert.ok(json.ok === true, "Response harus { ok: true }");
+    assert.ok(
+      Array.isArray(json.agenticSubAgents) && json.agenticSubAgents.length === 1,
+      `agenticSubAgents setelah diciutkan harus berisi 1 entri, dapat: ${JSON.stringify(json.agenticSubAgents)}`
+    );
+    assert.equal(
+      json.agenticSubAgents[0].agentId,
+      candidateIds[0],
+      `agenticSubAgents harus berisi kandidat pertama (id=${candidateIds[0]})`
+    );
+  }
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEST 6: GET /api/store/catalog setelah diciutkan menampilkan harga tier 2
+//         1 sub-agen + 1 orkestrator = 2 total → tier 499.000
+// ─────────────────────────────────────────────────────────────────────────────
+test(
+  "hub-audit HTTP: harga katalog setelah diciutkan (1 sub) = tier 499.000",
+  { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
+  async () => {
+    const item = await findCatalogItem(storeProductId);
+    assert.ok(
+      item !== undefined,
+      `Store product id=${storeProductId} tidak ditemukan di katalog setelah diciutkan`
+    );
+    assert.equal(
+      item.price,
+      499_000,
+      `Harga setelah diciutkan (1 sub, total=2) seharusnya 499.000, dapat: ${item.price}`
+    );
+  }
+);
