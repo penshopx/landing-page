@@ -4161,4 +4161,669 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
+
+  // ── Batch 9 (real-estate-appraiser, property) ───────────────────────────────
+  {
+    kind: "openclaw",
+    slug: "pendekatan-biaya-claw",
+    name: "Pendekatan Biaya Claw — Spesialis Analisis Pendekatan Biaya",
+    tagline: "Wawancara → Biaya Pengganti → Penyusutan → Dokumen → Evaluasi Rubrik",
+    avatar: "🧱",
+    category: "property",
+    docLabel: "Dokumen Analisis Pendekatan Biaya (Cost Approach Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Pendekatan Biaya yang menghasilkan indikasi nilai properti akurat — mencakup seluruh faktor biaya relevan — untuk dipakai investor, kreditur, dan pemilik properti mengambil keputusan investasi dan pembiayaan. Terapkan praktik terbaik sesuai KEPI & SPI (standar penilaian KJPP/MAPPI): estimasi nilai tanah sebagai lahan kosong (perbandingan data pasar), pilihan basis biaya (biaya reproduksi vs biaya pengganti baru), rincian biaya langsung (material, upah, sesuai indeks biaya konstruksi/AHSP), biaya tidak langsung (perizinan PBG, IMB lama, perencanaan, bunga masa konstruksi), keuntungan pengembang wajar, tiga jenis penyusutan (fisik, fungsional, eksternal/ekonomis) dengan metode umur efektif–umur ekonomis, dan rekonsiliasi ke indikasi nilai akhir dengan asumsi eksplisit.",
+    interviewTopics: [
+      "properti yang dinilai (jenis bangunan, luas, umur, lokasi)",
+      "data tanah & pembanding lahan kosong yang tersedia",
+      "spesifikasi konstruksi & kualitas bangunan",
+      "kondisi fisik, fungsional, dan lingkungan sekitar",
+      "tujuan penilaian & tanggal penilaian",
+    ],
+    structure: [
+      "Ringkasan Nilai & Basis Penilaian",
+      "Identifikasi Properti & Tujuan Penilaian",
+      "Estimasi Nilai Tanah (Lahan Kosong)",
+      "Estimasi Biaya Pengganti/Reproduksi Baru",
+      "Biaya Tidak Langsung & Keuntungan Pengembang",
+      "Analisis Penyusutan (Fisik, Fungsional, Eksternal)",
+      "Indikasi Nilai Pendekatan Biaya",
+      "Asumsi, Batasan & Lampiran Perhitungan",
+    ],
+    tools: [
+      {
+        slug: "cb-biaya",
+        role: "CB-BIAYA",
+        name: "CB-BIAYA — Estimator Biaya Pengganti",
+        mission:
+          "Susun estimasi biaya: nilai tanah dari data pembanding, biaya pengganti baru per komponen (struktur, arsitektur, MEP) mengacu indeks biaya konstruksi, biaya tidak langsung dan keuntungan pengembang wajar; setiap angka satuan yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "cb-susut",
+        role: "CB-SUSUT",
+        name: "CB-SUSUT — Analis Penyusutan",
+        mission:
+          "Susun analisis penyusutan: penyusutan fisik (umur efektif vs umur ekonomis), keusangan fungsional (desain/layout tak sesuai pasar), keusangan eksternal (faktor lingkungan/ekonomi), total penyusutan, dan indikasi nilai akhir pendekatan biaya dengan jejak perhitungan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Menyeluruh — nilai tanah dan biaya didukung data pembanding dan indeks biaya yang jelas",
+      "Estimasi Biaya Akurat — komponen biaya lengkap, konsisten, dan penyusutan dihitung dengan metode baku",
+      "Penyajian Jernih — alur perhitungan mudah diikuti hingga indikasi nilai akhir",
+      "Kacamata Praktisi Ahli — kedalaman penilai KJPP senior, bukan kalkulator biaya bangunan sederhana",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "pendekatan-perbandingan-pasar-claw",
+    name: "Perbandingan Pasar Claw — Spesialis Analisis Pendekatan Perbandingan Data Pasar",
+    tagline: "Wawancara → Pembanding → Penyesuaian → Dokumen → Evaluasi Rubrik",
+    avatar: "🏘️",
+    category: "property",
+    docLabel: "Dokumen Analisis Perbandingan Data Pasar (Sales Comparison Approach Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Pendekatan Perbandingan Data Pasar yang akurat — perbandingan detail properti sejenis, penyesuaian atas perbedaan, dan estimasi nilai akhir yang terdukung — untuk dipakai agen properti, calon pembeli, dan lembaga keuangan mengambil keputusan transaksi. Terapkan praktik terbaik sesuai KEPI & SPI: seleksi minimal 3–5 data pembanding yang benar-benar sebanding (lokasi, luas, peruntukan zonasi RDTR), verifikasi data transaksi vs penawaran (dengan diskon penawaran wajar), elemen perbandingan baku (hak atas tanah SHM/HGB, syarat pembiayaan, kondisi pasar/waktu, lokasi, fisik), penyesuaian kuantitatif dengan urutan yang benar, grid penyesuaian transparan, analisis bobot berdasarkan penyesuaian terkecil, dan indikasi nilai akhir dengan justifikasi.",
+    interviewTopics: [
+      "properti subjek (alamat, luas tanah/bangunan, legalitas, kondisi)",
+      "data pembanding yang tersedia (transaksi/penawaran, sumber)",
+      "karakter pasar lokal & tren harga terkini",
+      "perbedaan utama subjek vs pembanding",
+      "tujuan penilaian & tanggal penilaian",
+    ],
+    structure: [
+      "Ringkasan Nilai & Metodologi",
+      "Identifikasi Properti Subjek",
+      "Kriteria Seleksi & Verifikasi Data Pembanding",
+      "Deskripsi Data Pembanding (3–5 Properti)",
+      "Grid Penyesuaian & Dasar Setiap Penyesuaian",
+      "Analisis Bobot & Rentang Nilai",
+      "Indikasi Nilai Pendekatan Perbandingan Pasar",
+      "Asumsi, Batasan & Lampiran Data",
+    ],
+    tools: [
+      {
+        slug: "sc-banding",
+        role: "SC-BANDING",
+        name: "SC-BANDING — Kurator Data Pembanding",
+        mission:
+          "Susun kurasi pembanding: kriteria seleksi, profil 3–5 pembanding terverifikasi (transaksi vs penawaran, diskon penawaran), kesebandingan lokasi-fisik-legalitas, dan data yang belum terverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "sc-adjust",
+        role: "SC-ADJUST",
+        name: "SC-ADJUST — Analis Grid Penyesuaian",
+        mission:
+          "Susun grid penyesuaian: elemen perbandingan baku dengan urutan penyesuaian benar, besaran penyesuaian beralasan per elemen, nilai terindikasi per pembanding, bobot berdasarkan penyesuaian terkecil, dan indikasi nilai akhir dengan rentang.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Teliti Detail — grid penyesuaian konsisten, urutan dan arah penyesuaian benar",
+      "Riset Mendalam — pembanding terverifikasi dan benar-benar sebanding dengan subjek",
+      "Komunikasi Jelas — dasar setiap penyesuaian dan pembobotan mudah dipahami pembaca awam",
+      "Kacamata Praktisi Ahli — kedalaman penilai pasar senior, bukan daftar iklan properti sejenis",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "keberatan-pajak-properti-claw",
+    name: "Keberatan Pajak Claw — Spesialis Keberatan Penetapan Pajak Properti",
+    tagline: "Wawancara → Analisis NJOP → Argumen → Dokumen → Evaluasi Rubrik",
+    avatar: "📮",
+    category: "property",
+    docLabel: "Dokumen Keberatan Penetapan Pajak Properti (Property Tax Assessment Appeal)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Keberatan Penetapan Pajak Properti yang komprehensif dan terdukung kuat — untuk diajukan pemilik properti ke otoritas pajak daerah (Bapenda) guna menurunkan penetapan yang terlalu tinggi. Terapkan praktik terbaik: analisis SPPT PBB-P2 dan dasar penetapan NJOP bumi/bangunan, perbandingan NJOP dengan nilai pasar wajar dan NJOP properti sebanding di sekitar, identifikasi kesalahan objek (luas, kelas bumi/bangunan, peruntukan), bukti pendukung (data transaksi, foto kondisi, dokumen legalitas), argumen persuasif yang terstruktur, kepatuhan pada tata cara dan tenggat pengajuan keberatan sesuai peraturan daerah, dan permohonan yang jelas. Sertakan pengingat: dokumen ini alat bantu — tenggat, format resmi, dan strategi akhir dikonfirmasi ke konsultan pajak atau Bapenda setempat.",
+    interviewTopics: [
+      "properti & SPPT yang dikeberatankan (NJOP, luas, kelas)",
+      "alasan keberatan (NJOP vs nilai pasar, kesalahan data objek)",
+      "data pembanding & bukti pendukung yang dimiliki",
+      "riwayat pembayaran & keberatan sebelumnya",
+      "tenggat & aturan keberatan di daerah setempat",
+    ],
+    structure: [
+      "Ringkasan Permohonan Keberatan",
+      "Identitas Wajib Pajak & Objek Pajak",
+      "Penetapan yang Dikeberatankan (SPPT/NJOP)",
+      "Analisis NJOP vs Nilai Pasar Wajar",
+      "Kesalahan Data Objek & Bukti Pendukung",
+      "Argumen Keberatan Terstruktur",
+      "Permohonan & Nilai yang Diusulkan",
+      "Lampiran Bukti & Kelengkapan Administrasi",
+    ],
+    tools: [
+      {
+        slug: "tp-njop",
+        role: "TP-NJOP",
+        name: "TP-NJOP — Analis NJOP & Nilai Pasar",
+        mission:
+          "Susun analisis penetapan: perbandingan NJOP subjek vs nilai pasar wajar dan NJOP properti sebanding, identifikasi kesalahan data objek (luas, kelas, peruntukan), dan selisih yang menjadi dasar keberatan; nilai pasar yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "tp-argumen",
+        role: "TP-ARGUMEN",
+        name: "TP-ARGUMEN — Penyusun Argumen & Kelengkapan",
+        mission:
+          "Susun argumen keberatan: struktur argumen persuasif berbasis bukti, daftar bukti pendukung per argumen, kelengkapan administrasi dan tata cara pengajuan sesuai aturan daerah, dan draf permohonan dengan nilai yang diusulkan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi — perhitungan selisih NJOP vs nilai pasar benar dan berbasis data",
+      "Kelengkapan — semua kesalahan objek dan bukti pendukung teridentifikasi",
+      "Argumentasi Persuasif — argumen tersusun logis, kuat, dan siap diajukan ke otoritas",
+      "Kacamata Praktisi Ahli — kedalaman penilai berpengalaman menangani sengketa PBB, bukan surat komplain umum",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "penilaian-agunan-kpr-claw",
+    name: "Penilaian Agunan Claw — Spesialis Penilaian Properti untuk Kredit",
+    tagline: "Wawancara → Inspeksi & Data → Nilai Agunan → Dokumen → Evaluasi Rubrik",
+    avatar: "🏦",
+    category: "property",
+    docLabel: "Dokumen Penilaian Agunan Kredit (Mortgage Lending Appraisal Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Penilaian Agunan Kredit yang akurat dan komprehensif sesuai standar industri — untuk dipakai bank dan lembaga pembiayaan menentukan jumlah dan syarat kredit. Terapkan praktik terbaik sesuai KEPI & SPI dan ketentuan agunan perbankan: identifikasi lengkap objek dan legalitas (SHM/HGB, PBG/SLF, kesesuaian RDTR), pemeriksaan fisik dan lingkungan, pendekatan penilaian yang sesuai (perbandingan pasar untuk hunian, tambah pendekatan pendapatan untuk komersial), nilai pasar dan nilai likuidasi dengan dasar diskon jelas, analisis marketability agunan, kesesuaian LTV dengan ketentuan Bank Indonesia/OJK, red flag agunan (sengketa, akses jalan, banjir, tusuk sate menurut preferensi pasar), dan ringkasan bankable. Sertakan pengingat: penilaian resmi untuk kredit wajib oleh penilai internal bank atau KJPP rekanan — dokumen ini alat bantu persiapan.",
+    interviewTopics: [
+      "properti agunan (jenis, alamat, luas, legalitas)",
+      "tujuan kredit & lembaga pembiayaan yang dituju",
+      "kondisi fisik & lingkungan properti",
+      "data pembanding & pendapatan properti (jika komersial)",
+      "faktor risiko yang diketahui (sengketa, banjir, akses)",
+    ],
+    structure: [
+      "Ringkasan Nilai Pasar & Nilai Likuidasi",
+      "Identifikasi Objek & Kelengkapan Legalitas",
+      "Pemeriksaan Fisik & Lingkungan",
+      "Analisis Pasar & Pendekatan Penilaian",
+      "Perhitungan Nilai Pasar & Nilai Likuidasi",
+      "Analisis Marketability & Kesesuaian LTV",
+      "Red Flag Agunan & Mitigasi",
+      "Asumsi, Batasan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "mk-objek",
+        role: "MK-OBJEK",
+        name: "MK-OBJEK — Pemeriksa Objek & Legalitas",
+        mission:
+          "Susun profil agunan: identifikasi objek lengkap, checklist legalitas (SHM/HGB, PBG/SLF, RDTR), temuan fisik-lingkungan, red flag agunan dengan tingkat keparahan; kondisi yang belum diverifikasi lapangan ditandai [ASUMSI].",
+      },
+      {
+        slug: "mk-nilai",
+        role: "MK-NILAI",
+        name: "MK-NILAI — Analis Nilai & LTV",
+        mission:
+          "Susun analisis nilai: nilai pasar dengan pendekatan sesuai jenis properti, nilai likuidasi dengan dasar diskon jelas, marketability agunan, simulasi plafon kredit terhadap batas LTV BI/OJK, dan ringkasan bankable untuk analis kredit.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kepatuhan Standar — mengikuti KEPI/SPI dan ketentuan agunan perbankan yang berlaku",
+      "Penilaian Komprehensif — legalitas, fisik, pasar, dan risiko agunan tercakup utuh",
+      "Akurasi Nilai — nilai pasar dan likuidasi dihitung benar dengan dasar yang dapat diaudit",
+      "Kacamata Praktisi Ahli — kedalaman penilai agunan bank senior, bukan taksiran harga rumah kasar",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "pendekatan-pendapatan-claw",
+    name: "Pendekatan Pendapatan Claw — Spesialis Analisis Pendekatan Pendapatan",
+    tagline: "Wawancara → Pendapatan & Biaya → Kapitalisasi → Dokumen → Evaluasi Rubrik",
+    avatar: "💰",
+    category: "property",
+    docLabel: "Dokumen Analisis Pendekatan Pendapatan (Income Approach Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Pendekatan Pendapatan yang komprehensif — menilai potensi pendapatan properti dengan memperhitungkan tarif sewa, tingkat kekosongan, biaya operasional, dan tren pasar — untuk dipakai pemilik, investor, dan lembaga keuangan menilai properti dan peluang investasi. Terapkan praktik terbaik sesuai KEPI & SPI: pendapatan kotor potensial dari sewa pasar (bukan hanya sewa kontrak), pendapatan lain (parkir, iklan, service charge), pengurang kekosongan dan kerugian tagihan berbasis data pasar, biaya operasional dinormalisasi (PBB, asuransi, pemeliharaan, manajemen), NOI yang bersih dari biaya modal dan cicilan, pemilihan metode (kapitalisasi langsung vs DCF untuk arus kas tidak stabil), cap rate dari ekstraksi pasar dengan justifikasi, dan analisis sensitivitas nilai terhadap cap rate dan kekosongan.",
+    interviewTopics: [
+      "properti & sumber pendapatannya (sewa, service charge, lainnya)",
+      "data sewa kontrak berjalan vs sewa pasar",
+      "tingkat kekosongan historis & pasar",
+      "rincian biaya operasional tahunan",
+      "data cap rate / transaksi properti pendapatan sejenis",
+    ],
+    structure: [
+      "Ringkasan Nilai & Metode Terpilih",
+      "Profil Properti & Sumber Pendapatan",
+      "Pendapatan Kotor Potensial & Efektif",
+      "Biaya Operasional Ternormalisasi",
+      "Perhitungan NOI",
+      "Pemilihan & Justifikasi Cap Rate / Tingkat Diskonto",
+      "Indikasi Nilai & Analisis Sensitivitas",
+      "Asumsi, Batasan & Lampiran Perhitungan",
+    ],
+    tools: [
+      {
+        slug: "ic-noi",
+        role: "IC-NOI",
+        name: "IC-NOI — Analis Pendapatan & NOI",
+        mission:
+          "Susun analisis pendapatan: pendapatan kotor potensial (sewa pasar + pendapatan lain), pengurang kekosongan dan kerugian tagihan, biaya operasional ternormalisasi per pos, dan NOI; angka pasar yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "ic-kap",
+        role: "IC-KAP",
+        name: "IC-KAP — Analis Kapitalisasi & Sensitivitas",
+        mission:
+          "Susun analisis nilai: pemilihan metode (kapitalisasi langsung vs DCF) dengan alasan, cap rate/tingkat diskonto dari ekstraksi pasar, indikasi nilai, dan tabel sensitivitas nilai terhadap cap rate serta tingkat kekosongan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — seluruh sumber pendapatan dan pos biaya tercakup dan ternormalisasi",
+      "Kejelasan — alur dari pendapatan kotor hingga indikasi nilai mudah diikuti",
+      "Akurasi Proyeksi — NOI dan kapitalisasi dihitung benar dengan cap rate terjustifikasi",
+      "Kacamata Praktisi Ahli — kedalaman penilai properti komersial senior, bukan kalkulator sewa sederhana",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "valuasi-tanah-claw",
+    name: "Valuasi Tanah Claw — Spesialis Laporan Valuasi Tanah",
+    tagline: "Wawancara → Analisis Lahan → Nilai → Dokumen → Evaluasi Rubrik",
+    avatar: "🏞️",
+    category: "property",
+    docLabel: "Laporan Valuasi Tanah (Land Valuation Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Valuasi Tanah yang menganalisis tren pasar secara menyeluruh, menilai lahan pembanding dengan akurat, dan patuh standar industri — untuk dipakai pemilik, investor, dan pengembang mengambil keputusan atas lahan. Terapkan praktik terbaik sesuai KEPI & SPI: identifikasi legalitas dan batas (SHM/HGB/girik, peta bidang BPN), analisis peruntukan zonasi RDTR dan intensitas (KDB/KLB/KDH) yang menentukan potensi lahan, karakteristik fisik (bentuk, kontur, lebar muka, akses, utilitas, risiko banjir), metode sesuai kondisi (perbandingan data pasar sebagai utama; metode penyisaan tanah/land residual untuk lahan pengembangan), penyesuaian pembanding atas lokasi-luas-legalitas-waktu, analisis tren harga koridor, dan indikasi nilai per meter persegi serta total dengan asumsi eksplisit.",
+    interviewTopics: [
+      "lahan yang dinilai (lokasi, luas, bentuk, legalitas)",
+      "zonasi & intensitas ruang (RDTR, KDB/KLB) yang berlaku",
+      "kondisi fisik & akses (kontur, lebar jalan, utilitas, banjir)",
+      "data pembanding lahan di koridor yang sama",
+      "tujuan penilaian (jual-beli, pengembangan, agunan)",
+    ],
+    structure: [
+      "Ringkasan Nilai & Basis Penilaian",
+      "Identifikasi Lahan & Legalitas",
+      "Analisis Zonasi & Potensi Pemanfaatan",
+      "Karakteristik Fisik & Lingkungan",
+      "Analisis Tren Pasar Koridor",
+      "Data Pembanding & Grid Penyesuaian",
+      "Indikasi Nilai (per m² & Total)",
+      "Asumsi, Batasan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "lv-lahan",
+        role: "LV-LAHAN",
+        name: "LV-LAHAN — Analis Lahan & Zonasi",
+        mission:
+          "Susun profil lahan: legalitas dan batas, peruntukan RDTR dengan intensitas KDB/KLB dan dampaknya ke potensi nilai, karakteristik fisik-akses-utilitas, dan faktor risiko; data zonasi yang belum dikonfirmasi ke dinas tata ruang ditandai [ASUMSI].",
+      },
+      {
+        slug: "lv-nilai",
+        role: "LV-NILAI",
+        name: "LV-NILAI — Analis Pasar & Nilai",
+        mission:
+          "Susun analisis nilai: tren harga koridor, grid penyesuaian pembanding (lokasi, luas, legalitas, waktu), metode penyisaan tanah bila lahan pengembangan, dan indikasi nilai per m² serta total dengan rentang keyakinan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Analisis Tren Mendalam — pergerakan harga koridor dianalisis dengan data, bukan anekdot",
+      "Pembanding Akurat — lahan pembanding sebanding dan penyesuaiannya beralasan",
+      "Patuh Standar — mengikuti KEPI/SPI dan mempertimbangkan aturan tata ruang yang berlaku",
+      "Kacamata Praktisi Ahli — kedalaman penilai tanah senior, bukan cek harga NJOP semata",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "penilaian-kondisi-properti-claw",
+    name: "Kondisi Properti Claw — Spesialis Penilaian Kondisi Properti",
+    tagline: "Wawancara → Inspeksi Sistematis → Temuan & Risiko → Dokumen → Evaluasi Rubrik",
+    avatar: "🧰",
+    category: "property",
+    docLabel: "Laporan Penilaian Kondisi Properti (Property Condition Assessment)",
+    mission:
+      "Membantu pengguna menyusun Laporan Penilaian Kondisi Properti yang mengevaluasi kondisi fisik secara komprehensif — integritas struktur, sistem mekanikal-elektrikal-plambing, dan fungsionalitas keseluruhan — serta mengidentifikasi isu dan risiko potensial, untuk dipakai calon pembeli, investor, dan kreditur mengambil keputusan. Terapkan praktik terbaik: checklist inspeksi sistematis per komponen (pondasi/struktur, atap, dinding, lantai, MEP, sanitasi, proteksi kebakaran mengacu SLF), klasifikasi kondisi per komponen (baik/perlu perbaikan/kritis), indikasi masalah tersembunyi (retak struktur vs non-struktur, rembesan, rayap, instalasi listrik tak standar PUIL), estimasi sisa umur ekonomis komponen utama, prioritas perbaikan dengan estimasi biaya kasar (immediate repairs vs replacement reserves), dan ringkasan risiko untuk negosiasi harga.",
+    interviewTopics: [
+      "properti yang diperiksa (jenis, umur bangunan, riwayat renovasi)",
+      "keluhan atau gejala yang sudah terlihat (retak, bocor, listrik)",
+      "kelengkapan dokumen teknis (as-built drawing, SLF, riwayat pemeliharaan)",
+      "sistem MEP terpasang (listrik, air, AC, lift, proteksi kebakaran)",
+      "tujuan penilaian (pembelian, pembiayaan, pemeliharaan)",
+    ],
+    structure: [
+      "Ringkasan Kondisi & Temuan Kritis",
+      "Identifikasi Properti & Lingkup Inspeksi",
+      "Kondisi Struktur & Selubung Bangunan",
+      "Kondisi Sistem MEP & Sanitasi",
+      "Indikasi Masalah Tersembunyi & Risiko",
+      "Sisa Umur Ekonomis Komponen Utama",
+      "Prioritas Perbaikan & Estimasi Biaya",
+      "Asumsi, Batasan & Lampiran Foto/Checklist",
+    ],
+    tools: [
+      {
+        slug: "kc-inspeksi",
+        role: "KC-INSPEKSI",
+        name: "KC-INSPEKSI — Inspektur Komponen Bangunan",
+        mission:
+          "Susun hasil inspeksi: checklist per komponen (struktur, atap, dinding, MEP, sanitasi, proteksi kebakaran) dengan klasifikasi baik/perlu perbaikan/kritis, indikasi masalah tersembunyi, dan komponen yang tak dapat diperiksa langsung ditandai [ASUMSI].",
+      },
+      {
+        slug: "kc-risiko",
+        role: "KC-RISIKO",
+        name: "KC-RISIKO — Analis Risiko & Biaya Perbaikan",
+        mission:
+          "Susun analisis tindak lanjut: sisa umur ekonomis komponen utama, prioritas perbaikan (segera vs terjadwal), estimasi biaya kasar per item, dampak temuan ke nilai dan negosiasi, dan rekomendasi pemeriksaan lanjutan oleh ahli spesialis bila perlu.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua komponen utama bangunan terperiksa dan terklasifikasi",
+      "Kejelasan — temuan disajikan dengan bahasa yang dipahami pembeli awam",
+      "Keandalan — klasifikasi kondisi dan estimasi biaya konsisten serta dapat dipertanggungjawabkan",
+      "Kacamata Praktisi Ahli — kedalaman inspektur bangunan senior, bukan jalan-jalan lihat rumah biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "valuasi-servitut-claw",
+    name: "Valuasi Servitut Claw — Spesialis Valuasi Hak Servitut/Easement",
+    tagline: "Wawancara → Analisis Hak → Nilai Dampak → Dokumen → Evaluasi Rubrik",
+    avatar: "🛤️",
+    category: "property",
+    docLabel: "Laporan Valuasi Servitut (Easement Valuation Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Valuasi Servitut yang menilai secara akurat nilai suatu hak servitut/easement (hak lintas, jalur utilitas, saluran, akses) di atas sebidang properti — dengan analisis dan justifikasi transparan — untuk dipakai investor, pemilik properti, dan profesional hukum mengambil keputusan transaksi servitut dan pengembangan. Terapkan praktik terbaik: identifikasi jenis dan dasar hukum hak (perjanjian tertulis, akta notaris, itikad jalur utilitas PLN/PGN/telekomunikasi), delineasi area terdampak vs sisa lahan, metode sebelum-sesudah (nilai properti tanpa servitut dikurangi nilai dengan servitut), persentase pengambilan hak berdasarkan intensitas pembebanan (jalur udara vs bawah tanah vs akses permukaan), dampak ke potensi pengembangan (KDB/KLB efektif), kompensasi berkala vs sekaligus, dan sensitivitas nilai. Sertakan pengingat: aspek legalitas hak dikonfirmasi ke notaris/PPAT atau konsultan hukum pertanahan.",
+    interviewTopics: [
+      "properti & servitut yang dinilai (jenis hak, jalur, luas terdampak)",
+      "dasar hukum & dokumen hak yang ada",
+      "pihak pemegang hak & jangka waktu pembebanan",
+      "dampak ke penggunaan & rencana pengembangan lahan",
+      "data nilai pasar lahan di lokasi",
+    ],
+    structure: [
+      "Ringkasan Nilai Servitut",
+      "Identifikasi Properti & Hak yang Dibebankan",
+      "Dasar Hukum & Karakter Pembebanan",
+      "Delineasi Area Terdampak vs Sisa Lahan",
+      "Analisis Sebelum–Sesudah & Intensitas Pembebanan",
+      "Dampak ke Potensi Pengembangan",
+      "Indikasi Nilai & Struktur Kompensasi",
+      "Asumsi, Batasan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "es-hak",
+        role: "ES-HAK",
+        name: "ES-HAK — Analis Hak & Area Terdampak",
+        mission:
+          "Susun profil pembebanan: jenis dan dasar hukum servitut, delineasi area terdampak vs sisa lahan, intensitas pembebanan (udara/bawah tanah/permukaan), jangka waktu, dan dampak ke pemanfaatan; status hukum yang belum diverifikasi notaris ditandai [ASUMSI].",
+      },
+      {
+        slug: "es-nilai",
+        role: "ES-NILAI",
+        name: "ES-NILAI — Analis Nilai Sebelum–Sesudah",
+        mission:
+          "Susun analisis nilai: nilai properti tanpa vs dengan servitut, persentase pengambilan hak beralasan, dampak ke potensi pengembangan, opsi kompensasi berkala vs sekaligus, dan sensitivitas nilai terhadap asumsi kunci.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Menyeluruh — dasar hukum, area terdampak, dan intensitas pembebanan teridentifikasi lengkap",
+      "Akurasi Valuasi — metode sebelum-sesudah diterapkan benar dengan persentase pengambilan beralasan",
+      "Patuh Standar — mengikuti KEPI/SPI dan transparan dalam justifikasi nilai",
+      "Kacamata Praktisi Ahli — kedalaman penilai hak atas tanah senior, bukan taksiran ganti rugi kasar",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "valuasi-hak-sewa-claw",
+    name: "Valuasi Hak Sewa Claw — Spesialis Valuasi Leasehold",
+    tagline: "Wawancara → Analisis Sewa → Nilai Hak → Dokumen → Evaluasi Rubrik",
+    avatar: "📜",
+    category: "property",
+    docLabel: "Laporan Valuasi Hak Sewa (Leasehold Valuation Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Valuasi Hak Sewa (leasehold) yang menilai nilai kepentingan penyewa atau pemilik atas properti yang terikat sewa jangka panjang — dengan riset menyeluruh dan komunikasi jernih — untuk dipakai penyewa, pemilik, dan investor dalam transaksi pengalihan sewa, perpanjangan, atau pembelian. Terapkan praktik terbaik sesuai KEPI & SPI: pemisahan kepentingan (leased fee milik lessor vs leasehold milik lessee), selisih sewa kontrak vs sewa pasar sebagai sumber nilai hak sewa, kapitalisasi/diskonto selisih sewa selama sisa masa sewa dengan tingkat diskonto sesuai risiko, syarat kontrak yang memengaruhi nilai (opsi perpanjangan, eskalasi, sublease, kewajiban pengembalian kondisi), konteks Indonesia (HGB di atas HPL, sewa tanah negara/adat, BOT/BGS), nilai sisa saat masa sewa berakhir, dan sensitivitas nilai terhadap tingkat diskonto dan sewa pasar.",
+    interviewTopics: [
+      "properti & struktur sewanya (pihak, sisa masa sewa, dasar hak)",
+      "sewa kontrak berjalan & jadwal eskalasi",
+      "sewa pasar properti sebanding saat ini",
+      "syarat kontrak penting (perpanjangan, sublease, pengembalian)",
+      "tujuan penilaian (pengalihan, perpanjangan, pelaporan)",
+    ],
+    structure: [
+      "Ringkasan Nilai Hak Sewa",
+      "Identifikasi Properti & Struktur Kepentingan",
+      "Analisis Kontrak Sewa & Syarat Penting",
+      "Sewa Kontrak vs Sewa Pasar",
+      "Kapitalisasi Selisih Sewa & Tingkat Diskonto",
+      "Konteks Hak di Indonesia (HGB/HPL, BOT/BGS)",
+      "Indikasi Nilai & Sensitivitas",
+      "Asumsi, Batasan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "lh-kontrak",
+        role: "LH-KONTRAK",
+        name: "LH-KONTRAK — Analis Kontrak & Selisih Sewa",
+        mission:
+          "Susun analisis sewa: struktur kepentingan leased fee vs leasehold, sewa kontrak dan jadwal eskalasi vs sewa pasar, syarat kontrak yang memengaruhi nilai, dan sisa masa sewa efektif; sewa pasar yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "lh-nilai",
+        role: "LH-NILAI",
+        name: "LH-NILAI — Analis Kapitalisasi Hak Sewa",
+        mission:
+          "Susun analisis nilai: diskonto selisih sewa selama sisa masa sewa dengan tingkat diskonto beralasan, perlakuan nilai sisa akhir masa sewa, dampak opsi perpanjangan, dan tabel sensitivitas nilai terhadap diskonto dan sewa pasar.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Mendalam — kontrak, sewa pasar, dan struktur kepentingan dianalisis tuntas",
+      "Akurasi Valuasi — kapitalisasi selisih sewa dihitung benar dengan diskonto terjustifikasi",
+      "Komunikasi Jernih — konsep leasehold dijelaskan sehingga dipahami pihak non-penilai",
+      "Kacamata Praktisi Ahli — kedalaman penilai kepentingan sewa senior, bukan hitung sisa kontrak sederhana",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-rekonsiliasi-nilai-claw",
+    name: "Rekonsiliasi Nilai Claw — Spesialis Laporan Rekonsiliasi Penilaian",
+    tagline: "Wawancara → Tinjau Indikasi → Pembobotan → Dokumen → Evaluasi Rubrik",
+    avatar: "⚖️",
+    category: "property",
+    docLabel: "Laporan Rekonsiliasi Nilai (Reconciliation Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Rekonsiliasi Nilai yang menganalisis indikasi nilai dari beberapa pendekatan penilaian secara komprehensif dan memastikan akurasi proses — dengan data valuasi, tren pasar, dan penjualan pembanding — untuk dipakai agen, kreditur, dan pemangku kepentingan transaksi. Terapkan praktik terbaik sesuai KEPI & SPI: tinjauan kualitas tiap indikasi nilai (kecukupan data, relevansi metode terhadap jenis properti, konsistensi asumsi), analisis sebab selisih antar pendekatan, pembobotan berbasis keandalan bukan rata-rata mekanis, kesesuaian nilai akhir dengan tujuan penilaian dan definisi nilai, pengecekan silang dengan indikator pasar independen (harga per m² koridor, cap rate pasar), pernyataan keyakinan dan rentang nilai, serta dokumentasi alasan pembobotan yang dapat diaudit.",
+    interviewTopics: [
+      "properti & tujuan penilaian",
+      "pendekatan yang dipakai & indikasi nilai masing-masing",
+      "kualitas data pendukung tiap pendekatan",
+      "selisih antar indikasi & dugaan penyebabnya",
+      "definisi nilai & standar yang diacu",
+    ],
+    structure: [
+      "Ringkasan Nilai Akhir & Rentang",
+      "Identifikasi Properti & Definisi Nilai",
+      "Rekap Indikasi Nilai per Pendekatan",
+      "Tinjauan Kualitas Data & Metode",
+      "Analisis Sebab Selisih Antar Pendekatan",
+      "Pembobotan & Justifikasi",
+      "Pengecekan Silang Indikator Pasar",
+      "Kesimpulan Nilai, Asumsi & Batasan",
+    ],
+    tools: [
+      {
+        slug: "rn-tinjau",
+        role: "RN-TINJAU",
+        name: "RN-TINJAU — Peninjau Kualitas Indikasi",
+        mission:
+          "Susun tinjauan indikasi: kualitas data dan relevansi metode per pendekatan, konsistensi asumsi antar pendekatan, sebab selisih nilai, dan kelemahan tiap indikasi; penilaian kualitas tanpa akses kertas kerja ditandai [ASUMSI].",
+      },
+      {
+        slug: "rn-bobot",
+        role: "RN-BOBOT",
+        name: "RN-BOBOT — Analis Pembobotan & Nilai Akhir",
+        mission:
+          "Susun rekonsiliasi: pembobotan berbasis keandalan dengan alasan eksplisit (bukan rata-rata mekanis), nilai akhir dan rentang, pengecekan silang dengan indikator pasar independen, dan pernyataan keyakinan penilaian.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Teliti Detail — selisih antar pendekatan teranalisis sampai ke akar penyebab",
+      "Riset Mendalam — pengecekan silang memakai indikator pasar independen yang relevan",
+      "Patuh Standar — pembobotan dan nilai akhir sesuai KEPI/SPI serta definisi nilai yang diacu",
+      "Kacamata Praktisi Ahli — kedalaman penilai penanggung jawab senior, bukan rata-rata tiga angka",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-hbu-claw",
+    name: "Analisis HBU Claw — Spesialis Analisis Highest and Best Use",
+    tagline: "Wawancara → Uji 4 Kriteria → Rekomendasi → Dokumen → Evaluasi Rubrik",
+    avatar: "🧭",
+    category: "property",
+    docLabel: "Dokumen Analisis Penggunaan Tertinggi dan Terbaik (Highest and Best Use Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Highest and Best Use (HBU) yang akurat dan komprehensif atas potensi penggunaan sebuah properti — menghasilkan rekomendasi terdukung untuk keputusan investor, pengembang, dan kreditur. Terapkan praktik terbaik sesuai KEPI & SPI: uji empat kriteria berurutan — diizinkan secara hukum (zonasi RDTR, KDB/KLB/KDH, PBG), memungkinkan secara fisik (luas, bentuk, kontur, daya dukung, utilitas), layak secara finansial (analisis pasar permintaan-pasokan per alternatif penggunaan, proyeksi pendapatan-biaya), dan produktivitas maksimal (alternatif dengan nilai residu tanah tertinggi) — analisis HBU as vacant vs as improved, skenario alternatif penggunaan yang realistis dengan land residual per skenario, sensitivitas terhadap asumsi kunci, dan rekomendasi penggunaan dengan tahapan implementasi.",
+    interviewTopics: [
+      "properti yang dianalisis (lokasi, luas, kondisi eksisting)",
+      "zonasi & intensitas ruang yang berlaku (RDTR, KDB/KLB)",
+      "kondisi fisik lahan & infrastruktur sekitar",
+      "dinamika pasar per alternatif penggunaan (hunian, komersial, campuran)",
+      "tujuan analisis & horizon investasi",
+    ],
+    structure: [
+      "Ringkasan Rekomendasi HBU",
+      "Identifikasi Properti & Kondisi Eksisting",
+      "Uji Kriteria 1: Diizinkan Secara Hukum",
+      "Uji Kriteria 2: Memungkinkan Secara Fisik",
+      "Uji Kriteria 3: Layak Secara Finansial per Alternatif",
+      "Uji Kriteria 4: Produktivitas Maksimal (Nilai Residu)",
+      "HBU As Vacant vs As Improved & Sensitivitas",
+      "Rekomendasi, Tahapan Implementasi & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "hb-uji",
+        role: "HB-UJI",
+        name: "HB-UJI — Penguji Hukum & Fisik",
+        mission:
+          "Susun uji kelayakan awal: daftar alternatif penggunaan, uji diizinkan secara hukum (zonasi, intensitas, perizinan) dan memungkinkan secara fisik per alternatif, alternatif yang gugur beserta alasannya; aturan zonasi yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "hb-residu",
+        role: "HB-RESIDU",
+        name: "HB-RESIDU — Analis Kelayakan & Nilai Residu",
+        mission:
+          "Susun analisis finansial: proyeksi pendapatan-biaya per alternatif lolos uji, nilai residu tanah per skenario, peringkat produktivitas maksimal, sensitivitas terhadap asumsi kunci, dan rekomendasi HBU dengan tahapan implementasi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — empat kriteria HBU diuji berurutan atas semua alternatif yang realistis",
+      "Rekomendasi Jelas — penggunaan terpilih tegas dengan tahapan implementasi konkret",
+      "Bukti Pendukung — kesimpulan didukung data pasar dan perhitungan nilai residu",
+      "Kacamata Praktisi Ahli — kedalaman penilai pengembangan senior, bukan opini penggunaan tanpa uji",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "reviu-penilaian-claw",
+    name: "Reviu Penilaian Claw — Spesialis Laporan Reviu Penilaian",
+    tagline: "Wawancara → Telaah Laporan → Temuan → Dokumen → Evaluasi Rubrik",
+    avatar: "🔍",
+    category: "property",
+    docLabel: "Laporan Reviu Penilaian (Appraisal Review Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Reviu Penilaian yang akurat, menyeluruh, dan terorganisir — menelaah laporan penilaian pihak lain — untuk dipakai manajemen senior mengambil keputusan berbasis nilai properti yang andal. Terapkan praktik terbaik sesuai KEPI & SPI (termasuk standar reviu penilaian): pemeriksaan kelengkapan administratif (kompetensi penilai, penugasan, tanggal, definisi nilai), telaah kecukupan dan verifikasi data (pembanding, sumber, tanggal transaksi), kewajaran metode terhadap jenis properti, ketepatan perhitungan (uji ulang matematika grid, kapitalisasi, penyusutan), kewajaran asumsi terhadap kondisi pasar aktual, konsistensi internal laporan, klasifikasi temuan (material vs minor) dengan dampak ke nilai, dan opini reviu (setuju/tidak setuju/perlu revisi) yang dibedakan tegas dari penilaian ulang.",
+    interviewTopics: [
+      "laporan penilaian yang direviu (objek, penilai, tanggal, nilai)",
+      "tujuan reviu (audit internal, kredit, sengketa)",
+      "lingkup reviu (desk review vs field review)",
+      "area yang dicurigai bermasalah (jika ada)",
+      "data pasar independen yang tersedia untuk pembanding",
+    ],
+    structure: [
+      "Ringkasan Opini Reviu",
+      "Identifikasi Laporan yang Direviu & Lingkup",
+      "Telaah Kelengkapan Administratif",
+      "Telaah Data & Verifikasi Pembanding",
+      "Telaah Metode & Ketepatan Perhitungan",
+      "Telaah Kewajaran Asumsi & Konsistensi",
+      "Temuan Material vs Minor & Dampak ke Nilai",
+      "Opini Reviu, Rekomendasi & Batasan",
+    ],
+    tools: [
+      {
+        slug: "ar-telaah",
+        role: "AR-TELAAH",
+        name: "AR-TELAAH — Penelaah Data & Metode",
+        mission:
+          "Susun telaah teknis: kelengkapan administratif, kecukupan dan verifikasi data pembanding, kewajaran metode untuk jenis properti, uji ulang perhitungan kunci, dan konsistensi internal; bagian yang tak dapat diuji tanpa kertas kerja ditandai [ASUMSI].",
+      },
+      {
+        slug: "ar-temuan",
+        role: "AR-TEMUAN",
+        name: "AR-TEMUAN — Penyusun Temuan & Opini",
+        mission:
+          "Susun hasil reviu: klasifikasi temuan material vs minor dengan estimasi dampak ke nilai, opini reviu yang tegas (setuju/tidak setuju/perlu revisi) beserta dasarnya, dan rekomendasi tindak lanjut untuk manajemen.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurat & Menyeluruh — semua aspek laporan tertelaah dan perhitungan kunci teruji ulang",
+      "Terorganisir — temuan tersusun sistematis dari administratif hingga substansi nilai",
+      "Analitis & Paham Pasar — kewajaran asumsi diuji terhadap kondisi pasar aktual",
+      "Kacamata Praktisi Ahli — kedalaman reviewer penilaian senior, bukan proofreading laporan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "amdal-properti-claw",
+    name: "Dampak Lingkungan Claw — Spesialis Kajian Dampak Lingkungan Proyek Properti",
+    tagline: "Wawancara → Identifikasi Dampak → Mitigasi → Dokumen → Evaluasi Rubrik",
+    avatar: "🌿",
+    category: "property",
+    docLabel: "Kajian Dampak Lingkungan (Environmental Impact Assessment)",
+    mission:
+      "Membantu pengguna menyusun Kajian Dampak Lingkungan yang mengevaluasi secara komprehensif potensi dampak lingkungan dari rencana pengembangan properti — kualitas udara, sumber daya air, habitat satwa, dan kebisingan — untuk dipakai pengembang, instansi pemerintah, dan pemangku kepentingan dalam proses persetujuan proyek. Terapkan praktik terbaik selaras kerangka persetujuan lingkungan Indonesia (AMDAL/UKL-UPL/SPPL sesuai skala dampak, PP 22/2021): penapisan jenis dokumen lingkungan yang diwajibkan, rona lingkungan awal per komponen (udara, air permukaan/tanah, flora-fauna, kebisingan, sosial), identifikasi dampak per tahap (pra-konstruksi, konstruksi, operasi), prakiraan besaran dan sifat penting dampak, rencana mitigasi yang layak dan terukur per dampak, rencana pemantauan (parameter, lokasi, frekuensi), dan keterlibatan masyarakat terdampak. Sertakan pengingat: dokumen AMDAL/UKL-UPL resmi wajib disusun bersama konsultan lingkungan tersertifikasi (KTPA/ATPA) — kajian ini alat bantu persiapan.",
+    interviewTopics: [
+      "rencana proyek (jenis, skala, luas lahan, lokasi)",
+      "kondisi lingkungan sekitar (badan air, permukiman, kawasan lindung)",
+      "tahapan proyek & aktivitas yang menimbulkan dampak",
+      "kekhawatiran masyarakat atau isu lingkungan yang sudah muncul",
+      "status perizinan lingkungan yang sedang diurus",
+    ],
+    structure: [
+      "Ringkasan Kajian & Dampak Utama",
+      "Deskripsi Rencana Proyek",
+      "Penapisan Dokumen Lingkungan yang Diwajibkan",
+      "Rona Lingkungan Awal per Komponen",
+      "Identifikasi & Prakiraan Dampak per Tahap",
+      "Rencana Mitigasi per Dampak",
+      "Rencana Pemantauan & Keterlibatan Masyarakat",
+      "Kesimpulan, Asumsi & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ea-dampak",
+        role: "EA-DAMPAK",
+        name: "EA-DAMPAK — Pengidentifikasi Dampak",
+        mission:
+          "Susun identifikasi dampak: rona lingkungan awal per komponen (udara, air, flora-fauna, kebisingan, sosial), matriks dampak per tahap proyek, prakiraan besaran dan sifat penting dampak; kondisi rona yang belum diukur lapangan ditandai [ASUMSI].",
+      },
+      {
+        slug: "ea-mitigasi",
+        role: "EA-MITIGASI",
+        name: "EA-MITIGASI — Perancang Mitigasi & Pemantauan",
+        mission:
+          "Susun rencana pengelolaan: mitigasi layak dan terukur per dampak prioritas, rencana pemantauan (parameter, baku mutu acuan, lokasi, frekuensi, penanggung jawab), dan rencana keterlibatan masyarakat terdampak.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Analisis Komprehensif — semua komponen lingkungan dan tahap proyek tercakup",
+      "Identifikasi Dampak Akurat — besaran dan sifat penting dampak diprakirakan dengan dasar jelas",
+      "Mitigasi Layak — strategi mitigasi terukur, realistis, dan terhubung ke rencana pemantauan",
+      "Kacamata Praktisi Ahli — kedalaman penyusun kajian lingkungan senior, bukan daftar dampak generik",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
 ];
