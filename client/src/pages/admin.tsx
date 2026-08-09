@@ -359,6 +359,63 @@ Selamat berkreasi! 🚀
 — Tim Gustafta`;
 }
 
+// ---- Academy Stat Cards (named export so tests can import the real component) ----
+export function AcademyStatCards({
+  totalCourses,
+  totalEnrollments,
+  loading,
+  onNavigateToTools,
+}: {
+  totalCourses: number;
+  totalEnrollments: number;
+  loading: boolean;
+  onNavigateToTools: () => void;
+}) {
+  return (
+    <>
+      <Card
+        data-testid="stat-total-courses"
+        className="cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all"
+        onClick={onNavigateToTools}
+        title="Buka tab Tools → Academy"
+      >
+        <CardContent className="pt-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Kursus Aktif-Publik</p>
+              <p className="text-3xl font-bold mt-1 text-emerald-600">{loading ? "—" : totalCourses}</p>
+            </div>
+            <BookOpen className="h-8 w-8 text-emerald-500 opacity-80" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+            <ExternalLink className="h-3 w-3" /> Lihat Academy
+          </p>
+        </CardContent>
+      </Card>
+
+      <Card
+        data-testid="stat-total-enrollments"
+        className="cursor-pointer hover:border-violet-400 hover:shadow-md transition-all"
+        onClick={onNavigateToTools}
+        title="Buka tab Tools → Academy"
+      >
+        <CardContent className="pt-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Total Enrollment</p>
+              <p className="text-3xl font-bold mt-1 text-violet-600">{loading ? "—" : totalEnrollments}</p>
+            </div>
+            <GraduationCap className="h-8 w-8 text-violet-500 opacity-80" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+            <ExternalLink className="h-3 w-3" /> Lihat Academy
+          </p>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
 // ---- Main Component ----
 export default function AdminPage() {
   const { toast } = useToast();
@@ -1203,45 +1260,12 @@ export default function AdminPage() {
             </CardContent>
           </Card>
 
-          <Card
-            data-testid="stat-total-courses"
-            className="cursor-pointer hover:border-emerald-400 hover:shadow-md transition-all"
-            onClick={() => setActiveTab("tools")}
-            title="Buka tab Tools → Academy"
-          >
-            <CardContent className="pt-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Kursus Aktif-Publik</p>
-                  <p className="text-3xl font-bold mt-1 text-emerald-600">{statsLoading ? "—" : (stats?.totalCourses ?? 0)}</p>
-                </div>
-                <BookOpen className="h-8 w-8 text-emerald-500 opacity-80" />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                <ExternalLink className="h-3 w-3" /> Lihat Academy
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card
-            data-testid="stat-total-enrollments"
-            className="cursor-pointer hover:border-violet-400 hover:shadow-md transition-all"
-            onClick={() => setActiveTab("tools")}
-            title="Buka tab Tools → Academy"
-          >
-            <CardContent className="pt-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Total Enrollment</p>
-                  <p className="text-3xl font-bold mt-1 text-violet-600">{statsLoading ? "—" : (stats?.totalEnrollments ?? 0)}</p>
-                </div>
-                <GraduationCap className="h-8 w-8 text-violet-500 opacity-80" />
-              </div>
-              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
-                <ExternalLink className="h-3 w-3" /> Lihat Academy
-              </p>
-            </CardContent>
-          </Card>
+          <AcademyStatCards
+            totalCourses={stats?.totalCourses ?? 0}
+            totalEnrollments={stats?.totalEnrollments ?? 0}
+            loading={statsLoading}
+            onNavigateToTools={() => setActiveTab("tools")}
+          />
 
           <Card data-testid="stat-active-agents">
             <CardContent className="pt-5">
