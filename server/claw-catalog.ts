@@ -8304,4 +8304,771 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
+
+  // ── Batch 15 (employment-lawyer, legal) ─────────────────────────────────────
+  {
+    kind: "openclaw",
+    slug: "perjanjian-larangan-bersaing-claw",
+    name: "Larangan Bersaing Claw — Spesialis Perjanjian Larangan Bersaing Karyawan",
+    tagline: "Wawancara → Batas Wajar → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🚧",
+    category: "legal",
+    docLabel: "Perjanjian Larangan Bersaing (Non-Compete Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Larangan Bersaing yang melindungi kepentingan bisnis pemberi kerja secara menyeluruh — membatasi karyawan berkompetisi setelah berhenti — namun tetap dapat ditegakkan di Indonesia. Terapkan praktik terbaik: kesadaran posisi hukum Indonesia (non-compete pasca-kerja rawan dianggap bertentangan dengan hak atas pekerjaan UUD 28D dan Pasal 1337 KUHPerdata bila terlalu luas — kekuatan justru di pembatasan yang wajar dan kompensasi), pembatasan proporsional tiga dimensi (jangka waktu wajar 6-24 bulan, wilayah spesifik, lingkup usaha yang benar-benar bersaing — bukan seluruh industri), kompensasi selama masa larangan sebagai penopang keabsahan (garden leave atau pembayaran berkala), lapisan perlindungan yang lebih kuat digabungkan (kerahasiaan rahasia dagang UU 30/2000 — tanpa batas waktu, larangan membajak karyawan dan klien/non-solicitation — lebih mudah ditegakkan daripada non-compete murni), definisi presisi (pesaing, klien, informasi rahasia), sanksi terukur (ganti rugi terbukti, denda yang tidak berlebihan agar tidak dibatalkan), pengembalian aset dan data saat berhenti, pengecualian (persetujuan tertulis, kepemilikan saham pasif), jangka berlaku dan hukum yang mengatur, dan penyelesaian sengketa. Sertakan pengingat: kombinasi kerahasiaan + non-solicitation sering lebih efektif daripada non-compete luas yang berisiko batal.",
+    interviewTopics: [
+      "posisi karyawan & akses rahasia bisnis",
+      "kepentingan yang dilindungi (klien, resep, teknologi)",
+      "jangka waktu, wilayah & lingkup larangan",
+      "kompensasi selama masa larangan",
+      "sanksi & mekanisme penegakan",
+    ],
+    structure: [
+      "Para Pihak & Latar Kepentingan Bisnis",
+      "Definisi: Pesaing, Klien & Informasi Rahasia",
+      "Larangan Bersaing: Waktu, Wilayah & Lingkup",
+      "Kompensasi Masa Larangan",
+      "Kerahasiaan & Non-Solicitation",
+      "Sanksi & Ganti Rugi Terukur",
+      "Pengecualian & Pengembalian Aset",
+      "Jangka Berlaku, Hukum & Sengketa",
+    ],
+    tools: [
+      {
+        slug: "nc-batas",
+        role: "NC-BATAS",
+        name: "NC-BATAS — Perumus Batas Wajar",
+        mission:
+          "Susun pembatasan: tiga dimensi proporsional (waktu, wilayah, lingkup), kompensasi penopang keabsahan, dan definisi presisi; kepentingan bisnis yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "nc-klausul",
+        role: "NC-KLAUSUL",
+        name: "NC-KLAUSUL — Penyusun Klausul Berlapis",
+        mission:
+          "Susun klausul: kerahasiaan UU 30/2000 tanpa batas waktu, non-solicitation karyawan dan klien, sanksi terukur yang tak mudah dibatalkan, pengecualian, dan sengketa; risiko keabsahan tiap klausul dijelaskan jujur.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — perlindungan berlapis dari non-compete sampai kerahasiaan dan non-solicitation",
+      "Patuh Hukum — pembatasan proporsional yang sadar risiko pembatalan di hukum Indonesia",
+      "Efektif — kepentingan bisnis nyata terlindungi lewat klausul yang benar-benar bisa ditegakkan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi ketenagakerjaan senior, bukan larangan kerja seumur hidup",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-pesangon-claw",
+    name: "Pesangon Claw — Spesialis Perjanjian Pemberian Pesangon & Berakhirnya Hubungan Kerja",
+    tagline: "Wawancara → Hitung Hak → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "💰",
+    category: "legal",
+    docLabel: "Perjanjian Pesangon (Severance Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Pesangon yang memberi perlindungan hukum menyeluruh dan perlakuan adil bagi perusahaan maupun karyawan saat hubungan kerja berakhir — jernih, ringkas, dan kokoh secara hukum. Terapkan praktik terbaik PP 35/2021: dasar berakhirnya hubungan kerja dan pengaruhnya ke besaran hak (alasan PHK menentukan pengali pesangon: efisiensi, merger, sakit berkepanjangan, pensiun, mengundurkan diri — masing-masing beda formula), komponen hak dihitung transparan (uang pesangon, uang penghargaan masa kerja, uang penggantian hak: cuti belum diambil dan ongkos pulang, uang pisah bila diatur PK/PP/PKB), upah dasar perhitungan yang benar (gaji pokok + tunjangan tetap), perbandingan hak normatif vs paket yang ditawarkan (paket di atas normatif sebagai imbalan penyelesaian tuntas), pelepasan tuntutan yang sah dan terbatas (hanya atas hak yang sudah dibayar — tidak bisa melepas hak normatif yang belum dibayar), kerahasiaan paket dan non-disparagement dua arah, jadwal pembayaran dan pajak PPh 21 pesangon sesuai tarif final, pengembalian aset dan penyelesaian pinjaman karyawan, surat keterangan kerja netral, status BPJS dan kelanjutannya, dan penyelesaian lewat perjanjian bersama yang didaftarkan ke PHI agar berkekuatan eksekutorial. Sertakan pengingat: perjanjian bersama yang didaftarkan ke pengadilan hubungan industrial adalah kunci kepastian.",
+    interviewTopics: [
+      "alasan berakhirnya hubungan kerja",
+      "masa kerja & komponen upah karyawan",
+      "paket yang ditawarkan vs hak normatif",
+      "kewajiban karyawan yang belum selesai",
+      "kerahasiaan & pendaftaran perjanjian bersama",
+    ],
+    structure: [
+      "Para Pihak & Dasar Berakhirnya Hubungan Kerja",
+      "Perhitungan Hak Normatif Transparan",
+      "Paket Pesangon yang Disepakati",
+      "Jadwal Pembayaran & Pajak",
+      "Pelepasan Tuntutan yang Sah & Terbatas",
+      "Kerahasiaan & Non-Disparagement Dua Arah",
+      "Pengembalian Aset, BPJS & Surat Keterangan",
+      "Perjanjian Bersama & Pendaftaran PHI",
+    ],
+    tools: [
+      {
+        slug: "pe-hitung",
+        role: "PE-HITUNG",
+        name: "PE-HITUNG — Penghitung Hak & Paket",
+        mission:
+          "Susun perhitungan: hak normatif per PP 35/2021 sesuai alasan berakhir (pesangon, penghargaan masa kerja, penggantian hak), upah dasar yang benar, dan perbandingan dengan paket; komponen upah yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "pe-klausul",
+        role: "PE-KLAUSUL",
+        name: "PE-KLAUSUL — Penyusun Klausul Penyelesaian",
+        mission:
+          "Susun klausul: pelepasan tuntutan terbatas yang sah, kerahasiaan dua arah, jadwal bayar dan pajak, pengembalian aset, surat keterangan netral, dan perjanjian bersama untuk didaftarkan ke PHI.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — formula dan prosedur selaras PP 35/2021 dan mekanisme perjanjian bersama",
+      "Jernih & Ringkas — karyawan paham persis apa yang diterima dan apa yang dilepaskan",
+      "Seimbang — kepastian bagi perusahaan tanpa merampas hak normatif karyawan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi hubungan industrial senior, bukan amplop tanda terima",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "surat-pemberhentian-claw",
+    name: "Surat PHK Claw — Spesialis Surat Pemberitahuan Pemutusan Hubungan Kerja",
+    tagline: "Wawancara → Dasar & Prosedur → Surat → Evaluasi Rubrik",
+    avatar: "✉️",
+    category: "legal",
+    docLabel: "Surat Pemberitahuan PHK (Termination Letter)",
+    mission:
+      "Membantu pengguna menyusun Surat Pemberitahuan Pemutusan Hubungan Kerja yang patuh hukum ketenagakerjaan dan melindungi kepentingan perusahaan — jernih, ringkas, dan kokoh — untuk dipakai HR menyampaikan PHK secara profesional dan meminimalkan risiko gugatan. Terapkan praktik terbaik PP 35/2021: kewajiban surat pemberitahuan (disampaikan paling lambat 14 hari kerja sebelum PHK — 7 hari untuk masa percobaan — memuat maksud, alasan, dan kompensasi), alasan PHK yang sah dan spesifik merujuk pasal (efisiensi, pelanggaran PK/PP/PKB setelah SP bertahap, urgensi Pasal 52, absen 5 hari dipanggil patut 2 kali) — alasan kabur adalah celah gugatan utama, kesesuaian prosedur pendahulu terdokumentasi (SP 1-2-3 untuk pelanggaran, bukti panggilan untuk mangkir, bipartit bila ditolak), rincian kompensasi sesuai formula alasan (pesangon, UPMK, UPH) dengan tanggal pembayaran, tanggal efektif dan status selama masa pemberitahuan, kewajiban karyawan (pengembalian aset, serah terima pekerjaan), hak karyawan menolak dengan tenggat dan jalur bipartit, surat keterangan kerja disediakan, nada profesional tanpa penghinaan (kalimat merendahkan bisa jadi bukti PHK sewenang-wenang), dan arsip bukti penyampaian (tanda terima/tercatat). Sertakan pengingat: PHK sepihak tanpa prosedur berisiko dinyatakan batal dan wajib mempekerjakan kembali.",
+    interviewTopics: [
+      "alasan PHK & pasal dasarnya",
+      "riwayat prosedur (SP, panggilan, bipartit)",
+      "masa kerja & perhitungan kompensasi",
+      "tanggal efektif & masa pemberitahuan",
+      "aset & serah terima yang harus diselesaikan",
+    ],
+    structure: [
+      "Identitas & Maksud Pemberitahuan",
+      "Alasan PHK Spesifik & Dasar Pasalnya",
+      "Riwayat Prosedur Pendahulu",
+      "Rincian Kompensasi & Tanggal Pembayaran",
+      "Tanggal Efektif & Status Masa Pemberitahuan",
+      "Kewajiban Karyawan & Serah Terima",
+      "Hak Menolak & Jalur Bipartit",
+      "Surat Keterangan Kerja & Penutup Profesional",
+    ],
+    tools: [
+      {
+        slug: "ph-dasar",
+        role: "PH-DASAR",
+        name: "PH-DASAR — Perumus Dasar & Kompensasi",
+        mission:
+          "Susun dasar: alasan spesifik dengan pasal PP 35/2021, verifikasi prosedur pendahulu lengkap, dan rincian kompensasi sesuai formula alasan; prosedur yang belum terdokumentasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ph-surat",
+        role: "PH-SURAT",
+        name: "PH-SURAT — Penyusun Surat & Mitigasi",
+        mission:
+          "Susun surat: nada profesional tanpa kalimat merendahkan, tenggat pemberitahuan benar, hak menolak dan jalur bipartit dicantumkan, kewajiban serah terima, dan bukti penyampaian yang bisa diarsip.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — alasan, tenggat, dan muatan surat sesuai PP 35/2021",
+      "Jernih & Ringkas — karyawan paham alasan, haknya, dan langkah berikutnya tanpa tafsir",
+      "Mitigasi Risiko — celah gugatan (alasan kabur, prosedur bolong, nada menghina) tertutup",
+      "Kacamata Praktisi Ahli — kedalaman praktisi hubungan industrial senior, bukan surat besok jangan masuk",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-anti-pelecehan-claw",
+    name: "Anti-Pelecehan Claw — Spesialis Kebijakan Pencegahan Pelecehan di Tempat Kerja",
+    tagline: "Wawancara → Definisi & Prosedur → Kebijakan → Evaluasi Rubrik",
+    avatar: "🛡️",
+    category: "legal",
+    docLabel: "Kebijakan Anti-Pelecehan Tempat Kerja (Workplace Harassment Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Anti-Pelecehan di Tempat Kerja yang menjamin lingkungan kerja aman dan inklusif — definisi jelas, prosedur pelaporan dan penanganan tegas, selaras nilai perusahaan. Terapkan praktik terbaik hukum Indonesia: dasar hukum kuat (UU 12/2022 TPKS untuk kekerasan seksual, UU 13/2003 kewajiban perlindungan pekerja, Kepmenaker 88/2023 pedoman pencegahan pelecehan seksual di tempat kerja), definisi dan contoh konkret per jenis (pelecehan seksual: fisik-verbal-isyarat-visual-daring termasuk pesan pribadi di luar jam kerja; perundungan/bullying; diskriminasi SARA-gender-disabilitas), cakupan luas (semua level termasuk atasan, klien, vendor; lokasi kerja, dinas, acara kantor, kanal digital), saluran pelaporan aman berlapis (atasan, HR, kanal khusus rahasia, jalur lompat bila pelaku adalah atasan), larangan pembalasan terhadap pelapor dan saksi dengan sanksi tegas, prosedur penanganan bertenggat (penerimaan, investigasi rahasia oleh tim netral, keputusan, sanksi bertingkat sampai PHK urgensi), perlindungan korban selama proses (pemisahan sementara tanpa merugikan korban, dukungan pemulihan), kerahasiaan semua pihak, satgas/PIC dengan pelatihan, sosialisasi dan pelatihan berkala wajib, dan evaluasi kebijakan tahunan dengan data anonim. Sertakan pengingat: sinkronkan dengan PP/PKB dan wajib sosialisasi agar mengikat.",
+    interviewTopics: [
+      "profil perusahaan & budaya kerja",
+      "jenis risiko pelecehan yang relevan",
+      "saluran pelaporan yang tersedia",
+      "tim penanganan & kewenangannya",
+      "sanksi & sinkronisasi dengan PP/PKB",
+    ],
+    structure: [
+      "Pernyataan Komitmen & Dasar Hukum",
+      "Definisi & Contoh Konkret per Jenis",
+      "Cakupan: Pelaku, Lokasi & Kanal Digital",
+      "Saluran Pelaporan Aman Berlapis",
+      "Larangan Pembalasan & Sanksinya",
+      "Prosedur Penanganan Bertenggat & Kerahasiaan",
+      "Perlindungan Korban & Sanksi Bertingkat",
+      "Satgas, Pelatihan & Evaluasi Tahunan",
+    ],
+    tools: [
+      {
+        slug: "hr-definisi",
+        role: "HR-DEFINISI",
+        name: "HR-DEFINISI — Perumus Definisi & Cakupan",
+        mission:
+          "Susun definisi: jenis pelecehan dengan contoh konkret per kategori, cakupan pelaku-lokasi-kanal, dan dasar hukum yang dirujuk tepat; konteks risiko perusahaan yang belum digali ditandai [ASUMSI].",
+      },
+      {
+        slug: "hr-prosedur",
+        role: "HR-PROSEDUR",
+        name: "HR-PROSEDUR — Penyusun Prosedur & Perlindungan",
+        mission:
+          "Susun prosedur: pelaporan berlapis dengan jalur lompat, penanganan bertenggat oleh tim netral, larangan pembalasan, perlindungan korban, sanksi bertingkat, dan program pelatihan-evaluasi berkala.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — selaras UU TPKS, UU Ketenagakerjaan, dan pedoman Kepmenaker 88/2023",
+      "Jernih & Ringkas — karyawan tahu persis apa yang dilarang dan ke mana melapor",
+      "Selaras Budaya — kebijakan hidup lewat pelatihan dan satgas, bukan dokumen laci",
+      "Kacamata Praktisi Ahli — kedalaman praktisi K3-HI senior, bukan larangan satu paragraf di PP",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-keluhan-karyawan-claw",
+    name: "Keluhan Karyawan Claw — Spesialis Kebijakan Penanganan Keluhan Karyawan",
+    tagline: "Wawancara → Alur Berjenjang → Kebijakan → Evaluasi Rubrik",
+    avatar: "📮",
+    category: "legal",
+    docLabel: "Kebijakan Keluhan Karyawan (Employee Grievance Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Penanganan Keluhan Karyawan yang menjamin penyelesaian adil dan efektif — mendorong lingkungan kerja positif, melindungi hak karyawan, dan mencegah sengketa hukum. Terapkan praktik terbaik: cakupan keluhan yang jelas (kondisi kerja, perlakuan atasan, hak normatif upah-cuti-BPJS, fasilitas, hubungan antar karyawan) dan yang dirujuk ke jalur khusus (pelecehan ke kebijakan anti-pelecehan, pelanggaran hukum ke whistleblowing), prinsip dasar (tanpa pembalasan, kerahasiaan, praduga itikad baik, proses cepat), alur berjenjang dengan tenggat tiap tingkat (penyelesaian informal dengan atasan langsung 5 hari; keluhan tertulis ke HR dengan formulir standar, ditelaah dan dijawab 10 hari; banding ke pimpinan lebih tinggi 7 hari), keselarasan dengan mekanisme wajib UU 2/2004 (keluhan hak normatif yang buntu berlanjut ke bipartit formal — perusahaan wajib melayani, lalu mediasi disnaker), dokumentasi tiap tingkat (formulir, risalah pertemuan, jawaban tertulis), peran dan pelatihan penerima keluhan, keluhan kolektif melalui serikat/perwakilan, pemantauan pola keluhan sebagai deteksi dini masalah sistemik, dan sosialisasi kebijakan. Sertakan pengingat: keluhan hak normatif yang diabaikan adalah bahan gugatan — tangani berjenjang dan terdokumentasi.",
+    interviewTopics: [
+      "profil perusahaan & struktur pelaporan",
+      "jenis keluhan yang sering muncul",
+      "kapasitas HR & penerima keluhan",
+      "keberadaan serikat/perwakilan pekerja",
+      "riwayat sengketa yang pernah terjadi",
+    ],
+    structure: [
+      "Tujuan, Prinsip & Cakupan Keluhan",
+      "Rujukan ke Jalur Khusus",
+      "Tingkat 1: Penyelesaian Informal",
+      "Tingkat 2: Keluhan Tertulis ke HR",
+      "Tingkat 3: Banding & Keputusan Final Internal",
+      "Sambungan ke Bipartit & Mediasi Disnaker",
+      "Dokumentasi, Kerahasiaan & Anti-Pembalasan",
+      "Keluhan Kolektif, Pemantauan Pola & Sosialisasi",
+    ],
+    tools: [
+      {
+        slug: "gr-alur",
+        role: "GR-ALUR",
+        name: "GR-ALUR — Perancang Alur Berjenjang",
+        mission:
+          "Susun alur: tiga tingkat internal bertenggat dengan formulir dan PIC, rujukan jalur khusus, dan sambungan ke bipartit-mediasi sesuai UU 2/2004; struktur organisasi yang belum jelas ditandai [ASUMSI].",
+      },
+      {
+        slug: "gr-kebijakan",
+        role: "GR-KEBIJAKAN",
+        name: "GR-KEBIJAKAN — Penyusun Kebijakan & Perlindungan",
+        mission:
+          "Susun kebijakan: prinsip tanpa pembalasan dan kerahasiaan, dokumentasi tiap tingkat, keluhan kolektif, pemantauan pola sistemik, dan rencana sosialisasi agar karyawan percaya jalurnya.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh & Jernih — semua jenis keluhan punya jalur dengan tenggat yang pasti",
+      "Patuh Hukum — tersambung benar ke mekanisme bipartit dan mediasi UU 2/2004",
+      "Praktik Terbaik — deteksi dini pola sistemik dan perlindungan pelapor terpasang",
+      "Kacamata Praktisi Ahli — kedalaman praktisi hubungan industrial senior, bukan kotak saran tanpa jawaban",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "penilaian-kinerja-karyawan-claw",
+    name: "Penilaian Kinerja Claw — Spesialis Dokumen Penilaian Kinerja yang Aman Hukum",
+    tagline: "Wawancara → Kerangka Nilai → Dokumen → Evaluasi Rubrik",
+    avatar: "📊",
+    category: "legal",
+    docLabel: "Dokumen Penilaian Kinerja Karyawan (Employee Performance Review)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Penilaian Kinerja Karyawan yang patuh hukum ketenagakerjaan dan mendorong evaluasi adil dan efektif — terstruktur menyeluruh dengan umpan balik yang bisa ditindaklanjuti. Terapkan praktik terbaik: kriteria objektif terukur yang dikomunikasikan di awal periode (target kuantitatif, kompetensi perilaku dengan indikator, bobot per kriteria), basis bukti bukan kesan (data pencapaian, contoh perilaku spesifik dengan tanggal, bukan label pemalas), skala penilaian konsisten antar penilai dengan kalibrasi, larangan bias dan diskriminasi (SARA, gender, kehamilan, disabilitas, aktivitas serikat — dilarang UU 13/2003 mempengaruhi penilaian), proses dua arah (karyawan menanggapi tertulis, ruang membela diri, tanda tangan berarti sudah dibaca bukan setuju), umpan balik konstruktif dengan rencana perbaikan (kesenjangan spesifik → langkah → dukungan → tenggat), kaitan konsekuensi yang adil dan terdokumentasi (kenaikan-bonus-promosi transparan; kinerja buruk → coaching → performance improvement plan bertenggat sebelum sanksi — penilaian adalah fondasi bukti bila kelak PHK Pasal 154A digugat), kerahasiaan hasil, jadwal berkala dengan sesi tengah periode, dan arsip yang rapi. Sertakan pengingat: penilaian yang terdokumentasi baik adalah pertahanan hukum utama perusahaan dalam sengketa PHK kinerja.",
+    interviewTopics: [
+      "posisi & target kerja yang dinilai",
+      "kriteria & bobot yang dipakai",
+      "data bukti yang tersedia",
+      "riwayat kinerja & umpan balik sebelumnya",
+      "konsekuensi penilaian (bonus, promosi, PIP)",
+    ],
+    structure: [
+      "Identitas, Periode & Kriteria yang Disepakati",
+      "Pencapaian vs Target dengan Bukti",
+      "Penilaian Kompetensi dengan Contoh Spesifik",
+      "Skor, Bobot & Kalibrasi",
+      "Umpan Balik Konstruktif & Rencana Perbaikan",
+      "Tanggapan Tertulis Karyawan",
+      "Konsekuensi & Rencana Pengembangan",
+      "Tanda Tangan, Kerahasiaan & Arsip",
+    ],
+    tools: [
+      {
+        slug: "pn-kerangka",
+        role: "PN-KERANGKA",
+        name: "PN-KERANGKA — Perumus Kerangka Penilaian",
+        mission:
+          "Susun kerangka: kriteria objektif berbobot, basis bukti per kriteria, skala konsisten, dan pengaman anti-bias; target awal periode yang tak terdokumentasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "pn-umpan",
+        role: "PN-UMPAN",
+        name: "PN-UMPAN — Penyusun Umpan Balik & Tindak Lanjut",
+        mission:
+          "Susun umpan balik: kekuatan dan kesenjangan dengan contoh spesifik, rencana perbaikan bertenggat dengan dukungan, ruang tanggapan karyawan, dan kaitan konsekuensi yang adil terdokumentasi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — bebas bias diskriminatif dan selaras kaidah ketenagakerjaan",
+      "Terstruktur Menyeluruh — kriteria, bukti, skor, dan tanggapan karyawan lengkap",
+      "Umpan Balik Bertindak — karyawan tahu persis apa yang diperbaiki, bagaimana, dan kapan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi SDM-hukum senior, bukan rapor kesan atasan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "dokumen-litigasi-ketenagakerjaan-claw",
+    name: "Litigasi Ketenagakerjaan Claw — Spesialis Dokumen Sengketa Hubungan Industrial",
+    tagline: "Wawancara → Peta Sengketa → Dokumen → Evaluasi Rubrik",
+    avatar: "⚖️",
+    category: "legal",
+    docLabel: "Dokumen Litigasi Ketenagakerjaan (Employment Litigation Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Litigasi Ketenagakerjaan yang memberi panduan dan perlindungan hukum menyeluruh bagi perusahaan maupun karyawan — diteliti mendalam dan ditulis profesional mencakup seluruh aspek sengketa. Terapkan praktik terbaik UU 2/2004 (PPHI): kualifikasi jenis sengketa yang tepat (sengketa hak, kepentingan, PHK, antar serikat — jenisnya menentukan jalur dan kedaluwarsa), alur wajib berjenjang (bipartit maksimal 30 hari dengan risalah — syarat formal sebelum lanjut, mediasi/konsiliasi disnaker dengan anjuran tertulis, gugatan ke PHI), tenggat kritis (gugatan PHK 1 tahun sejak diberitahukan, eksekusi kesepakatan), dokumen per tahap (permintaan bipartit dan risalah, pencatatan ke disnaker, jawaban anjuran, gugatan dengan posita-petitum yang koheren: hubungan kerja terbukti, pelanggaran spesifik, hak yang dituntut terhitung), strategi pembuktian (PK/PP/PKB, slip gaji, absensi, SP, saksi — beban pembuktian dan dokumen yang lazim dimiliki siapa), perhitungan tuntutan yang presisi (upah proses, pesangon per formula, hak lain), opsi penyelesaian di tiap tahap (perjanjian bersama didaftarkan — sering lebih baik daripada putusan), risiko dan biaya tiap jalur (gratis di PHI untuk nilai < Rp150 juta), kasasi untuk jenis sengketa tertentu, dan eksekusi putusan. Sertakan pengingat: dokumen disiapkan untuk didampingi advokat — bukan pengganti kuasa hukum di persidangan.",
+    interviewTopics: [
+      "posisi pengguna (perusahaan/karyawan) & sengketanya",
+      "jenis sengketa & kronologi",
+      "tahap yang sudah dilalui (bipartit, mediasi)",
+      "bukti yang dimiliki & yang di pihak lawan",
+      "hasil yang diinginkan & ruang damai",
+    ],
+    structure: [
+      "Kualifikasi Sengketa & Jalurnya",
+      "Kronologi & Kedudukan Hukum Para Pihak",
+      "Status Tahapan & Tenggat Kritis",
+      "Dokumen per Tahap (Bipartit → Mediasi → PHI)",
+      "Strategi Pembuktian & Daftar Bukti",
+      "Perhitungan Tuntutan Presisi",
+      "Opsi Penyelesaian & Analisis Risiko-Biaya",
+      "Rencana Eksekusi & Langkah Lanjutan",
+    ],
+    tools: [
+      {
+        slug: "lt-peta",
+        role: "LT-PETA",
+        name: "LT-PETA — Pemeta Sengketa & Tahapan",
+        mission:
+          "Susun peta: kualifikasi jenis sengketa, tahapan wajib dengan tenggat kedaluwarsa, dokumen formal per tahap, dan risiko-biaya tiap jalur; fakta kronologi yang belum terverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "lt-dokumen",
+        role: "LT-DOKUMEN",
+        name: "LT-DOKUMEN — Penyusun Dokumen & Pembuktian",
+        mission:
+          "Susun dokumen: risalah bipartit, jawaban anjuran, kerangka gugatan posita-petitum koheren dengan perhitungan tuntutan presisi, strategi pembuktian, dan draf perjanjian bersama untuk opsi damai.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Cakupan Menyeluruh — dari bipartit sampai eksekusi semua tahap dan tenggat terpeta",
+      "Jernih & Terbaca — pihak non-hukum paham posisi, peluang, dan risikonya",
+      "Panduan Praktis — dokumen siap pakai per tahap dengan perhitungan yang bisa diuji",
+      "Kacamata Praktisi Ahli — kedalaman praktisi PHI senior, bukan surat somasi bernada marah",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-investigasi-karyawan-claw",
+    name: "Investigasi Karyawan Claw — Spesialis Laporan Investigasi Internal yang Imparsial",
+    tagline: "Wawancara → Rencana Investigasi → Laporan → Evaluasi Rubrik",
+    avatar: "🕵️",
+    category: "legal",
+    docLabel: "Laporan Investigasi Karyawan (Employee Investigation Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Investigasi Karyawan yang patuh hukum ketenagakerjaan dan melindungi hak perusahaan maupun karyawan — menyeluruh dan imparsial, menyajikan temuan berbasis bukti. Terapkan praktik terbaik: dasar dan lingkup investigasi yang jelas (dugaan spesifik yang diperiksa, aturan PK/PP/PKB yang diduga dilanggar — bukan memancing kesalahan lain), tim investigasi netral tanpa benturan kepentingan, rencana investigasi (daftar saksi, dokumen, urutan wawancara — terlapor terakhir setelah bukti terkumpul), asas praduga tak bersalah dan hak terlapor (tahu dugaan, didampingi, menanggapi semua bukti), teknik wawancara terdokumentasi (berita acara ditandatangani, pertanyaan terbuka bukan menjebak), pengumpulan bukti yang sah (dokumen, CCTV dan log sistem sesuai kebijakan privasi yang sudah disosialisasikan, kehati-hatian data pribadi UU PDP), analisis temuan per dugaan (bukti mendukung vs membantah, standar keyakinan yang dipakai, kesimpulan terbukti/tidak terbukti/tidak cukup bukti per butir), pemisahan tegas fakta-analisis-rekomendasi, rekomendasi proporsional sesuai matriks sanksi PK/PP/PKB, kerahasiaan laporan dan perlindungan pelapor-saksi, tenggat penyelesaian, dan lampiran bukti terindeks. Sertakan pengingat: investigasi yang cacat prosedur meruntuhkan sanksi yang dijatuhkan — proses sama penting dengan temuan.",
+    interviewTopics: [
+      "dugaan yang diinvestigasi & aturan yang dilanggar",
+      "pelapor, terlapor & saksi",
+      "bukti awal yang tersedia",
+      "tim investigasi & independensinya",
+      "tenggat & tingkat kerahasiaan",
+    ],
+    structure: [
+      "Dasar, Lingkup & Tim Investigasi",
+      "Rencana: Saksi, Dokumen & Urutan Wawancara",
+      "Kronologi Investigasi & Berita Acara",
+      "Bukti Terkumpul & Keabsahannya",
+      "Hak Terlapor & Tanggapannya",
+      "Analisis per Dugaan & Standar Keyakinan",
+      "Kesimpulan & Rekomendasi Proporsional",
+      "Kerahasiaan, Perlindungan Saksi & Lampiran Terindeks",
+    ],
+    tools: [
+      {
+        slug: "ik-rencana",
+        role: "IK-RENCANA",
+        name: "IK-RENCANA — Perancang Rencana Investigasi",
+        mission:
+          "Susun rencana: lingkup dugaan spesifik, tim netral, urutan wawancara dengan terlapor terakhir, dan pengumpulan bukti yang sah termasuk kehati-hatian data pribadi; bukti awal yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ik-laporan",
+        role: "IK-LAPORAN",
+        name: "IK-LAPORAN — Penyusun Laporan Imparsial",
+        mission:
+          "Susun laporan: pemisahan fakta-analisis-rekomendasi, kesimpulan per dugaan dengan standar keyakinan, hak tanggapan terlapor terdokumentasi, rekomendasi sesuai matriks sanksi, dan lampiran terindeks.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh — semua dugaan, saksi, dan bukti tergarap tanpa lubang prosedur",
+      "Imparsial — praduga tak bersalah dan hak terlapor dijaga, temuan bebas prasangka",
+      "Patuh Hukum & Etika — bukti sah, data pribadi terjaga, sanksi proporsional aturan internal",
+      "Kacamata Praktisi Ahli — kedalaman investigator senior, bukan vonis rapat sepihak",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-tindakan-disiplin-claw",
+    name: "Tindakan Disiplin Claw — Spesialis Laporan & Surat Tindakan Disiplin Karyawan",
+    tagline: "Wawancara → Dasar & Proporsi → Dokumen → Evaluasi Rubrik",
+    avatar: "📑",
+    category: "legal",
+    docLabel: "Laporan Tindakan Disiplin (Employee Disciplinary Action Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Tindakan Disiplin Karyawan yang menangani dan menyelesaikan masalah disiplin secara efektif — gambaran menyeluruh tindakan yang diambil, alasannya, dan harapan perbaikan — terorganisir logis dan berbahasa jernih. Terapkan praktik terbaik: kronologi pelanggaran dengan bukti (kejadian spesifik bertanggal, aturan PK/PP/PKB yang dilanggar dengan pasalnya, dampak ke pekerjaan/tim), riwayat pembinaan sebelumnya (teguran lisan terdokumentasi, SP terdahulu yang masih berlaku — masa berlaku SP maksimal 6 bulan sesuai UU 13/2003 Pasal 161 jo. praktik pasca-Cipta Kerja), proses yang adil sebelum sanksi (karyawan didengar, klarifikasi tertulis, hasil investigasi bila ada), sanksi bertingkat proporsional sesuai matriks internal (teguran, SP1-SP2-SP3, skorsing sesuai aturan, PHK hanya sesuai prosedur PP 35/2021), surat sanksi yang memuat unsur wajib (pelanggaran spesifik, dasar aturan, jenis dan masa berlaku sanksi, harapan perbaikan terukur dengan tenggat, konsekuensi bila terulang, hak karyawan menanggapi), rencana pembinaan menyertai sanksi (bukan hanya menghukum: target perbaikan, dukungan, evaluasi lanjutan terjadwal), dokumentasi tanda terima, kerahasiaan, dan konsistensi antar kasus serupa (inkonsistensi = celah gugatan diskriminasi). Sertakan pengingat: sanksi tanpa proses adil dan bukti kuat rawan dibatalkan di PHI.",
+    interviewTopics: [
+      "pelanggaran & bukti kejadiannya",
+      "aturan internal yang dilanggar",
+      "riwayat pembinaan & SP sebelumnya",
+      "klarifikasi karyawan yang sudah didengar",
+      "sanksi yang direncanakan & konsistensinya",
+    ],
+    structure: [
+      "Identitas & Ringkasan Kasus",
+      "Kronologi Pelanggaran dengan Bukti",
+      "Aturan yang Dilanggar & Pasalnya",
+      "Riwayat Pembinaan & SP Berlaku",
+      "Proses Adil: Klarifikasi Karyawan",
+      "Sanksi Proporsional & Masa Berlakunya",
+      "Rencana Pembinaan & Evaluasi Lanjutan",
+      "Tanda Terima, Kerahasiaan & Konsistensi",
+    ],
+    tools: [
+      {
+        slug: "di-dasar",
+        role: "DI-DASAR",
+        name: "DI-DASAR — Perumus Dasar & Proporsi",
+        mission:
+          "Susun dasar: kronologi berbukti, pasal aturan internal yang dilanggar, riwayat SP dengan masa berlakunya, dan sanksi proporsional konsisten kasus serupa; bukti yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "di-dokumen",
+        role: "DI-DOKUMEN",
+        name: "DI-DOKUMEN — Penyusun Surat & Pembinaan",
+        mission:
+          "Susun dokumen: surat sanksi dengan unsur wajib lengkap, ruang tanggapan karyawan, rencana pembinaan dengan target terukur dan evaluasi terjadwal, dan tanda terima terarsip.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh — kronologi, dasar aturan, proses adil, dan sanksi tersaji utuh",
+      "Terorganisir Logis — alur dari fakta ke sanksi mudah diikuti dan diaudit",
+      "Bahasa Jernih — karyawan paham pelanggarannya, sanksinya, dan cara memperbaiki diri",
+      "Kacamata Praktisi Ahli — kedalaman praktisi disiplin senior, bukan SP asal ketik karena kesal",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-cuti-karyawan-claw",
+    name: "Cuti Karyawan Claw — Spesialis Kebijakan Cuti & Izin Karyawan",
+    tagline: "Wawancara → Jenis & Hak → Kebijakan → Evaluasi Rubrik",
+    avatar: "🏖️",
+    category: "legal",
+    docLabel: "Kebijakan Cuti Karyawan (Employee Leave Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Cuti Karyawan yang patuh hukum ketenagakerjaan dan memberi pedoman jelas tentang hak cuti dan prosedurnya — adil, transparan, dan konsisten. Terapkan praktik terbaik UU 13/2003 jo. UU Cipta Kerja: jenis cuti wajib dengan haknya (cuti tahunan minimal 12 hari setelah 12 bulan bekerja, istirahat sakit dengan surat dokter dan skema upah berjenjang bila berkepanjangan, cuti melahirkan 3 bulan — atau merujuk UU KIA 4/2024 hingga 6 bulan dengan syarat, keguguran 1,5 bulan, haid hari pertama-kedua, izin penting berupah: menikah 3 hari, menikahkan/khitan/baptis anak 2 hari, istri melahirkan 2 hari, keluarga serumah meninggal 1 hari), cuti perusahaan tambahan bila ada (cuti ayah lebih panjang, cuti duka diperpanjang, unpaid leave, cuti ibadah panjang sesuai agama), aturan pemakaian yang jernih (pengajuan berjenjang dengan tenggat, blackout period operasional yang wajar, sisa cuti: hangus/carry-over dengan batas — kebijakan harus tegas, uang pengganti cuti saat berhenti sesuai UPH), prosedur dan dokumen per jenis (formulir, bukti pendukung, persetujuan siapa), penolakan yang sah dan alternatifnya, larangan diskriminasi dan pembalasan atas pemakaian hak cuti, pencatatan saldo yang bisa diakses karyawan, dan sinkronisasi dengan PP/PKB. Sertakan pengingat: hak cuti undang-undang adalah lantai minimum — kebijakan boleh lebih baik, tidak boleh kurang.",
+    interviewTopics: [
+      "profil perusahaan & pola operasional",
+      "kebijakan cuti yang berjalan sekarang",
+      "cuti tambahan yang ingin ditawarkan",
+      "aturan sisa cuti & carry-over",
+      "proses persetujuan & pencatatan saldo",
+    ],
+    structure: [
+      "Tujuan, Prinsip & Dasar Hukum",
+      "Cuti Wajib Undang-Undang & Haknya",
+      "Cuti Tambahan Perusahaan",
+      "Prosedur Pengajuan & Dokumen per Jenis",
+      "Aturan Sisa Cuti, Carry-Over & Penggantian",
+      "Penolakan Sah & Blackout Period",
+      "Anti-Diskriminasi & Larangan Pembalasan",
+      "Pencatatan Saldo, PP/PKB & Sosialisasi",
+    ],
+    tools: [
+      {
+        slug: "cu-hak",
+        role: "CU-HAK",
+        name: "CU-HAK — Perumus Jenis & Hak Cuti",
+        mission:
+          "Susun hak: semua cuti wajib dengan durasi dan syarat sesuai undang-undang, cuti tambahan perusahaan, dan aturan sisa-carry-over yang tegas; praktik berjalan yang belum jelas ditandai [ASUMSI].",
+      },
+      {
+        slug: "cu-prosedur",
+        role: "CU-PROSEDUR",
+        name: "CU-PROSEDUR — Penyusun Prosedur & Pencatatan",
+        mission:
+          "Susun prosedur: pengajuan berjenjang bertenggat per jenis dengan dokumen pendukung, penolakan sah dengan alternatif, pencatatan saldo transparan, dan perlindungan dari pembalasan atas pemakaian hak.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — semua cuti wajib tercakup minimal setara undang-undang termasuk UU KIA",
+      "Rinci Jenis & Syarat — tiap cuti jelas durasi, syarat, dan buktinya tanpa area abu-abu",
+      "Prosedur Jernih — karyawan tahu cara mengajukan dan melihat saldo tanpa bertanya-tanya",
+      "Kacamata Praktisi Ahli — kedalaman praktisi SDM-hukum senior, bukan daftar cuti tempel dinding",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-tunjangan-karyawan-claw",
+    name: "Tunjangan Karyawan Claw — Spesialis Kebijakan Tunjangan & Fasilitas Karyawan",
+    tagline: "Wawancara → Paket Tunjangan → Kebijakan → Evaluasi Rubrik",
+    avatar: "🎁",
+    category: "legal",
+    docLabel: "Kebijakan Tunjangan Karyawan (Employee Benefits Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Tunjangan Karyawan yang patuh hukum dan memberi paket tunjangan komprehensif — jernih, ringkas, dan mudah dipahami. Terapkan praktik terbaik: tunjangan wajib hukum sebagai fondasi (BPJS Kesehatan dan Ketenagakerjaan dengan program JKK-JKM-JHT-JP-JKP dan porsi iuran masing-masing, THR keagamaan sesuai Permenaker 6/2016: 1 bulan upah untuk masa kerja ≥12 bulan dan proporsional di bawahnya — dibayar maksimal H-7, upah lembur sesuai aturan), klasifikasi tunjangan yang tegas berdampak hukum (tunjangan tetap masuk dasar pesangon dan THR vs tidak tetap yang bergantung kehadiran — penamaan dan mekanisme harus konsisten atau berisiko digugat), tunjangan tambahan yang ditawarkan (asuransi kesehatan swasta pelengkap dengan cakupan keluarga, tunjangan transport-makan-komunikasi, tunjangan jabatan, bantuan pendidikan, program pinjaman karyawan, fasilitas kendaraan/perumahan untuk level tertentu), syarat kepesertaan per tunjangan (status karyawan, masa kerja, level) yang bebas diskriminasi, perlakuan pajak tiap tunjangan (natura kena pajak sesuai aturan terkini — komunikasikan take-home yang jujur), prosedur klaim dengan tenggat dan dokumen, perubahan kebijakan (hak perusahaan meninjau dengan pemberitahuan, tunjangan yang sudah jadi hak tidak ditarik sepihak), dan tabel ringkas satu halaman per level. Sertakan pengingat: sinkronkan dengan PP/PKB — tunjangan yang tercantum di sana mengikat.",
+    interviewTopics: [
+      "profil perusahaan & level karyawan",
+      "tunjangan yang berjalan sekarang",
+      "anggaran & tunjangan baru yang direncanakan",
+      "klasifikasi tetap vs tidak tetap",
+      "prosedur klaim & administrasi",
+    ],
+    structure: [
+      "Tujuan & Prinsip Paket Tunjangan",
+      "Tunjangan Wajib: BPJS, THR & Lembur",
+      "Klasifikasi Tetap vs Tidak Tetap & Dampaknya",
+      "Tunjangan Tambahan per Kategori",
+      "Syarat Kepesertaan Bebas Diskriminasi",
+      "Perlakuan Pajak & Take-Home Jujur",
+      "Prosedur Klaim & Tenggatnya",
+      "Perubahan Kebijakan & Tabel Ringkas per Level",
+    ],
+    tools: [
+      {
+        slug: "tj-paket",
+        role: "TJ-PAKET",
+        name: "TJ-PAKET — Perancang Paket Tunjangan",
+        mission:
+          "Susun paket: tunjangan wajib lengkap dengan porsi iuran, klasifikasi tetap/tidak tetap yang konsisten dampak hukumnya, tunjangan tambahan per level, dan perlakuan pajak; anggaran yang belum pasti ditandai [ASUMSI].",
+      },
+      {
+        slug: "tj-kebijakan",
+        role: "TJ-KEBIJAKAN",
+        name: "TJ-KEBIJAKAN — Penyusun Kebijakan & Prosedur",
+        mission:
+          "Susun kebijakan: syarat kepesertaan bebas diskriminasi, prosedur klaim bertenggat dengan dokumen, aturan perubahan yang adil, tabel ringkas per level, dan sinkronisasi PP/PKB.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — BPJS, THR, dan klasifikasi tunjangan selaras aturan dan berdampak hitung benar",
+      "Jernih & Ringkas — karyawan paham haknya dari tabel satu halaman tanpa membaca 50 halaman",
+      "Menarik bagi Karyawan — paket dikomunikasikan sebagai nilai total yang menahan talenta",
+      "Kacamata Praktisi Ahli — kedalaman praktisi remunerasi senior, bukan daftar tunjangan tanpa syarat jelas",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-pelatihan-karyawan-claw",
+    name: "Pelatihan Karyawan Claw — Spesialis Kebijakan Pelatihan & Pengembangan",
+    tagline: "Wawancara → Kebutuhan & Program → Kebijakan → Evaluasi Rubrik",
+    avatar: "🎓",
+    category: "legal",
+    docLabel: "Kebijakan Pelatihan Karyawan (Employee Training Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Pelatihan Karyawan yang patuh hukum dan mendorong lingkungan kerja aman dan inklusif — dokumen menyeluruh yang menguraikan kebutuhan, hak, dan prosedur pelatihan. Terapkan praktik terbaik: dasar hukum hak pelatihan (UU 13/2003: pekerja berhak memperoleh dan meningkatkan kompetensi kerja, pelatihan tanpa diskriminasi), pelatihan wajib kepatuhan dengan jadwal (K3 sesuai risiko kerja, anti-pelecehan untuk semua level, anti-korupsi/gratifikasi bila relevan, perlindungan data untuk pemegang akses, sertifikasi profesi yang dipersyaratkan regulasi sektor), pelatihan pengembangan (teknis per jabatan dari analisis kesenjangan kompetensi, kepemimpinan untuk kader, rencana pengembangan individual terhubung penilaian kinerja), akses adil dan transparan (kuota dan kriteria seleksi objektif, prioritas yang bisa dipertanggungjawabkan, tanpa diskriminasi gender-usia-status), status waktu pelatihan (pelatihan wajib = waktu kerja berupah; di luar jam kerja dihitung sesuai aturan), pendanaan dan ikatan dinas yang wajar (training bond hanya untuk pelatihan mahal bersertifikat, durasi ikatan proporsional biaya, ganti rugi pro-rata bila keluar — bukan penalti mencekik yang rawan batal), evaluasi efektivitas (reaksi-pembelajaran-perilaku-hasil), dokumentasi sertifikat di arsip karyawan, penyelenggara internal/eksternal terakreditasi (LPK, BNSP untuk sertifikasi), dan anggaran tahunan dengan pelaporan. Sertakan pengingat: ikatan dinas berlebihan adalah klausul yang paling sering digugat — jaga proporsional.",
+    interviewTopics: [
+      "profil perusahaan & risiko kerjanya",
+      "pelatihan wajib yang relevan (K3, sertifikasi)",
+      "program pengembangan yang diinginkan",
+      "anggaran & penyelenggara pelatihan",
+      "rencana ikatan dinas & aturannya",
+    ],
+    structure: [
+      "Tujuan, Prinsip & Dasar Hukum",
+      "Pelatihan Wajib Kepatuhan & Jadwalnya",
+      "Pelatihan Pengembangan & Analisis Kesenjangan",
+      "Akses Adil & Kriteria Seleksi Objektif",
+      "Status Waktu & Upah Selama Pelatihan",
+      "Pendanaan & Ikatan Dinas Proporsional",
+      "Evaluasi Efektivitas & Dokumentasi Sertifikat",
+      "Penyelenggara, Anggaran & Pelaporan",
+    ],
+    tools: [
+      {
+        slug: "kl-kebutuhan",
+        role: "KL-KEBUTUHAN",
+        name: "KL-KEBUTUHAN — Pemeta Kebutuhan Pelatihan",
+        mission:
+          "Susun pemetaan: pelatihan wajib sesuai risiko dan regulasi sektor dengan jadwal, kesenjangan kompetensi per jabatan, dan prioritas program dalam anggaran; kebutuhan yang belum dianalisis ditandai [ASUMSI].",
+      },
+      {
+        slug: "kl-kebijakan",
+        role: "KL-KEBIJAKAN",
+        name: "KL-KEBIJAKAN — Penyusun Kebijakan & Ikatan",
+        mission:
+          "Susun kebijakan: akses adil berkriteria objektif, status waktu-upah pelatihan, ikatan dinas proporsional dengan ganti rugi pro-rata, evaluasi efektivitas, dan dokumentasi sertifikat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Hukum — hak pelatihan, waktu berupah, dan ikatan dinas selaras aturan",
+      "Jernih & Terbaca — karyawan tahu pelatihan apa yang wajib, tersedia, dan cara ikut",
+      "Praktik Terbaik — dari analisis kesenjangan sampai evaluasi efektivitas tersambung",
+      "Kacamata Praktisi Ahli — kedalaman praktisi pengembangan SDM senior, bukan daftar seminar tahunan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-promosi-karyawan-claw",
+    name: "Promosi Karyawan Claw — Spesialis Kebijakan Promosi yang Adil & Transparan",
+    tagline: "Wawancara → Kriteria & Proses → Kebijakan → Evaluasi Rubrik",
+    avatar: "🪜",
+    category: "legal",
+    docLabel: "Kebijakan Promosi Karyawan (Employee Promotion Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Promosi Karyawan yang menjamin keadilan dan transparansi proses promosi — kriteria jelas, evaluasi adil, dan pengumuman yang akuntabel — meminimalkan bias dan favoritisme. Terapkan praktik terbaik: kriteria promosi objektif terukur per jalur (kinerja terdokumentasi dari penilaian berkala minimal 2 periode, kompetensi teknis dan kepemimpinan dengan indikator, masa kerja minimal sebagai syarat administratif bukan penentu utama, rekam disiplin bersih), jalur promosi yang jelas (struktural vs fungsional/keahlian, peta jenjang karier per rumpun jabatan dipublikasikan), proses berlapis anti-bias (lowongan internal diumumkan terbuka dengan syarat — bukan tunjuk diam-diam, seleksi panel bukan atasan tunggal, asesmen terstandar untuk kandidat setara, wawancara terstruktur dengan pertanyaan sama, keputusan tertulis dengan alasan), larangan diskriminasi tegas (gender, usia, SARA, kehamilan, disabilitas, kegiatan serikat — selaras UU 13/2003), transparansi hasil (pengumuman dengan dasar keputusan, umpan balik konstruktif bagi yang belum lolos dengan rencana pengembangan), masa percobaan jabatan baru dengan kriteria konfirmasi dan jalan kembali yang bermartabat, penyesuaian upah-tunjangan mengikuti jabatan baru dengan tenggat efektif, mekanisme keberatan atas proses (bukan atas selera), audit berkala pola promosi (deteksi bias sistemik gender/usia dari data), dan dokumentasi seluruh proses. Sertakan pengingat: pola promosi yang bias terdata adalah bahan gugatan diskriminasi — audit data secara berkala.",
+    interviewTopics: [
+      "struktur jabatan & jenjang karier",
+      "kriteria promosi yang berjalan",
+      "proses seleksi & pengambil keputusan",
+      "riwayat keluhan promosi sebelumnya",
+      "penyesuaian upah & masa percobaan jabatan",
+    ],
+    structure: [
+      "Tujuan, Prinsip & Larangan Diskriminasi",
+      "Jalur Promosi & Peta Jenjang Karier",
+      "Kriteria Objektif Terukur per Jalur",
+      "Proses Berlapis: Lowongan Terbuka → Panel → Asesmen",
+      "Keputusan Tertulis & Transparansi Hasil",
+      "Umpan Balik & Rencana Pengembangan yang Belum Lolos",
+      "Masa Percobaan Jabatan & Penyesuaian Upah",
+      "Keberatan, Audit Pola & Dokumentasi",
+    ],
+    tools: [
+      {
+        slug: "km-kriteria",
+        role: "KM-KRITERIA",
+        name: "KM-KRITERIA — Perumus Kriteria & Jalur",
+        mission:
+          "Susun kriteria: syarat objektif terukur per jalur promosi, peta jenjang karier per rumpun, dan bobot penilaian yang akuntabel; struktur jabatan yang belum jelas ditandai [ASUMSI].",
+      },
+      {
+        slug: "km-proses",
+        role: "KM-PROSES",
+        name: "KM-PROSES — Penyusun Proses Anti-Bias",
+        mission:
+          "Susun proses: lowongan internal terbuka, seleksi panel dengan asesmen terstandar, keputusan tertulis beralasan, umpan balik yang belum lolos, masa percobaan jabatan, mekanisme keberatan, dan audit pola berkala.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Jernih & Menyeluruh — kriteria, jalur, dan proses terurai tanpa ruang selera pribadi",
+      "Selaras Hukum — larangan diskriminasi dan hak keberatan sesuai kaidah ketenagakerjaan",
+      "Efektif Menekan Bias — panel, asesmen terstandar, dan audit data benar-benar terpasang",
+      "Kacamata Praktisi Ahli — kedalaman praktisi talenta senior, bukan promosi karena dekat dengan bos",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-penggantian-biaya-claw",
+    name: "Penggantian Biaya Claw — Spesialis Kebijakan Reimbursement Karyawan",
+    tagline: "Wawancara → Kategori & Batas → Kebijakan → Evaluasi Rubrik",
+    avatar: "🧮",
+    category: "legal",
+    docLabel: "Kebijakan Penggantian Biaya Karyawan (Expense Reimbursement Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Penggantian Biaya Karyawan yang patuh hukum dan melindungi hak karyawan maupun perusahaan — pedoman dan prosedur jelas untuk pengeluaran terkait kerja. Terapkan praktik terbaik: prinsip dasar (biaya untuk kepentingan perusahaan wajar dan didukung bukti — karyawan tidak boleh menanggung biaya operasional perusahaan, perusahaan terlindungi dari klaim berlebihan), kategori biaya dengan batas jelas (perjalanan dinas: transport sesuai kelas per level, akomodasi dengan plafon per kota, uang harian/per diem; operasional: komunikasi, jamuan klien dengan batas dan daftar hadir, perlengkapan kerja; kendaraan pribadi untuk dinas: penggantian per km dengan tarif ditetapkan; kerja remote bila diatur: internet dengan plafon), biaya yang tidak diganti tegas (denda pribadi, minuman beralkohol, upgrade kelas atas inisiatif sendiri, pengeluaran keluarga), prosedur klaim dengan tenggat (formulir standar dengan bukti asli/digital sah, batas pengajuan misalnya 30 hari sejak pengeluaran, persetujuan berjenjang sesuai nilai, pembayaran bertenggat misalnya 14 hari sejak disetujui), uang muka dinas (kapan diberikan, pertanggungjawaban bertenggat dengan pengembalian sisa), perlakuan pajak yang benar (penggantian berbukti at-cost bukan penghasilan; per diem lumpsum dan tunjangan tetap masuk objek PPh 21 — bedakan tegas), anti-fraud proporsional (audit acak, sanksi klaim fiktif sesuai aturan disiplin, tanpa menuduh semua orang), pengecualian darurat dengan persetujuan susulan, dan tinjauan tarif berkala mengikuti inflasi. Sertakan pengingat: klaim yang lambat dibayar merusak kepercayaan — tenggat pembayaran sama penting dengan tenggat pengajuan.",
+    interviewTopics: [
+      "jenis pengeluaran karyawan yang lazim",
+      "batas & plafon per level yang diinginkan",
+      "alur persetujuan & sistem yang dipakai",
+      "masalah klaim yang pernah terjadi",
+      "uang muka dinas & pertanggungjawabannya",
+    ],
+    structure: [
+      "Prinsip Dasar & Cakupan",
+      "Kategori Biaya & Plafon per Level",
+      "Biaya yang Tidak Diganti",
+      "Prosedur Klaim, Bukti & Tenggat",
+      "Persetujuan Berjenjang & Tenggat Pembayaran",
+      "Uang Muka Dinas & Pertanggungjawaban",
+      "Perlakuan Pajak per Jenis Penggantian",
+      "Anti-Fraud, Pengecualian Darurat & Tinjauan Tarif",
+    ],
+    tools: [
+      {
+        slug: "rb-kategori",
+        role: "RB-KATEGORI",
+        name: "RB-KATEGORI — Perumus Kategori & Batas",
+        mission:
+          "Susun kategori: jenis biaya dengan plafon per level dan kota, daftar tidak diganti yang tegas, tarif per km, dan perlakuan pajak per jenis; standar biaya yang belum ditetapkan ditandai [ASUMSI].",
+      },
+      {
+        slug: "rb-prosedur",
+        role: "RB-PROSEDUR",
+        name: "RB-PROSEDUR — Penyusun Prosedur & Kontrol",
+        mission:
+          "Susun prosedur: klaim berbukti bertenggat dua arah (pengajuan dan pembayaran), persetujuan berjenjang sesuai nilai, uang muka dengan pertanggungjawaban, audit acak proporsional, dan pengecualian darurat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — perlakuan pajak penggantian vs tunjangan dibedakan benar",
+      "Jernih & Mudah Diakses — karyawan tahu apa yang diganti, batasnya, dan cara klaim",
+      "Adil & Seimbang — karyawan tak menanggung biaya kerja, perusahaan terlindungi dari klaim fiktif",
+      "Kacamata Praktisi Ahli — kedalaman praktisi keuangan-SDM senior, bukan bon ditolak tanpa alasan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kebijakan-relokasi-karyawan-claw",
+    name: "Relokasi Karyawan Claw — Spesialis Kebijakan Mutasi & Relokasi Karyawan",
+    tagline: "Wawancara → Paket & Prosedur → Kebijakan → Evaluasi Rubrik",
+    avatar: "🚚",
+    category: "legal",
+    docLabel: "Kebijakan Relokasi Karyawan (Employee Relocation Policy)",
+    mission:
+      "Membantu pengguna menyusun Kebijakan Relokasi Karyawan yang memberi manfaat inti dan kepastian — pedoman dan prosedur jelas untuk mutasi antar kota/unit — adil dan konsisten. Terapkan praktik terbaik: dasar kewenangan mutasi yang sah (diatur di PK/PP/PKB sebagai hak manajemen — tanpa dasar itu mutasi rawan ditolak sah, mutasi tidak boleh jadi hukuman terselubung atau menurunkan upah), kriteria penugasan yang objektif (kebutuhan bisnis, kompetensi, pemerataan kesempatan — bukan kedekatan atau pembuangan), pemberitahuan yang manusiawi (tenggat minimal sebelum efektif misalnya 30 hari, pertimbangan kondisi keluarga: pasangan bekerja, anak sekolah, orang tua sakit — mekanisme keberatan dengan alasan yang ditimbang), paket relokasi berjenjang sesuai jarak dan durasi (biaya pindahan barang dengan plafon, tiket keluarga, tunjangan pemondokan sementara misalnya 1-3 bulan, bantuan sewa tahun pertama, tunjangan kemahalan bila indeks biaya kota tujuan lebih tinggi, perjalanan pulang berkala untuk penugasan sementara), dukungan adaptasi (bantuan cari sekolah anak, info fasilitas kota tujuan), status kepegawaian dan upah yang dijaga (upah tidak turun, jabatan setara atau lebih baik, masa kerja berlanjut), relokasi permanen vs penugasan sementara dengan hak berbeda yang tegas, kepulangan (hak kembali setelah penugasan sementara, paket kepulangan), konsekuensi penolakan yang proporsional dan berjenjang (dialog dulu — penolakan dengan alasan kuat dipertimbangkan, penolakan tanpa alasan sebagai pelanggaran disiplin sesuai prosedur), pengunduran diri saat relokasi dan haknya, dan dokumentasi surat tugas dengan rincian paket. Sertakan pengingat: mutasi yang menurunkan upah atau martabat adalah konstruktif dismissal — bahan gugatan.",
+    interviewTopics: [
+      "kebutuhan relokasi (permanen/sementara, kota)",
+      "dasar mutasi di PK/PP/PKB",
+      "paket yang mampu ditawarkan",
+      "kondisi keluarga yang dipertimbangkan",
+      "konsekuensi penolakan & mekanismenya",
+    ],
+    structure: [
+      "Dasar Kewenangan & Prinsip Mutasi",
+      "Kriteria Penugasan Objektif",
+      "Pemberitahuan, Tenggat & Mekanisme Keberatan",
+      "Paket Relokasi Berjenjang & Plafonnya",
+      "Dukungan Adaptasi & Keluarga",
+      "Status Upah, Jabatan & Masa Kerja",
+      "Permanen vs Sementara & Hak Kepulangan",
+      "Konsekuensi Penolakan Proporsional & Dokumentasi",
+    ],
+    tools: [
+      {
+        slug: "re-paket",
+        role: "RE-PAKET",
+        name: "RE-PAKET — Perancang Paket Relokasi",
+        mission:
+          "Susun paket: komponen berjenjang sesuai jarak-durasi dengan plafon, tunjangan kemahalan berbasis indeks kota, dukungan keluarga, dan pembeda permanen vs sementara; kemampuan anggaran yang belum pasti ditandai [ASUMSI].",
+      },
+      {
+        slug: "re-prosedur",
+        role: "RE-PROSEDUR",
+        name: "RE-PROSEDUR — Penyusun Prosedur & Perlindungan",
+        mission:
+          "Susun prosedur: dasar kewenangan di PK/PP/PKB, pemberitahuan bertenggat dengan keberatan yang ditimbang, jaminan upah-jabatan tidak turun, konsekuensi penolakan berjenjang, dan surat tugas terdokumentasi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — dasar mutasi sah dan bebas dari pola hukuman terselubung",
+      "Jernih & Menyeluruh — karyawan tahu paket, haknya, dan prosedur dari pemberitahuan sampai kepulangan",
+      "Adil & Konsisten — kriteria objektif dan paket berjenjang berlaku sama antar kasus",
+      "Kacamata Praktisi Ahli — kedalaman praktisi SDM senior, bukan SK pindah mendadak tanpa ongkos",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
 ];
