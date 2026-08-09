@@ -145,14 +145,49 @@ function statusBadge(status: string) {
 }
 
 // ── ProdUrlCard: configure stable production URL ──────────────────────────
+
+function validateProdUrl(url: string): string | null {
+  if (!url) return null;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return "Format URL tidak valid. Contoh yang benar: https://nama-app.replit.app";
+  }
+  if (parsed.protocol !== "https:") {
+    return "URL harus menggunakan https:// (bukan http:// atau protokol lain)";
+  }
+  if (parsed.hostname.endsWith(".replit.dev")) {
+    return "URL .replit.dev adalah URL development yang tidak stabil. Gunakan URL deployment yang stabil, misalnya https://nama-app.replit.app";
+  }
+  return null;
+}
+
 function ProdUrlCard({ appUrl, isDevUrl, onSaved }: { appUrl: string; isDevUrl: boolean; onSaved: (u: string) => void }) {
   const { toast } = useToast();
   const [input, setInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [inputError, setInputError] = useState<string | null>(null);
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    setInput(val);
+    // Validate live once the user has typed something that looks like a URL
+    if (val.trim().length > 7) {
+      setInputError(validateProdUrl(val.trim()));
+    } else {
+      setInputError(null);
+    }
+  }
 
   async function handleSave() {
     const url = input.trim();
     if (!url) return;
+    const clientErr = validateProdUrl(url);
+    if (clientErr) {
+      setInputError(clientErr);
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/admin/set-prod-url", {
@@ -178,9 +213,13 @@ function ProdUrlCard({ appUrl, isDevUrl, onSaved }: { appUrl: string; isDevUrl: 
         });
         return;
       }
-      if (!res.ok) throw new Error(data.error || "Gagal menyimpan");
+      if (!res.ok) {
+        setInputError(data.error || "Gagal menyimpan");
+        return;
+      }
       onSaved(data.appUrl);
       setInput("");
+      setInputError(null);
       toast({ title: "URL Production tersimpan!", description: data.appUrl });
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
@@ -236,14 +275,20 @@ function ProdUrlCard({ appUrl, isDevUrl, onSaved }: { appUrl: string; isDevUrl: 
             <Input
               placeholder="https://nama-app.replit.app"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="text-sm font-mono"
+              onChange={handleInputChange}
+              className={`text-sm font-mono ${inputError ? "border-red-500 focus-visible:ring-red-500" : ""}`}
               data-testid="input-prod-url"
             />
-            <Button size="sm" onClick={handleSave} disabled={saving || !input.trim()} data-testid="button-save-prod-url">
+            <Button size="sm" onClick={handleSave} disabled={saving || !input.trim() || !!inputError} data-testid="button-save-prod-url">
               {saving ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : "Simpan"}
             </Button>
           </div>
+          {inputError && (
+            <p className="text-xs text-red-500 flex items-center gap-1 mt-1" data-testid="prod-url-error">
+              <AlertCircle className="h-3.5 w-3.5 flex-shrink-0" />
+              {inputError}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">

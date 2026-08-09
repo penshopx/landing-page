@@ -11524,9 +11524,25 @@ Balas dengan JSON dengan struktur PERSIS ini:
     const { url } = req.body as { url?: string };
     if (!url || typeof url !== "string") return res.status(400).json({ error: "url required" });
     const clean = url.trim().replace(/\/$/, "");
-    if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
-      return res.status(400).json({ error: "URL harus dimulai dengan https://" });
+
+    // Must be a valid URL
+    let parsed: URL;
+    try {
+      parsed = new URL(clean);
+    } catch {
+      return res.status(400).json({ error: "Format URL tidak valid. Contoh yang benar: https://nama-app.replit.app" });
     }
+
+    // Must use https
+    if (parsed.protocol !== "https:") {
+      return res.status(400).json({ error: "URL harus menggunakan https:// (bukan http:// atau protokol lain)" });
+    }
+
+    // Must not be a .replit.dev URL (development/unstable)
+    if (parsed.hostname.endsWith(".replit.dev")) {
+      return res.status(400).json({ error: "URL .replit.dev adalah URL development yang tidak stabil dan akan berubah. Gunakan URL deployment yang stabil, misalnya https://nama-app.replit.app" });
+    }
+
     await saveProdUrlToDb(clean);
     return res.json({ ok: true, appUrl: clean });
   });
