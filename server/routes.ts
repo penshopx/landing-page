@@ -20311,27 +20311,15 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 const { db: dbOrd } = await import("./db");
                 const { storeOrders: soTbl } = await import("@shared/schema");
 
-                // Resolve download URL — full URL (Google Drive etc.) or Supabase signed URL
-                const signedUrl = await resolveDownloadUrl(matched.downloadPath, 86_400);
+                // Generate access token BEFORE everything so it can be used as
+                // both the order correlation key and the Brevo tag.
+                // The order record is persisted FIRST so the token is durable in
+                // the DB before Brevo can emit any bounce event — eliminating the
+                // insert-after-send race that could permanently lose WA fallback.
+                const dpAccessToken = dpUUID();
+                const orderCorrelationTag = `digital-delivery-${dpAccessToken}`;
 
-                // Send delivery email (fire-and-forget)
-                sendDigitalProductDeliveryEmail({
-                  to: customerEmail,
-                  customerName: customerName || null,
-                  productName: matched.name,
-                  downloadUrl: signedUrl,
-                  expiryHours: 24,
-                }).then((r: any) => {
-                  if (r.sent) {
-                    console.log(`[DigitalDelivery] Email terkirim ke ${customerEmail} untuk "${matched.name}"`);
-                  } else {
-                    console.error(`[DigitalDelivery] Email gagal ke ${customerEmail}: ${r.reason} — ${r.detail ?? ""}`);
-                  }
-                }).catch((e: any) => {
-                  console.error("[DigitalDelivery] sendEmail error:", e?.message);
-                });
-
-                // Record order
+                // Persist order FIRST — token in DB before Brevo can bounce.
                 await dbOrd.insert(soTbl).values({
                   productId: matched.id,
                   customerName: customerName || "Customer",
@@ -20339,11 +20327,66 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                   customerPhone,
                   amount: Math.round(grossRevenue),
                   midtransOrderId: `scalev_${orderId}`,
-                  accessToken: dpUUID(),
+                  accessToken: dpAccessToken,
                   status: "paid",
                 } as any).onConflictDoNothing();
-
                 console.log(`[DigitalDelivery] Order recorded for "${matched.name}" — ${customerEmail}`);
+
+                // Resolve download URL — full URL (Google Drive etc.) or Supabase signed URL
+                const signedUrl = await resolveDownloadUrl(matched.downloadPath, 86_400);
+
+                // Send delivery email — await so we can fall back to WA if it fails immediately
+                let emailSent = false;
+                try {
+                  const emailResult = await sendDigitalProductDeliveryEmail({
+                    to: customerEmail,
+                    customerName: customerName || null,
+                    productName: matched.name,
+                    downloadUrl: signedUrl,
+                    expiryHours: 24,
+                    orderCorrelationTag,
+                  });
+                  emailSent = emailResult.sent;
+                  if (emailResult.sent) {
+                    console.log(`[DigitalDelivery] Email terkirim ke ${customerEmail} untuk "${matched.name}" (token: ${dpAccessToken})`);
+                  } else {
+                    console.error(`[DigitalDelivery] Email gagal ke ${customerEmail}: ${(emailResult as any).reason} — ${(emailResult as any).detail ?? ""}`);
+                  }
+                } catch (emailErr: any) {
+                  console.error("[DigitalDelivery] sendEmail error:", emailErr?.message);
+                }
+
+                // Immediate WA fallback: Brevo rejected the send synchronously
+                // (API error, network error, or BREVO_API_KEY not configured).
+                // We already have signedUrl in memory — send directly without DB lookup.
+                const immediateFonnteKey = process.env.FONNTE_API_TOKEN || process.env.FONNTE_API_KEY;
+                if (!emailSent && customerPhone && immediateFonnteKey) {
+                  const greet = (customerName || "").trim() || "Pembeli";
+                  const waMessage =
+                    `📦 *${matched.name}*\n\n` +
+                    `Halo ${greet},\n\n` +
+                    `Link download produk Anda sudah siap:\n${signedUrl}\n\n` +
+                    `⚠️ Link berlaku 24 jam. Simpan segera sebelum kedaluwarsa.\n\n` +
+                    `— Gustafta Digital`;
+                  try {
+                    const waRes = await fetch("https://api.fonnte.com/send", {
+                      method: "POST",
+                      headers: { Authorization: immediateFonnteKey },
+                      body: new URLSearchParams({ target: customerPhone, message: waMessage, countryCode: "62" }),
+                    });
+                    const waJson = (await waRes.json()) as { status?: boolean; reason?: string };
+                    if (waJson.status) {
+                      // Mark token as already WA-delivered so the async bounce
+                      // handler skips a duplicate send if Brevo later bounces.
+                      _digitalDeliveryWaSentTokens.add(dpAccessToken);
+                      console.log(`[DigitalDelivery] WA fallback (immediate) terkirim ke ${customerPhone} untuk "${matched.name}"`);
+                    } else {
+                      console.error(`[DigitalDelivery] WA fallback (immediate) gagal ke ${customerPhone}: ${waJson.reason ?? `HTTP ${waRes.status}`}`);
+                    }
+                  } catch (waErr: any) {
+                    console.error("[DigitalDelivery] WA fallback (immediate) error:", waErr?.message);
+                  }
+                }
                 return res.status(200).json({ received: true, type: "digital_product_delivery" });
               } catch (dpErr: any) {
                 console.error("[DigitalDelivery] Error:", dpErr?.message);
@@ -20817,6 +20860,106 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   // Bounce tracker — persisted di system_config agar tidak hilang saat redeploy.
   // Key: "email_bounce_stats" → JSON { delivered, bounced, spam, lastAlertAt }
   const _brevoStats = { delivered: 0, bounced: 0, spam: 0, lastAlertAt: 0 };
+  // In-memory dedup set: prevents sending WA fallback twice when Brevo fires
+  // multiple bounce events for the same delivery (keyed by order accessToken).
+  // Key is reserved BEFORE any async work so concurrent duplicate events are blocked.
+  // Intentionally ephemeral — bounces arrive within minutes; restart risk is negligible.
+  const _digitalDeliveryWaSentTokens = new Set<string>();
+
+  // Fire WA fallback for a digital delivery that bounced asynchronously.
+  // `orderCorrelationTag` is the Brevo tag embedded at send time, formatted as
+  // "digital-delivery-<accessToken>". The accessToken uniquely identifies a single
+  // store_order row, so even if the same buyer placed multiple orders the correct
+  // delivery is always found — no email-based ambiguity.
+  // Never throws. Called from the bounce webhook handler (fire-and-forget).
+  async function _fireDigitalDeliveryWaFallback(orderCorrelationTag: string): Promise<void> {
+    // Extract the accessToken from the tag (format: "digital-delivery-<uuid>")
+    const accessToken = orderCorrelationTag.replace(/^digital-delivery-/, "");
+    if (!accessToken || accessToken === orderCorrelationTag) {
+      console.warn(`[DigitalDelivery] Malformed orderCorrelationTag: ${orderCorrelationTag}`);
+      return;
+    }
+
+    // Reserve dedup key BEFORE any async work so concurrent duplicate bounce
+    // webhooks are blocked immediately, not after Fonnte responds.
+    if (_digitalDeliveryWaSentTokens.has(accessToken)) {
+      console.log(`[DigitalDelivery] WA fallback already sent for token ${accessToken}, skipping duplicate bounce event`);
+      return;
+    }
+    _digitalDeliveryWaSentTokens.add(accessToken);
+
+    const fonnteKey = process.env.FONNTE_API_TOKEN || process.env.FONNTE_API_KEY;
+    if (!fonnteKey) {
+      console.warn(`[DigitalDelivery] WA fallback skipped for token ${accessToken} — FONNTE_API_TOKEN/FONNTE_API_KEY not configured`);
+      _digitalDeliveryWaSentTokens.delete(accessToken); // allow retry after key is set
+      return;
+    }
+    try {
+      const { db: dbWa } = await import("./db");
+      const { storeProducts: spTblWa, storeOrders: soTblWa } = await import("@shared/schema");
+      const { eq: eqWa } = await import("drizzle-orm");
+
+      // Look up the EXACT order by accessToken — not by email — so a buyer
+      // with multiple purchases is always matched to the right product.
+      const rows = await dbWa
+        .select({
+          customerName: soTblWa.customerName,
+          customerPhone: soTblWa.customerPhone,
+          customerEmail: soTblWa.customerEmail,
+          productName: spTblWa.name,
+          downloadPath: spTblWa.downloadPath,
+        })
+        .from(soTblWa)
+        .innerJoin(spTblWa, eqWa(soTblWa.productId, spTblWa.id))
+        .where(eqWa(soTblWa.accessToken, accessToken))
+        .limit(1);
+
+      if (!rows[0]) {
+        console.warn(`[DigitalDelivery] No order found for token ${accessToken} — skipping WA fallback`);
+        _digitalDeliveryWaSentTokens.delete(accessToken); // allow retry if order lands late
+        return;
+      }
+
+      const { customerName, customerPhone, customerEmail, productName, downloadPath } = rows[0];
+      if (!customerPhone) {
+        console.warn(`[DigitalDelivery] WA fallback skipped for token ${accessToken} (${customerEmail}) — no phone number on order`);
+        return;
+      }
+      if (!downloadPath) {
+        console.warn(`[DigitalDelivery] WA fallback skipped for token ${accessToken} — product has no downloadPath`);
+        return;
+      }
+
+      const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+      const signedUrl = await resolveDownloadUrl(downloadPath, 86_400);
+
+      const greet = (customerName || "").trim() || "Pembeli";
+      const waMessage =
+        `📦 *${productName}*\n\n` +
+        `Halo ${greet},\n\n` +
+        `Email pengiriman link download kami tidak sampai ke kotak masuk Anda.\n` +
+        `Berikut link download langsung via WhatsApp:\n${signedUrl}\n\n` +
+        `⚠️ Link berlaku 24 jam. Simpan segera sebelum kedaluwarsa.\n\n` +
+        `— Gustafta Digital`;
+
+      const waRes = await fetch("https://api.fonnte.com/send", {
+        method: "POST",
+        headers: { Authorization: fonnteKey },
+        body: new URLSearchParams({ target: customerPhone, message: waMessage, countryCode: "62" }),
+      });
+      const waJson = (await waRes.json()) as { status?: boolean; reason?: string };
+      if (waJson.status) {
+        console.log(`[DigitalDelivery] WA fallback (bounce) terkirim ke ${customerPhone} untuk "${productName}" (token: ${accessToken})`);
+      } else {
+        // Fonnte rejected — remove from sent set so a manual retry is possible
+        _digitalDeliveryWaSentTokens.delete(accessToken);
+        console.error(`[DigitalDelivery] WA fallback (bounce) gagal ke ${customerPhone}: ${waJson.reason ?? `HTTP ${waRes.status}`}`);
+      }
+    } catch (err: any) {
+      _digitalDeliveryWaSentTokens.delete(accessToken); // allow retry
+      console.error(`[DigitalDelivery] WA fallback (bounce) error for token ${accessToken}:`, err?.message);
+    }
+  }
 
   // Load snapshot awal dari DB saat routes terdaftar
   (async () => {
@@ -21011,6 +21154,10 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               if (isOtpEmail) {
                 console.warn(`[Brevo] OTP hard bounce for ${email} — user will not receive verification code. Reason: ${reason || "unknown"}`);
               }
+              {
+                const deliveryTag = tags.find((t: string) => t.startsWith("digital-delivery-"));
+                if (deliveryTag) void _fireDigitalDeliveryWaFallback(deliveryTag);
+              }
               break;
 
             case "soft_bounce":
@@ -21019,6 +21166,10 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 `[Brevo] ~ SOFT BOUNCE${isOtpEmail ? " [OTP EMAIL]" : ""} — ` +
                 `to=${email} reason="${reason}" messageId=${messageId} ts=${ts}`
               );
+              {
+                const deliveryTag = tags.find((t: string) => t.startsWith("digital-delivery-"));
+                if (deliveryTag) void _fireDigitalDeliveryWaFallback(deliveryTag);
+              }
               break;
 
             case "spam":
@@ -21035,6 +21186,10 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 `[Brevo] ✗ INVALID EMAIL${isOtpEmail ? " [OTP EMAIL]" : ""} — ` +
                 `to=${email} messageId=${messageId} ts=${ts}`
               );
+              {
+                const deliveryTag = tags.find((t: string) => t.startsWith("digital-delivery-"));
+                if (deliveryTag) void _fireDigitalDeliveryWaFallback(deliveryTag);
+              }
               break;
 
             case "deferred":

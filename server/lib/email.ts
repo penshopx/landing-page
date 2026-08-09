@@ -665,6 +665,12 @@ interface DigitalProductDeliveryOptions {
   downloadUrl: string;
   /** Hours until link expires (default 24) */
   expiryHours?: number;
+  /**
+   * Opaque tag for Brevo → webhook correlation. When set, included in the
+   * Brevo tags array so a bounce event can identify the exact order.
+   * Recommended format: "digital-delivery-<accessToken>".
+   */
+  orderCorrelationTag?: string;
 }
 
 /**
@@ -741,12 +747,14 @@ Butuh bantuan? Kunjungi gustafta.my.id
 
 — Tim Gustafta`;
 
+  const tags = ["digital-product-delivery", "transactional"];
+  if (opts.orderCorrelationTag) tags.push(opts.orderCorrelationTag);
   return sendEmail({
     to: opts.to,
     toName: greetName,
     subject: `📦 File Siap Diunduh: ${opts.productName}`,
     htmlContent: html,
     textContent,
-    tags: ["digital-product-delivery", "transactional"],
+    tags,
   });
 }
