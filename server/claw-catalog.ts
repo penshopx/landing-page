@@ -6617,4 +6617,822 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
+
+  // ── Batch 13 (corporate-lawyer, legal) ──────────────────────────────────────
+  {
+    kind: "openclaw",
+    slug: "perjanjian-kerahasiaan-claw",
+    name: "Kerahasiaan Claw — Spesialis Perjanjian Kerahasiaan (NDA)",
+    tagline: "Wawancara → Lingkup Rahasia → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🤐",
+    category: "legal",
+    docLabel: "Perjanjian Kerahasiaan (Non-Disclosure Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Kerahasiaan (NDA) yang menjamin kerahasiaan dan melindungi kepentingan para pihak — komprehensif dan kokoh secara hukum — untuk dipakai membangun kepercayaan sebelum berbagi informasi bisnis sensitif. Terapkan praktik terbaik hukum Indonesia: definisi informasi rahasia yang presisi (apa yang tercakup dan pengecualiannya: informasi publik, diketahui sebelumnya, dikembangkan independen, diwajibkan hukum), arah kewajiban (sepihak atau timbal balik), lingkup penggunaan yang diizinkan dan pihak yang boleh menerima (karyawan/penasihat dengan kewajiban serupa), jangka waktu kerahasiaan yang wajar termasuk setelah perjanjian berakhir, kewajiban pengembalian/pemusnahan informasi, sanksi dan ganti rugi yang dapat ditegakkan, kaitan dengan perlindungan rahasia dagang UU 30/2000 dan data pribadi UU PDP, keabsahan sesuai syarat sah perjanjian KUHPerdata 1320, pilihan hukum dan penyelesaian sengketa (musyawarah → arbitrase/pengadilan), serta bahasa Indonesia sesuai UU 24/2009 untuk pihak Indonesia. Sertakan pengingat: reviu akhir oleh konsultan hukum sebelum ditandatangani.",
+    interviewTopics: [
+      "para pihak & konteks berbagi informasi",
+      "jenis informasi yang dirahasiakan",
+      "arah kewajiban (sepihak/timbal balik)",
+      "jangka waktu & pihak yang boleh menerima",
+      "sanksi & penyelesaian sengketa yang diinginkan",
+    ],
+    structure: [
+      "Para Pihak & Latar Belakang",
+      "Definisi Informasi Rahasia & Pengecualian",
+      "Kewajiban Kerahasiaan & Penggunaan yang Diizinkan",
+      "Jangka Waktu & Kewajiban Pasca-Berakhir",
+      "Pengembalian/Pemusnahan Informasi",
+      "Sanksi, Ganti Rugi & Penegakan",
+      "Pilihan Hukum & Penyelesaian Sengketa",
+      "Keabsahan, Bahasa & Tanda Tangan",
+    ],
+    tools: [
+      {
+        slug: "nd-lingkup",
+        role: "ND-LINGKUP",
+        name: "ND-LINGKUP — Perumus Lingkup Kerahasiaan",
+        mission:
+          "Susun lingkup: definisi informasi rahasia presisi dengan pengecualian baku, arah kewajiban, penggunaan yang diizinkan, penerima yang dibolehkan, dan jangka waktu wajar; kebutuhan pihak yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "nd-klausul",
+        role: "ND-KLAUSUL",
+        name: "ND-KLAUSUL — Penyusun Klausul & Penegakan",
+        mission:
+          "Susun klausul: sanksi dan ganti rugi yang dapat ditegakkan, kaitan rahasia dagang UU 30/2000 dan UU PDP, pilihan hukum dan forum sengketa, keabsahan KUHPerdata 1320, dan pengingat reviu konsultan hukum.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — dari definisi sampai penegakan tak ada celah kebocoran yang tak diatur",
+      "Patuh Hukum — selaras KUHPerdata, UU 30/2000, UU PDP, dan UU 24/2009",
+      "Jernih & Terbaca — pihak non-hukum paham kewajibannya tanpa tafsir ganda",
+      "Kacamata Praktisi Ahli — kedalaman korporat lawyer senior, bukan template NDA unduhan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-pemegang-saham-claw",
+    name: "Pemegang Saham Claw — Spesialis Perjanjian Pemegang Saham",
+    tagline: "Wawancara → Hak & Kewajiban → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🧑‍⚖️",
+    category: "legal",
+    docLabel: "Perjanjian Pemegang Saham (Shareholders Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Pemegang Saham yang mencerminkan secara akurat hak dan kewajiban para pemegang saham — untuk dipakai perseroan dan pemegang sahamnya mengatur hubungan di luar anggaran dasar. Terapkan praktik terbaik: struktur kepemilikan dan setoran modal, hak suara dan hal-hal yang butuh persetujuan khusus (reserved matters: utang besar, pengalihan aset, penerbitan saham baru), susunan dan penunjukan direksi-komisaris, kebijakan dividen, pembatasan pengalihan saham (right of first refusal, tag along, drag along, lock-up pendiri), anti-dilusi dan pre-emptive rights sesuai UUPT 40/2007, penyelesaian kebuntuan (deadlock: mediasi, buy-out, shotgun clause), exit (IPO, penjualan, likuidasi), kewajiban non-kompetisi pemegang saham aktif, mekanisme sengketa berjenjang (musyawarah → arbitrase BANI), keselarasan dengan anggaran dasar (yang bertentangan harus diubah lewat RUPS), dan bahasa Indonesia UU 24/2009. Sertakan pengingat: finalisasi bersama notaris dan konsultan hukum.",
+    interviewTopics: [
+      "perseroan & komposisi pemegang saham",
+      "hal yang ingin butuh persetujuan khusus",
+      "aturan pengalihan saham yang diinginkan",
+      "kebijakan dividen & rencana exit",
+      "antisipasi kebuntuan & sengketa",
+    ],
+    structure: [
+      "Para Pihak, Perseroan & Struktur Kepemilikan",
+      "Hak Suara & Reserved Matters",
+      "Direksi, Komisaris & Tata Kelola",
+      "Kebijakan Dividen",
+      "Pembatasan Pengalihan Saham (ROFR/Tag/Drag)",
+      "Anti-Dilusi & Hak Memesan Terlebih Dahulu",
+      "Deadlock, Exit & Non-Kompetisi",
+      "Sengketa, Keselarasan AD & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "sh-hak",
+        role: "SH-HAK",
+        name: "SH-HAK — Perumus Hak & Tata Kelola",
+        mission:
+          "Susun pengaturan: struktur kepemilikan, reserved matters, penunjukan direksi-komisaris, kebijakan dividen, dan hak memesan sesuai UUPT 40/2007; preferensi pihak yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "sh-klausul",
+        role: "SH-KLAUSUL",
+        name: "SH-KLAUSUL — Penyusun Klausul Pengalihan & Sengketa",
+        mission:
+          "Susun klausul: pembatasan pengalihan (ROFR, tag along, drag along, lock-up), penyelesaian deadlock dan exit, non-kompetisi, sengketa berjenjang sampai arbitrase, dan keselarasan dengan anggaran dasar.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Hukum Menyeluruh — klausul selaras UUPT 40/2007 dan tidak bertentangan dengan AD",
+      "Bahasa Jernih & Ringkas — hak dan kewajiban tiap pemegang saham terbaca tegas",
+      "Sengketa Efektif — mekanisme deadlock dan sengketa berjenjang benar-benar bisa dijalankan",
+      "Kacamata Praktisi Ahli — kedalaman corporate lawyer senior, bukan salinan akta pendirian",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-kekayaan-intelektual-claw",
+    name: "Kekayaan Intelektual Claw — Spesialis Perjanjian Kekayaan Intelektual",
+    tagline: "Wawancara → Pemetaan KI → Klausul Perlindungan → Dokumen → Evaluasi Rubrik",
+    avatar: "🧠",
+    category: "legal",
+    docLabel: "Perjanjian Kekayaan Intelektual (Intellectual Property Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Kekayaan Intelektual yang melindungi hak KI klien — komprehensif, kokoh secara hukum, dengan syarat penggunaan dan perlindungan yang jelas. Terapkan praktik terbaik rezim KI Indonesia: identifikasi jenis KI yang diatur (hak cipta UU 28/2014, paten UU 13/2016, merek UU 20/2016, desain industri, rahasia dagang UU 30/2000), status kepemilikan awal dan hasil pengembangan (karya pesanan vs karya karyawan — default hukum berbeda, atur tegas), lingkup pengalihan vs lisensi (pengalihan hak cipta wajib tertulis; lisensi wajib dicatatkan ke DJKI agar berlaku ke pihak ketiga), moral rights pencipta yang tak dapat dialihkan, KI turunan dan perbaikan di masa depan, kerahasiaan proses pengembangan, jaminan non-pelanggaran KI pihak ketiga dan ganti rugi bila digugat, akibat berakhirnya perjanjian terhadap penggunaan KI, dan forum sengketa (Pengadilan Niaga untuk KI terdaftar). Sertakan pengingat: pencatatan ke DJKI dan reviu konsultan KI untuk finalisasi.",
+    interviewTopics: [
+      "jenis KI yang diatur & status pendaftarannya",
+      "konteks (pengembangan, pesanan, kerja sama, jual-beli KI)",
+      "kepemilikan hasil & KI turunan yang diinginkan",
+      "lingkup penggunaan pihak lain",
+      "jaminan & antisipasi pelanggaran pihak ketiga",
+    ],
+    structure: [
+      "Para Pihak & Latar Belakang",
+      "Identifikasi & Status KI yang Diatur",
+      "Kepemilikan Awal, Hasil & KI Turunan",
+      "Pengalihan vs Lisensi & Pencatatan DJKI",
+      "Moral Rights & Kerahasiaan Pengembangan",
+      "Jaminan Non-Pelanggaran & Ganti Rugi",
+      "Akibat Berakhirnya Perjanjian",
+      "Sengketa, Keabsahan & Tanda Tangan",
+    ],
+    tools: [
+      {
+        slug: "hk-peta",
+        role: "HK-PETA",
+        name: "HK-PETA — Pemeta Kekayaan Intelektual",
+        mission:
+          "Susun pemetaan: jenis KI dengan undang-undang acuannya, status kepemilikan awal vs hasil (default karya pesanan/karyawan diatur tegas), KI turunan, dan kebutuhan pencatatan DJKI; status pendaftaran yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "hk-lindung",
+        role: "HK-LINDUNG",
+        name: "HK-LINDUNG — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: lingkup pengalihan/lisensi presisi, moral rights, kerahasiaan, jaminan non-pelanggaran dengan mekanisme ganti rugi, akibat pengakhiran, dan forum Pengadilan Niaga untuk KI terdaftar.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua jenis KI dan skenario kepemilikan hasil tercakup tanpa celah",
+      "Patuh Hukum — selaras rezim UU hak cipta/paten/merek/rahasia dagang dan kewajiban pencatatan DJKI",
+      "Jernih & Presisi — batas pengalihan vs lisensi dan lingkup penggunaan tak bisa ditafsir ganda",
+      "Kacamata Praktisi Ahli — kedalaman praktisi KI senior, bukan klausul KI tempelan di kontrak umum",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "sewa-komersial-claw",
+    name: "Sewa Komersial Claw — Spesialis Perjanjian Sewa Komersial",
+    tagline: "Wawancara → Syarat Sewa → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏬",
+    category: "legal",
+    docLabel: "Perjanjian Sewa Komersial (Commercial Lease Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Sewa Komersial yang patuh hukum dan melindungi kepentingan para pihak — hak dan kewajiban pemilik dan penyewa terdefinisi jelas — untuk ruang usaha, kantor, ruko, atau gudang. Terapkan praktik terbaik: identifikasi objek sewa presisi (sertifikat, luas, batas, kondisi serah terima dengan berita acara dan foto), harga sewa dan mekanisme kenaikan, service charge dan biaya lain yang dipisah tegas, jangka waktu dengan opsi perpanjangan dan syaratnya, peruntukan penggunaan dan kepatuhan perizinan usaha penyewa (NIB, PBG/SLF gedung), fit-out dan pengembalian kondisi saat berakhir, kewajiban pemeliharaan yang dibagi jelas (struktural vs operasional), asuransi dan risiko force majeure, larangan sewa-ulang tanpa izin, wanprestasi dan pengakhiran lebih awal dengan konsekuensi terukur, deposit dan mekanisme pengembaliannya, pajak (PPh final sewa, PPN bila pemilik PKP, bea materai), dan sengketa berjenjang. Sertakan pengingat: akta notaris disarankan untuk sewa jangka panjang bernilai besar.",
+    interviewTopics: [
+      "objek sewa & legalitasnya",
+      "harga, service charge & mekanisme kenaikan",
+      "jangka waktu, perpanjangan & fit-out",
+      "pembagian pemeliharaan & asuransi",
+      "deposit, wanprestasi & pengakhiran awal",
+    ],
+    structure: [
+      "Para Pihak & Objek Sewa (Legalitas, Serah Terima)",
+      "Harga Sewa, Service Charge & Kenaikan",
+      "Jangka Waktu & Opsi Perpanjangan",
+      "Peruntukan, Perizinan & Fit-Out",
+      "Pemeliharaan, Asuransi & Force Majeure",
+      "Deposit, Larangan Sewa-Ulang & Wanprestasi",
+      "Pajak & Biaya-Biaya",
+      "Pengakhiran, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "cl-syarat",
+        role: "CL-SYARAT",
+        name: "CL-SYARAT — Perumus Syarat Komersial",
+        mission:
+          "Susun syarat: objek presisi dengan berita acara serah terima, struktur harga-service charge-kenaikan, jangka waktu dan perpanjangan, fit-out dan pengembalian kondisi, serta perlakuan pajak; angka yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "cl-klausul",
+        role: "CL-KLAUSUL",
+        name: "CL-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: pembagian pemeliharaan struktural vs operasional, asuransi dan force majeure, deposit dan pengembaliannya, wanprestasi dan pengakhiran awal dengan konsekuensi terukur, dan sengketa berjenjang.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — selaras KUHPerdata sewa-menyewa, perizinan bangunan, dan kewajiban pajak sewa",
+      "Jernih & Lengkap — pembagian kewajiban pemilik vs penyewa tegas sampai biaya terkecil",
+      "Perlindungan Seimbang — deposit, wanprestasi, dan pengakhiran melindungi dua pihak secara adil",
+      "Kacamata Praktisi Ahli — kedalaman praktisi properti komersial senior, bukan kuitansi sewa bermaterai",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-merger-akuisisi-claw",
+    name: "Merger & Akuisisi Claw — Spesialis Perjanjian Merger dan Akuisisi",
+    tagline: "Wawancara → Struktur Transaksi → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🤝",
+    category: "legal",
+    docLabel: "Perjanjian Merger & Akuisisi (Mergers and Acquisitions Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Merger dan Akuisisi yang patuh hukum dan melindungi para pihak — mencerminkan akurat syarat dan ketentuan penggabungan atau pengambilalihan. Terapkan praktik terbaik hukum Indonesia: struktur transaksi (merger/penggabungan, akuisisi saham, akuisisi aset — konsekuensi hukum berbeda), harga dan mekanisme penyesuaian (locked box vs completion accounts, earn-out), syarat pendahuluan (conditions precedent: due diligence tuntas, persetujuan RUPS sesuai UUPT 40/2007, notifikasi/persetujuan KPPU untuk ambang tertentu, persetujuan kreditur dan pihak ketiga, izin sektor bila ada), pernyataan dan jaminan penjual (representations & warranties) dengan batasan tanggung jawab (cap, basket, masa klaim), kewajiban antara tanda tangan dan closing (ordinary course, no leakage), perlindungan karyawan sesuai UU Ketenagakerjaan saat perubahan pengendalian, mekanisme closing dan dokumen serah terima, indemnity untuk risiko spesifik hasil due diligence, non-kompetisi penjual, dan pengumuman sesuai kewajiban UUPT (surat kabar, karyawan). Sertakan pengingat: transaksi M&A wajib didampingi konsultan hukum dan notaris.",
+    interviewTopics: [
+      "struktur transaksi & para pihak",
+      "harga, penyesuaian & earn-out",
+      "temuan due diligence & risiko spesifik",
+      "persetujuan yang dibutuhkan (RUPS, KPPU, kreditur)",
+      "karyawan & rencana pasca-closing",
+    ],
+    structure: [
+      "Para Pihak, Struktur & Objek Transaksi",
+      "Harga & Mekanisme Penyesuaian",
+      "Syarat Pendahuluan (CP) & Persetujuan Regulator",
+      "Pernyataan & Jaminan dengan Batasan Tanggung Jawab",
+      "Kewajiban Pra-Closing & Larangan Kebocoran",
+      "Mekanisme Closing & Dokumen Serah Terima",
+      "Indemnity, Non-Kompetisi & Karyawan",
+      "Pengumuman Wajib, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "ma-struktur",
+        role: "MA-STRUKTUR",
+        name: "MA-STRUKTUR — Perancang Struktur Transaksi",
+        mission:
+          "Susun struktur: bentuk transaksi dengan konsekuensi hukumnya, harga dan penyesuaian, syarat pendahuluan lengkap (RUPS, KPPU, kreditur, izin sektor), dan jadwal menuju closing; persetujuan yang belum dipastikan ditandai [ASUMSI].",
+      },
+      {
+        slug: "ma-klausul",
+        role: "MA-KLAUSUL",
+        name: "MA-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: pernyataan-jaminan dengan cap/basket/masa klaim, kewajiban pra-closing, indemnity risiko spesifik, non-kompetisi, perlindungan karyawan, dan kewajiban pengumuman sesuai UUPT.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh — dari CP sampai indemnity tak ada risiko transaksi yang tak diatur",
+      "Jernih & Presisi — harga, penyesuaian, dan batasan tanggung jawab terukur tanpa ambigu",
+      "Komunikasi Efektif — ringkasan transaksi dapat dipahami direksi non-hukum untuk keputusan RUPS",
+      "Kacamata Praktisi Ahli — kedalaman praktisi M&A senior, bukan akta jual beli saham biasa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "anggaran-dasar-claw",
+    name: "Anggaran Dasar Claw — Spesialis Anggaran Dasar & Aturan Internal Perseroan",
+    tagline: "Wawancara → Tata Kelola → Pasal-Pasal → Dokumen → Evaluasi Rubrik",
+    avatar: "🏛️",
+    category: "legal",
+    docLabel: "Anggaran Dasar & Aturan Internal Perseroan (Corporate Bylaws)",
+    mission:
+      "Membantu pengguna menyusun Anggaran Dasar dan aturan internal perseroan yang menetapkan tata kelola operasional internal — komprehensif, kokoh secara hukum, patuh UUPT 40/2007 (dan penyesuaian UU Cipta Kerja), melindungi hak pemegang saham dan organ perseroan. Terapkan praktik terbaik: nama-tempat kedudukan-jangka waktu, maksud dan tujuan dengan kode KBLI yang tepat (menentukan izin di OSS), modal dasar-ditempatkan-disetor dan klasifikasi saham, mekanisme RUPS (kuorum, panggilan, keputusan sirkuler, RUPS elektronik), kewenangan dan pembatasan direksi (perbuatan yang butuh persetujuan komisaris/RUPS), tugas pengawasan komisaris, tahun buku dan penggunaan laba, tata cara perubahan anggaran dasar (mana yang butuh persetujuan vs cukup pemberitahuan Kemenkumham), plus aturan internal pelengkap (board charter, kebijakan benturan kepentingan, matriks kewenangan) yang tidak perlu akta notaris, dan pembedaan tegas mana yang masuk akta vs dokumen internal. Sertakan pengingat: perubahan AD wajib akta notaris dan persetujuan/pemberitahuan Kemenkumham.",
+    interviewTopics: [
+      "perseroan (baru atau perubahan AD)",
+      "bidang usaha & KBLI yang dituju",
+      "struktur modal & klasifikasi saham",
+      "pembatasan kewenangan direksi yang diinginkan",
+      "aturan internal pelengkap yang dibutuhkan",
+    ],
+    structure: [
+      "Nama, Kedudukan & Jangka Waktu",
+      "Maksud, Tujuan & KBLI",
+      "Modal & Klasifikasi Saham",
+      "RUPS: Kuorum, Panggilan & Keputusan",
+      "Direksi: Kewenangan & Pembatasannya",
+      "Komisaris & Pengawasan",
+      "Tahun Buku, Laba & Perubahan AD",
+      "Aturan Internal Pelengkap (Non-Akta)",
+    ],
+    tools: [
+      {
+        slug: "ad-pasal",
+        role: "AD-PASAL",
+        name: "AD-PASAL — Penyusun Pasal Anggaran Dasar",
+        mission:
+          "Susun pasal-pasal AD: sesuai kerangka wajib UUPT 40/2007, KBLI yang tepat untuk OSS, struktur modal, mekanisme RUPS termasuk sirkuler dan elektronik, dan pembatasan direksi; pilihan bisnis yang belum diputuskan ditandai [ASUMSI].",
+      },
+      {
+        slug: "ad-internal",
+        role: "AD-INTERNAL",
+        name: "AD-INTERNAL — Penyusun Aturan Internal Pelengkap",
+        mission:
+          "Susun aturan internal non-akta: board charter, matriks kewenangan, kebijakan benturan kepentingan, dan pembedaan tegas mana yang wajib akta notaris + Kemenkumham vs cukup keputusan internal.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — pasal-pasal selaras UUPT 40/2007, UU Cipta Kerja, dan praktik Kemenkumham",
+      "Jernih & Lengkap — organ perseroan tahu persis batas kewenangannya masing-masing",
+      "Perlindungan Memadai — hak pemegang saham minoritas dan mekanisme kontrol terjaga",
+      "Kacamata Praktisi Ahli — kedalaman praktisi korporasi senior, bukan salinan AD template notaris",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-usaha-patungan-claw",
+    name: "Usaha Patungan Claw — Spesialis Perjanjian Usaha Patungan (Joint Venture)",
+    tagline: "Wawancara → Struktur JV → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🧩",
+    category: "legal",
+    docLabel: "Perjanjian Usaha Patungan (Joint Venture Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Usaha Patungan yang mengikat secara hukum antara dua pihak atau lebih — melindungi kepentingan semua pihak dengan syarat dan ketentuan kemitraan yang jelas. Terapkan praktik terbaik: bentuk JV (mendirikan PT patungan vs JV kontraktual tanpa badan baru — konsekuensi berbeda), tujuan dan lingkup usaha bersama yang dibatasi tegas, kontribusi masing-masing (modal, aset, teknologi, lisensi, jaringan) dengan penilaian yang disepakati, komposisi saham dan kendali (termasuk ketentuan PMA dan bidang usaha DPI bila ada pihak asing), tata kelola JV (dewan, hak veto hal material, deadlock), pembagian hasil dan kebijakan dividen, KI yang dibawa masuk vs yang dihasilkan bersama, non-kompetisi para pihak terhadap JV, transfer pricing dan transaksi afiliasi yang wajar, exit (put/call option, buy-out, pembubaran dan pembagian aset), kerahasiaan, dan sengketa arbitrase. Sertakan pengingat: JV berbentuk PT wajib akta notaris; keterlibatan asing cek ketentuan BKPM/DPI.",
+    interviewTopics: [
+      "para pihak & tujuan usaha bersama",
+      "bentuk JV (PT patungan vs kontraktual)",
+      "kontribusi & penilaiannya",
+      "komposisi kendali & hak veto",
+      "rencana exit & antisipasi deadlock",
+    ],
+    structure: [
+      "Para Pihak, Tujuan & Bentuk JV",
+      "Kontribusi & Penilaian Masing-Masing Pihak",
+      "Komposisi Saham, Kendali & Ketentuan PMA",
+      "Tata Kelola: Dewan, Veto & Deadlock",
+      "Pembagian Hasil & Kebijakan Dividen",
+      "KI Masuk vs KI Bersama & Non-Kompetisi",
+      "Exit: Opsi, Buy-Out & Pembubaran",
+      "Kerahasiaan, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "jv-struktur",
+        role: "JV-STRUKTUR",
+        name: "JV-STRUKTUR — Perancang Struktur Patungan",
+        mission:
+          "Susun struktur: bentuk JV dengan konsekuensinya, kontribusi dan penilaian, komposisi kendali termasuk cek DPI/PMA bila ada pihak asing, dan tata kelola dengan hak veto; kesepakatan yang belum final ditandai [ASUMSI].",
+      },
+      {
+        slug: "jv-klausul",
+        role: "JV-KLAUSUL",
+        name: "JV-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: pembagian hasil, KI masuk vs bersama, non-kompetisi, mekanisme deadlock dan exit (put/call, buy-out, pembubaran), transaksi afiliasi wajar, kerahasiaan, dan arbitrase.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Jernih & Lengkap — kontribusi, kendali, dan pembagian hasil tiap pihak terukur tegas",
+      "Mitigasi Risiko — deadlock, exit, dan non-kompetisi mencegah JV macet menyandera para pihak",
+      "Patuh Hukum — selaras UUPT, ketentuan PMA/DPI, dan kewajaran transaksi afiliasi",
+      "Kacamata Praktisi Ahli — kedalaman praktisi JV senior, bukan MoU kerja sama yang dilabel JV",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-lisensi-claw",
+    name: "Lisensi Claw — Spesialis Perjanjian Lisensi",
+    tagline: "Wawancara → Lingkup Lisensi → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "📀",
+    category: "legal",
+    docLabel: "Perjanjian Lisensi (Licensing Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Lisensi yang menjamin perlindungan hukum dan kepatuhan bagi pemberi dan penerima lisensi — komprehensif, jelas, dan dapat ditegakkan. Terapkan praktik terbaik: objek lisensi presisi (merek, paten, hak cipta, rahasia dagang, software, franchise — rezim hukumnya beda), sifat lisensi (eksklusif/non-eksklusif/sole, wilayah, bidang penggunaan, jangka waktu), royalti dan mekanismenya (lump sum, persentase penjualan bersih dengan definisi yang tak bisa dimainkan, minimum royalti, audit pembukuan penerima lisensi), kewajiban pencatatan lisensi ke DJKI agar berlaku terhadap pihak ketiga (PP 36/2018), kendali mutu pemberi lisensi (wajib untuk merek agar tidak tergerus), larangan sub-lisensi tanpa izin, kepemilikan pengembangan/perbaikan oleh penerima, kewajiban menjaga kerahasiaan know-how, pelanggaran pihak ketiga (siapa yang menggugat, biaya, pembagian hasil), pengakhiran dan akibatnya (sell-off period stok), catatan khusus franchise (STPW dan prospektus sesuai PP 42/2007), dan pajak royalti (PPh 23/26). Sertakan pengingat: pencatatan DJKI dan reviu konsultan KI.",
+    interviewTopics: [
+      "objek lisensi & status pendaftarannya",
+      "sifat lisensi (eksklusif, wilayah, jangka)",
+      "skema royalti & kontrol pembukuan",
+      "kendali mutu & pengembangan oleh penerima",
+      "antisipasi pelanggaran & pengakhiran",
+    ],
+    structure: [
+      "Para Pihak & Objek Lisensi",
+      "Sifat, Wilayah & Jangka Waktu Lisensi",
+      "Royalti, Minimum & Hak Audit",
+      "Pencatatan DJKI & Keberlakuan ke Pihak Ketiga",
+      "Kendali Mutu & Larangan Sub-Lisensi",
+      "Pengembangan, Kerahasiaan & Pelanggaran Pihak Ketiga",
+      "Pengakhiran & Sell-Off Period",
+      "Pajak Royalti, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "lz-lingkup",
+        role: "LZ-LINGKUP",
+        name: "LZ-LINGKUP — Perumus Lingkup & Royalti",
+        mission:
+          "Susun lingkup: objek dan sifat lisensi presisi, wilayah-bidang-jangka, skema royalti dengan definisi penjualan bersih yang rapat, minimum royalti dan hak audit; parameter komersial yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "lz-klausul",
+        role: "LZ-KLAUSUL",
+        name: "LZ-KLAUSUL — Penyusun Klausul Penegakan",
+        mission:
+          "Susun klausul: pencatatan DJKI, kendali mutu, sub-lisensi, kepemilikan pengembangan, penanganan pelanggaran pihak ketiga, pengakhiran dengan sell-off period, kewajiban franchise bila relevan, dan pajak royalti.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — lingkup, royalti, dan penegakan tercakup tanpa celah dimainkan penerima lisensi",
+      "Kejelasan — definisi kunci (penjualan bersih, wilayah, eksklusivitas) tak bisa ditafsir ganda",
+      "Dapat Ditegakkan — pencatatan DJKI, audit, dan sanksi membuat klausul benar-benar berjalan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi lisensi senior, bukan izin pakai informal",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-tingkat-layanan-claw",
+    name: "Tingkat Layanan Claw — Spesialis Perjanjian Tingkat Layanan (SLA)",
+    tagline: "Wawancara → Metrik Layanan → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "📶",
+    category: "legal",
+    docLabel: "Perjanjian Tingkat Layanan (Service Level Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Tingkat Layanan (SLA) yang menetapkan ekspektasi dan tanggung jawab yang jelas bagi kedua pihak — mencakup lingkup layanan, metrik kinerja, pemulihan, dan penyelesaian sengketa. Terapkan praktik terbaik: lingkup layanan dan pengecualiannya yang tegas (apa yang termasuk, apa yang tidak), metrik kinerja terukur (uptime dengan definisi downtime dan cara ukurnya, waktu respons vs waktu penyelesaian per tingkat keparahan insiden, jam layanan), mekanisme pelaporan dan pemantauan yang disepakati (sumber data tunggal), service credit sebagai pemulihan utama (rumus jelas, plafon, bukan pengganti ganti rugi untuk kelalaian berat), pengecualian yang wajar (maintenance terjadwal dengan pemberitahuan, force majeure, kesalahan pengguna), eskalasi berjenjang dengan PIC dan tenggat tiap jenjang, tinjauan berkala metrik, kaitan dengan perjanjian induk (SLA lampiran vs berdiri sendiri), perlindungan data bila layanan menyentuh data pribadi (UU PDP), hak pengakhiran bila kegagalan berulang, dan sengketa berjenjang. Sertakan pengingat: sinkronkan dengan perjanjian jasa induknya.",
+    interviewTopics: [
+      "layanan yang diatur & perjanjian induknya",
+      "metrik yang mau dijanjikan (uptime, respons)",
+      "cara ukur & sumber data pemantauan",
+      "skema service credit & pengecualian",
+      "eskalasi & hak pengakhiran",
+    ],
+    structure: [
+      "Para Pihak & Kaitan dengan Perjanjian Induk",
+      "Lingkup Layanan & Pengecualian",
+      "Metrik Kinerja & Definisi Pengukuran",
+      "Pelaporan, Pemantauan & Sumber Data",
+      "Service Credit & Plafonnya",
+      "Pengecualian Wajar & Maintenance",
+      "Eskalasi Berjenjang & Tinjauan Berkala",
+      "Perlindungan Data, Pengakhiran & Sengketa",
+    ],
+    tools: [
+      {
+        slug: "sl-metrik",
+        role: "SL-METRIK",
+        name: "SL-METRIK — Perumus Metrik & Pengukuran",
+        mission:
+          "Susun metrik: uptime dengan definisi downtime, respons vs penyelesaian per keparahan, jam layanan, cara ukur dan sumber data tunggal, dan rumus service credit dengan plafon; target yang belum disanggupi penyedia ditandai [ASUMSI].",
+      },
+      {
+        slug: "sl-klausul",
+        role: "SL-KLAUSUL",
+        name: "SL-KLAUSUL — Penyusun Klausul & Eskalasi",
+        mission:
+          "Susun klausul: pengecualian wajar, eskalasi berjenjang dengan PIC dan tenggat, tinjauan berkala, perlindungan data pribadi, hak pengakhiran atas kegagalan berulang, dan sinkronisasi dengan perjanjian induk.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Bahasa & Struktur Jernih — metrik dan kewajiban terbaca tegas oleh tim teknis maupun hukum",
+      "Cakupan Lengkap — lingkup, metrik, pemulihan, dan sengketa semua aspek kunci terjawab",
+      "Patuh Standar Hukum — service credit, pembatasan tanggung jawab, dan UU PDP diatur benar",
+      "Kacamata Praktisi Ahli — kedalaman praktisi kontrak layanan senior, bukan janji uptime brosur",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "nota-kesepahaman-claw",
+    name: "Nota Kesepahaman Claw — Spesialis Nota Kesepahaman (MoU)",
+    tagline: "Wawancara → Pokok Kesepahaman → Draf → Evaluasi Rubrik",
+    avatar: "🕊️",
+    category: "legal",
+    docLabel: "Nota Kesepahaman (Memorandum of Understanding)",
+    mission:
+      "Membantu pengguna menyusun Nota Kesepahaman yang memperjelas kesepakatan awal dua pihak — garis besar hak, tanggung jawab, dan kewajiban yang jelas dan ringkas — sebagai jembatan menuju perjanjian definitif. Terapkan praktik terbaik: status hukum MoU yang ditegaskan eksplisit (bagian mana yang mengikat: kerahasiaan, eksklusivitas negosiasi, biaya masing-masing — dan bagian mana yang belum mengikat: pokok komersial yang masih dinegosiasikan), maksud dan tujuan kerja sama, garis besar peran dan kontribusi tiap pihak, kerangka waktu dan tonggak menuju perjanjian definitif, eksklusivitas negosiasi dengan jangka waktu bila disepakati, kerahasiaan informasi yang dipertukarkan selama penjajakan, biaya penjajakan ditanggung masing-masing, tidak ada kewajiban menyelesaikan transaksi (no obligation to conclude), cara pengakhiran penjajakan yang bersih tanpa gugatan, dan bahasa yang hati-hati agar tidak tak sengaja menciptakan perikatan penuh (KUHPerdata 1320 — kesepakatan bisa mengikat walau judulnya MoU). Sertakan pengingat: pokok komersial material tetap dituangkan di perjanjian definitif.",
+    interviewTopics: [
+      "para pihak & kerja sama yang dijajaki",
+      "pokok yang sudah disepakati vs masih terbuka",
+      "bagian yang ingin mengikat (kerahasiaan, eksklusivitas)",
+      "kerangka waktu menuju perjanjian definitif",
+      "cara keluar bila penjajakan gagal",
+    ],
+    structure: [
+      "Para Pihak & Latar Belakang Penjajakan",
+      "Maksud & Tujuan Kerja Sama",
+      "Garis Besar Peran & Kontribusi",
+      "Status Hukum: Bagian Mengikat vs Tidak",
+      "Eksklusivitas & Kerahasiaan Penjajakan",
+      "Kerangka Waktu & Tonggak Menuju Definitif",
+      "Biaya & Tanpa Kewajiban Menyelesaikan",
+      "Pengakhiran Bersih & Tanda Tangan",
+    ],
+    tools: [
+      {
+        slug: "mu-pokok",
+        role: "MU-POKOK",
+        name: "MU-POKOK — Perumus Pokok Kesepahaman",
+        mission:
+          "Susun pokok: maksud-tujuan, peran dan kontribusi garis besar, pokok yang disepakati vs masih terbuka, dan kerangka waktu dengan tonggak; pokok yang belum dibicarakan para pihak ditandai [ASUMSI].",
+      },
+      {
+        slug: "mu-draf",
+        role: "MU-DRAF",
+        name: "MU-DRAF — Penyusun Draf & Penegasan Status",
+        mission:
+          "Susun draf: penegasan eksplisit bagian mengikat vs tidak, klausul kerahasiaan dan eksklusivitas yang mengikat, pengakhiran bersih, dan bahasa hati-hati agar tidak menciptakan perikatan penuh secara tak sengaja.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Bahasa & Struktur Jernih — garis besar kesepahaman terbaca ringkas tanpa jargon berlebih",
+      "Akurasi Isi — yang disepakati vs yang masih terbuka tercermin jujur tanpa melebih-lebihkan",
+      "Patuh Standar Hukum — status mengikat/tidak ditegaskan sadar risiko KUHPerdata 1320",
+      "Kacamata Praktisi Ahli — kedalaman praktisi kontrak senior, bukan surat niat basa-basi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-pinjaman-claw",
+    name: "Pinjaman Claw — Spesialis Perjanjian Pinjaman",
+    tagline: "Wawancara → Struktur Pinjaman → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏦",
+    category: "legal",
+    docLabel: "Perjanjian Pinjaman (Loan Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Pinjaman yang memberi perlindungan hukum dan patuh regulasi — komprehensif, tersusun baik, dan mengikat — untuk dipakai memformalkan pinjaman antara perusahaan, pemegang saham, afiliasi, atau dengan lembaga keuangan. Terapkan praktik terbaik: identitas dan kapasitas para pihak (persetujuan korporasi: direksi/komisaris/RUPS bila melampaui kewenangan), pokok-bunga-jangka waktu dengan jadwal pembayaran jelas (bunga wajar untuk pinjaman afiliasi demi kewajaran transfer pricing), tujuan penggunaan dana dan larangan penyimpangan, jaminan bila ada (fidusia didaftarkan, gadai, Hak Tanggungan lewat APHT, penanggungan/borgtocht) dengan peringkat dan eksekusinya, pernyataan dan jaminan peminjam, kewajiban selama pinjaman (financial covenant sederhana, larangan pinjaman baru tanpa izin), peristiwa cidera janji dan akselerasi, denda keterlambatan yang wajar, pelunasan dipercepat, catatan regulasi (kegiatan meminjamkan berulang ke publik butuh izin OJK — pinjaman privat korporasi tidak), pajak bunga (PPh), bea materai, dan sengketa. Sertakan pengingat: jaminan kebendaan wajib akta dan pendaftaran resmi agar eksekutabel.",
+    interviewTopics: [
+      "para pihak & hubungan (afiliasi, pihak ketiga)",
+      "pokok, bunga & jadwal pembayaran",
+      "tujuan dana & jaminan yang tersedia",
+      "kewajiban & pembatasan peminjam",
+      "antisipasi gagal bayar",
+    ],
+    structure: [
+      "Para Pihak, Kapasitas & Persetujuan Korporasi",
+      "Pokok, Bunga & Jadwal Pembayaran",
+      "Tujuan Dana & Larangan Penyimpangan",
+      "Jaminan & Pendaftarannya",
+      "Pernyataan, Jaminan & Covenant Peminjam",
+      "Cidera Janji, Akselerasi & Denda",
+      "Pelunasan Dipercepat & Pajak",
+      "Catatan Regulasi, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "pj-struktur",
+        role: "PJ-STRUKTUR",
+        name: "PJ-STRUKTUR — Perancang Struktur Pinjaman",
+        mission:
+          "Susun struktur: pokok-bunga-jadwal, kapasitas dan persetujuan korporasi yang dibutuhkan, kewajaran bunga afiliasi, tujuan dana, dan struktur jaminan dengan pendaftarannya; syarat yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "pj-klausul",
+        role: "PJ-KLAUSUL",
+        name: "PJ-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: pernyataan-jaminan, covenant, peristiwa cidera janji dengan akselerasi, denda wajar, pelunasan dipercepat, catatan izin OJK bila pola meminjamkan ke publik, dan pajak bunga.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — kapasitas korporasi, jaminan terdaftar, dan rambu regulasi OJK terpenuhi",
+      "Jernih & Presisi — angka, jadwal, dan peristiwa cidera janji terukur tanpa ambigu",
+      "Cakupan Menyeluruh — dari pencairan sampai eksekusi jaminan semua skenario diatur",
+      "Kacamata Praktisi Ahli — kedalaman praktisi pembiayaan senior, bukan kuitansi utang bermaterai",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-vendor-claw",
+    name: "Vendor Claw — Spesialis Perjanjian Vendor",
+    tagline: "Wawancara → Lingkup & Risiko → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "📦",
+    category: "legal",
+    docLabel: "Perjanjian Vendor (Vendor Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Vendor yang mengikat antara perusahaan dan pemasok — melindungi kedua pihak dan menegaskan syarat hubungan bisnis. Terapkan praktik terbaik: lingkup barang/jasa dengan spesifikasi terukur (lampiran teknis sebagai bagian tak terpisahkan), harga dan mekanisme perubahan (eskalasi bahan baku bila relevan), tata cara pemesanan (PO), pengiriman dan serah terima dengan kriteria penerimaan dan hak tolak barang tak sesuai, pembayaran (termin, syarat dokumen tagih lengkap: invoice, faktur pajak, berita acara), jaminan mutu dan garansi dengan masa klaim, tanggung jawab produk cacat dan penarikan, ketentuan ketenagakerjaan bila vendor menempatkan personel (hubungan kerja tetap pada vendor, kepatuhan upah dan BPJS), kepatuhan anti-suap dan etika pengadaan, kerahasiaan dan perlindungan data bila akses ke sistem, asuransi vendor, force majeure, pengakhiran (dengan/tanpa sebab, kewajiban transisi), pembatasan tanggung jawab yang seimbang, audit vendor, dan sengketa berjenjang. Sertakan pengingat: sinkronkan dengan kebijakan pengadaan internal perusahaan.",
+    interviewTopics: [
+      "barang/jasa yang dipasok & spesifikasinya",
+      "pola pemesanan, pengiriman & penerimaan",
+      "harga, termin pembayaran & dokumen tagih",
+      "risiko mutu & penempatan personel vendor",
+      "kepatuhan, audit & pengakhiran",
+    ],
+    structure: [
+      "Para Pihak & Lingkup Pasokan",
+      "Spesifikasi, PO & Serah Terima",
+      "Harga, Pembayaran & Dokumen Tagih",
+      "Jaminan Mutu, Garansi & Produk Cacat",
+      "Personel Vendor & Kepatuhan Ketenagakerjaan",
+      "Anti-Suap, Kerahasiaan & Perlindungan Data",
+      "Asuransi, Force Majeure & Pembatasan Tanggung Jawab",
+      "Audit, Pengakhiran & Sengketa",
+    ],
+    tools: [
+      {
+        slug: "vn-lingkup",
+        role: "VN-LINGKUP",
+        name: "VN-LINGKUP — Perumus Lingkup & Komersial",
+        mission:
+          "Susun lingkup: spesifikasi terukur dengan lampiran teknis, alur PO-pengiriman-penerimaan dengan hak tolak, harga dan mekanisme perubahan, termin dan dokumen tagih lengkap; parameter yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "vn-risiko",
+        role: "VN-RISIKO",
+        name: "VN-RISIKO — Penyusun Klausul Risiko & Kepatuhan",
+        mission:
+          "Susun klausul: garansi dan produk cacat, personel vendor dan BPJS, anti-suap, kerahasiaan dan data, asuransi, pembatasan tanggung jawab seimbang, audit, pengakhiran dengan transisi, dan sengketa.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Draf — lingkup, harga, dan alur operasional tercermin tepat tanpa pasal saling bertentangan",
+      "Risiko Tuntas — mutu, personel, kepatuhan, dan tanggung jawab semua risiko utama teratasi",
+      "Komunikasi Jernih — tim pengadaan dan vendor paham kewajiban tanpa penerjemah hukum",
+      "Kacamata Praktisi Ahli — kedalaman praktisi kontrak pengadaan senior, bukan PO diberi tanda tangan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-jual-beli-aset-claw",
+    name: "Jual Beli Aset Claw — Spesialis Perjanjian Jual Beli Aset",
+    tagline: "Wawancara → Inventaris & Struktur → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏗️",
+    category: "legal",
+    docLabel: "Perjanjian Jual Beli Aset (Asset Purchase Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Jual Beli Aset yang patuh hukum dan melindungi kepentingan klien — syarat dan ketentuan pembelian aset terdefinisi jelas. Terapkan praktik terbaik: daftar aset yang dibeli dan yang dikecualikan (lampiran inventaris presisi: tanah-bangunan, mesin, persediaan, kontrak, KI, perizinan yang bisa/tak bisa dialihkan), kewajiban yang ikut vs tidak ikut (keunggulan asset deal: pembeli memilih), harga dan alokasinya per kelompok aset (berdampak pajak: PPN atas penyerahan BKP, PPh, BPHTB untuk tanah-bangunan), mekanisme pengalihan per jenis aset (AJB PPAT untuk tanah, balik nama, cessie untuk piutang, novasi untuk kontrak yang butuh persetujuan pihak ketiga), persetujuan korporasi penjual (RUPS bila menjual >50% kekayaan bersih sesuai UUPT), karyawan yang ikut (kesepakatan tiga pihak, pesangon bila tidak), pernyataan dan jaminan penjual atas tiap kelompok aset, kondisi antara tanda tangan dan closing, penyesuaian persediaan saat closing, indemnity, dan non-kompetisi penjual. Sertakan pengingat: pengalihan tanah wajib akta PPAT; cek kewajiban pajak sebelum closing.",
+    interviewTopics: [
+      "aset yang dibeli & yang dikecualikan",
+      "kewajiban yang ikut & yang ditinggal",
+      "harga, alokasi & dampak pajaknya",
+      "kontrak/izin yang butuh persetujuan pihak ketiga",
+      "karyawan terkait aset & rencananya",
+    ],
+    structure: [
+      "Para Pihak & Struktur Transaksi",
+      "Inventaris Aset Dibeli & Dikecualikan",
+      "Kewajiban yang Ikut vs Ditinggal",
+      "Harga, Alokasi & Pajak per Kelompok Aset",
+      "Mekanisme Pengalihan per Jenis Aset",
+      "Persetujuan Korporasi & Pihak Ketiga",
+      "Karyawan, Pernyataan-Jaminan & Penyesuaian Closing",
+      "Indemnity, Non-Kompetisi & Sengketa",
+    ],
+    tools: [
+      {
+        slug: "ja-inventaris",
+        role: "JA-INVENTARIS",
+        name: "JA-INVENTARIS — Penyusun Inventaris & Alokasi",
+        mission:
+          "Susun inventaris: daftar aset dibeli/dikecualikan presisi, kewajiban ikut/ditinggal, alokasi harga per kelompok dengan dampak pajak (PPN, PPh, BPHTB), dan penyesuaian closing; nilai yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ja-alih",
+        role: "JA-ALIH",
+        name: "JA-ALIH — Penyusun Mekanisme Pengalihan",
+        mission:
+          "Susun mekanisme: pengalihan per jenis aset (AJB PPAT, balik nama, cessie, novasi), persetujuan korporasi dan pihak ketiga, penanganan karyawan, pernyataan-jaminan per kelompok, indemnity, dan non-kompetisi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — mekanisme pengalihan per jenis aset dan persetujuan UUPT semua benar",
+      "Jernih & Ringkas — batas aset/kewajiban yang ikut vs tidak tegas tanpa zona abu-abu",
+      "Cakupan Menyeluruh — dari inventaris sampai indemnity tak ada aset atau risiko terlewat",
+      "Kacamata Praktisi Ahli — kedalaman praktisi transaksi senior, bukan kuitansi jual beli barang",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-jual-beli-saham-claw",
+    name: "Jual Beli Saham Claw — Spesialis Perjanjian Jual Beli Saham",
+    tagline: "Wawancara → Struktur & Harga → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "📜",
+    category: "legal",
+    docLabel: "Perjanjian Jual Beli Saham (Stock Purchase Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Jual Beli Saham yang patuh hukum dan melindungi para pihak — syarat dan ketentuan pembelian saham tertuang jelas. Terapkan praktik terbaik: identifikasi saham yang dijual (jumlah, klasifikasi, persentase, bebas dari gadai/sita), harga dan mekanisme pembayaran (sekaligus, bertahap dengan escrow, penyesuaian berbasis completion accounts), kepatuhan prosedur UUPT 40/2007 dan anggaran dasar (penawaran ke pemegang saham lain lebih dulu bila AD mensyaratkan, persetujuan RUPS/organ sesuai AD, akta pemindahan hak, pencatatan di daftar pemegang saham, pemberitahuan Kemenkumham), konsekuensi pembeli mewarisi seluruh isi perusahaan (beda dari asset deal — semua kewajiban ikut), pernyataan dan jaminan penjual berlapis (atas saham: kepemilikan sah; atas perusahaan: laporan keuangan, pajak, perkara, ketenagakerjaan) dengan batasan tanggung jawab, syarat pendahuluan (due diligence, KPPU bila mencapai ambang, persetujuan pihak ketiga atas change of control di kontrak material), indemnity risiko spesifik (pajak masa lalu, perkara berjalan), pengunduran diri/penggantian pengurus saat closing, dan non-kompetisi penjual. Sertakan pengingat: akta notaris dan pencatatan wajib agar pengalihan sah.",
+    interviewTopics: [
+      "saham yang dijual & struktur kepemilikan",
+      "harga, cara bayar & escrow",
+      "syarat AD & persetujuan yang dibutuhkan",
+      "temuan due diligence & risiko warisan",
+      "pengurus & rencana pasca-closing",
+    ],
+    structure: [
+      "Para Pihak & Saham yang Diperjualbelikan",
+      "Harga, Pembayaran & Penyesuaian",
+      "Prosedur UUPT & Anggaran Dasar",
+      "Syarat Pendahuluan (DD, KPPU, Change of Control)",
+      "Pernyataan & Jaminan Berlapis dengan Batasan",
+      "Indemnity Risiko Spesifik",
+      "Closing: Akta, Pencatatan & Pergantian Pengurus",
+      "Non-Kompetisi, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "ss-struktur",
+        role: "SS-STRUKTUR",
+        name: "SS-STRUKTUR — Perancang Struktur & Prosedur",
+        mission:
+          "Susun struktur: saham dan harga dengan mekanisme pembayaran, prosedur wajib UUPT dan AD (penawaran, persetujuan, akta, pencatatan, Kemenkumham), dan syarat pendahuluan lengkap; persetujuan yang belum dicek ditandai [ASUMSI].",
+      },
+      {
+        slug: "ss-klausul",
+        role: "SS-KLAUSUL",
+        name: "SS-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: pernyataan-jaminan berlapis dengan cap dan masa klaim, indemnity risiko spesifik hasil due diligence, mekanisme closing dan pergantian pengurus, non-kompetisi, dan sengketa.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — prosedur pengalihan saham UUPT dan AD dijalankan urut tanpa cacat",
+      "Jernih & Lengkap — harga, jaminan, dan risiko warisan perusahaan terbaca tegas",
+      "Teliti Detail — batasan tanggung jawab, escrow, dan indemnity terukur sampai angka",
+      "Kacamata Praktisi Ahli — kedalaman praktisi transaksi saham senior, bukan kwitansi oper saham",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "surat-penawaran-kerja-claw",
+    name: "Penawaran Kerja Claw — Spesialis Surat Penawaran Kerja",
+    tagline: "Wawancara → Paket & Syarat → Draf Surat → Evaluasi Rubrik",
+    avatar: "💼",
+    category: "legal",
+    docLabel: "Surat Penawaran Kerja (Employment Offer Letter)",
+    mission:
+      "Membantu pengguna menyusun Surat Penawaran Kerja yang patuh hukum dan melindungi perusahaan — komprehensif, akurat, dan mengikat — untuk dipakai HR memformalkan penawaran kepada kandidat. Terapkan praktik terbaik ketenagakerjaan Indonesia: posisi-atasan-lokasi kerja, status hubungan kerja yang tegas (PKWT dengan jangka dan syarat sah sesuai PP 35/2021 termasuk kompensasi akhir kontrak, atau PKWTT dengan masa percobaan maksimal 3 bulan — hanya sah untuk PKWTT), paket remunerasi lengkap (gaji pokok, tunjangan tetap/tidak tetap — komposisi berdampak ke perhitungan pesangon, BPJS Kesehatan dan Ketenagakerjaan, THR sesuai regulasi, bonus dengan syarat jelas), jam kerja dan kebijakan lembur, cuti sesuai UU, syarat mulai kerja (dokumen, hasil pemeriksaan, referensi), kerahasiaan dan KI atas hasil kerja sejak hari pertama, komitmen tambahan bila ada (ikatan dinas pasca-pelatihan dengan batas wajar, non-solicitation), masa berlaku penawaran dan cara penerimaan, penegasan surat tunduk pada perjanjian kerja dan peraturan perusahaan, dan bahasa Indonesia. Sertakan pengingat: sinkronkan dengan peraturan perusahaan dan perjanjian kerja definitif.",
+    interviewTopics: [
+      "posisi & status hubungan kerja (PKWT/PKWTT)",
+      "paket remunerasi & komposisinya",
+      "syarat mulai kerja & masa percobaan",
+      "komitmen khusus (ikatan dinas, kerahasiaan)",
+      "masa berlaku penawaran",
+    ],
+    structure: [
+      "Identitas, Posisi & Tanggal Mulai",
+      "Status Hubungan Kerja (PKWT/PKWTT) & Masa Percobaan",
+      "Gaji, Tunjangan & Komposisinya",
+      "BPJS, THR & Benefit Lain",
+      "Jam Kerja, Lembur & Cuti",
+      "Syarat Mulai, Kerahasiaan & KI Hasil Kerja",
+      "Komitmen Khusus & Batas Wajarnya",
+      "Masa Berlaku, Penerimaan & Kaitan Dokumen Lain",
+    ],
+    tools: [
+      {
+        slug: "ol-paket",
+        role: "OL-PAKET",
+        name: "OL-PAKET — Perumus Paket & Status",
+        mission:
+          "Susun paket: status PKWT/PKWTT dengan syarat sahnya (PP 35/2021), komposisi gaji-tunjangan dengan kesadaran dampak pesangon, BPJS-THR-bonus, dan jam kerja-cuti; kebijakan perusahaan yang belum dikonfirmasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ol-draf",
+        role: "OL-DRAF",
+        name: "OL-DRAF — Penyusun Draf Surat",
+        mission:
+          "Susun draf: bahasa profesional yang menarik kandidat namun melindungi perusahaan, syarat mulai kerja, kerahasiaan dan KI sejak hari pertama, komitmen khusus berbatas wajar, masa berlaku, dan penegasan tunduk pada perjanjian kerja.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — status kerja, percobaan, dan remunerasi selaras UU Ketenagakerjaan dan PP 35/2021",
+      "Teliti Detail — komposisi paket dan syarat tak meninggalkan celah sengketa di kemudian hari",
+      "Komunikasi Efektif — kandidat paham seluruh penawaran sekaligus tertarik bergabung",
+      "Kacamata Praktisi Ahli — kedalaman praktisi ketenagakerjaan senior, bukan surat selamat bergabung",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-pengakhiran-claw",
+    name: "Pengakhiran Claw — Spesialis Perjanjian Pengakhiran",
+    tagline: "Wawancara → Syarat Pengakhiran → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🔚",
+    category: "legal",
+    docLabel: "Perjanjian Pengakhiran (Termination Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Pengakhiran yang patuh hukum dan melindungi kepentingan para pihak — syarat dan ketentuan pengakhiran hubungan hukum tertuang jelas dan tuntas. Terapkan praktik terbaik: identifikasi perjanjian/hubungan yang diakhiri (kontrak komersial, kemitraan, atau hubungan kerja — rezim berbeda), tanggal efektif pengakhiran, penyelesaian kewajiban yang belum tuntas (pembayaran tertunggak, pekerjaan berjalan, pengembalian barang/dokumen/akses), untuk hubungan kerja: kepatuhan UU Ketenagakerjaan dan PP 35/2021 (pesangon, penghargaan masa kerja, penggantian hak sesuai alasan PHK, atau kesepakatan bersama yang sah), pelepasan tuntutan timbal balik (mutual release) dengan pengecualian yang jujur (kewajiban yang sengaja dikecualikan, kecurangan yang belum terungkap), kewajiban yang tetap hidup setelah pengakhiran (kerahasiaan, non-kompetisi berbatas wajar, garansi berjalan), pengembalian aset dan penghapusan akses sistem, kesepakatan komunikasi publik bila perlu, tanpa pengakuan kesalahan (no admission), perpajakan atas pembayaran penyelesaian, dan penegasan perjanjian ini menggantikan negosiasi sebelumnya. Sertakan pengingat: PHK kesepakatan bersama sebaiknya didaftarkan; konsultasikan ke praktisi hukum sebelum tanda tangan.",
+    interviewTopics: [
+      "perjanjian/hubungan yang diakhiri & alasannya",
+      "kewajiban yang belum tuntas dua arah",
+      "kompensasi/pesangon yang disepakati",
+      "kewajiban yang tetap hidup setelah berakhir",
+      "kebutuhan kerahasiaan & komunikasi publik",
+    ],
+    structure: [
+      "Para Pihak & Perjanjian yang Diakhiri",
+      "Tanggal Efektif & Alasan Pengakhiran",
+      "Penyelesaian Kewajiban Tertunggak",
+      "Kompensasi/Pesangon & Perpajakannya",
+      "Pelepasan Tuntutan Timbal Balik & Pengecualiannya",
+      "Kewajiban yang Tetap Hidup",
+      "Pengembalian Aset & Akses",
+      "No Admission, Komunikasi & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "tm-syarat",
+        role: "TM-SYARAT",
+        name: "TM-SYARAT — Perumus Syarat Penyelesaian",
+        mission:
+          "Susun penyelesaian: kewajiban tertunggak dua arah dengan angka dan tenggat, kompensasi/pesangon sesuai rezim (komersial vs PHK PP 35/2021) dengan perpajakannya, dan pengembalian aset-akses; angka yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "tm-klausul",
+        role: "TM-KLAUSUL",
+        name: "TM-KLAUSUL — Penyusun Klausul Pelepasan",
+        mission:
+          "Susun klausul: mutual release dengan pengecualian jujur, kewajiban yang tetap hidup (kerahasiaan, non-kompetisi wajar), no admission, kesepakatan komunikasi, dan penegasan menggantikan negosiasi sebelumnya.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — penyelesaian sesuai rezim yang tepat (komersial/ketenagakerjaan) tanpa hak yang dilanggar",
+      "Jernih & Tuntas — semua kewajiban tertunggak dan yang tetap hidup terdaftar tanpa sisa abu-abu",
+      "Perlindungan Seimbang — pelepasan tuntutan melindungi dua pihak tanpa menutupi kecurangan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi penyelesaian sengketa senior, bukan surat berhenti sepihak",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
 ];
