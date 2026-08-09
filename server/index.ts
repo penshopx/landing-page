@@ -180,6 +180,8 @@ import * as M_desainProyekClaw from "./seed-desain-proyek-claw";
 import * as M_rencanaProyekClaw from "./seed-rencana-proyek-claw";
 import * as M_studiKelayakanClaw from "./seed-studi-kelayakan-claw";
 import * as M_persiapanProyekMulticlaw from "./seed-persiapan-proyek-multiclaw";
+import { seedClawCatalog } from "./lib/claw-factory";
+import { CLAW_CATALOG } from "./claw-catalog";
 import { seedStoreProducts } from "./seed-store-products";
 
 const seedModuleRegistry: Record<string, any> = {
@@ -2237,6 +2239,8 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
       try { await M_studiKelayakanClaw.seedStudiKelayakanClaw(); } catch (err) { log("[Seed StudiKelayakanClaw] Error: " + (err as Error).message); }
       // MultiClaw HARUS setelah 3 seed spesialis di atas (wiring via slug lookup)
       try { await M_persiapanProyekMulticlaw.seedPersiapanProyekMulticlaw(); } catch (err) { log("[Seed PersiapanProyekMulticlaw] Error: " + (err as Error).message); }
+      // Claw Factory: semua produk claw baru dari server/claw-catalog.ts
+      try { await seedClawCatalog(CLAW_CATALOG); } catch (err) { log("[ClawFactory] Error: " + (err as Error).message); }
 
       // ── Store Products — produk unggulan di katalog marketplace ──────────
       try { await seedStoreProducts(); } catch (err) { log("[Seed StoreProducts] Error: " + (err as Error).message); }

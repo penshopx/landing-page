@@ -46,6 +46,7 @@
 - [Ruang Simpan WA Templates](ruang-simpan-wa-templates.md) — 4 template WA personal untuk marketing Memori Bisnis; urutan narasi PAS: Masalah → Perbandingan → Solusi → Nama konsep.
 - [Ruang Simpan Object Storage](ruang-simpan-object-storage.md) — file bytes pindah dari PostgreSQL bytea → Replit Object Storage; kolom storage_key di ruang_simpan_files; deployment → Autoscale.
 - [Subscription grant audit](subscription-grant-audit.md) — grantedBy must be stamped on EVERY admin-mediated active-sub insert (early-adopter AND trial-approval); keep it immutable in the PATCH.
+- [Claw Factory](claw-factory.md) — produk claw baru = 1 entri data di server/claw-catalog.ts (bukan file seed); factory rakit prompt template Gustafta + evaluator otomatis; user cuma tempel prompt aiforwork mentah.
 - [Sellable claw seed](sellable-claw-seed.md) — Store-listed hands-off product needs isListed+premiumClass:private (createAgent DROPS both → post-create updateAgent); use aiModel not model; seed must RECONCILE not early-return.
 - [Inter-agent invocation authz](inter-agent-invocation-authz.md) — callAgentInternal gate checks ORCHESTRATOR owner not end-user; allow falsy/public sub-agent owner or same-owner. Tightening the falsy-owner rule silently breaks every sold clone.
 - [Access-code voucher system](access-code-voucher.md) — self-redeem code → active subscription grant; redeem must NEVER touch users.isActive (bypass); atomic txn, quota-locked, unique-conflict→"already".
