@@ -26,6 +26,9 @@ const files = [
   // Explicitly models the old guard bug vs the fix so regressions are caught.
   resolve(__dirname, "store-sort-order-autofill-after-delete.test.ts"),
   resolve(__dirname, "store-catalog-payment-link-clear.test.ts"),
+  // Integration + cache: confirms clearing a product's paymentUrl falls back to
+  // the agent URL (or null) immediately after invalidation — without a redeploy.
+  resolve(__dirname, "store-catalog-payment-link-fallback.test.ts"),
   // DB integration: confirms superadmin bootstrap guard survives server restarts.
   // Skipped automatically (process.exit 0) when DATABASE_URL is absent.
   resolve(__dirname, "bootstrap-superadmin-db.test.ts"),
