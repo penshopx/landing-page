@@ -21,6 +21,10 @@ const files = [
   resolve(__dirname, "routes-helper-usage.test.ts"),
   resolve(__dirname, "wa-cta-integrity.test.ts"),
   resolve(__dirname, "store-product-reorder-persistence.test.ts"),
+  // Unit: confirms sortOrder auto-fill reads the correct (updated) orderedProducts
+  // after a product is deleted, including when all products are deleted (→ 10).
+  // Explicitly models the old guard bug vs the fix so regressions are caught.
+  resolve(__dirname, "store-sort-order-autofill-after-delete.test.ts"),
   resolve(__dirname, "store-catalog-payment-link-clear.test.ts"),
   // DB integration: confirms superadmin bootstrap guard survives server restarts.
   // Skipped automatically (process.exit 0) when DATABASE_URL is absent.

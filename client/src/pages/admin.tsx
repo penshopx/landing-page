@@ -17,6 +17,7 @@ import {
   Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical
 } from "lucide-react";
 import { useContactNumbers } from "@/lib/contact";
+import { syncOrderedProducts, computeNextSortOrder } from "@/lib/store-sort-order";
 
 // ---- Types ----
 interface AdminMeData {
@@ -537,11 +538,12 @@ export default function AdminPage() {
   const [draggedProductId, setDraggedProductId] = useState<number | null>(null);
   const [dragOverProductId, setDragOverProductId] = useState<number | null>(null);
 
-  // Sync local order when server data arrives (but not while dragging)
+  // Sync local order when server data arrives (including empty list so stale
+  // orderedProducts don't linger after the last product is deleted).
+  // Uses syncOrderedProducts from @/lib/store-sort-order — imported by tests
+  // to guarantee the regression is caught if the guard is reintroduced.
   useEffect(() => {
-    if (storeProducts.length > 0) {
-      setOrderedProducts([...storeProducts].sort((a, b) => (a.sortOrder - b.sortOrder) || (a.id - b.id)));
-    }
+    setOrderedProducts(syncOrderedProducts(storeProducts));
   }, [storeProducts]);
 
   const reorderProductsMutation = useMutation({
@@ -1871,11 +1873,8 @@ export default function AdminPage() {
                       <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white gap-1"
                         onClick={() => {
                           if (!showProductForm) {
-                            // Auto-fill sort order: max existing + 10
-                            const maxOrder = orderedProducts.length > 0
-                              ? Math.max(...orderedProducts.map(p => p.sortOrder ?? 0))
-                              : 0;
-                            setProductForm(f => ({ ...f, sortOrder: String(maxOrder + 10) }));
+                            // Auto-fill sort order: max existing + 10 (via production helper)
+                            setProductForm(f => ({ ...f, sortOrder: String(computeNextSortOrder(orderedProducts)) }));
                           }
                           setShowProductForm(!showProductForm);
                         }}
