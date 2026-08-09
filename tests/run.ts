@@ -36,6 +36,11 @@ const files = [
   // formats (leading 0, +62, bare 8x) so format mismatches never silently block
   // superadmin promotion. No DB or env required — pure logic test.
   resolve(__dirname, "superadmin-phone-promotion.test.ts"),
+  // Static + logic: confirms handleBuyNow/handleBuy in store pages builds
+  // PAYMENT_BASE_URL/c/checkout?variant_ids=<id>&qty=1 when paymentUrl is null.
+  // Catches regressions where the field is dropped from the catalog response or
+  // the handler falls back to the root payment domain instead of the checkout path.
+  resolve(__dirname, "store-beli-scalev-checkout.test.ts"),
 ];
 
 let hadFailure = false;

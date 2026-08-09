@@ -443,9 +443,12 @@ export default function StoreFeatured() {
       window.open(agent.paymentUrl, "_blank");
       return;
     }
-    // Scalev variant → Wuryanto Store (no explicit URL set yet)
+    // Scalev variant → variant-specific checkout URL
     if (agent.scalevVariantId) {
-      window.open(`${PAYMENT_BASE_URL}`, "_blank");
+      const qs = new URLSearchParams();
+      qs.set("variant_ids", String(agent.scalevVariantId));
+      qs.set("qty", "1");
+      window.open(`${PAYMENT_BASE_URL}/c/checkout?${qs.toString()}`, "_blank");
       return;
     }
     // Produk non-store (agent) → WA inquiry
