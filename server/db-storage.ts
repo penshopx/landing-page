@@ -2347,8 +2347,8 @@ export class DatabaseStorage implements IStorage {
       userId: row.userId,
       plan: row.plan as Subscription["plan"],
       status: (row.status || "pending") as Subscription["status"],
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       chatbotLimit: row.chatbotLimit || 1,
@@ -2366,8 +2366,8 @@ export class DatabaseStorage implements IStorage {
       userId: subscription.userId,
       plan: subscription.plan,
       status: subscription.status || "pending",
-      scalevOrderId: subscription.scalevOrderId,
-      scalevPaymentUrl: subscription.scalevPaymentUrl,
+      orderId: subscription.orderId,
+      paymentUrl: subscription.paymentUrl,
       amount: subscription.amount || 0,
       currency: subscription.currency || "IDR",
       chatbotLimit: subscription.chatbotLimit || 1,
@@ -2383,9 +2383,9 @@ export class DatabaseStorage implements IStorage {
     return this.mapSubscriptionRow(result[0]);
   }
 
-  async getSubscriptionByScalevOrderId(scalevOrderId: string): Promise<Subscription | undefined> {
+  async getSubscriptionByOrderId(orderId: string): Promise<Subscription | undefined> {
     const result = await db.select().from(subscriptionsTable)
-      .where(eq(subscriptionsTable.scalevOrderId, scalevOrderId))
+      .where(eq(subscriptionsTable.orderId, orderId))
       .limit(1);
     if (result.length === 0) return undefined;
     return this.mapSubscriptionRow(result[0]);
@@ -2506,7 +2506,7 @@ export class DatabaseStorage implements IStorage {
         currency: "IDR",
         chatbotLimit,
         grantedBy: code.createdBy ?? null,
-        scalevOrderId: `CODE-${normalized}-${userId.slice(0, 8)}-${Date.now()}`,
+        orderId: `CODE-${normalized}-${userId.slice(0, 8)}-${Date.now()}`,
         startDate: now,
         endDate,
       }).returning();

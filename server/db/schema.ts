@@ -191,9 +191,9 @@ export const subscriptions = pgTable("subscriptions", {
   planId: text("plan_id").notNull(),
   status: text("status").default("pending"),
   // Generic order/transaction ID for any payment provider (Scalev, access codes, early-adopter grants, etc.)
-  scalevOrderId: text("scalev_order_id"),
-  // Scalev checkout URL returned at subscription creation; null for non-Scalev grants (access codes, admin grants, etc.)
-  scalevPaymentUrl: text("scalev_payment_url"),
+  orderId: text("order_id"),
+  // Payment checkout URL returned at subscription creation; null for non-payment grants (access codes, admin grants, etc.)
+  paymentUrl: text("payment_url"),
   amount: integer("amount").default(0),
   currency: text("currency").default("IDR"),
   startDate: timestamp("start_date"),

@@ -275,7 +275,7 @@ export interface IStorage {
   // Subscription methods
   createSubscription(subscription: InsertSubscription): Promise<Subscription>;
   getSubscription(id: string): Promise<Subscription | undefined>;
-  getSubscriptionByScalevOrderId(scalevOrderId: string): Promise<Subscription | undefined>;
+  getSubscriptionByOrderId(orderId: string): Promise<Subscription | undefined>;
   getActiveSubscription(userId: string): Promise<Subscription | undefined>;
   updateSubscription(id: string, data: Partial<InsertSubscription>): Promise<Subscription | undefined>;
   getLatestPendingSubscription(userId: string): Promise<Subscription | undefined>;
@@ -1768,8 +1768,8 @@ export class MemStorage implements IStorage {
       userId: insertSubscription.userId,
       plan: insertSubscription.plan,
       status: insertSubscription.status || "pending",
-      scalevOrderId: insertSubscription.scalevOrderId,
-      scalevPaymentUrl: insertSubscription.scalevPaymentUrl,
+      orderId: insertSubscription.orderId,
+      paymentUrl: insertSubscription.paymentUrl,
       amount: insertSubscription.amount,
       currency: insertSubscription.currency || "IDR",
       chatbotLimit: insertSubscription.chatbotLimit || 1,
@@ -1786,9 +1786,9 @@ export class MemStorage implements IStorage {
     return this.subscriptions.get(id);
   }
 
-  async getSubscriptionByScalevOrderId(scalevOrderId: string): Promise<Subscription | undefined> {
+  async getSubscriptionByOrderId(orderId: string): Promise<Subscription | undefined> {
     return Array.from(this.subscriptions.values()).find(
-      (sub) => sub.scalevOrderId === scalevOrderId
+      (sub) => sub.orderId === orderId
     );
   }
 
