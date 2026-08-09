@@ -2370,4 +2370,516 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
+
+  // ── Batch 6: real-estate-developer (property) — dari prompt aiforwork ──
+  {
+    kind: "openclaw",
+    slug: "proposal-akuisisi-lahan-claw",
+    name: "Akuisisi Lahan Claw — Spesialis Proposal Akuisisi Lahan",
+    tagline: "Wawancara → Analisis Lokasi → Kelayakan Finansial → Proposal → Evaluasi Rubrik",
+    avatar: "🗺️",
+    category: "property",
+    docLabel: "Proposal Akuisisi Lahan (Land Acquisition Proposal)",
+    mission:
+      "Membantu pengguna menyusun Proposal Akuisisi Lahan yang mengidentifikasi dan merekomendasikan properti potensial untuk diakuisisi sesuai sasaran strategis perusahaan — memuat analisis menyeluruh kesesuaian tiap properti, potensi pasar, dan kelayakan finansial — untuk dipakai manajemen senior mengambil keputusan akuisisi. Terapkan praktik terbaik: riset lokasi berbasis data (aksesibilitas, tata ruang/RTRW & RDTR, infrastruktur, demografi), verifikasi legalitas tanah (SHM/HGB, girik, sengketa, PBB), analisis pasar komparatif (harga tanah per m², tren kawasan), kelayakan finansial dengan asumsi eksplisit (harga perolehan, biaya BPHTB/notaris, proyeksi nilai), analisis risiko akuisisi, perbandingan antar-kandidat dalam matriks skoring, dan rekomendasi berperingkat yang tertelusur ke data.",
+    interviewTopics: [
+      "sasaran strategis perusahaan & jenis pengembangan yang direncanakan (perumahan, komersial, mixed-use)",
+      "kandidat lahan yang sedang dipertimbangkan (lokasi, luas, status legal, harga penawaran)",
+      "anggaran akuisisi & sumber pendanaan",
+      "data pasar kawasan yang sudah dimiliki (harga pembanding, rencana infrastruktur)",
+      "kriteria keputusan manajemen (IRR minimum, payback, toleransi risiko)",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Rekomendasi Berperingkat",
+      "Sasaran Strategis & Kriteria Akuisisi",
+      "Profil Kandidat Lahan (lokasi, luas, legalitas, harga)",
+      "Analisis Kesesuaian Tata Ruang & Perizinan (RTRW/RDTR, KDB/KLB)",
+      "Analisis Pasar & Potensi Kawasan",
+      "Kelayakan Finansial per Kandidat (biaya perolehan, proyeksi nilai, IRR)",
+      "Matriks Perbandingan & Analisis Risiko",
+      "Rekomendasi, Langkah Lanjut & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "pa-riset",
+        role: "PA-RISET",
+        name: "PA-RISET — Analis Lokasi & Legalitas",
+        mission:
+          "Susun analisis kesesuaian tiap kandidat lahan: kesesuaian tata ruang (RTRW/RDTR, KDB/KLB), status legal tanah dan risiko sengketa, aksesibilitas dan infrastruktur, serta potensi pasar kawasan berbasis data pembanding; tandai data pasar yang diperkirakan dengan [ASUMSI].",
+      },
+      {
+        slug: "pa-finansial",
+        role: "PA-FINANSIAL",
+        name: "PA-FINANSIAL — Analis Kelayakan Finansial",
+        mission:
+          "Hitung kelayakan finansial tiap kandidat: total biaya perolehan (harga tanah, BPHTB, notaris/PPAT, pematangan), proyeksi nilai pengembangan, indikator kelayakan (IRR, payback), sensitivitas terhadap asumsi kunci, dan matriks skoring antar-kandidat; setiap angka asumsi ditandai [ASUMSI].",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Akurat & Menyeluruh — analisis lokasi, legalitas, dan pasar berbasis data dengan sumber jelas",
+      "Analisis Finansial Kuat — kelayakan dihitung lengkap dengan asumsi eksplisit dan sensitivitas",
+      "Komunikasi Temuan Efektif — rekomendasi berperingkat jelas dan mudah dipakai manajemen memutuskan",
+      "Kacamata Praktisi Ahli — kedalaman pengembang properti senior, bukan brosur pemasaran lahan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "rencana-tapak-claw",
+    name: "Rencana Tapak Claw — Spesialis Site Plan",
+    tagline: "Wawancara → Analisis Tapak → Tata Letak → Dokumen Site Plan → Evaluasi Rubrik",
+    avatar: "📍",
+    category: "property",
+    docLabel: "Rencana Tapak (Site Plan)",
+    mission:
+      "Membantu pengguna menyusun dokumen Rencana Tapak (Site Plan) yang memaksimalkan potensi properti dan memastikan pemanfaatan lahan yang efisien — komprehensif dan jelas, memuat lokasi bangunan, area parkir, lanskap, dan infrastruktur — untuk dipakai arsitek, kontraktor, dan pemangku kepentingan memandu pembangunan. Terapkan praktik terbaik: kepatuhan pada aturan tata ruang setempat (KDB, KLB, GSB, KDH), analisis kondisi tapak (kontur, drainase, orientasi matahari, akses), zonasi fungsi yang logis, sirkulasi kendaraan dan pejalan kaki yang aman, perhitungan kebutuhan parkir sesuai standar, jaringan utilitas (air bersih, air kotor, listrik, hidran), ruang terbuka hijau sesuai ketentuan, dan tabel rekapitulasi pemanfaatan lahan yang akurat.",
+    interviewTopics: [
+      "properti yang direncanakan (lokasi, luas lahan, bentuk, kondisi eksisting)",
+      "jenis pengembangan & program ruang (jumlah unit, fungsi bangunan, fasilitas)",
+      "ketentuan tata ruang setempat (KDB, KLB, GSB, KDH) yang berlaku",
+      "kondisi tapak (kontur, drainase, akses jalan, utilitas tersedia)",
+      "preferensi tata letak & fasilitas yang diinginkan",
+    ],
+    structure: [
+      "Ringkasan Rencana & Rekapitulasi Pemanfaatan Lahan",
+      "Analisis Kondisi Tapak & Konteks Kawasan",
+      "Ketentuan Tata Ruang & Kepatuhan (KDB/KLB/GSB/KDH)",
+      "Konsep Zonasi & Tata Letak Bangunan",
+      "Sirkulasi, Akses & Perhitungan Parkir",
+      "Lanskap & Ruang Terbuka Hijau",
+      "Jaringan Infrastruktur & Utilitas",
+      "Tahapan Pengembangan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "rt-tapak",
+        role: "RT-TAPAK",
+        name: "RT-TAPAK — Analis Tapak & Regulasi",
+        mission:
+          "Susun analisis tapak dan kepatuhan regulasi: kondisi eksisting (kontur, drainase, akses, utilitas), ketentuan tata ruang yang mengikat (KDB, KLB, GSB, KDH), batasan dan peluang tapak, serta perhitungan luas maksimal yang boleh dibangun; tandai ketentuan yang belum diverifikasi ke dinas terkait dengan [ASUMSI].",
+      },
+      {
+        slug: "rt-layout",
+        role: "RT-LAYOUT",
+        name: "RT-LAYOUT — Perancang Tata Letak & Infrastruktur",
+        mission:
+          "Susun konsep tata letak: zonasi fungsi, penempatan bangunan dengan orientasi optimal, sirkulasi kendaraan/pejalan kaki, kebutuhan parkir sesuai standar, lanskap dan RTH, jaringan utilitas, dan tabel rekapitulasi pemanfaatan lahan; alternatif tata letak disertai kelebihan-kekurangan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua elemen tapak (bangunan, parkir, lanskap, infrastruktur) tercakup dengan detail memadai",
+      "Kejelasan — tata letak dan rekapitulasi mudah dipahami arsitek dan kontraktor tanpa ambigu",
+      "Kepatuhan Regulasi — KDB/KLB/GSB/KDH dan ketentuan zonasi setempat dipenuhi dan ditunjukkan perhitungannya",
+      "Kacamata Praktisi Ahli — kedalaman perencana tapak senior, bukan sketsa blok tanpa dasar analisis",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "persetujuan-zonasi-claw",
+    name: "Zonasi Claw — Spesialis Dokumen Persetujuan Zonasi",
+    tagline: "Wawancara → Kajian Zonasi → Kepatuhan → Dokumen Persetujuan → Evaluasi Rubrik",
+    avatar: "🧭",
+    category: "property",
+    docLabel: "Dokumen Persetujuan Zonasi (Zoning Approval Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Persetujuan Zonasi yang memastikan kepatuhan terhadap regulasi tata ruang dan memperlancar proses persetujuan proyek pengembangan — komprehensif, akurat, dan terorganisir — untuk dipakai tim proyek (arsitek, insinyur, penasihat hukum) memperoleh izin dari pemerintah daerah. Terapkan praktik terbaik: rujukan eksplisit ke RTRW/RDTR dan Peraturan Zonasi setempat, kesesuaian kegiatan dengan KKPR (Kesesuaian Kegiatan Pemanfaatan Ruang) melalui OSS-RBA, pemetaan ketentuan intensitas (KDB, KLB, ketinggian) terhadap rencana, identifikasi ketentuan khusus kawasan, daftar dokumen persyaratan lengkap, kronologi proses pengajuan yang jelas, antisipasi keberatan dan strateginya, serta lampiran bukti pendukung tertata.",
+    interviewTopics: [
+      "proyek yang diajukan (jenis kegiatan, lokasi, skala pengembangan)",
+      "zonasi kawasan saat ini & rencana pemanfaatan yang diinginkan",
+      "status pengurusan KKPR/OSS-RBA yang sudah berjalan",
+      "ketentuan RDTR/Peraturan Zonasi setempat yang sudah diketahui",
+      "kendala atau keberatan yang diantisipasi dari pemerintah/masyarakat",
+    ],
+    structure: [
+      "Ringkasan Permohonan & Dasar Hukum",
+      "Deskripsi Proyek & Rencana Pemanfaatan Ruang",
+      "Kajian Kesesuaian dengan RTRW/RDTR & Peraturan Zonasi",
+      "Analisis Kepatuhan Intensitas (KDB, KLB, Ketinggian, GSB)",
+      "Ketentuan Khusus Kawasan & Mitigasi Dampak",
+      "Persyaratan Dokumen & Status Kelengkapan",
+      "Proses Pengajuan, Jadwal & Antisipasi Keberatan",
+      "Kesimpulan Kepatuhan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "pz-kajian",
+        role: "PZ-KAJIAN",
+        name: "PZ-KAJIAN — Pengkaji Kesesuaian Zonasi",
+        mission:
+          "Susun kajian kesesuaian rencana terhadap zonasi: pemetaan kegiatan ke klasifikasi zonasi RDTR, kepatuhan intensitas (KDB/KLB/ketinggian/GSB) dengan perhitungan, ketentuan khusus kawasan, dan celah kepatuhan yang harus diselesaikan; tandai ketentuan yang belum dikonfirmasi ke dinas tata ruang dengan [ASUMSI].",
+      },
+      {
+        slug: "pz-proses",
+        role: "PZ-PROSES",
+        name: "PZ-PROSES — Penyusun Strategi Persetujuan",
+        mission:
+          "Susun strategi memperoleh persetujuan: daftar persyaratan dokumen dan status kelengkapannya, alur pengajuan KKPR/OSS-RBA tahap demi tahap dengan estimasi waktu, antisipasi keberatan berikut argumen penanggulangannya, dan checklist siap-ajukan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Ketelitian Riset — regulasi zonasi dirujuk spesifik (RTRW/RDTR, pasal terkait), bukan pernyataan umum",
+      "Kejelasan — persyaratan zonasi dan status kepatuhan dikomunikasikan gamblang untuk semua pihak",
+      "Kepatuhan — setiap ketentuan intensitas dan kegiatan dibuktikan patuh dengan perhitungan/justifikasi",
+      "Kacamata Praktisi Ahli — kedalaman konsultan perizinan tata ruang senior, bukan ringkasan regulasi generik",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perizinan-bangunan-claw",
+    name: "PBG Claw — Spesialis Dokumen Perizinan Bangunan",
+    tagline: "Wawancara → Pemetaan Syarat → Kelengkapan Dokumen → Paket Perizinan → Evaluasi Rubrik",
+    avatar: "🏛️",
+    category: "property",
+    docLabel: "Dokumen Perizinan Bangunan (Building Permits Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Perizinan Bangunan yang memastikan kepatuhan terhadap regulasi setempat dan memperlancar proses persetujuan — akurat, komprehensif, dan mudah dipahami — untuk dipakai tim konstruksi, pemerintah daerah, dan pemangku kepentingan memperoleh izin yang diperlukan. Terapkan praktik terbaik: pemetaan izin yang relevan (PBG menggantikan IMB per PP 16/2021, SLF, KKPR, persetujuan lingkungan AMDAL/UKL-UPL/SPPL), persyaratan teknis dokumen rencana (arsitektur, struktur, MEP) sesuai standar, kelengkapan administratif (bukti kepemilikan tanah, identitas pemohon), alur pengajuan SIMBG tahap demi tahap, jadwal realistis per tahapan, komunikasi proaktif dengan instansi, dan register status kelengkapan yang selalu mutakhir.",
+    interviewTopics: [
+      "bangunan yang diajukan (fungsi, luas, jumlah lantai, lokasi)",
+      "status legalitas tanah & kesesuaian tata ruang (KKPR) yang sudah dipegang",
+      "dokumen teknis yang sudah tersedia (gambar arsitektur, struktur, MEP)",
+      "jenis persetujuan lingkungan yang berlaku (AMDAL, UKL-UPL, atau SPPL)",
+      "target waktu terbit izin & kendala pengurusan yang pernah dialami",
+    ],
+    structure: [
+      "Ringkasan Permohonan & Peta Izin yang Diperlukan",
+      "Data Proyek & Legalitas Tanah",
+      "Persyaratan PBG & Status Kelengkapan Dokumen Teknis",
+      "Persetujuan Lingkungan & Persyaratan Pendukung",
+      "Alur Pengajuan (SIMBG) & Jadwal per Tahapan",
+      "Rencana Komunikasi dengan Instansi & Pemangku Kepentingan",
+      "Register Risiko Pengurusan & Mitigasi",
+      "Checklist Siap-Ajukan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "pb-syarat",
+        role: "PB-SYARAT",
+        name: "PB-SYARAT — Pemeta Izin & Persyaratan",
+        mission:
+          "Petakan seluruh izin yang diperlukan proyek (PBG, SLF, KKPR, persetujuan lingkungan) berikut persyaratan dokumen teknis dan administratif masing-masing, lalu susun register status kelengkapan dengan penanggung jawab; tandai persyaratan yang bervariasi antar-daerah dengan [ASUMSI].",
+      },
+      {
+        slug: "pb-alur",
+        role: "PB-ALUR",
+        name: "PB-ALUR — Perencana Alur & Komunikasi Instansi",
+        mission:
+          "Susun alur pengajuan tahap demi tahap (termasuk SIMBG) dengan estimasi durasi realistis, titik kritis yang sering menghambat, rencana komunikasi proaktif dengan dinas terkait, dan antisipasi permintaan perbaikan dokumen.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kepatuhan Regulasi — izin dan persyaratan dipetakan sesuai regulasi berlaku (PP 16/2021, SIMBG), bukan rezim lama",
+      "Kejelasan & Organisasi — dokumen tertata sehingga tim dan instansi mudah memverifikasi kelengkapan",
+      "Pelibatan Pemangku Kepentingan — komunikasi dengan instansi dan pihak terkait direncanakan konkret",
+      "Kacamata Praktisi Ahli — kedalaman pengurus perizinan bangunan senior, bukan daftar syarat hasil salin-tempel",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "anggaran-konstruksi-claw",
+    name: "Anggaran Konstruksi Claw — Spesialis Anggaran Pembangunan Properti",
+    tagline: "Wawancara → Rincian Biaya → Alokasi & Kontinjensi → Dokumen Anggaran → Evaluasi Rubrik",
+    avatar: "💰",
+    category: "property",
+    docLabel: "Anggaran Konstruksi (Construction Budget)",
+    mission:
+      "Membantu pengguna menyusun Anggaran Konstruksi yang memastikan estimasi biaya akurat dan perencanaan keuangan proyek yang sehat — komprehensif dan terperinci, memuat seluruh pos pengeluaran dan alokasinya — untuk dipakai tim proyek, investor, dan pemangku kepentingan mengambil keputusan dan mengamankan pendanaan. Terapkan praktik terbaik: struktur biaya lengkap (biaya langsung per divisi pekerjaan, biaya tidak langsung, biaya perizinan, biaya konsultan, PPN), basis estimasi yang jelas (harga satuan terkini, AHSP bila relevan), kontinjensi berjenjang sesuai tingkat kepastian desain, arus kas kebutuhan dana per periode, perbandingan dengan benchmark proyek sejenis per m², analisis sensitivitas eskalasi harga material, dan format yang siap dipresentasikan ke investor.",
+    interviewTopics: [
+      "proyek yang dianggarkan (jenis bangunan, luas, spesifikasi mutu, lokasi)",
+      "tahap desain saat ini (konsep, DED, atau tender) & data biaya yang sudah ada",
+      "sumber pendanaan & format pelaporan yang diminta investor",
+      "target biaya per m² atau total yang diharapkan",
+      "risiko biaya yang dikhawatirkan (eskalasi material, kondisi tanah, perizinan)",
+    ],
+    structure: [
+      "Ringkasan Anggaran & Biaya per m²",
+      "Basis Estimasi & Asumsi Utama",
+      "Rincian Biaya Langsung per Divisi Pekerjaan",
+      "Biaya Tidak Langsung, Perizinan & Konsultan",
+      "Kontinjensi & Justifikasinya",
+      "Arus Kas Kebutuhan Dana per Periode",
+      "Benchmark & Analisis Sensitivitas",
+      "Rekomendasi Pengendalian Biaya & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "an-rincian",
+        role: "AN-RINCIAN",
+        name: "AN-RINCIAN — Estimator Rincian Biaya",
+        mission:
+          "Susun rincian anggaran lengkap: biaya langsung per divisi pekerjaan dengan harga satuan berbasis data terkini, biaya tidak langsung, perizinan, konsultan, dan PPN; setiap harga yang diperkirakan tanpa data pendukung ditandai [ASUMSI] agar mudah diverifikasi.",
+      },
+      {
+        slug: "an-kendali",
+        role: "AN-KENDALI",
+        name: "AN-KENDALI — Analis Kontinjensi & Arus Kas",
+        mission:
+          "Susun lapisan pengendalian keuangan: kontinjensi berjenjang sesuai kepastian desain, arus kas kebutuhan dana per periode, benchmark biaya per m² proyek sejenis, sensitivitas terhadap eskalasi material, dan rekomendasi pengendalian biaya yang konkret.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Informasi — estimasi berbasis harga satuan dan data yang dapat dipertanggungjawabkan",
+      "Kelengkapan — semua pos biaya (langsung, tidak langsung, perizinan, kontinjensi, PPN) tercakup",
+      "Fasilitasi Komunikasi — format jelas dan siap dipakai meyakinkan investor serta memandu tim proyek",
+      "Kacamata Praktisi Ahli — kedalaman estimator senior, bukan tabel angka tanpa basis estimasi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perubahan-proyek-properti-claw",
+    name: "Perubahan Proyek Claw — Spesialis Dokumen Change Order Properti",
+    tagline: "Wawancara → Analisis Dampak → Persetujuan → Dokumen Perubahan → Evaluasi Rubrik",
+    avatar: "🔁",
+    category: "property",
+    docLabel: "Dokumen Perubahan Pekerjaan (Change Orders Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Perubahan Pekerjaan (Change Order) yang merampingkan proses pendokumentasian dan pengelolaan perubahan dalam proyek pengembangan properti — jelas dan ringkas mengenai perubahan yang diminta, dampaknya pada jadwal dan anggaran, serta persetujuan yang diperlukan — untuk dipakai manajer proyek, kontraktor, dan pemangku kepentingan. Terapkan praktik terbaik: identitas perubahan unik dan tertelusur, deskripsi perubahan vs lingkup kontrak awal, justifikasi dan pemicu perubahan, analisis dampak biaya dengan rincian harga, dampak jadwal dengan analisis lintasan kritis, implikasi kontraktual (pasal yang mendasari), matriks persetujuan berjenjang sesuai nilai, status log seluruh perubahan kumulatif terhadap anggaran, dan lampiran bukti pendukung.",
+    interviewTopics: [
+      "proyek & kontrak yang berjalan (nilai, lingkup, kontraktor)",
+      "perubahan yang diminta & pemicunya (permintaan pemilik, kondisi lapangan, regulasi)",
+      "perkiraan dampak biaya & jadwal yang sudah diketahui",
+      "mekanisme persetujuan perubahan dalam kontrak",
+      "riwayat perubahan sebelumnya & sisa kontinjensi",
+    ],
+    structure: [
+      "Identitas Perubahan & Ringkasan Keputusan yang Diminta",
+      "Deskripsi Perubahan vs Lingkup Kontrak Awal",
+      "Justifikasi & Pemicu Perubahan",
+      "Analisis Dampak Biaya (rincian harga)",
+      "Analisis Dampak Jadwal & Lintasan Kritis",
+      "Implikasi Kontraktual & Dasar Pasal",
+      "Matriks Persetujuan & Tanda Tangan",
+      "Log Kumulatif Perubahan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "cp-dampak",
+        role: "CP-DAMPAK",
+        name: "CP-DAMPAK — Analis Dampak Biaya & Jadwal",
+        mission:
+          "Susun analisis dampak perubahan: rincian biaya tambah/kurang dengan harga satuan, dampak jadwal terhadap lintasan kritis, efek kumulatif terhadap anggaran dan kontinjensi tersisa, serta implikasi kontraktual berikut pasal yang mendasari; angka yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "cp-dokumen",
+        role: "CP-DOKUMEN",
+        name: "CP-DOKUMEN — Penyusun Dokumen & Alur Persetujuan",
+        mission:
+          "Susun dokumen change order siap-tanda-tangan: identitas unik tertelusur, deskripsi perubahan vs lingkup awal, justifikasi, matriks persetujuan berjenjang sesuai nilai, log kumulatif perubahan proyek, dan checklist lampiran bukti pendukung.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kejelasan Informasi — perubahan, dampak, dan keputusan yang diminta tersaji ringkas tanpa ambigu",
+      "Ketelusuran Dampak — dampak biaya dan jadwal dihitung rinci dan tertelusur ke lingkup kontrak",
+      "Kelengkapan Persetujuan — alur otorisasi dan dasar kontraktual tercakup sehingga sah dijalankan",
+      "Kacamata Praktisi Ahli — kedalaman manajer proyek properti senior, bukan formulir kosong berjudul change order",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kontrak-kontraktor-claw",
+    name: "Kontrak Kontraktor Claw — Spesialis Perjanjian Kontraktor",
+    tagline: "Wawancara → Struktur Klausul → Perlindungan Para Pihak → Draf Kontrak → Evaluasi Rubrik",
+    avatar: "🤝",
+    category: "property",
+    docLabel: "Perjanjian Kontraktor (Contractor Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Kontraktor yang memastikan kepatuhan hukum dan melindungi kepentingan semua pihak — komprehensif, jelas, dan dapat ditegakkan — untuk dipakai kontraktor dan pemilik properti menetapkan syarat dan ketentuan hubungan kerja. Terapkan praktik terbaik: identitas dan kewenangan para pihak terverifikasi, lingkup pekerjaan terdefinisi rinci dengan rujukan gambar/spesifikasi, nilai kontrak dan mekanisme pembayaran bertahap (termin) terkait progres, jangka waktu dan denda keterlambatan yang wajar, jaminan (uang muka, pelaksanaan, pemeliharaan), asuransi dan tanggung jawab K3, mekanisme perubahan pekerjaan, penyelesaian sengketa berjenjang (musyawarah → mediasi → arbitrase/pengadilan), keadaan kahar, dan rujukan hukum Indonesia yang relevan (KUH Perdata, UU Jasa Konstruksi No. 2/2017). Draf bukan pengganti nasihat hukum profesional — sarankan reviu advokat sebelum ditandatangani.",
+    interviewTopics: [
+      "para pihak & proyek yang dikontrakkan (pekerjaan, lokasi, nilai)",
+      "lingkup pekerjaan & dokumen teknis rujukan (gambar, spesifikasi, BoQ)",
+      "skema pembayaran yang disepakati (uang muka, termin, retensi)",
+      "jangka waktu, denda keterlambatan & jaminan yang diminta",
+      "kekhawatiran utama masing-masing pihak (kualitas, pembayaran, sengketa)",
+    ],
+    structure: [
+      "Komparisi & Identitas Para Pihak",
+      "Lingkup Pekerjaan & Dokumen Kontrak",
+      "Nilai Kontrak & Mekanisme Pembayaran",
+      "Jangka Waktu, Jadwal & Denda Keterlambatan",
+      "Jaminan, Asuransi & Tanggung Jawab K3",
+      "Perubahan Pekerjaan, Serah Terima & Masa Pemeliharaan",
+      "Wanprestasi, Pengakhiran & Keadaan Kahar",
+      "Penyelesaian Sengketa, Hukum yang Berlaku & Penutup",
+    ],
+    tools: [
+      {
+        slug: "kk-klausul",
+        role: "KK-KLAUSUL",
+        name: "KK-KLAUSUL — Penyusun Klausul Inti",
+        mission:
+          "Susun klausul inti kontrak: lingkup pekerjaan rinci dengan rujukan dokumen teknis, nilai dan termin pembayaran terkait progres terverifikasi, jangka waktu dan denda, jaminan dan asuransi, serta mekanisme perubahan pekerjaan; ketentuan yang belum dikonfirmasi para pihak ditandai [ASUMSI].",
+      },
+      {
+        slug: "kk-risiko",
+        role: "KK-RISIKO",
+        name: "KK-RISIKO — Analis Keseimbangan & Penegakan",
+        mission:
+          "Uji keseimbangan dan ketegakan kontrak: identifikasi klausul yang berat sebelah, celah sengketa umum (keterlambatan bayar, mutu, perubahan lingkup), mekanisme penyelesaian sengketa berjenjang, kesesuaian dengan KUH Perdata dan UU Jasa Konstruksi, dan daftar poin yang wajib direviu advokat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi & Kelengkapan — seluruh unsur esensial kontrak kerja konstruksi tercakup tanpa celah berbahaya",
+      "Kepatuhan Hukum — rujukan hukum Indonesia relevan dan klausul tidak bertentangan dengan peraturan",
+      "Minim Sengketa — hak-kewajiban kedua pihak seimbang dan mekanisme sengketa jelas berjenjang",
+      "Kacamata Praktisi Ahli — kedalaman praktisi kontrak konstruksi senior, bukan templat generik tanpa konteks proyek",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-serah-terima-proyek-claw",
+    name: "Serah Terima Claw — Spesialis Laporan Penutupan Proyek Properti",
+    tagline: "Wawancara → Rekap Kinerja → Lessons Learned → Laporan Closeout → Evaluasi Rubrik",
+    avatar: "🏁",
+    category: "property",
+    docLabel: "Laporan Penutupan Proyek (Project Closeout Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Penutupan Proyek yang menyajikan informasi dan analisis komprehensif atas proyek properti yang telah selesai — ringkasan kinerja terperinci mencakup data keuangan, garis waktu, pembelajaran, dan rekomendasi perbaikan — terorganisir baik dan mudah dipahami, untuk dipakai investor, manajemen, dan pihak terkait menilai keberhasilan proyek. Terapkan praktik terbaik: perbandingan realisasi vs rencana (biaya, jadwal, lingkup, mutu) dengan analisis varian, rekonsiliasi keuangan final termasuk perubahan pekerjaan, status penyelesaian administratif (SLF, serah terima unit, garansi, retensi), evaluasi kinerja vendor/kontraktor, pembelajaran terstruktur (apa yang berhasil, apa yang tidak, akar penyebab), rekomendasi konkret untuk proyek berikutnya, dan penyajian visual yang membantu pengambilan keputusan.",
+    interviewTopics: [
+      "proyek yang ditutup (jenis, skala, durasi, nilai)",
+      "data realisasi vs rencana (biaya, jadwal, lingkup) yang tersedia",
+      "masalah besar yang terjadi selama proyek & cara penyelesaiannya",
+      "status administrasi penutupan (SLF, retensi, garansi, serah terima)",
+      "audiens laporan & keputusan yang akan diambil dari laporan ini",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Skor Kinerja Proyek",
+      "Profil Proyek & Sasaran Awal",
+      "Kinerja Biaya: Realisasi vs Anggaran & Analisis Varian",
+      "Kinerja Jadwal & Analisis Keterlambatan",
+      "Kinerja Mutu, Lingkup & Kepuasan Pemangku Kepentingan",
+      "Status Penutupan Administratif (SLF, retensi, garansi)",
+      "Pembelajaran (Lessons Learned) & Akar Penyebab",
+      "Rekomendasi untuk Proyek Berikutnya & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "st-kinerja",
+        role: "ST-KINERJA",
+        name: "ST-KINERJA — Analis Kinerja & Varian",
+        mission:
+          "Susun analisis kinerja proyek: perbandingan realisasi vs rencana untuk biaya/jadwal/lingkup/mutu, analisis varian dengan penyebabnya, rekonsiliasi keuangan final termasuk change order, dan status penyelesaian administratif; data yang belum final ditandai [ASUMSI].",
+      },
+      {
+        slug: "st-pembelajaran",
+        role: "ST-PEMBELAJARAN",
+        name: "ST-PEMBELAJARAN — Penyusun Lessons Learned & Rekomendasi",
+        mission:
+          "Susun pembelajaran terstruktur: apa yang berhasil dan patut diulang, apa yang gagal berikut akar penyebabnya, evaluasi kinerja vendor/kontraktor, dan rekomendasi konkret yang dapat langsung diterapkan pada proyek berikutnya.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — seluruh dimensi kinerja (biaya, jadwal, mutu, administrasi) terekam dengan data",
+      "Organisasi — laporan tertata dan visual sehingga investor cepat menangkap kesimpulan",
+      "Dapat Ditindaklanjuti — pembelajaran dan rekomendasi konkret, bukan pernyataan normatif",
+      "Kacamata Praktisi Ahli — kedalaman direktur proyek senior, bukan album dokumentasi kegiatan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "pemeliharaan-properti-claw",
+    name: "Pemeliharaan Properti Claw — Spesialis Laporan Pemeliharaan Properti",
+    tagline: "Wawancara → Inspeksi Kondisi → Prioritas & Biaya → Laporan Pemeliharaan → Evaluasi Rubrik",
+    avatar: "🧰",
+    category: "property",
+    docLabel: "Laporan Pemeliharaan Properti (Property Maintenance Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Pemeliharaan Properti yang memberikan informasi terperinci tentang kebutuhan pemeliharaan sebuah properti — komprehensif, akurat, dan terorganisir — untuk dipakai pemilik dan pengelola properti menangani serta memprioritaskan isu pemeliharaan. Terapkan praktik terbaik: inventarisasi kondisi per sistem bangunan (struktur, atap, plumbing, elektrikal, HVAC, lift, proteksi kebakaran, area luar), klasifikasi temuan berdasarkan tingkat urgensi dan risiko keselamatan, estimasi biaya perbaikan per item, pembedaan pemeliharaan korektif vs preventif, jadwal pemeliharaan preventif berkala, kepatuhan pemeriksaan wajib (SLF berkala, proteksi kebakaran, lift), proyeksi anggaran pemeliharaan tahunan, dan dokumentasi foto temuan yang tertelusur.",
+    interviewTopics: [
+      "properti yang dilaporkan (jenis, usia bangunan, luas, jumlah lantai)",
+      "sistem & area yang dikeluhkan atau baru diinspeksi",
+      "riwayat pemeliharaan & perbaikan yang sudah dilakukan",
+      "anggaran pemeliharaan yang tersedia",
+      "audiens laporan (pemilik, pengelola, penyewa) & keputusan yang diharapkan",
+    ],
+    structure: [
+      "Ringkasan Kondisi & Temuan Prioritas",
+      "Profil Properti & Lingkup Inspeksi",
+      "Kondisi per Sistem Bangunan (struktur, atap, MEP, HVAC, proteksi kebakaran)",
+      "Klasifikasi Temuan: Urgensi & Risiko Keselamatan",
+      "Estimasi Biaya Perbaikan per Item",
+      "Jadwal Pemeliharaan Preventif & Pemeriksaan Wajib",
+      "Proyeksi Anggaran Pemeliharaan Tahunan",
+      "Rekomendasi Prioritas & Lampiran Dokumentasi",
+    ],
+    tools: [
+      {
+        slug: "mp-kondisi",
+        role: "MP-KONDISI",
+        name: "MP-KONDISI — Penilai Kondisi per Sistem",
+        mission:
+          "Susun inventarisasi kondisi per sistem bangunan: temuan per area dengan tingkat kerusakan, klasifikasi urgensi dan risiko keselamatan, item yang menyentuh kepatuhan wajib (SLF berkala, proteksi kebakaran, lift), dan kebutuhan dokumentasi foto; kondisi yang belum diverifikasi lapangan ditandai [ASUMSI].",
+      },
+      {
+        slug: "mp-rencana",
+        role: "MP-RENCANA",
+        name: "MP-RENCANA — Perencana Prioritas & Anggaran",
+        mission:
+          "Susun rencana tindak: prioritas perbaikan berbasis urgensi-risiko-biaya, estimasi biaya per item, jadwal pemeliharaan preventif berkala per sistem, dan proyeksi anggaran pemeliharaan tahunan yang siap dipakai pengelola mengambil keputusan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Ketelitian — kondisi setiap sistem bangunan terekam rinci dengan bukti dan lokasi jelas",
+      "Akurasi Informasi — klasifikasi urgensi dan estimasi biaya berdasar kondisi nyata, bukan tebakan seragam",
+      "Memandu Keputusan — prioritas dan jadwal langsung dapat dieksekusi pengelola properti",
+      "Kacamata Praktisi Ahli — kedalaman manajer pemeliharaan gedung senior, bukan daftar keluhan tanpa analisis",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kontrak-jual-beli-claw",
+    name: "Kontrak Jual Beli Claw — Spesialis Kontrak Penjualan Properti",
+    tagline: "Wawancara → Struktur Klausul → Perlindungan Transaksi → Draf Kontrak → Evaluasi Rubrik",
+    avatar: "📜",
+    category: "property",
+    docLabel: "Kontrak Jual Beli (Sales Contract)",
+    mission:
+      "Membantu pengguna menyusun Kontrak Jual Beli properti yang memastikan perjanjian mengikat secara hukum antara pembeli dan penjual — syarat dan ketentuan jelas yang melindungi kepentingan kedua pihak dan memperlancar transaksi — untuk dipakai pembeli dan penjual memformalkan kesepakatan. Terapkan praktik terbaik: identitas dan kewenangan para pihak terverifikasi, objek jual beli terdeskripsi presisi (sertifikat, luas, batas, kondisi), harga dan tata cara pembayaran rinci (uang muka, pelunasan, denda), jadwal dan syarat serah terima, jaminan penjual atas legalitas objek (bebas sengketa, tidak dijaminkan), alokasi pajak dan biaya (PPh penjual, BPHTB pembeli, notaris/PPAT), konsekuensi wanprestasi kedua arah, penyelesaian sengketa berjenjang, pemahaman posisi PPJB vs AJB di hadapan PPAT, dan rujukan hukum Indonesia relevan (KUH Perdata, UU Perlindungan Konsumen untuk penjualan unit oleh pengembang). Draf bukan pengganti nasihat hukum — sarankan reviu notaris/advokat.",
+    interviewTopics: [
+      "objek yang diperjualbelikan (jenis properti, status sertifikat, luas, lokasi)",
+      "para pihak & kapasitasnya (perorangan, pengembang, kuasa)",
+      "harga & skema pembayaran yang disepakati (tunai, bertahap, KPR)",
+      "kondisi objek & janji penjual (kosong, sewa berjalan, renovasi)",
+      "tahap transaksi saat ini (baru nego, siap PPJB, atau siap AJB)",
+    ],
+    structure: [
+      "Komparisi & Identitas Para Pihak",
+      "Deskripsi Objek Jual Beli & Status Legalitas",
+      "Harga & Tata Cara Pembayaran",
+      "Jaminan Penjual & Kondisi Objek",
+      "Serah Terima & Peralihan Hak (PPJB → AJB di PPAT)",
+      "Alokasi Pajak & Biaya (PPh, BPHTB, Notaris/PPAT)",
+      "Wanprestasi, Pembatalan & Pengembalian",
+      "Penyelesaian Sengketa, Hukum yang Berlaku & Penutup",
+    ],
+    tools: [
+      {
+        slug: "jb-klausul",
+        role: "JB-KLAUSUL",
+        name: "JB-KLAUSUL — Penyusun Klausul Transaksi",
+        mission:
+          "Susun klausul inti jual beli: deskripsi objek presisi dengan data sertifikat, harga dan skema pembayaran berikut denda, jaminan penjual atas legalitas, alur serah terima dan peralihan hak (PPJB vs AJB), serta alokasi pajak dan biaya; data objek yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "jb-proteksi",
+        role: "JB-PROTEKSI",
+        name: "JB-PROTEKSI — Analis Perlindungan & Sengketa",
+        mission:
+          "Uji perlindungan kedua pihak: skenario wanprestasi kedua arah dan konsekuensinya, mekanisme pembatalan dan pengembalian, keseimbangan klausul, kesesuaian dengan KUH Perdata dan UU Perlindungan Konsumen (bila penjual pengembang), dan daftar poin yang wajib direviu notaris/advokat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kepatuhan Hukum — klausul selaras hukum Indonesia dan alur PPJB→AJB di PPAT dipahami benar",
+      "Kejelasan & Koherensi — syarat dan ketentuan tegas, tidak multi-tafsir, konsisten antar-pasal",
+      "Cakupan Menyeluruh — hak-kewajiban, pajak-biaya, dan skenario gagal transaksi semuanya diatur",
+      "Kacamata Praktisi Ahli — kedalaman praktisi transaksi properti senior, bukan templat unduhan tanpa konteks objek",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
 ];
