@@ -25,6 +25,10 @@ const files = [
   // DB integration: confirms superadmin bootstrap guard survives server restarts.
   // Skipped automatically (process.exit 0) when DATABASE_URL is absent.
   resolve(__dirname, "bootstrap-superadmin-db.test.ts"),
+  // Unit: confirms normalizePhone + promoteSuperAdminIfMatch handle all phone
+  // formats (leading 0, +62, bare 8x) so format mismatches never silently block
+  // superadmin promotion. No DB or env required — pure logic test.
+  resolve(__dirname, "superadmin-phone-promotion.test.ts"),
 ];
 
 let hadFailure = false;
