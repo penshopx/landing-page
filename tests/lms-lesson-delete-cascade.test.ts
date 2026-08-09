@@ -73,6 +73,7 @@ after(async () => {
   if (createdCourseIds.length > 0) {
     const ids = createdCourseIds.join(",");
     await queryDb(`DELETE FROM lms_lesson_progress WHERE course_id IN (${ids})`);
+    await queryDb(`DELETE FROM lms_enrollments WHERE course_id IN (${ids})`);
     await queryDb(`DELETE FROM lms_lessons WHERE course_id IN (${ids})`);
     await queryDb(`DELETE FROM lms_courses WHERE id IN (${ids})`);
   }
@@ -250,6 +251,109 @@ test(
 );
 
 test(
+  "enrollment guard: returns 409 with enrolledStudents when course has active enrollments",
+  { skip: SKIP },
+  async () => {
+    const seqSuffix = Math.random().toString(36).slice(2, 8);
+    const studentUserId = `student-guard-${RUN}-${seqSuffix}`;
+
+    // Create course + lesson.
+    const [course] = await queryDb(
+      `INSERT INTO lms_courses (title, slug, category, is_active, sort_order, price, level)
+       VALUES ($1, $2, 'onboarding', true, 999, 0, 'beginner')
+       RETURNING id`,
+      [`Guard Test Course ${RUN}-${seqSuffix}`, `guard-course-${RUN}-${seqSuffix}`]
+    );
+    const cId = course.id as number;
+    createdCourseIds.push(cId);
+
+    const [lesson] = await queryDb(
+      `INSERT INTO lms_lessons (course_id, title, slug, type, duration_minutes, sort_order, is_active)
+       VALUES ($1, $2, $3, 'article', 5, 1, true)
+       RETURNING id`,
+      [cId, `Guard Lesson ${RUN}-${seqSuffix}`, `guard-lesson-${RUN}-${seqSuffix}`]
+    );
+    const lId = lesson.id as number;
+
+    // Enroll a student (no progress yet — guard must still fire).
+    await queryDb(
+      `INSERT INTO lms_enrollments (user_id, course_id) VALUES ($1, $2)`,
+      [studentUserId, cId]
+    );
+
+    // Act: attempt delete without ?force=true.
+    const res = await fetch(`${baseUrl}/api/admin/lms/lessons/${lId}`, {
+      method: "DELETE",
+    });
+    assert.equal(res.status, 409, "Should return 409 when enrolled students exist and force is absent");
+    const body = (await res.json()) as any;
+    assert.ok(
+      typeof body.enrolledStudents === "number" && body.enrolledStudents > 0,
+      `Response must include enrolledStudents > 0, got: ${JSON.stringify(body)}`
+    );
+
+    // Lesson must still exist — guard must not have deleted it.
+    const lessonRows = await queryDb(`SELECT id FROM lms_lessons WHERE id = $1`, [lId]);
+    assert.equal(lessonRows.length, 1, "Lesson must survive a blocked delete attempt");
+  }
+);
+
+test(
+  "enrollment guard: force=true bypasses guard and deletes lesson with enrolled students",
+  { skip: SKIP },
+  async () => {
+    const seqSuffix = Math.random().toString(36).slice(2, 8);
+    const studentUserId = `student-force-${RUN}-${seqSuffix}`;
+
+    const [course] = await queryDb(
+      `INSERT INTO lms_courses (title, slug, category, is_active, sort_order, price, level)
+       VALUES ($1, $2, 'onboarding', true, 999, 0, 'beginner')
+       RETURNING id`,
+      [`Force Test Course ${RUN}-${seqSuffix}`, `force-course-${RUN}-${seqSuffix}`]
+    );
+    const cId = course.id as number;
+    createdCourseIds.push(cId);
+
+    const [lesson] = await queryDb(
+      `INSERT INTO lms_lessons (course_id, title, slug, type, duration_minutes, sort_order, is_active)
+       VALUES ($1, $2, $3, 'article', 5, 1, true)
+       RETURNING id`,
+      [cId, `Force Lesson ${RUN}-${seqSuffix}`, `force-lesson-${RUN}-${seqSuffix}`]
+    );
+    const lId = lesson.id as number;
+
+    // Enroll a student and mark the lesson as completed.
+    await queryDb(
+      `INSERT INTO lms_enrollments (user_id, course_id) VALUES ($1, $2)`,
+      [studentUserId, cId]
+    );
+    await queryDb(
+      `INSERT INTO lms_lesson_progress (user_id, course_id, lesson_id) VALUES ($1, $2, $3)`,
+      [studentUserId, cId, lId]
+    );
+
+    // Act: delete with ?force=true — must succeed.
+    const res = await fetch(`${baseUrl}/api/admin/lms/lessons/${lId}?force=true`, {
+      method: "DELETE",
+    });
+    assert.equal(res.status, 200, `Expected 200 OK with force=true, got ${res.status}`);
+    const body = (await res.json()) as any;
+    assert.equal(body.ok, true, "Response body must be { ok: true }");
+
+    // Lesson must be gone.
+    const lessonRows = await queryDb(`SELECT id FROM lms_lessons WHERE id = $1`, [lId]);
+    assert.equal(lessonRows.length, 0, "Lesson must be deleted when force=true");
+
+    // Progress row must also be gone.
+    const progressRows = await queryDb(
+      `SELECT id FROM lms_lesson_progress WHERE lesson_id = $1`,
+      [lId]
+    );
+    assert.equal(progressRows.length, 0, "Progress rows must be cascade-deleted with the lesson");
+  }
+);
+
+test(
   "static: DELETE lesson route uses a transaction wrapping both progress and lesson deletes",
   { skip: false },
   async () => {
@@ -268,7 +372,7 @@ test(
     );
     assert.ok(handlerStart !== -1, "DELETE lesson route comment must exist in source");
 
-    const handlerSlice = src.slice(handlerStart, handlerStart + 1200);
+    const handlerSlice = src.slice(handlerStart, handlerStart + 2500);
 
     // Must use a transaction.
     assert.ok(

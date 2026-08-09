@@ -143,7 +143,10 @@ async function getEnrollmentProgress(studentId: string, courseId: number): Promi
 }
 
 async function deleteLesson(lessonId: number): Promise<void> {
-  const res = await fetch(`${baseUrl}/api/admin/lms/lessons/${lessonId}`, {
+  // Tests in this file always enroll students, so ?force=true is required to
+  // bypass the enrollment guard (DELETE /api/admin/lms/lessons/:id returns 409
+  // when enrolled students exist and force is absent).
+  const res = await fetch(`${baseUrl}/api/admin/lms/lessons/${lessonId}?force=true`, {
     method: "DELETE",
   });
   assert.equal(res.status, 200, `Expected 200 OK deleting lesson ${lessonId}, got ${res.status}`);

@@ -593,6 +593,11 @@ function LessonsPanel({ course }: { course: Course }) {
     open: false,
   });
   const [deleteLesson, setDeleteLesson] = useState<Lesson | null>(null);
+  // Second-stage: force-delete confirmation when the lesson's course has enrolled students
+  const [forceDeleteState, setForceDeleteState] = useState<{
+    lesson: Lesson;
+    enrolledStudents: number;
+  } | null>(null);
   const [localLessons, setLocalLessons] = useState<Lesson[]>([]);
   const [isSavingOrder, setIsSavingOrder] = useState(false);
 
@@ -624,16 +629,47 @@ function LessonsPanel({ course }: { course: Course }) {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
+  const invalidateAfterDelete = () => {
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses", course.id, "lessons"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+  };
+
   const delMut = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/admin/lms/lessons/${id}`),
     onSuccess: () => {
       toast({ title: "Lesson dihapus" });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses", course.id, "lessons"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      invalidateAfterDelete();
       setDeleteLesson(null);
     },
+    onError: (e: any) => {
+      // apiRequest throws Error with message "STATUS: {json body}"
+      const msg: string = e?.message ?? "";
+      if (msg.startsWith("409:")) {
+        let enrolledStudents = 0;
+        try {
+          const jsonPart = msg.slice(msg.indexOf(":") + 1).trim();
+          const body = JSON.parse(jsonPart);
+          enrolledStudents = body?.enrolledStudents ?? 0;
+        } catch { /* ignore parse errors */ }
+        if (deleteLesson) {
+          setForceDeleteState({ lesson: deleteLesson, enrolledStudents });
+          setDeleteLesson(null);
+        }
+        return;
+      }
+      toast({ title: "Gagal hapus", description: msg, variant: "destructive" });
+    },
+  });
+
+  const forceDelMut = useMutation({
+    mutationFn: (id: number) => apiRequest("DELETE", `/api/admin/lms/lessons/${id}?force=true`),
+    onSuccess: () => {
+      toast({ title: "Lesson dihapus beserta data progress siswa" });
+      invalidateAfterDelete();
+      setForceDeleteState(null);
+    },
     onError: (e: any) =>
-      toast({ title: "Gagal hapus", description: e?.message, variant: "destructive" }),
+      toast({ title: "Gagal hapus paksa", description: e?.message, variant: "destructive" }),
   });
 
   const handleDragEnd = useCallback(
@@ -722,6 +758,7 @@ function LessonsPanel({ course }: { course: Course }) {
         onSaved={() => {}}
       />
 
+      {/* Stage 1: simple confirmation (no progress rows yet) */}
       <AlertDialog open={!!deleteLesson} onOpenChange={(o) => !o && setDeleteLesson(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -737,6 +774,45 @@ function LessonsPanel({ course }: { course: Course }) {
               onClick={() => deleteLesson && delMut.mutate(deleteLesson.id)}
             >
               {delMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Stage 2: force-delete — shown when the lesson has student progress rows */}
+      <AlertDialog
+        open={!!forceDeleteState}
+        onOpenChange={(o) => !o && setForceDeleteState(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus lesson dengan data siswa?</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-2 text-sm">
+                <p>
+                  <strong>{forceDeleteState?.lesson.title}</strong> ada di kursus dengan{" "}
+                  <strong>{forceDeleteState?.enrolledStudents} siswa terdaftar</strong>.
+                </p>
+                <p className="text-destructive font-medium">
+                  Menghapus lesson ini akan menghapus seluruh catatan kemajuan belajar mereka
+                  secara permanen dan tidak dapat dibatalkan.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() =>
+                forceDeleteState && forceDelMut.mutate(forceDeleteState.lesson.id)
+              }
+            >
+              {forceDelMut.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Hapus Paksa"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

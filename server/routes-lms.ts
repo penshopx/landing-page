@@ -1109,27 +1109,64 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
   // After the lesson and its progress rows are removed, the enrollment progress%
   // for every enrolled student is recalculated so stale / inflated values never
   // reach the student UI.
+  //
+  // Enrollment guard: if the lesson's course has any enrolled students and
+  // ?force=true is NOT set, the route returns 409 with { error, enrolledStudents }
+  // so the frontend can show a confirmation dialog before destructively removing
+  // the lesson and wiping affected student progress.
   app.delete("/api/admin/lms/lessons/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) return res.status(400).json({ error: "ID tidak valid" });
+      const force = req.query.force === "true";
 
-      let deleted: typeof lmsLessons.$inferSelect | undefined;
+      // Pre-fetch the lesson so we can (a) return 404 early and (b) get courseId
+      // for the enrollment count without doing the check inside the transaction.
+      const [lesson] = await db.select().from(lmsLessons).where(eq(lmsLessons.id, id));
+      if (!lesson) return res.status(404).json({ error: "Lesson tidak ditemukan" });
+
+      // Guard: block deletion if any student is enrolled in the course, unless
+      // the admin explicitly confirms with ?force=true.
+      const [{ enrolledStudents }] = await db
+        .select({ enrolledStudents: count() })
+        .from(lmsEnrollments)
+        .where(eq(lmsEnrollments.courseId, lesson.courseId));
+      const enrolled = Number(enrolledStudents);
+      if (enrolled > 0 && !force) {
+        return res.status(409).json({
+          error: `Kursus ini memiliki ${enrolled} siswa yang terdaftar. Gunakan ?force=true untuk menghapus lesson ini beserta data belajar mereka.`,
+          enrolledStudents: enrolled,
+        });
+      }
+
+      const courseId = lesson.courseId;
       await db.transaction(async (tx) => {
         // Explicit cleanup (defence-in-depth / pre-FK environments).
         await tx.delete(lmsLessonProgress).where(eq(lmsLessonProgress.lessonId, id));
-        const [row] = await tx.delete(lmsLessons).where(eq(lmsLessons.id, id)).returning();
-        deleted = row;
+        await tx.delete(lmsLessons).where(eq(lmsLessons.id, id));
 
-        if (deleted) {
-          const courseId = deleted.courseId;
-          // Recalculate progress for all enrolled students in the affected course.
-          // At this point inside the transaction the deleted lesson is already gone,
-          // so both lesson count and completed-lesson count are already correct.
-          await tx.execute(sql`
-            UPDATE lms_enrollments e
-            SET
-              progress = ROUND(
+        // Recalculate progress for all enrolled students in the affected course.
+        // At this point inside the transaction the deleted lesson is already gone,
+        // so both lesson count and completed-lesson count are already correct.
+        await tx.execute(sql`
+          UPDATE lms_enrollments e
+          SET
+            progress = ROUND(
+              COALESCE(
+                (
+                  SELECT COUNT(*) FROM lms_lesson_progress lp
+                  WHERE lp.user_id = e.user_id AND lp.course_id = e.course_id
+                )::numeric /
+                NULLIF(
+                  (SELECT COUNT(*) FROM lms_lessons l WHERE l.course_id = e.course_id),
+                  0
+                ) * 100,
+                0
+              )
+            ),
+            -- Clear completedAt if the student no longer has 100% progress.
+            completed_at = CASE
+              WHEN ROUND(
                 COALESCE(
                   (
                     SELECT COUNT(*) FROM lms_lesson_progress lp
@@ -1141,30 +1178,13 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
                   ) * 100,
                   0
                 )
-              ),
-              -- Clear completedAt if the student no longer has 100% progress.
-              completed_at = CASE
-                WHEN ROUND(
-                  COALESCE(
-                    (
-                      SELECT COUNT(*) FROM lms_lesson_progress lp
-                      WHERE lp.user_id = e.user_id AND lp.course_id = e.course_id
-                    )::numeric /
-                    NULLIF(
-                      (SELECT COUNT(*) FROM lms_lessons l WHERE l.course_id = e.course_id),
-                      0
-                    ) * 100,
-                    0
-                  )
-                ) >= 100 THEN e.completed_at
-                ELSE NULL
-              END
-            WHERE e.course_id = ${courseId}
-          `);
-        }
+              ) >= 100 THEN e.completed_at
+              ELSE NULL
+            END
+          WHERE e.course_id = ${courseId}
+        `);
       });
 
-      if (!deleted) return res.status(404).json({ error: "Lesson tidak ditemukan" });
       res.json({ ok: true });
     } catch (e: any) {
       console.error("[LMS-ADMIN] DELETE lesson:", e);
