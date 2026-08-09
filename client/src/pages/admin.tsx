@@ -408,6 +408,7 @@ export default function AdminPage() {
   const [productForm, setProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", paymentUrl: "", sortOrder: "0" });
   const [editPaymentUrlId, setEditPaymentUrlId] = useState<number | null>(null);
   const [editPaymentUrlValue, setEditPaymentUrlValue] = useState("");
+  const [testDownloadState, setTestDownloadState] = useState<Record<number, { loading: boolean; url?: string; error?: string }>>({});
   const [showProductForm, setShowProductForm] = useState(false);
   const [editProductDialog, setEditProductDialog] = useState<{ open: boolean; product: StoreProduct | null }>({ open: false, product: null });
   const [editProductForm, setEditProductForm] = useState({ name: "", description: "", category: "Konstruksi", price: "", agentId: "", emoji: "🤖", features: "", sortOrder: "0", isActive: true, paymentUrl: "", priceOverride: "", downloadPath: "", scalevProductName: "" });
@@ -2083,6 +2084,55 @@ export default function AdminPage() {
                                 onClick={() => { setEditPaymentUrlId(p.id); setEditPaymentUrlValue(p.paymentUrl || ""); }}>
                                 Edit Link
                               </Button>
+                            </div>
+                          )}
+                          {/* Test Download Link — only shown when a downloadPath is configured */}
+                          {p.downloadPath && (
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-xs text-muted-foreground font-mono truncate max-w-xs" title={p.downloadPath}>
+                                📁 {p.downloadPath}
+                              </span>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-6 px-2 text-xs gap-1 border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                                disabled={testDownloadState[p.id]?.loading}
+                                data-testid={`button-test-download-${p.id}`}
+                                onClick={async () => {
+                                  setTestDownloadState(s => ({ ...s, [p.id]: { loading: true } }));
+                                  try {
+                                    const res = await fetch(`/api/admin/store/products/${p.id}/test-download`, {
+                                      method: "POST",
+                                      credentials: "include",
+                                    });
+                                    const data = await res.json();
+                                    if (!res.ok) {
+                                      setTestDownloadState(s => ({ ...s, [p.id]: { loading: false, error: data.error || "Gagal" } }));
+                                    } else {
+                                      setTestDownloadState(s => ({ ...s, [p.id]: { loading: false, url: data.url } }));
+                                    }
+                                  } catch (e: any) {
+                                    setTestDownloadState(s => ({ ...s, [p.id]: { loading: false, error: e.message || "Network error" } }));
+                                  }
+                                }}>
+                                {testDownloadState[p.id]?.loading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Link2 className="h-3 w-3" />}
+                                Test Link
+                              </Button>
+                              {testDownloadState[p.id]?.url && (
+                                <a
+                                  href={testDownloadState[p.id]!.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-green-600 dark:text-green-400 hover:underline flex items-center gap-0.5"
+                                  data-testid={`link-test-download-result-${p.id}`}>
+                                  <CheckCircle2 className="h-3 w-3" /> Buka file ↗
+                                </a>
+                              )}
+                              {testDownloadState[p.id]?.error && (
+                                <span className="text-xs text-red-500 flex items-center gap-0.5" data-testid={`error-test-download-${p.id}`}>
+                                  <XCircle className="h-3 w-3" /> {testDownloadState[p.id]!.error}
+                                </span>
+                              )}
                             </div>
                           )}
                         </div>

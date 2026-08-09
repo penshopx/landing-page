@@ -7847,6 +7847,38 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
+  // POST /api/admin/store/products/:id/test-download — verify the signed URL is reachable
+  app.post("/api/admin/store/products/:id/test-download", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      if (!userId) return res.status(401).json({ error: "Unauthorized" });
+      const { db: dbCheck } = await import("./db");
+      const { users: usersTable } = await import("@shared/schema");
+      const { eq: eqCheck } = await import("drizzle-orm");
+      const userRows = await dbCheck.select({ role: usersTable.role, email: usersTable.email }).from(usersTable).where(eqCheck(usersTable.id, userId)).limit(1);
+      const dbRole = userRows[0]?.role;
+      const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+      const superAdminEmails = (process.env.SUPERADMIN_EMAILS || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+      const isAdminCheck = adminIds.includes(userId) || superAdminEmails.includes(userRows[0]?.email || "") || dbRole === "admin" || dbRole === "superadmin";
+      if (!isAdminCheck) return res.status(403).json({ error: "Akses ditolak" });
+
+      const productId = Number(req.params.id);
+      const { storeProducts: spTbl } = await import("@shared/schema");
+      const { eq: eqSp } = await import("drizzle-orm");
+      const spRows = await dbCheck.select().from(spTbl).where(eqSp(spTbl.id, productId)).limit(1);
+      const sp = spRows[0];
+      if (!sp) return res.status(404).json({ error: "Produk tidak ditemukan" });
+      if (!sp.downloadPath) return res.status(400).json({ error: "Produk ini tidak memiliki downloadPath" });
+
+      const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+      // Short-lived URL for testing (5 minutes)
+      const signedUrl = await resolveDownloadUrl(sp.downloadPath, 300);
+      return res.json({ ok: true, url: signedUrl, downloadPath: sp.downloadPath });
+    } catch (err: any) {
+      return res.status(500).json({ ok: false, error: err?.message ?? "Gagal membuat signed URL" });
+    }
+  });
+
   app.get("/api/store/admin/orders", isAuthenticated, async (_req, res) => {
     try {
       const orders = await storage.getStoreOrders();
