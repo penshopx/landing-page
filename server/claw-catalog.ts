@@ -7435,4 +7435,873 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
+
+  // ── Batch 14 (real-estate-lawyer, legal) ────────────────────────────────────
+  {
+    kind: "openclaw",
+    slug: "perjanjian-pembelian-properti-claw",
+    name: "Pembelian Properti Claw — Spesialis Perjanjian Pembelian Properti (PPJB)",
+    tagline: "Wawancara → Syarat Beli → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🖋️",
+    category: "legal",
+    docLabel: "Perjanjian Pembelian Properti / PPJB (Purchase Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Pembelian Properti (PPJB — Perjanjian Pengikatan Jual Beli) yang patuh hukum, komprehensif, akurat, dan dapat ditegakkan — melindungi kepentingan pembeli dan penjual sebelum AJB. Terapkan praktik terbaik: identifikasi objek presisi (sertifikat, luas, batas, kondisi), verifikasi penjual berhak menjual (nama di sertifikat, persetujuan pasangan, ahli waris lengkap), harga dan tahapan pembayaran yang dikaitkan tonggak (uang tanda jadi, pelunasan saat AJB), syarat menuju AJB (roya bila masih dibebani Hak Tanggungan, PBB lunas, cek bersih ke BPN via PPAT), perlindungan pembeli (kuasa menjual yang tidak dapat ditarik hanya setelah lunas, sanksi penjual mundur = kembali dobel uang muka sesuai kebiasaan, sanksi pembeli mundur = hangus), penyerahan fisik dan risiko sebelum AJB, biaya-biaya siapa menanggung apa (BPHTB pembeli, PPh penjual, PPAT sesuai kesepakatan), PPJB lunas vs belum lunas dan akibat hukumnya (PP 12/2021 untuk pengembang), keadaan memaksa, dan sengketa berjenjang. Sertakan pengingat: AJB tetap wajib di hadapan PPAT — PPJB bukan pengganti balik nama.",
+    interviewTopics: [
+      "objek properti & status sertifikatnya",
+      "para pihak & kewenangan menjual",
+      "harga & tahapan pembayaran",
+      "beban di properti (HT, sewa berjalan)",
+      "jadwal AJB & pembagian biaya",
+    ],
+    structure: [
+      "Para Pihak & Kewenangan Menjual",
+      "Objek Properti & Kondisinya",
+      "Harga & Tahapan Pembayaran",
+      "Syarat Menuju AJB (Roya, PBB, Cek Bersih)",
+      "Perlindungan Pembeli & Sanksi Mundur",
+      "Penyerahan Fisik & Risiko",
+      "Pembagian Biaya & Pajak",
+      "Keadaan Memaksa, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "pl-syarat",
+        role: "PL-SYARAT",
+        name: "PL-SYARAT — Perumus Syarat Pembelian",
+        mission:
+          "Susun syarat: objek presisi, verifikasi kewenangan menjual, harga bertahap terkait tonggak, syarat menuju AJB, dan pembagian biaya-pajak; status legalitas yang belum dicek ke BPN ditandai [ASUMSI].",
+      },
+      {
+        slug: "pl-klausul",
+        role: "PL-KLAUSUL",
+        name: "PL-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: sanksi mundur dua arah, kuasa dan perlindungan pembeli setelah lunas, penyerahan dan risiko, keadaan memaksa, sengketa berjenjang, dan penegasan AJB wajib di PPAT.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — selaras KUHPerdata, praktik PPAT, dan PP 12/2021 bila melibatkan pengembang",
+      "Lengkap & Akurat — objek, harga, dan syarat AJB tak menyisakan celah sengketa",
+      "Dapat Ditegakkan — sanksi dan perlindungan dua arah benar-benar bisa dieksekusi",
+      "Kacamata Praktisi Ahli — kedalaman praktisi properti senior, bukan kuitansi tanda jadi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-penjualan-properti-claw",
+    name: "Penjualan Properti Claw — Spesialis Perjanjian Penjualan dari Sisi Penjual",
+    tagline: "Wawancara → Perlindungan Penjual → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏷️",
+    category: "legal",
+    docLabel: "Perjanjian Penjualan Properti (Sale Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Penjualan Properti yang komprehensif, akurat, dan mengikat — dirancang dari sudut pandang penjual namun adil bagi dua pihak — untuk transaksi jual beli rumah, tanah, atau unit komersial. Terapkan praktik terbaik perlindungan penjual: kepastian kemampuan bayar pembeli (bukti dana atau SP3K bila KPR, tenggat pelunasan tegas), uang tanda jadi yang hangus bila pembeli mundur tanpa alasan sah, penyerahan dokumen asli hanya saat pelunasan melalui PPAT, penyerahan fisik setelah pelunasan dengan berita acara, kondisi properti dijual apa adanya dengan pengungkapan jujur cacat yang diketahui (menghindari gugatan tersembunyi KUHPerdata 1504), pembeli KPR: konsekuensi bila bank menolak (batal tanpa sanksi atau perpanjangan sekali), pajak dan biaya (PPh final penjual dibayar sebelum AJB, BPHTB pembeli), larangan pembeli mengalihkan hak sebelum AJB, jadwal dan tempat AJB, dan sengketa berjenjang. Sertakan pengingat: pelunasan dan penyerahan dokumen melalui mekanisme PPAT agar dua pihak aman.",
+    interviewTopics: [
+      "properti yang dijual & kelengkapan dokumen",
+      "profil pembeli & cara bayar (tunai/KPR)",
+      "uang tanda jadi & tenggat pelunasan",
+      "kondisi properti & cacat yang diketahui",
+      "jadwal AJB & serah terima",
+    ],
+    structure: [
+      "Para Pihak & Objek yang Dijual",
+      "Harga, Tanda Jadi & Tenggat Pelunasan",
+      "Kepastian Dana Pembeli (Tunai/KPR)",
+      "Pengungkapan Kondisi & Dijual Apa Adanya",
+      "Penyerahan Dokumen & Fisik via PPAT",
+      "Sanksi Mundur & Skenario KPR Ditolak",
+      "Pajak & Biaya Masing-Masing",
+      "Jadwal AJB, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "jl-lindung",
+        role: "JL-LINDUNG",
+        name: "JL-LINDUNG — Perumus Perlindungan Penjual",
+        mission:
+          "Susun perlindungan: kepastian dana pembeli, tanda jadi dan sanksi mundur, penyerahan dokumen hanya saat pelunasan via PPAT, dan skenario KPR ditolak; komitmen pembeli yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "jl-klausul",
+        role: "JL-KLAUSUL",
+        name: "JL-KLAUSUL — Penyusun Klausul & Pengungkapan",
+        mission:
+          "Susun klausul: pengungkapan jujur kondisi properti (mencegah gugatan cacat tersembunyi), pajak dan biaya, larangan pengalihan sebelum AJB, berita acara serah terima, dan sengketa berjenjang.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — selaras KUHPerdata jual beli termasuk kewajiban atas cacat tersembunyi",
+      "Menyeluruh — semua skenario (tunai, KPR, mundur, telat) ada aturannya",
+      "Jernih & Terbaca — pembeli awam paham kewajibannya tanpa merasa dijebak",
+      "Kacamata Praktisi Ahli — kedalaman praktisi transaksi senior yang menjaga penjual, bukan surat jual lepas",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-titel-properti-claw",
+    name: "Laporan Titel Claw — Spesialis Laporan Riwayat & Status Titel Properti",
+    tagline: "Wawancara → Telusur Riwayat → Analisis Hukum → Dokumen → Evaluasi Rubrik",
+    avatar: "📖",
+    category: "legal",
+    docLabel: "Laporan Titel Properti (Title Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Titel Properti yang akurat dan komprehensif tentang riwayat kepemilikan, beban, dan segala persoalan hukum yang melekat — terorganisir jernih untuk pengambilan keputusan transaksi. Terapkan praktik terbaik: identifikasi objek dan sertifikat (jenis hak, nomor, NIB bidang, luas, gambar situasi), rantai kepemilikan kronologis dari penerbitan hak sampai pemegang sekarang (jual beli AJB, waris dengan penetapan/keterangan waris, hibah, lelang) dengan dokumen pendukung tiap mata rantai, beban terdaftar (Hak Tanggungan dengan peringkat, sewa, blokir, sita) dan indikasi beban tak terdaftar (penguasaan fisik pihak lain, sengketa keluarga), analisis hukum tiap temuan (mata rantai lemah: waris belum dibagi, kuasa jual kedaluwarsa, tumpang tindih bidang), status kewajiban (PBB, roya belum dijalankan), perkara yang melibatkan properti (cek register pengadilan bila ada indikasi), kesimpulan tingkat risiko titel (bersih/berisiko rendah/tinggi) dengan syarat pembersihan per temuan, dan lampiran kronologi. Sertakan pengingat: validasi final tetap lewat pengecekan resmi PPAT ke BPN.",
+    interviewTopics: [
+      "properti & sertifikat yang ditelusuri",
+      "tujuan laporan (beli, agunan, sengketa, waris)",
+      "riwayat peralihan yang diketahui",
+      "dokumen tiap mata rantai yang tersedia",
+      "indikasi sengketa atau penguasaan pihak lain",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Tingkat Risiko Titel",
+      "Identifikasi Objek & Sertifikat",
+      "Rantai Kepemilikan Kronologis",
+      "Beban Terdaftar & Indikasi Tak Terdaftar",
+      "Analisis Hukum per Temuan",
+      "Kewajiban Tertunggak & Perkara Terkait",
+      "Syarat Pembersihan per Temuan",
+      "Kesimpulan, Asumsi & Lampiran Kronologi",
+    ],
+    tools: [
+      {
+        slug: "tr-telusur",
+        role: "TR-TELUSUR",
+        name: "TR-TELUSUR — Penelusur Rantai Kepemilikan",
+        mission:
+          "Susun penelusuran: rantai kepemilikan kronologis dengan dokumen tiap mata rantai, beban terdaftar dan indikasi tak terdaftar, dan kewajiban tertunggak; mata rantai tanpa dokumen ditandai [ASUMSI].",
+      },
+      {
+        slug: "tr-analisis",
+        role: "TR-ANALISIS",
+        name: "TR-ANALISIS — Analis Hukum Titel",
+        mission:
+          "Susun analisis: kekuatan/kelemahan hukum tiap mata rantai dan beban, tingkat risiko titel keseluruhan, syarat pembersihan per temuan, dan rekomendasi lanjut/tidaknya transaksi dengan mitigasi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh — rantai kepemilikan dan beban tertelusur tanpa mata rantai bolong",
+      "Jernih — temuan tersusun sistematis sehingga non-hukum paham risiko utamanya",
+      "Analisis Hukum Akurat — kesimpulan risiko berdasar dasar hukum yang tepat, bukan dugaan",
+      "Kacamata Praktisi Ahli — kedalaman pemeriksa titel senior, bukan salinan riwayat di sertifikat",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-servitut-claw",
+    name: "Servitut Claw — Spesialis Perjanjian Hak Lintas & Pemanfaatan Lahan Tetangga",
+    tagline: "Wawancara → Lingkup Hak → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🛤️",
+    category: "legal",
+    docLabel: "Perjanjian Servitut / Hak Lintas (Easement Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Servitut (pengabdian pekarangan / hak lintas) yang memberi kejelasan dan perlindungan hukum bagi pemilik lahan dan pihak yang memanfaatkan — akses jalan, saluran air, jaringan utilitas, atau pemanfaatan terbatas lain di lahan orang lain. Terapkan praktik terbaik hukum Indonesia: dasar hukum pengabdian pekarangan KUHPerdata (Pasal 674 dst.) dan kebutuhan pekarangan terkurung (Pasal 667-668), identifikasi dua bidang (pekarangan penguasa dan pekarangan pengabdi) dengan peta/sketsa terlampir dan koordinat batas jalur, lingkup hak presisi (lebar jalur, jenis penggunaan: lewat orang/kendaraan/utilitas tanam, jam penggunaan bila dibatasi), sifat hak (melekat pada tanah — mengikat pemilik berikutnya, atau hanya perjanjian pribadi — bedakan tegas akibatnya), kompensasi sekali bayar atau berkala, kewajiban pemeliharaan jalur dan pembagian biayanya, larangan memperberat beban tanpa persetujuan (memperlebar, menambah jenis penggunaan), pemasangan tanda dan bangunan di jalur, berakhirnya hak (pekarangan tidak lagi terkurung, kesepakatan, musnahnya bidang), pendaftaran/pencatatan yang memungkinkan agar diketahui pihak ketiga, dan sengketa. Sertakan pengingat: aktakan di hadapan notaris/PPAT agar kuat terhadap pemilik berikutnya.",
+    interviewTopics: [
+      "kedua bidang tanah & pemiliknya",
+      "kebutuhan pemanfaatan (akses, saluran, utilitas)",
+      "jalur, lebar & batas penggunaan",
+      "kompensasi & pemeliharaan",
+      "keberlanjutan hak bila tanah dijual",
+    ],
+    structure: [
+      "Para Pihak & Identifikasi Dua Bidang",
+      "Dasar Hukum & Sifat Hak",
+      "Lingkup Hak: Jalur, Lebar & Jenis Penggunaan",
+      "Kompensasi & Cara Pembayarannya",
+      "Pemeliharaan Jalur & Pembagian Biaya",
+      "Larangan Memperberat Beban",
+      "Berakhirnya Hak & Keberlakuan ke Pemilik Baru",
+      "Pencatatan, Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "em-lingkup",
+        role: "EM-LINGKUP",
+        name: "EM-LINGKUP — Perumus Lingkup Hak",
+        mission:
+          "Susun lingkup: identifikasi dua bidang dengan sketsa jalur, lebar dan jenis penggunaan presisi, kompensasi, dan pemeliharaan; batas fisik yang belum diukur ditandai [ASUMSI].",
+      },
+      {
+        slug: "em-klausul",
+        role: "EM-KLAUSUL",
+        name: "EM-KLAUSUL — Penyusun Klausul Keberlanjutan",
+        mission:
+          "Susun klausul: sifat hak melekat vs pribadi dengan akibatnya, larangan memperberat beban, berakhirnya hak, keberlakuan ke pemilik berikutnya, pencatatan, dan sengketa; dasar KUHPerdata pengabdian pekarangan dirujuk tepat.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — dasar pengabdian pekarangan KUHPerdata dirujuk dan diterapkan benar",
+      "Bahasa Jernih — jalur, hak, dan larangan dipahami dua pemilik tanpa tafsir ganda",
+      "Cakupan Lengkap — dari kompensasi sampai nasib hak saat tanah dijual semua diatur",
+      "Kacamata Praktisi Ahli — kedalaman praktisi pertanahan senior, bukan izin lewat lisan bertetangga",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-hak-tanggungan-claw",
+    name: "Hak Tanggungan Claw — Spesialis Perjanjian Kredit dengan Jaminan Properti",
+    tagline: "Wawancara → Struktur Jaminan → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏰",
+    category: "legal",
+    docLabel: "Perjanjian Kredit dengan Hak Tanggungan (Mortgage Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Kredit dengan jaminan Hak Tanggungan yang patuh hukum, komprehensif, dan dapat dieksekusi — melindungi kreditur dan debitur dalam pembiayaan berjaminan properti. Terapkan praktik terbaik UU 4/1996 (Hak Tanggungan): perjanjian pokok (utang piutang) sebagai dasar — HT bersifat accessoir, objek yang dapat dibebani (hak atas tanah SHM/HGB berikut bangunan), nilai tanggungan yang dicantumkan (lazim 125% dari plafon untuk mengamankan bunga dan biaya), proses pembebanan yang sah (APHT di hadapan PPAT, pendaftaran ke BPN agar lahir HT dan sertifikat HT terbit — janji saja tidak cukup), SKMHT dan batas waktunya bila akta belum bisa langsung, peringkat HT bila objek sudah dibebani, klausul yang lazim dan batasnya (janji menjual atas kekuasaan sendiri sesuai Pasal 6, larangan janji memiliki objek — batal demi hukum), eksekusi (titel eksekutorial sertifikat HT, parate eksekusi lelang, penjualan bawah tangan atas kesepakatan), asuransi objek dengan banker's clause, roya setelah lunas, perlindungan konsumen bila debitur perorangan, dan sengketa. Sertakan pengingat: APHT wajib PPAT dan pendaftaran BPN — draf ini bahan persiapan.",
+    interviewTopics: [
+      "utang pokok & para pihak",
+      "objek jaminan & status sertifikatnya",
+      "nilai tanggungan & peringkat HT",
+      "skema eksekusi yang diinginkan",
+      "asuransi objek & kewajiban debitur",
+    ],
+    structure: [
+      "Perjanjian Pokok & Sifat Accessoir HT",
+      "Objek Jaminan & Nilai Tanggungan",
+      "Proses Pembebanan: APHT, SKMHT & Pendaftaran",
+      "Peringkat HT & Beban Sebelumnya",
+      "Klausul yang Sah vs Batal Demi Hukum",
+      "Eksekusi: Titel Eksekutorial & Parate Eksekusi",
+      "Asuransi Objek & Kewajiban Debitur",
+      "Roya, Perlindungan Konsumen & Sengketa",
+    ],
+    tools: [
+      {
+        slug: "ht-struktur",
+        role: "HT-STRUKTUR",
+        name: "HT-STRUKTUR — Perancang Struktur Jaminan",
+        mission:
+          "Susun struktur: perjanjian pokok, objek dan nilai tanggungan, alur APHT-pendaftaran-sertifikat HT dengan tenggat SKMHT, dan peringkat; status objek yang belum dicek BPN ditandai [ASUMSI].",
+      },
+      {
+        slug: "ht-klausul",
+        role: "HT-KLAUSUL",
+        name: "HT-KLAUSUL — Penyusun Klausul & Eksekusi",
+        mission:
+          "Susun klausul: janji-janji yang sah sesuai UU 4/1996 (hindari yang batal demi hukum), skema eksekusi berjenjang, asuransi dengan banker's clause, kewajiban debitur, roya setelah lunas, dan perlindungan konsumen.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh — dari pembebanan sampai roya semua tahap hidup jaminan diatur",
+      "Teliti Detail — nilai tanggungan, peringkat, dan tenggat SKMHT tepat sesuai praktik",
+      "Patuh Hukum — klausul selaras UU 4/1996, tanpa janji yang batal demi hukum",
+      "Kacamata Praktisi Ahli — kedalaman praktisi jaminan kebendaan senior, bukan surat utang bermaterai",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "keberatan-pajak-pbb-claw",
+    name: "Keberatan PBB Claw — Spesialis Dokumen Hukum Keberatan & Banding Pajak Properti",
+    tagline: "Wawancara → Bukti & Argumen → Dokumen Keberatan → Evaluasi Rubrik",
+    avatar: "🧾",
+    category: "legal",
+    docLabel: "Dokumen Keberatan Pajak Properti (Property Tax Appeals Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Keberatan Pajak Properti yang komprehensif, akurat, dan persuasif — membantu pemilik menurunkan beban pajak yang tidak wajar — untuk keberatan PBB-P2 ke pemerintah daerah, keberatan NJOP sebagai dasar, atau BPHTB yang ditetapkan berlebih. Terapkan praktik terbaik: dasar hukum keberatan (UU PDRD/UU HKPD 1/2022 dan perda setempat, tenggat pengajuan sejak SPPT/SKPD diterima — umumnya 3 bulan, syarat formal agar tidak ditolak administratif), objek keberatan yang tepat (NJOP tidak sesuai kondisi pasar, luas/karakteristik objek salah catat, penetapan ganda, properti sudah beralih), bukti pembanding yang kuat (transaksi properti sebanding, penilaian independen KJPP, foto kondisi aktual: akses buruk, terdampak bencana, peruntukan terbatas), perhitungan versi wajib pajak berdampingan dengan versi penetapan, argumen hukum tersusun dari fakta → dasar hukum → kesimpulan, riwayat pembayaran patuh sebagai kredibilitas, permohonan spesifik (pembetulan NJOP ke angka berapa, pengurangan berapa persen), kelengkapan lampiran sesuai syarat perda, dan langkah lanjut bila ditolak (banding ke Pengadilan Pajak dengan tenggatnya). Sertakan pengingat: cek tenggat dan syarat formal perda daerah setempat sebelum mengajukan.",
+    interviewTopics: [
+      "objek pajak & SPPT/penetapan yang diterima",
+      "alasan keberatan (NJOP, luas, kondisi)",
+      "bukti pembanding yang dimiliki",
+      "riwayat pembayaran & tenggat sejak diterima",
+      "hasil yang diminta (angka target)",
+    ],
+    structure: [
+      "Identitas Wajib Pajak & Objek Pajak",
+      "Penetapan yang Dikeberatankan & Tenggat Formal",
+      "Fakta & Kondisi Aktual Objek",
+      "Bukti Pembanding & Penilaian Independen",
+      "Perhitungan Versi Penetapan vs Versi Wajib Pajak",
+      "Argumen Hukum (Fakta → Dasar → Kesimpulan)",
+      "Permohonan Spesifik & Lampiran",
+      "Langkah Lanjut bila Ditolak",
+    ],
+    tools: [
+      {
+        slug: "tx-bukti",
+        role: "TX-BUKTI",
+        name: "TX-BUKTI — Penyusun Bukti & Perhitungan",
+        mission:
+          "Susun bukti: pembanding transaksi/penilaian, foto kondisi aktual, salah catat objek, dan perhitungan berdampingan versi penetapan vs wajib pajak; pembanding yang belum terverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "tx-argumen",
+        role: "TX-ARGUMEN",
+        name: "TX-ARGUMEN — Perumus Argumen Hukum",
+        mission:
+          "Susun argumen: struktur fakta → dasar hukum (UU HKPD, perda) → kesimpulan, syarat formal dan tenggat terpenuhi, permohonan spesifik dengan angka target, dan peta langkah banding bila ditolak.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Menyeluruh — dasar hukum, tenggat, dan syarat formal perda setempat terpetakan benar",
+      "Argumen Hukum Kuat — alur fakta-dasar-kesimpulan sulit dibantah penelaah keberatan",
+      "Bukti Tersaji Jernih — pembanding dan perhitungan berdampingan langsung meyakinkan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi sengketa pajak daerah senior, bukan surat protes tarif",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kepatuhan-tata-ruang-claw",
+    name: "Tata Ruang Claw — Spesialis Dokumen Kepatuhan Tata Ruang",
+    tagline: "Wawancara → Telaah Zonasi → Analisis Kepatuhan → Dokumen → Evaluasi Rubrik",
+    avatar: "🗺️",
+    category: "legal",
+    docLabel: "Dokumen Kepatuhan Tata Ruang (Zoning Compliance Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Kepatuhan Tata Ruang yang akurat, menyeluruh, dan kokoh secara hukum — memastikan properti atau rencana pengembangan patuh ketentuan zonasi — untuk dipakai pemilik, pengembang, dan pemangku kepentingan. Terapkan praktik terbaik rezim tata ruang Indonesia: kesesuaian dengan RTRW/RDTR daerah (zona peruntukan lokasi: perumahan, komersial, industri, campuran), KKPR sebagai instrumen kesesuaian (konfirmasi KKPR untuk zona ber-RDTR di OSS, persetujuan KKPR bila belum ada RDTR), intensitas pemanfaatan (KDB, KLB, KDH, GSB, ketinggian maksimal) dihitung terhadap rencana, kegiatan yang diizinkan/bersyarat/dilarang di zona tersebut, keselarasan dengan PBG dan SLF (fungsi bangunan harus sesuai zona), analisis ketidaksesuaian bila ada (bangunan lama sebelum perda — ketentuan transisi, opsi penyesuaian atau permohonan perubahan pemanfaatan), risiko pelanggaran (sanksi administratif UU Cipta Kerja: pembongkaran, denda), dokumen pendukung (peta zonasi, ITR/informasi tata ruang dari dinas), dan rekomendasi langkah kepatuhan berurutan. Sertakan pengingat: konfirmasi resmi zonasi lewat ITR/dinas tata ruang atau OSS.",
+    interviewTopics: [
+      "properti/rencana & lokasinya",
+      "peruntukan zona yang diketahui (ITR/RDTR)",
+      "rencana penggunaan & intensitas bangunan",
+      "status PBG/SLF & bangunan eksisting",
+      "ketidaksesuaian yang dicurigai",
+    ],
+    structure: [
+      "Ringkasan Kepatuhan & Kesimpulan",
+      "Identifikasi Properti & Zona (RTRW/RDTR)",
+      "Status KKPR & Jalur Perolehannya",
+      "Analisis Intensitas: KDB, KLB, KDH, GSB",
+      "Kegiatan Diizinkan vs Rencana Penggunaan",
+      "Keselarasan PBG/SLF & Bangunan Eksisting",
+      "Ketidaksesuaian, Risiko Sanksi & Opsi Penyesuaian",
+      "Rekomendasi Langkah & Lampiran Peta",
+    ],
+    tools: [
+      {
+        slug: "zn-telaah",
+        role: "ZN-TELAAH",
+        name: "ZN-TELAAH — Penelaah Zonasi & Intensitas",
+        mission:
+          "Susun telaah: zona peruntukan dan aturan RDTR/RTRW, jalur KKPR yang tepat, perhitungan KDB-KLB-KDH-GSB terhadap rencana, dan kegiatan diizinkan; data zonasi yang belum dikonfirmasi dinas ditandai [ASUMSI].",
+      },
+      {
+        slug: "zn-patuh",
+        role: "ZN-PATUH",
+        name: "ZN-PATUH — Analis Kepatuhan & Mitigasi",
+        mission:
+          "Susun analisis: ketidaksesuaian dengan ketentuan transisi bangunan lama, risiko sanksi administratif, opsi penyesuaian atau perubahan pemanfaatan, dan rekomendasi langkah kepatuhan berurutan dengan instansinya.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Teliti Detail — perhitungan intensitas dan status zona tepat angka per angka",
+      "Paham Hukum Tata Ruang — KKPR, RDTR, PBG/SLF, dan sanksi dirujuk sesuai rezim berlaku",
+      "Komunikasi Efektif — pemilik non-hukum paham status patuh/tidaknya dan langkahnya",
+      "Kacamata Praktisi Ahli — kedalaman praktisi tata ruang senior, bukan tebakan zona dari peta daring",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perizinan-penggunaan-lahan-claw",
+    name: "Izin Lahan Claw — Spesialis Dokumen Perizinan Penggunaan Lahan",
+    tagline: "Wawancara → Peta Izin → Dokumen Permohonan → Evaluasi Rubrik",
+    avatar: "🪪",
+    category: "legal",
+    docLabel: "Dokumen Perizinan Penggunaan Lahan (Land Use Permits)",
+    mission:
+      "Membantu pengguna menyusun dokumen perizinan penggunaan lahan yang komprehensif dan akurat — patuh seluruh regulasi terkait — untuk pemanfaatan atau pengembangan lahan. Terapkan praktik terbaik perizinan berusaha berbasis risiko (PP 5/2021 dan OSS): pemetaan izin yang dibutuhkan sesuai rencana (KKPR sebagai pintu pertama, pertimbangan teknis pertanahan BPN, izin lingkungan sesuai skala: SPPL/UKL-UPL/AMDAL per PP 22/2021, PBG untuk bangunan, izin khusus sektor bila ada: perkebunan, tambang galian C, pariwisata), urutan pengurusan yang benar dengan ketergantungan antar izin (KKPR dulu sebelum PBG; persetujuan lingkungan sebelum PBG terbit), kelengkapan dokumen tiap permohonan (bukti hak atas tanah, peta/koordinat, proposal kegiatan, kajian teknis), perhatian khusus alih fungsi (lahan sawah dilindungi LP2B — alih fungsi sangat dibatasi, kawasan hutan butuh pelepasan/pinjam pakai dari KLHK), status tanah adat/ulayat bila ada, jangka waktu dan kewajiban tiap izin setelah terbit (laporan berkala, kewajiban lingkungan), risiko sanksi bila beroperasi tanpa izin, dan checklist per instansi dengan estimasi waktu. Sertakan pengingat: verifikasi persyaratan final di OSS dan dinas daerah setempat.",
+    interviewTopics: [
+      "lahan & rencana penggunaannya",
+      "status tanah (hak, sawah, kawasan hutan, ulayat)",
+      "skala kegiatan & dampak lingkungannya",
+      "izin yang sudah dimiliki",
+      "target waktu mulai kegiatan",
+    ],
+    structure: [
+      "Ringkasan Rencana & Peta Izin yang Dibutuhkan",
+      "Status Tanah & Hambatan Alih Fungsi",
+      "KKPR & Pertimbangan Teknis Pertanahan",
+      "Persetujuan Lingkungan (SPPL/UKL-UPL/AMDAL)",
+      "PBG & Izin Sektor Khusus",
+      "Urutan Pengurusan & Ketergantungan Antar Izin",
+      "Kelengkapan Dokumen per Permohonan",
+      "Kewajiban Pasca-Terbit, Risiko & Checklist Waktu",
+    ],
+    tools: [
+      {
+        slug: "iz-peta",
+        role: "IZ-PETA",
+        name: "IZ-PETA — Pemeta Kebutuhan Izin",
+        mission:
+          "Susun peta izin: daftar izin sesuai rencana dan skala, urutan pengurusan dengan ketergantungan, hambatan alih fungsi (LP2B, kawasan hutan, ulayat), dan estimasi waktu per instansi; persyaratan daerah yang belum dicek ditandai [ASUMSI].",
+      },
+      {
+        slug: "iz-dokumen",
+        role: "IZ-DOKUMEN",
+        name: "IZ-DOKUMEN — Penyusun Dokumen Permohonan",
+        mission:
+          "Susun dokumen: kelengkapan tiap permohonan (bukti hak, peta koordinat, proposal, kajian), narasi permohonan yang sesuai bahasa instansi, kewajiban pasca-terbit, dan checklist kepatuhan berkelanjutan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Patuh Hukum — peta izin selaras PP 5/2021, PP 22/2021, dan rezim OSS berbasis risiko",
+      "Menyeluruh — semua izin dan ketergantungannya terpetakan tanpa ada yang tertinggal",
+      "Jernih & Terorganisir — pemohon tahu persis urutan, dokumen, dan waktu tiap langkah",
+      "Kacamata Praktisi Ahli — kedalaman pengurus perizinan senior, bukan daftar izin hasil pencarian",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "akta-jaminan-fidusia-claw",
+    name: "Jaminan Fidusia Claw — Spesialis Perjanjian & Akta Jaminan Fidusia",
+    tagline: "Wawancara → Struktur Fidusia → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🗝️",
+    category: "legal",
+    docLabel: "Perjanjian Jaminan Fidusia (Deed of Trust)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Jaminan Fidusia yang akurat, komprehensif, dan dapat dieksekusi — kepercayaan penyerahan hak milik atas benda bergerak/tertentu sebagai jaminan sementara benda tetap dikuasai pemberi fidusia (padanan fungsi deed of trust dalam praktik Indonesia). Terapkan praktik terbaik UU 42/1999: perjanjian pokok sebagai dasar (fidusia accessoir), objek fidusia yang dapat dijaminkan (kendaraan, mesin, persediaan dengan daftar berubah, piutang, benda bergerak lain — bukan tanah yang rezimnya Hak Tanggungan), uraian objek presisi (identitas, nomor rangka/mesin, daftar persediaan dengan mekanisme pembaruan), nilai penjaminan dan nilai objek, kewajiban akta notaris berbahasa Indonesia dan pendaftaran ke Kantor Fidusia elektronik (sertifikat fidusia dengan titel eksekutorial — tanpa daftar, kreditur hanya konkuren), kewajiban pemberi fidusia (merawat, asuransi, larangan mengalihkan tanpa izin — pengalihan objek terdaftar oleh pemberi tanpa izin = pidana), eksekusi pasca-putusan MK 18/2019 (cidera janji disepakati atau lewat penetapan; penyerahan sukarela atau eksekusi pengadilan — tidak boleh paksa sepihak), penghapusan fidusia setelah lunas (roya elektronik), dan sengketa. Sertakan pengingat: akta wajib notaris dan pendaftaran fidusia agar eksekutorial.",
+    interviewTopics: [
+      "utang pokok & para pihak",
+      "objek yang difidusiakan & identitasnya",
+      "nilai penjaminan vs nilai objek",
+      "objek persediaan berubah (bila ada)",
+      "skema eksekusi & asuransi objek",
+    ],
+    structure: [
+      "Perjanjian Pokok & Sifat Accessoir",
+      "Objek Fidusia & Uraian Presisi",
+      "Nilai Penjaminan & Nilai Objek",
+      "Akta Notaris & Pendaftaran Kantor Fidusia",
+      "Kewajiban Pemberi Fidusia & Larangan Pengalihan",
+      "Cidera Janji & Eksekusi Pasca-MK 18/2019",
+      "Asuransi Objek & Penghapusan Setelah Lunas",
+      "Sengketa & Keabsahan",
+    ],
+    tools: [
+      {
+        slug: "dt-struktur",
+        role: "DT-STRUKTUR",
+        name: "DT-STRUKTUR — Perancang Struktur Fidusia",
+        mission:
+          "Susun struktur: objek dengan uraian presisi (termasuk mekanisme daftar persediaan berubah), nilai penjaminan, dan alur akta-pendaftaran-sertifikat; identitas objek yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "dt-klausul",
+        role: "DT-KLAUSUL",
+        name: "DT-KLAUSUL — Penyusun Klausul & Eksekusi",
+        mission:
+          "Susun klausul: kewajiban pemberi fidusia, larangan pengalihan dengan konsekuensi pidananya, definisi cidera janji yang disepakati, eksekusi sesuai koridor MK 18/2019, asuransi, dan roya elektronik.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — dari objek sampai penghapusan seluruh siklus fidusia diatur",
+      "Patuh Hukum — selaras UU 42/1999 dan koridor eksekusi putusan MK 18/2019",
+      "Jernih & Terorganisir — pemberi fidusia paham kewajiban dan risiko pidananya",
+      "Kacamata Praktisi Ahli — kedalaman praktisi jaminan senior, bukan surat gadai barang informal",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "instruksi-rekening-bersama-claw",
+    name: "Rekening Bersama Claw — Spesialis Instruksi Penampungan Dana Transaksi",
+    tagline: "Wawancara → Alur Dana → Instruksi → Dokumen → Evaluasi Rubrik",
+    avatar: "🤲",
+    category: "legal",
+    docLabel: "Instruksi Penampungan Dana Transaksi (Escrow Instructions)",
+    mission:
+      "Membantu pengguna menyusun Instruksi Penampungan Dana Transaksi yang menjamin transaksi properti berjalan lancar dan aman — komprehensif, akurat, dan kokoh secara hukum — untuk memandu pembeli, penjual, dan pihak penampung (notaris/PPAT sebagai pemegang dana titipan, atau bank lewat rekening escrow). Terapkan praktik terbaik: penunjukan pihak penampung yang netral dengan dasar hukumnya (penitipan pada notaris, perjanjian escrow account dengan bank), identifikasi transaksi pokok yang diacu (PPJB/AJB), dana yang dititipkan (jumlah, sumber, mata uang) dan biaya penitipan siapa menanggung, syarat pencairan yang objektif dan dapat diverifikasi dokumen (AJB ditandatangani, sertifikat selesai balik nama, roya selesai, kondisi fisik diserahkan sesuai berita acara), urutan pencairan bertahap bila disepakati, instruksi bila syarat gagal terpenuhi dalam tenggat (kembali ke pembeli, mekanisme perpanjangan sekali), larangan pencairan atas perintah sepihak, penanganan sengketa antara para pihak (dana ditahan sampai kesepakatan/putusan), bunga/hasil dana selama penitipan milik siapa, tanggung jawab dan pembebasan pihak penampung yang bertindak sesuai instruksi, kepatuhan APU-PPT (verifikasi sumber dana), dan pengakhiran penitipan. Sertakan pengingat: gunakan notaris/bank berizin — hindari penampung perorangan tanpa dasar hukum.",
+    interviewTopics: [
+      "transaksi pokok & para pihak",
+      "pihak penampung (notaris/bank escrow)",
+      "dana yang dititipkan & sumbernya",
+      "syarat pencairan yang disepakati",
+      "skenario gagal & sengketa",
+    ],
+    structure: [
+      "Para Pihak & Pihak Penampung Netral",
+      "Transaksi Pokok yang Diacu",
+      "Dana Titipan & Biaya Penitipan",
+      "Syarat Pencairan Objektif & Dokumennya",
+      "Urutan Pencairan Bertahap",
+      "Skenario Gagal, Tenggat & Pengembalian",
+      "Sengketa, Bunga Dana & Pembebasan Penampung",
+      "Kepatuhan APU-PPT & Pengakhiran",
+    ],
+    tools: [
+      {
+        slug: "ew-alur",
+        role: "EW-ALUR",
+        name: "EW-ALUR — Perancang Alur Dana",
+        mission:
+          "Susun alur: dana titipan, syarat pencairan objektif dengan dokumen verifikasi, urutan bertahap, tenggat dan skenario gagal; kesepakatan para pihak yang belum final ditandai [ASUMSI].",
+      },
+      {
+        slug: "ew-instruksi",
+        role: "EW-INSTRUKSI",
+        name: "EW-INSTRUKSI — Penyusun Instruksi & Perlindungan",
+        mission:
+          "Susun instruksi: larangan pencairan sepihak, penanganan sengketa dengan dana ditahan, kepemilikan bunga, pembebasan penampung yang patuh instruksi, kepatuhan verifikasi sumber dana, dan pengakhiran penitipan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Teliti Detail — syarat pencairan objektif berbasis dokumen tanpa ruang tafsir penampung",
+      "Komunikasi Jernih — tiga pihak paham alur dana di tiap skenario termasuk gagal",
+      "Patuh Hukum — dasar penitipan, APU-PPT, dan tanggung jawab penampung diatur sah",
+      "Kacamata Praktisi Ahli — kedalaman praktisi transaksi senior, bukan rekber marketplace informal",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-dampak-lingkungan-claw",
+    name: "Dampak Lingkungan Claw — Spesialis Laporan Dampak Lingkungan Proyek Properti",
+    tagline: "Wawancara → Kajian Dampak → Mitigasi → Dokumen → Evaluasi Rubrik",
+    avatar: "🌿",
+    category: "legal",
+    docLabel: "Laporan Dampak Lingkungan (Environmental Impact Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Dampak Lingkungan proyek properti yang patuh regulasi dan menilai dampak proyek terhadap lingkungan sekitar — komprehensif, akurat, dan berbasis kajian — sebagai bahan persetujuan lingkungan. Terapkan praktik terbaik PP 22/2021: penentuan instrumen yang tepat sesuai skala dan dampak (SPPL untuk dampak minimal, UKL-UPL untuk dampak tidak penting, AMDAL untuk dampak penting — cek daftar wajib AMDAL Permen LHK), deskripsi kegiatan dan rona lingkungan awal (kualitas air-udara-kebisingan, flora fauna, sosial ekonomi warga sekitar), identifikasi dampak per tahap (prakonstruksi: pembebasan lahan dan sosial; konstruksi: debu, kebisingan, lalu lintas, limbah, air larian; operasi: air bersih, air limbah domestik, sampah, parkir dan bangkitan lalu lintas), besaran dampak dan sifat pentingnya, rencana pengelolaan (RKL: langkah mitigasi per dampak dengan penanggung jawab) dan pemantauan (RPL: parameter, lokasi, frekuensi), konsultasi publik untuk AMDAL, keterkaitan dengan KKPR dan PBG (persetujuan lingkungan prasyarat), komitmen pengelolaan pasca-terbit dan pelaporan berkala, dan matriks dampak-mitigasi yang mudah diaudit. Sertakan pengingat: penyusunan AMDAL formal wajib melibatkan penyusun tersertifikasi KLHK.",
+    interviewTopics: [
+      "proyek & skalanya (luas, unit, fasilitas)",
+      "lokasi & rona lingkungan sekitar",
+      "instrumen yang diminta (SPPL/UKL-UPL/AMDAL)",
+      "dampak yang sudah teridentifikasi/dikhawatirkan warga",
+      "rencana mitigasi yang sudah disiapkan",
+    ],
+    structure: [
+      "Ringkasan Proyek & Instrumen Lingkungan yang Tepat",
+      "Deskripsi Kegiatan per Tahap",
+      "Rona Lingkungan Awal",
+      "Identifikasi Dampak per Tahap & Besarannya",
+      "Rencana Pengelolaan (Mitigasi per Dampak)",
+      "Rencana Pemantauan (Parameter & Frekuensi)",
+      "Konsultasi Publik & Keterkaitan Izin Lain",
+      "Komitmen Pasca-Terbit & Matriks Dampak-Mitigasi",
+    ],
+    tools: [
+      {
+        slug: "en-kaji",
+        role: "EN-KAJI",
+        name: "EN-KAJI — Pengkaji Dampak",
+        mission:
+          "Susun kajian: instrumen yang tepat sesuai PP 22/2021, rona awal, identifikasi dampak per tahap dengan besaran dan sifat penting; data rona yang belum diukur lapangan ditandai [ASUMSI].",
+      },
+      {
+        slug: "en-kelola",
+        role: "EN-KELOLA",
+        name: "EN-KELOLA — Penyusun Pengelolaan & Pemantauan",
+        mission:
+          "Susun RKL-RPL: mitigasi per dampak dengan penanggung jawab dan biaya, parameter pemantauan dengan lokasi-frekuensi, komitmen pelaporan berkala, dan matriks dampak-mitigasi yang mudah diaudit instansi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Analisis Menyeluruh — dampak tiap tahap teridentifikasi dengan besaran, bukan daftar generik",
+      "Patuh Regulasi — instrumen, muatan, dan prosedur selaras PP 22/2021 dan aturan KLHK",
+      "Temuan Tersaji Jernih — matriks dampak-mitigasi langsung dipahami penilai dan warga",
+      "Kacamata Praktisi Ahli — kedalaman pengkaji lingkungan senior, bukan salinan formulir SPPL",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "polis-jaminan-titel-claw",
+    name: "Polis Titel Claw — Spesialis Rancangan Perlindungan Titel Properti",
+    tagline: "Wawancara → Risiko Titel → Rancangan Perlindungan → Dokumen → Evaluasi Rubrik",
+    avatar: "🧾",
+    category: "legal",
+    docLabel: "Rancangan Perlindungan Titel (Title Insurance Policy)",
+    mission:
+      "Membantu pengguna menyusun Rancangan Perlindungan Titel Properti yang komprehensif — mengidentifikasi dan menangani potensi cacat titel — melindungi pemilik dari kerugian akibat masalah kepemilikan (adaptasi title insurance ke praktik Indonesia, di mana asuransi titel belum lazim: perlindungan dibangun lewat kombinasi pemeriksaan, jaminan kontraktual, dan penitipan). Terapkan praktik terbaik: daftar risiko titel yang dilindungi (pemalsuan dokumen di rantai kepemilikan, ahli waris yang muncul belakangan, kuasa jual cacat, tumpang tindih sertifikat, sita/blokir yang tidak terungkap), lapisan perlindungan yang dirancang (pemeriksaan titel menyeluruh pra-transaksi, jaminan penjual dalam akta dengan klausul ganti rugi spesifik dan jangka waktu klaim, penahanan sebagian harga di penitipan notaris untuk masa sanggah, asuransi umum yang tersedia bila ada produk terkait), besaran perlindungan dan batasnya per risiko, pengecualian yang jujur (risiko yang tidak bisa dilindungi: sengketa fisik batas yang kasat mata, perubahan regulasi), prosedur klaim/penuntutan bila cacat muncul (siapa dituntut, dasar hukum, tenggat), kewajiban pemilik menjaga perlindungan (menyimpan dokumen, tidak mengakui klaim pihak ketiga tanpa konsultasi), dan peta eskalasi hukum per jenis cacat (perdata pembatalan, pidana pemalsuan, administrasi BPN). Sertakan pengingat: kekuatan utama tetap pemeriksaan pra-transaksi lewat PPAT/BPN.",
+    interviewTopics: [
+      "properti & nilai yang dilindungi",
+      "hasil pemeriksaan titel yang sudah ada",
+      "risiko spesifik yang dikhawatirkan",
+      "jaminan penjual yang bisa dinegosiasikan",
+      "dana yang bisa ditahan di penitipan",
+    ],
+    structure: [
+      "Ringkasan Perlindungan & Nilai",
+      "Daftar Risiko Titel yang Dilindungi",
+      "Lapisan Perlindungan & Mekanismenya",
+      "Besaran & Batas per Risiko",
+      "Pengecualian yang Jujur",
+      "Prosedur Klaim & Penuntutan per Cacat",
+      "Kewajiban Pemilik Menjaga Perlindungan",
+      "Peta Eskalasi Hukum & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "po-risiko",
+        role: "PO-RISIKO",
+        name: "PO-RISIKO — Pemeta Risiko Titel",
+        mission:
+          "Susun pemetaan: risiko titel per kategori dengan probabilitas dari hasil pemeriksaan, besaran kerugian potensial, dan risiko yang tak terlindungi; temuan pemeriksaan yang belum final ditandai [ASUMSI].",
+      },
+      {
+        slug: "po-lindung",
+        role: "PO-LINDUNG",
+        name: "PO-LINDUNG — Perancang Lapisan Perlindungan",
+        mission:
+          "Susun perlindungan: jaminan penjual kontraktual dengan ganti rugi dan jangka klaim, penahanan dana di penitipan, prosedur penuntutan per jenis cacat dengan dasar hukum, dan kewajiban pemilik.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset & Analisis Menyeluruh — risiko titel terpetakan dari bukti pemeriksaan, bukan daftar teoritis",
+      "Bahasa Jernih & Ringkas — pemilik paham apa yang terlindungi, batasnya, dan cara klaim",
+      "Patuh Hukum — mekanisme jaminan dan penuntutan berdasar hukum Indonesia yang bisa dieksekusi",
+      "Kacamata Praktisi Ahli — kedalaman praktisi mitigasi titel senior, bukan janji polis yang tak ada produknya",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-inspeksi-properti-claw",
+    name: "Inspeksi Properti Claw — Spesialis Laporan Inspeksi Kondisi Properti",
+    tagline: "Wawancara → Temuan per Komponen → Analisis → Dokumen → Evaluasi Rubrik",
+    avatar: "🔦",
+    category: "legal",
+    docLabel: "Laporan Inspeksi Properti (Property Inspection Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Inspeksi Properti yang memberi informasi menyeluruh tentang kondisi properti — akurat, terperinci, dan terorganisir — agar pembaca memahami potensi masalah sebelum membeli, menyewa, atau serah terima. Terapkan praktik terbaik: cakupan inspeksi per komponen (struktur: pondasi-kolom-balok dengan indikasi retak struktural vs non-struktural, atap dan kebocoran, dinding dan kelembapan, lantai, kusen-pintu-jendela; utilitas: instalasi listrik sesuai PUIL dengan kapasitas dan kondisi panel, pipa air bersih-kotor dengan tekanan dan kebocoran, sanitasi dan septik, drainase dan resapan), metode dan keterbatasan inspeksi visual (tanpa bongkar — dinyatakan jujur), klasifikasi temuan bertingkat (kritis: keselamatan/struktural, perlu perbaikan segera, pemeliharaan rutin, kosmetik), dokumentasi foto bertanda lokasi untuk tiap temuan, estimasi indikatif biaya perbaikan per temuan, implikasi temuan terhadap transaksi (bahan negosiasi harga, syarat perbaikan sebelum serah terima), rekomendasi pemeriksaan lanjutan oleh ahli spesifik bila ada indikasi (struktur oleh insinyur, rayap oleh pest control), dan ringkasan eksekutif dengan skor kondisi keseluruhan. Sertakan pengingat: untuk aspek struktural kritis, gunakan insinyur sipil bersertifikat.",
+    interviewTopics: [
+      "properti & tujuan inspeksi (beli, sewa, serah terima)",
+      "usia bangunan & riwayat renovasi",
+      "keluhan/gejala yang sudah diketahui",
+      "komponen yang bisa diakses vs tidak",
+      "rencana penggunaan temuan (negosiasi, perbaikan)",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Skor Kondisi",
+      "Identifikasi Properti & Metode Inspeksi",
+      "Temuan Struktur (Pondasi, Atap, Dinding)",
+      "Temuan Utilitas (Listrik, Air, Sanitasi, Drainase)",
+      "Klasifikasi Temuan Bertingkat & Foto",
+      "Estimasi Indikatif Biaya Perbaikan",
+      "Implikasi terhadap Transaksi",
+      "Rekomendasi Ahli Lanjutan & Keterbatasan",
+    ],
+    tools: [
+      {
+        slug: "ir-temuan",
+        role: "IR-TEMUAN",
+        name: "IR-TEMUAN — Penyusun Temuan per Komponen",
+        mission:
+          "Susun temuan: kondisi per komponen struktur dan utilitas dengan klasifikasi bertingkat, dokumentasi foto berlokasi, dan keterbatasan metode yang jujur; komponen yang tak dapat diakses ditandai [ASUMSI].",
+      },
+      {
+        slug: "ir-analisis",
+        role: "IR-ANALISIS",
+        name: "IR-ANALISIS — Analis Implikasi & Biaya",
+        mission:
+          "Susun analisis: estimasi indikatif biaya per temuan, implikasi ke transaksi (negosiasi, syarat perbaikan), rekomendasi ahli lanjutan untuk indikasi serius, dan skor kondisi keseluruhan yang dapat dipertanggungjawabkan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh — semua komponen utama terperiksa atau dinyatakan jujur tak teramati",
+      "Jernih — klasifikasi bertingkat membuat pembaca langsung tahu mana yang genting",
+      "Patuh Standar — acuan teknis (PUIL, praktik struktur) dipakai benar pada tiap penilaian",
+      "Kacamata Praktisi Ahli — kedalaman inspektor senior, bukan jalan keliling rumah dengan catatan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-sewa-hunian-claw",
+    name: "Sewa Hunian Claw — Spesialis Perjanjian Sewa Properti Hunian",
+    tagline: "Wawancara → Syarat Sewa → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏠",
+    category: "legal",
+    docLabel: "Perjanjian Sewa Hunian (Lease Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Sewa Properti Hunian yang memberi perlindungan hukum menyeluruh dan kejelasan bagi pemilik maupun penyewa — rumah, apartemen, atau kamar kos — patuh hukum dan efektif menyelesaikan perselisihan. Terapkan praktik terbaik: identifikasi objek dan kelengkapan (daftar perabot/kondisi dengan foto saat serah terima), harga sewa dan cara bayar (di muka tahunan/bulanan, denda keterlambatan wajar), deposit dengan aturan jelas (jumlah, dipotong untuk apa saja dengan bukti, tenggat pengembalian), jangka waktu dan perpanjangan (pemberitahuan sebelum berakhir, prioritas penyewa lama), penggunaan hanya hunian dengan batas penghuni dan larangan usaha/sub-sewa tanpa izin, pembagian kewajiban perbaikan (kerusakan struktural pemilik, pemakaian sehari-hari penyewa, tenggat respons pemilik untuk perbaikan vital seperti air dan listrik), tagihan utilitas dan iuran lingkungan siapa menanggung, tata tertib (jam tamu, hewan, renovasi kecil), akses pemilik dengan pemberitahuan wajar, pengakhiran lebih awal dua arah dengan konsekuensi proporsional, keadaan memaksa, serah terima akhir dengan berita acara pembanding kondisi awal, dan penyelesaian perselisihan bertingkat. Sertakan pengingat: sesuaikan dengan aturan P3SRS untuk unit apartemen.",
+    interviewTopics: [
+      "objek sewa & kelengkapannya",
+      "harga, cara bayar & deposit",
+      "jangka waktu & aturan perpanjangan",
+      "pembagian perbaikan & utilitas",
+      "tata tertib & batasan penggunaan",
+    ],
+    structure: [
+      "Para Pihak & Objek Sewa dengan Kondisi Awal",
+      "Harga Sewa, Cara Bayar & Denda",
+      "Deposit: Potongan Sah & Pengembalian",
+      "Jangka Waktu, Perpanjangan & Prioritas",
+      "Penggunaan, Batas Penghuni & Larangan",
+      "Pembagian Perbaikan & Tenggat Respons",
+      "Utilitas, Tata Tertib & Akses Pemilik",
+      "Pengakhiran Awal, Serah Terima & Perselisihan",
+    ],
+    tools: [
+      {
+        slug: "sw-syarat",
+        role: "SW-SYARAT",
+        name: "SW-SYARAT — Perumus Syarat Sewa",
+        mission:
+          "Susun syarat: objek dengan kondisi awal terdokumentasi, harga-deposit-denda wajar, jangka waktu dan perpanjangan, dan pembagian perbaikan-utilitas; preferensi pihak yang belum disepakati ditandai [ASUMSI].",
+      },
+      {
+        slug: "sw-klausul",
+        role: "SW-KLAUSUL",
+        name: "SW-KLAUSUL — Penyusun Klausul Perlindungan",
+        mission:
+          "Susun klausul: penggunaan dan larangan, akses pemilik berpemberitahuan, pengakhiran awal proporsional dua arah, serah terima akhir dengan pembanding kondisi, dan perselisihan bertingkat yang murah dijalankan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Jernih & Lengkap — hak-kewajiban dua pihak tegas dari bayar sewa sampai kembali deposit",
+      "Patuh Hukum — selaras KUHPerdata sewa-menyewa dan aturan rusun/P3SRS bila unit apartemen",
+      "Perselisihan Efektif — mekanisme bertingkat mencegah konflik kecil jadi gugatan mahal",
+      "Kacamata Praktisi Ahli — kedalaman praktisi sewa senior, bukan kuitansi kos-kosan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "pernyataan-kondisi-properti-claw",
+    name: "Kondisi Properti Claw — Spesialis Pernyataan Pengungkapan Kondisi Properti",
+    tagline: "Wawancara → Inventaris Pengungkapan → Dokumen → Evaluasi Rubrik",
+    avatar: "📋",
+    category: "legal",
+    docLabel: "Pernyataan Pengungkapan Kondisi Properti (Property Disclosure Statement)",
+    mission:
+      "Membantu pengguna menyusun Pernyataan Pengungkapan Kondisi Properti yang patuh hukum dan melindungi penjual sekaligus pembeli — mengungkap jujur seluruh informasi relevan tentang properti sebelum transaksi. Terapkan praktik terbaik: dasar perlindungan dua arah (penjual yang mengungkap jujur terlindung dari gugatan cacat tersembunyi KUHPerdata 1504-1506; pembeli mendapat dasar keputusan), cakupan pengungkapan per kategori (fisik: riwayat kebocoran-banjir-retak-rayap-perbaikan besar dengan tahunnya; legal: status sertifikat, batas yang pernah dipersoalkan, sengketa/perkara yang pernah ada, IMB/PBG sesuai bangunan aktual; lingkungan: banjir kawasan, longsor, sutet, rencana pembangunan sekitar yang diketahui; ekonomi: tunggakan PBB-IPL-utilitas, sewa berjalan dengan hak penyewa), format pernyataan per butir (ya/tidak/tidak tahu — jawaban 'tidak tahu' yang jujur lebih aman daripada 'tidak' yang keliru), lampiran bukti untuk pengungkapan penting, batas pengetahuan penjual dinyatakan tegas (sepengetahuan terbaik, bukan jaminan mutlak), konsekuensi hukum pernyataan tidak benar, kesempatan pembeli inspeksi mandiri tetap dianjurkan, dan tanda tangan dua pihak dengan tanggal. Sertakan pengingat: pengungkapan jujur adalah perlindungan hukum terbaik penjual.",
+    interviewTopics: [
+      "properti & riwayat kepemilikan penjual",
+      "masalah fisik yang pernah terjadi",
+      "status legal & sengketa yang pernah ada",
+      "kondisi lingkungan yang diketahui",
+      "tunggakan & beban berjalan",
+    ],
+    structure: [
+      "Identitas Penjual & Batas Pengetahuan",
+      "Pengungkapan Fisik (Riwayat & Perbaikan)",
+      "Pengungkapan Legal (Sertifikat, Sengketa, PBG)",
+      "Pengungkapan Lingkungan Sekitar",
+      "Pengungkapan Ekonomi (Tunggakan, Sewa Berjalan)",
+      "Format per Butir: Ya/Tidak/Tidak Tahu",
+      "Lampiran Bukti & Konsekuensi Pernyataan Salah",
+      "Anjuran Inspeksi Mandiri & Tanda Tangan",
+    ],
+    tools: [
+      {
+        slug: "ps-inventaris",
+        role: "PS-INVENTARIS",
+        name: "PS-INVENTARIS — Penyusun Inventaris Pengungkapan",
+        mission:
+          "Susun inventaris: butir pengungkapan per kategori (fisik, legal, lingkungan, ekonomi) dengan format ya/tidak/tidak tahu dan lampiran bukti untuk butir penting; riwayat yang tak diketahui penjual ditandai jujur.",
+      },
+      {
+        slug: "ps-lindung",
+        role: "PS-LINDUNG",
+        name: "PS-LINDUNG — Penyusun Perlindungan Hukum",
+        mission:
+          "Susun perlindungan: batas pengetahuan penjual, konsekuensi pernyataan tidak benar, kaitan dengan cacat tersembunyi KUHPerdata, anjuran inspeksi mandiri pembeli, dan keabsahan tanda tangan; klaim tanpa dokumen ditandai [ASUMSI].",
+      },
+    ],
+    evaluatorCriteria: [
+      "Menyeluruh — semua kategori pengungkapan tercakup tanpa area yang sengaja dikosongkan",
+      "Patuh Hukum — kaitan cacat tersembunyi dan konsekuensi hukum dirumuskan tepat",
+      "Jernih — format per butir membuat pembeli langsung melihat riwayat properti apa adanya",
+      "Kacamata Praktisi Ahli — kedalaman praktisi transaksi senior, bukan brosur 'kondisi bagus siap huni'",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "dokumen-penutupan-transaksi-claw",
+    name: "Penutupan Transaksi Claw — Spesialis Paket Dokumen Penutupan Transaksi Properti",
+    tagline: "Wawancara → Daftar Dokumen → Penyusunan Paket → Evaluasi Rubrik",
+    avatar: "🗂️",
+    category: "legal",
+    docLabel: "Paket Dokumen Penutupan Transaksi (Real Estate Closing Documents)",
+    mission:
+      "Membantu pengguna menyusun paket dokumen penutupan transaksi properti yang lengkap dan patuh hukum — akurat, komprehensif, dan kokoh — untuk dipakai agen, pembeli, penjual, dan notaris/PPAT menuntaskan transaksi dengan mulus. Terapkan praktik terbaik penutupan transaksi Indonesia: daftar dokumen inti dengan penanggung jawab dan tenggat (AJB disiapkan PPAT, pelunasan dan bukti transfer, bukti setor PPh final penjual dan BPHTB pembeli — keduanya prasyarat tanda tangan AJB, roya bila ada HT lama, surat pernyataan tidak sengketa, persetujuan pasangan, KTP-KK-NPWP para pihak, PBB lunas tahun berjalan, IMB/PBG dan SLF bila dipersyaratkan), dokumen serah terima (berita acara kondisi, kunci, kartu akses, dokumen garansi peralatan), dokumen pengalihan kewajiban berjalan (balik nama listrik-air-IPL, pemberitahuan ke pengelola/P3SRS untuk apartemen), pernyataan dan kuitansi yang melindungi dua pihak (kuitansi pelunasan bertahap, pernyataan pengosongan dengan tenggat dan sanksi), alur hari-H yang berurutan (verifikasi dokumen → pelunasan → tanda tangan AJB → serah kunci), daftar pihak hadir dengan perannya, checklist pasca-penutupan (pendaftaran balik nama ke BPN oleh PPAT dengan estimasi waktu, pengambilan sertifikat), dan penyimpanan salinan untuk tiap pihak. Sertakan pengingat: AJB dan balik nama hanya sah melalui PPAT.",
+    interviewTopics: [
+      "transaksi & progresnya (PPJB sudah/belum)",
+      "para pihak & kelengkapan identitas",
+      "beban yang harus dibereskan (HT, tunggakan)",
+      "jadwal hari-H & pihak yang hadir",
+      "kewajiban berjalan yang dialihkan",
+    ],
+    structure: [
+      "Ringkasan Transaksi & Status Kesiapan",
+      "Daftar Dokumen Inti dengan PIC & Tenggat",
+      "Prasyarat Pajak (PPh Final & BPHTB)",
+      "Dokumen Serah Terima & Berita Acara",
+      "Pengalihan Kewajiban Berjalan",
+      "Kuitansi & Pernyataan Perlindungan Dua Pihak",
+      "Alur Hari-H Berurutan",
+      "Checklist Pasca-Penutupan & Balik Nama",
+    ],
+    tools: [
+      {
+        slug: "cg-daftar",
+        role: "CG-DAFTAR",
+        name: "CG-DAFTAR — Penyusun Daftar & Kesiapan",
+        mission:
+          "Susun daftar: dokumen inti dengan penanggung jawab dan tenggat, prasyarat pajak, beban yang harus dibereskan sebelum AJB, dan status kesiapan; dokumen yang belum diverifikasi keberadaannya ditandai [ASUMSI].",
+      },
+      {
+        slug: "cg-paket",
+        role: "CG-PAKET",
+        name: "CG-PAKET — Penyusun Paket & Alur Hari-H",
+        mission:
+          "Susun paket: berita acara serah terima, kuitansi dan pernyataan perlindungan dua pihak, pengalihan kewajiban berjalan, alur hari-H berurutan dengan pihak hadir, dan checklist pasca-penutupan sampai sertifikat kembali.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Bahasa Hukum Akurat — istilah dan rujukan dokumen tepat sesuai praktik PPAT",
+      "Informasi Lengkap — tak ada dokumen atau prasyarat yang tertinggal membuat AJB batal hari-H",
+      "Komunikasi Jernih — semua pihak tahu perannya dan urutan langkah tanpa kebingungan",
+      "Kacamata Praktisi Ahli — kedalaman praktisi penutupan senior, bukan daftar bawa KTP dan uang",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perjanjian-pengelolaan-properti-claw",
+    name: "Pengelolaan Properti Claw — Spesialis Perjanjian Pengelolaan Properti Komersial",
+    tagline: "Wawancara → Lingkup & Kewenangan → Klausul → Dokumen → Evaluasi Rubrik",
+    avatar: "🏢",
+    category: "legal",
+    docLabel: "Perjanjian Pengelolaan Properti Komersial (Commercial Property Management Agreement)",
+    mission:
+      "Membantu pengguna menyusun Perjanjian Pengelolaan Properti Komersial yang memberi perlindungan hukum dan panduan menyeluruh bagi pemilik dan pengelola — gedung kantor, pusat ritel, atau kawasan komersial. Terapkan praktik terbaik: lingkup jasa pengelolaan yang dirinci (operasional harian: kebersihan-keamanan-parkir-ME; penyewaan: pemasaran unit, seleksi penyewa, negosiasi dalam parameter pemilik; keuangan: penagihan sewa dan service charge, pembayaran tagihan, pembukuan terpisah), batas kewenangan pengelola yang tegas (nilai pengeluaran tanpa persetujuan, kontrak vendor maksimal berapa, hal yang selalu butuh persetujuan tertulis pemilik: sewa di bawah harga floor, pengeluaran modal), imbalan pengelola (management fee persentase pendapatan kotor/tetap, leasing fee, insentif kinerja terukur: okupansi dan ketepatan tagih), rekening operasional terpisah milik pemilik dengan akses pelaporan, standar pelaporan berkala (laporan keuangan bulanan, okupansi, tunggakan, kondisi aset), KPI dan konsekuensi kinerja buruk, tenaga kerja pengelola (karyawan siapa, kepatuhan ketenagakerjaan dan BPJS), asuransi (properti oleh pemilik, liability pengelola), larangan benturan kepentingan (vendor terafiliasi wajib diungkap), audit oleh pemilik, pengakhiran (dengan/tanpa sebab, serah terima data-dokumen-dana lengkap dengan tenggat), dan sengketa berjenjang. Sertakan pengingat: sinkronkan dengan aturan P3SRS bila objek strata title.",
+    interviewTopics: [
+      "properti & kondisi pengelolaan sekarang",
+      "lingkup jasa yang diserahkan",
+      "batas kewenangan & persetujuan pemilik",
+      "skema imbalan & insentif kinerja",
+      "pelaporan, audit & pengakhiran",
+    ],
+    structure: [
+      "Para Pihak & Objek Pengelolaan",
+      "Lingkup Jasa: Operasional, Penyewaan & Keuangan",
+      "Batas Kewenangan & Persetujuan Wajib",
+      "Imbalan, Insentif & Rekening Terpisah",
+      "Pelaporan Berkala & KPI",
+      "Tenaga Kerja, Asuransi & Benturan Kepentingan",
+      "Audit & Konsekuensi Kinerja Buruk",
+      "Pengakhiran, Serah Terima & Sengketa",
+    ],
+    tools: [
+      {
+        slug: "mj-lingkup",
+        role: "MJ-LINGKUP",
+        name: "MJ-LINGKUP — Perumus Lingkup & Kewenangan",
+        mission:
+          "Susun lingkup: rincian jasa per bidang, batas kewenangan dengan ambang nilai, hal yang wajib persetujuan tertulis, dan skema imbalan dengan insentif terukur; parameter pemilik yang belum ditetapkan ditandai [ASUMSI].",
+      },
+      {
+        slug: "mj-klausul",
+        role: "MJ-KLAUSUL",
+        name: "MJ-KLAUSUL — Penyusun Klausul Pengawasan",
+        mission:
+          "Susun klausul: rekening terpisah dan pelaporan, KPI dengan konsekuensi, benturan kepentingan dan audit, tenaga kerja dan asuransi, pengakhiran dengan serah terima lengkap bertenggat, dan sengketa berjenjang.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — operasional, penyewaan, dan keuangan semua bidang pengelolaan diatur",
+      "Kejelasan — batas kewenangan dan ambang persetujuan tegas mencegah pengelola kebablasan",
+      "Penyelesaian Konflik — KPI, audit, dan pengakhiran memberi jalan keluar tanpa properti tersandera",
+      "Kacamata Praktisi Ahli — kedalaman praktisi pengelolaan komersial senior, bukan surat titip gedung",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
 ];
