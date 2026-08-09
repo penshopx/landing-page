@@ -1276,6 +1276,23 @@ export default function AdminAcademyPage() {
       toast({ title: "Gagal mengaktifkan", description: e?.message, variant: "destructive" }),
   });
 
+  const bulkReactivateMutation = useMutation({
+    mutationFn: (ids: number[]) =>
+      apiRequest("PATCH", "/api/admin/lms/courses/bulk-reactivate", { ids }),
+    onSuccess: (data: any) => {
+      const already = (data.selected ?? data.reactivated) - data.reactivated;
+      const msg = already > 0
+        ? `✅ ${data.reactivated} kursus diaktifkan kembali (${already} sudah aktif sebelumnya)`
+        : `✅ ${data.reactivated} kursus diaktifkan kembali`;
+      toast({ title: msg });
+      setSelectedCourseIds(new Set());
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
+    },
+    onError: (e: any) =>
+      toast({ title: "Gagal mengaktifkan kembali", description: e?.message, variant: "destructive" }),
+  });
+
   useEffect(() => {
     const prev = document.title;
     document.title = "Kelola Academy | Admin Gustafta";
@@ -1509,7 +1526,7 @@ export default function AdminAcademyPage() {
                   size="sm"
                   variant="outline"
                   className="h-7 px-3 text-xs gap-1.5"
-                  disabled={bulkActivateMutation.isPending || bulkDeactivateMutation.isPending}
+                  disabled={bulkActivateMutation.isPending || bulkDeactivateMutation.isPending || bulkReactivateMutation.isPending}
                   onClick={() => bulkActivateMutation.mutate(Array.from(selectedCourseIds))}
                   data-testid="button-bulk-activate"
                 >
@@ -1519,9 +1536,21 @@ export default function AdminAcademyPage() {
                 </Button>
                 <Button
                   size="sm"
+                  variant="outline"
+                  className="h-7 px-3 text-xs gap-1.5"
+                  disabled={bulkReactivateMutation.isPending || bulkActivateMutation.isPending || bulkDeactivateMutation.isPending}
+                  onClick={() => bulkReactivateMutation.mutate(Array.from(selectedCourseIds))}
+                  data-testid="button-bulk-reactivate"
+                >
+                  {bulkReactivateMutation.isPending
+                    ? <><Loader2 className="h-3 w-3 animate-spin" /> Mengaktifkan kembali...</>
+                    : <><RefreshCw className="h-3 w-3" /> Aktifkan kembali</>}
+                </Button>
+                <Button
+                  size="sm"
                   variant="destructive"
                   className="h-7 px-3 text-xs gap-1.5"
-                  disabled={bulkDeactivateMutation.isPending || bulkActivateMutation.isPending}
+                  disabled={bulkDeactivateMutation.isPending || bulkActivateMutation.isPending || bulkReactivateMutation.isPending}
                   onClick={() => bulkDeactivateMutation.mutate(Array.from(selectedCourseIds))}
                   data-testid="button-bulk-deactivate"
                 >
