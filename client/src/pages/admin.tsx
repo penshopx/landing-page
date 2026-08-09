@@ -523,6 +523,7 @@ export default function AdminPage() {
     priceOverride: number | null;
     computedPrice: number | null;
     teamSize: number | null;
+    effectivePrice: number;
     downloadPath: string | null;
     scalevProductName: string | null;
   }
@@ -4081,6 +4082,25 @@ Selamat menggunakan! 🚀
                   {editProductForm.priceOverride ? " · Override aktif" : " · Otomatis"}
                 </p>
               )}
+              {/* Effective price summary — what buyers actually see */}
+              <p className="text-xs mt-1 font-medium" data-testid="effective-price-summary">
+                <span className="text-muted-foreground">Pembeli melihat: </span>
+                <span className="text-foreground">
+                  Rp {(
+                    editProductForm.priceOverride
+                      ? Number(editProductForm.priceOverride)
+                      : (editProductDialog.product?.computedPrice ?? editProductDialog.product?.price ?? 0)
+                  ).toLocaleString("id-ID")}
+                </span>
+                {" "}
+                {editProductForm.priceOverride ? (
+                  <span className="text-[10px] bg-orange-100 text-orange-700 px-1 py-0.5 rounded">override</span>
+                ) : editProductDialog.product?.computedPrice != null && editProductDialog.product.computedPrice !== editProductDialog.product.price ? (
+                  <span className="text-[10px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded">tim</span>
+                ) : (
+                  <span className="text-[10px] bg-muted text-muted-foreground px-1 py-0.5 rounded">dasar</span>
+                )}
+              </p>
             </div>
             <div>
               <label className="text-xs font-medium mb-1 block text-muted-foreground">Kategori</label>

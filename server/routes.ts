@@ -7792,7 +7792,9 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         const info = p.agentId != null ? agentSubInfoMap.get(p.agentId) : undefined;
         const computedPrice = info !== undefined ? calcStorePrice(info.subAgents) : p.price;
         const teamSize = info?.teamSize ?? null;
-        return { ...p, computedPrice, teamSize };
+        // effectivePrice = the price buyers actually see (override wins over computed)
+        const effectivePrice = p.priceOverride != null ? p.priceOverride : computedPrice;
+        return { ...p, computedPrice, teamSize, effectivePrice };
       });
       res.json(enriched);
     } catch (error) {
