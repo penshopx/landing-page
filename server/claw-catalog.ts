@@ -2,10 +2,10 @@
 // KATALOG CLAW — daftar produk premium yang di-seed oleh Claw Factory.
 //
 // Produk baru = tambahkan SATU entri di array ini (bukan file seed baru).
-// Alur produksi dari prompt aiforwork:
+// Alur produksi:
 //   1. User menempelkan JSON prompt mentah (tidak perlu dipotong/diterjemahkan)
 //   2. Agent mengonversinya jadi entri ClawDef: terjemahkan → buang semua
-//      link/branding aiforwork → pecah jadi misi orkestrator + 2–3 alat bantu
+//      link/branding  → pecah jadi misi orkestrator + 2–3 alat bantu
 //      spesifik → petakan criteria ke evaluatorCriteria (evaluator dibuat
 //      otomatis oleh factory, tidak perlu ditulis)
 //   3. Boot berikutnya: factory seed → produk tampil di Store (Premium Privat)
@@ -19,7 +19,7 @@
 import type { CatalogEntry } from "./lib/claw-factory";
 
 export const CLAW_CATALOG: CatalogEntry[] = [
-  // ── Batch 1 (aiforwork civil-engineer, konstruksi) ─────────────────────────
+  // ── Batch 1 ( civil-engineer, konstruksi) ─────────────────────────
   {
     kind: "openclaw",
     slug: "estimasi-biaya-claw",
@@ -377,7 +377,7 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
-  // ── Batch 2 (aiforwork civil-engineer, konstruksi) ─────────────────────────
+  // ── Batch 2 ( civil-engineer, konstruksi) ─────────────────────────
   {
     kind: "openclaw",
     slug: "laporan-geoteknik-claw",
@@ -786,7 +786,7 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
-  // ── Batch 3 (aiforwork electrical-engineer, engineering) ───────────────────
+  // ── Batch 3 ( electrical-engineer, engineering) ───────────────────
   {
     kind: "openclaw",
     slug: "spesifikasi-elektrikal-claw",
@@ -1246,7 +1246,7 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
-  // ── Batch 4 (aiforwork electrical-engineer lanjutan, engineering) ──────────
+  // ── Batch 4 ( electrical-engineer lanjutan, engineering) ──────────
   {
     kind: "openclaw",
     slug: "analisis-efisiensi-energi-claw",
@@ -1604,7 +1604,7 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
-  // ── Batch 5 (aiforwork mechanical-engineer, engineering) ───────────────────
+  // ── Batch 5 ( mechanical-engineer, engineering) ───────────────────
   {
     kind: "openclaw",
     slug: "gambar-teknik-claw",
@@ -2371,7 +2371,7 @@ export const CLAW_CATALOG: CatalogEntry[] = [
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
 
-  // ── Batch 6: real-estate-developer (property) — dari prompt aiforwork ──
+  // ── Batch 6: real-estate-developer (property) ──
   {
     kind: "openclaw",
     slug: "proposal-akuisisi-lahan-claw",
@@ -2879,6 +2879,1285 @@ export const CLAW_CATALOG: CatalogEntry[] = [
       "Kejelasan & Koherensi — syarat dan ketentuan tegas, tidak multi-tafsir, konsisten antar-pasal",
       "Cakupan Menyeluruh — hak-kewajiban, pajak-biaya, dan skenario gagal transaksi semuanya diatur",
       "Kacamata Praktisi Ahli — kedalaman praktisi transaksi properti senior, bukan templat unduhan tanpa konteks objek",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+
+  // ── Batch 7: real-estate-investor (property) ──
+  {
+    kind: "openclaw",
+    slug: "analisis-properti-claw",
+    name: "Analisis Properti Claw — Spesialis Laporan Analisis Properti",
+    tagline: "Wawancara → Data Pasar → Analisis Investasi → Laporan → Evaluasi Rubrik",
+    avatar: "📊",
+    category: "property",
+    docLabel: "Laporan Analisis Properti (Property Analysis Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Analisis Properti tingkat ahli — memuat data komprehensif, tren pasar, dan rekomendasi investasi — untuk dipakai profesional properti dan investor mengambil keputusan investasi yang terinformasi. Terapkan praktik terbaik: profil properti lengkap (lokasi, kondisi fisik, legalitas), analisis pasar kawasan berbasis data pembanding (harga jual/sewa per m², tingkat hunian, tren pertumbuhan), analisis pendapatan potensial dan biaya operasional, indikator investasi kunci (yield sewa, cap rate, potensi apresiasi), analisis risiko (pasar, legal, fisik), skenario penggunaan terbaik (highest and best use), dan rekomendasi beli/tahan/lewati yang tertelusur ke angka.",
+    interviewTopics: [
+      "properti yang dianalisis (jenis, lokasi, luas, kondisi, harga penawaran)",
+      "tujuan investasi (sewa jangka panjang, jual kembali, pengembangan)",
+      "data pasar kawasan yang sudah dimiliki (harga pembanding, tingkat hunian)",
+      "estimasi pendapatan & biaya operasional yang diketahui",
+      "kriteria keputusan investor (yield minimum, horizon investasi)",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Rekomendasi Investasi",
+      "Profil Properti & Status Legalitas",
+      "Analisis Pasar Kawasan & Data Pembanding",
+      "Analisis Pendapatan & Biaya Operasional",
+      "Indikator Investasi (yield, cap rate, apresiasi)",
+      "Analisis Risiko & Mitigasi",
+      "Skenario Penggunaan Terbaik",
+      "Kesimpulan, Rekomendasi & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ap-pasar",
+        role: "AP-PASAR",
+        name: "AP-PASAR — Analis Pasar & Pembanding",
+        mission:
+          "Susun analisis pasar kawasan: data pembanding harga jual/sewa per m², tingkat hunian, tren pertumbuhan kawasan, faktor pendorong nilai (infrastruktur, demografi), dan posisi properti terhadap pembandingnya; data pasar yang diperkirakan tanpa sumber ditandai [ASUMSI].",
+      },
+      {
+        slug: "ap-investasi",
+        role: "AP-INVESTASI",
+        name: "AP-INVESTASI — Analis Kelayakan Investasi",
+        mission:
+          "Hitung indikator investasi: pendapatan potensial, biaya operasional, yield sewa, cap rate, proyeksi apresiasi, analisis risiko per kategori, dan rekomendasi beli/tahan/lewati dengan justifikasi angka; setiap asumsi finansial ditandai [ASUMSI].",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kedalaman Analitis — analisis menyentuh pasar, finansial, dan risiko dengan data pendukung",
+      "Kejelasan & Organisasi — laporan tertata sehingga investor cepat menangkap kesimpulan",
+      "Rekomendasi Dapat Ditindaklanjuti — rekomendasi tegas dan tertelusur ke indikator terukur",
+      "Kacamata Praktisi Ahli — kedalaman analis properti senior, bukan brosur pemasaran",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "proposal-investasi-properti-claw",
+    name: "Proposal Investasi Claw — Spesialis Proposal Investasi Properti",
+    tagline: "Wawancara → Riset Pasar → Proyeksi Finansial → Proposal → Evaluasi Rubrik",
+    avatar: "💼",
+    category: "property",
+    docLabel: "Proposal Investasi (Investment Proposal)",
+    mission:
+      "Membantu pengguna menyusun Proposal Investasi properti berkualitas tinggi — untuk dipakai calon investor dan pemangku kepentingan memutuskan berinvestasi pada proyek properti — dengan riset pasar menyeluruh, proyeksi finansial akurat, dan strategi investasi yang meyakinkan hingga mampu menarik investor dan mengamankan pendanaan. Terapkan praktik terbaik: tesis investasi yang jelas, riset pasar berbasis data (permintaan, pasokan, harga, tren), struktur transaksi dan penggunaan dana transparan, proyeksi finansial dengan asumsi eksplisit (pendapatan, biaya, IRR, cash-on-cash, payback), skema pembagian hasil dan exit strategy, analisis risiko jujur dengan mitigasi, rekam jejak sponsor, dan penyajian yang siap presentasi ke investor.",
+    interviewTopics: [
+      "proyek/properti yang ditawarkan (jenis, lokasi, tahap, nilai)",
+      "kebutuhan pendanaan & struktur transaksi yang direncanakan",
+      "proyeksi pendapatan & biaya yang sudah dihitung",
+      "profil investor sasaran & skema bagi hasil yang ditawarkan",
+      "strategi keluar (exit) & horizon investasi",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Tesis Investasi",
+      "Peluang Pasar & Riset Pendukung",
+      "Deskripsi Proyek & Rencana Eksekusi",
+      "Struktur Transaksi & Penggunaan Dana",
+      "Proyeksi Finansial (IRR, cash-on-cash, payback)",
+      "Skema Bagi Hasil & Exit Strategy",
+      "Analisis Risiko & Mitigasi",
+      "Rekam Jejak Sponsor & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ip-riset",
+        role: "IP-RISET",
+        name: "IP-RISET — Periset Pasar & Tesis",
+        mission:
+          "Susun tesis investasi dan riset pasar pendukung: analisis permintaan-pasokan kawasan, tren harga, target pasar, keunggulan kompetitif proyek, dan bukti data yang meyakinkan investor; data pasar yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "ip-finansial",
+        role: "IP-FINANSIAL",
+        name: "IP-FINANSIAL — Penyusun Proyeksi & Struktur",
+        mission:
+          "Susun proyeksi finansial dan struktur penawaran: model pendapatan-biaya dengan asumsi eksplisit, indikator kelayakan (IRR, cash-on-cash, payback), struktur transaksi dan penggunaan dana, skema bagi hasil, exit strategy, dan sensitivitas terhadap asumsi kunci; setiap angka asumsi ditandai [ASUMSI].",
+      },
+    ],
+    evaluatorCriteria: [
+      "Ketelitian Riset Pasar — permintaan, pasokan, dan tren didukung data dengan sumber jelas",
+      "Akurasi Proyeksi Finansial — model finansial lengkap, asumsi eksplisit, indikator kelayakan benar",
+      "Strategi Investasi Meyakinkan — tesis, struktur, dan exit tersaji koheren dan menarik bagi investor",
+      "Kacamata Praktisi Ahli — kedalaman sponsor investasi senior, bukan pitch deck kosmetik",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "strategi-akuisisi-claw",
+    name: "Strategi Akuisisi Claw — Spesialis Dokumen Strategi Akuisisi Properti",
+    tagline: "Wawancara → Analisis Pasar → Kriteria & Pipeline → Peta Jalan → Evaluasi Rubrik",
+    avatar: "♟️",
+    category: "property",
+    docLabel: "Dokumen Strategi Akuisisi (Acquisition Strategy Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Strategi Akuisisi yang memandu proses akuisisi properti — komprehensif, berbasis riset, dan memberi peta jalan yang jelas — untuk dipakai tim properti dan manajemen senior mengeksekusi akuisisi secara efektif. Terapkan praktik terbaik: sasaran akuisisi selaras strategi perusahaan, analisis pasar dan segmen target berbasis data, kriteria akuisisi terukur (lokasi, jenis aset, ukuran, yield minimum), strategi sourcing (broker, off-market, lelang), proses evaluasi dan persetujuan berjenjang, strategi penawaran dan negosiasi, rencana pendanaan, peta jalan eksekusi dengan target waktu, dan KPI keberhasilan akuisisi.",
+    interviewTopics: [
+      "sasaran strategis perusahaan & alokasi modal untuk akuisisi",
+      "segmen properti target (jenis, lokasi, ukuran, kisaran harga)",
+      "kriteria kelayakan (yield minimum, kondisi, legalitas)",
+      "kapasitas tim & sumber pendanaan yang tersedia",
+      "pengalaman akuisisi sebelumnya & pelajaran yang didapat",
+    ],
+    structure: [
+      "Ringkasan Strategi & Sasaran Akuisisi",
+      "Analisis Pasar & Segmen Target",
+      "Kriteria Akuisisi Terukur",
+      "Strategi Sourcing & Pipeline",
+      "Proses Evaluasi, Uji Tuntas & Persetujuan",
+      "Strategi Penawaran, Negosiasi & Pendanaan",
+      "Peta Jalan Eksekusi & Target Waktu",
+      "KPI, Risiko & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "sa-target",
+        role: "SA-TARGET",
+        name: "SA-TARGET — Analis Pasar & Kriteria",
+        mission:
+          "Susun analisis pasar dan kriteria akuisisi: segmen target berbasis data permintaan-pasokan, kriteria terukur (lokasi, jenis, ukuran, yield minimum, kondisi), dan matriks skoring kandidat yang selaras sasaran strategis; data pasar yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "sa-eksekusi",
+        role: "SA-EKSEKUSI",
+        name: "SA-EKSEKUSI — Perancang Peta Jalan Eksekusi",
+        mission:
+          "Susun peta jalan eksekusi: strategi sourcing multi-kanal, proses evaluasi dan persetujuan berjenjang, strategi penawaran-negosiasi, rencana pendanaan, jadwal target per tahap, KPI keberhasilan, dan register risiko akuisisi dengan mitigasi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Komprehensif — analisis pasar dan segmen target berbasis data dengan sumber jelas",
+      "Keselarasan Strategis — kriteria dan prioritas akuisisi tertelusur ke sasaran perusahaan",
+      "Peta Jalan Jelas — tahapan eksekusi konkret dengan penanggung jawab dan target waktu",
+      "Kacamata Praktisi Ahli — kedalaman kepala akuisisi senior, bukan wacana strategi tanpa eksekusi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "rencana-pengelolaan-properti-claw",
+    name: "Pengelolaan Properti Claw — Spesialis Rencana Pengelolaan Properti",
+    tagline: "Wawancara → SOP Pengelolaan → Keuangan & Pemeliharaan → Rencana → Evaluasi Rubrik",
+    avatar: "🏢",
+    category: "property",
+    docLabel: "Rencana Pengelolaan Properti (Property Management Plan)",
+    mission:
+      "Membantu pengguna menyusun Rencana Pengelolaan Properti yang memastikan pengelolaan efisien dan memaksimalkan imbal hasil investasi — komprehensif dan terstruktur, mencakup seleksi penyewa, penagihan sewa, pemeliharaan, dan pelaporan keuangan — untuk dipakai investor dan timnya mengelola properti secara efektif. Terapkan praktik terbaik industri: prosedur seleksi penyewa (verifikasi identitas, kemampuan bayar, riwayat), struktur sewa dan mekanisme penagihan dengan penanganan tunggakan berjenjang, program pemeliharaan preventif dan korektif dengan SLA, pengelolaan vendor, pelaporan keuangan berkala (pendapatan, biaya, NOI), KPI pengelolaan (tingkat hunian, tunggakan, biaya per unit), kepatuhan legal (perjanjian sewa, pajak), dan rencana peningkatan nilai aset.",
+    interviewTopics: [
+      "portofolio yang dikelola (jenis properti, jumlah unit, lokasi)",
+      "kondisi pengelolaan saat ini (hunian, tunggakan, keluhan)",
+      "tim & sistem yang tersedia (in-house, vendor, software)",
+      "target finansial pemilik (NOI, tingkat hunian, biaya)",
+      "masalah pengelolaan yang paling sering terjadi",
+    ],
+    structure: [
+      "Ringkasan Rencana & Target Kinerja",
+      "Profil Portofolio & Kondisi Saat Ini",
+      "Prosedur Seleksi & Pengelolaan Penyewa",
+      "Struktur Sewa, Penagihan & Penanganan Tunggakan",
+      "Program Pemeliharaan & Pengelolaan Vendor",
+      "Pelaporan Keuangan & KPI Pengelolaan",
+      "Kepatuhan Legal & Administrasi",
+      "Rencana Peningkatan Nilai & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "mn-operasi",
+        role: "MN-OPERASI",
+        name: "MN-OPERASI — Perancang SOP Operasional",
+        mission:
+          "Susun SOP pengelolaan: prosedur seleksi penyewa berjenjang, mekanisme penagihan dan penanganan tunggakan, program pemeliharaan preventif-korektif dengan SLA, dan pengelolaan vendor; praktik yang belum dikonfirmasi kondisi lapangan ditandai [ASUMSI].",
+      },
+      {
+        slug: "mn-kinerja",
+        role: "MN-KINERJA",
+        name: "MN-KINERJA — Analis Keuangan & KPI",
+        mission:
+          "Susun kerangka kinerja: format pelaporan keuangan berkala (pendapatan, biaya, NOI), KPI pengelolaan (hunian, tunggakan, biaya per unit) dengan target, jadwal reviu, dan rencana peningkatan nilai aset yang tertelusur ke angka.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Cakupan Menyeluruh — seleksi penyewa, penagihan, pemeliharaan, dan pelaporan semuanya teratur",
+      "Praktik Terbaik Industri — prosedur mengikuti standar pengelolaan properti profesional",
+      "Kejelasan & Struktur — SOP dan KPI langsung dapat dijalankan tim tanpa penafsiran ganda",
+      "Kacamata Praktisi Ahli — kedalaman manajer properti senior, bukan daftar tugas generik",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "uji-tuntas-properti-claw",
+    name: "Uji Tuntas Claw — Spesialis Checklist Due Diligence Properti",
+    tagline: "Wawancara → Pemetaan Risiko → Checklist Terstruktur → Evaluasi Rubrik",
+    avatar: "🔎",
+    category: "property",
+    docLabel: "Checklist Uji Tuntas (Due Diligence Checklist)",
+    mission:
+      "Membantu pengguna menyusun Checklist Uji Tuntas yang memastikan evaluasi menyeluruh atas properti calon investasi — meminimalkan risiko dan memaksimalkan imbal hasil — untuk dipakai investor dan profesional dalam proses akuisisi menilai kelayakan investasi, dengan cakupan faktor evaluasi kunci yang komprehensif, instruksi jelas dan ringkas, serta format yang mudah dipakai. Terapkan praktik terbaik: kelompok pemeriksaan lengkap (legal: sertifikat, IMB/PBG, sengketa, PBB; fisik: struktur, MEP, lingkungan; finansial: pendapatan, biaya, pajak; pasar: pembanding, hunian; penyewa: kontrak, tunggakan), tiap item punya kriteria lolos/gagal dan dokumen bukti, penanda tingkat risiko per temuan, penanggung jawab dan tenggat per item, dan ringkasan go/no-go di akhir.",
+    interviewTopics: [
+      "properti yang diuji tuntas (jenis, lokasi, harga, penjual)",
+      "tahap transaksi & tenggat waktu uji tuntas",
+      "kekhawatiran utama (legalitas, kondisi fisik, penyewa, keuangan)",
+      "dokumen yang sudah diterima dari penjual",
+      "tim/konsultan yang terlibat (notaris, penilai, inspektur)",
+    ],
+    structure: [
+      "Ringkasan Proses & Kriteria Go/No-Go",
+      "Uji Tuntas Legal (sertifikat, perizinan, sengketa, pajak)",
+      "Uji Tuntas Fisik (struktur, MEP, lingkungan)",
+      "Uji Tuntas Finansial (pendapatan, biaya, kewajiban)",
+      "Uji Tuntas Pasar & Penilaian",
+      "Uji Tuntas Penyewa & Kontrak Berjalan",
+      "Register Temuan & Tingkat Risiko",
+      "Rekomendasi Keputusan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "dd-checklist",
+        role: "DD-CHECKLIST",
+        name: "DD-CHECKLIST — Penyusun Checklist Terstruktur",
+        mission:
+          "Susun checklist uji tuntas per kelompok (legal, fisik, finansial, pasar, penyewa): tiap item dengan kriteria lolos/gagal, dokumen bukti yang diminta, penanggung jawab, dan tenggat; item yang relevansinya bergantung jenis properti ditandai [ASUMSI].",
+      },
+      {
+        slug: "dd-temuan",
+        role: "DD-TEMUAN",
+        name: "DD-TEMUAN — Analis Temuan & Keputusan",
+        mission:
+          "Susun kerangka analisis temuan: klasifikasi tingkat risiko per temuan (deal-breaker, perlu negosiasi, minor), dampak ke harga dan struktur transaksi, serta ringkasan rekomendasi go/no-go yang tertelusur ke temuan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Cakupan Komprehensif — semua faktor evaluasi kunci (legal, fisik, finansial, pasar, penyewa) tercakup",
+      "Kejelasan & Keringkasan — tiap item punya instruksi dan kriteria yang tidak multi-tafsir",
+      "Format Mudah Dipakai — struktur checklist siap dieksekusi tim dengan penanggung jawab dan tenggat",
+      "Kacamata Praktisi Ahli — kedalaman praktisi akuisisi senior, bukan daftar periksa generik",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "asuransi-properti-claw",
+    name: "Asuransi Properti Claw — Spesialis Dokumen Asuransi Properti",
+    tagline: "Wawancara → Pemetaan Risiko → Cakupan & Polis → Dokumen → Evaluasi Rubrik",
+    avatar: "🛡️",
+    category: "property",
+    docLabel: "Dokumen Asuransi Properti (Insurance Documents)",
+    mission:
+      "Membantu pengguna menyusun dokumen asuransi yang akurat, komprehensif, dan disesuaikan kebutuhan spesifik investasi properti — untuk dipakai investor dan pemangku kepentingan melindungi aset — dengan ketelitian, riset menyeluruh, dan kepatuhan pada ketentuan hukum dan regulasi (OJK, POJK terkait asuransi). Terapkan praktik terbaik: inventarisasi risiko properti (kebakaran, gempa/PSAGBI, banjir, tanggung jawab hukum pihak ketiga, kehilangan pendapatan sewa), penetapan nilai pertanggungan berbasis nilai penggantian (bukan harga pasar tanah), pemetaan jenis polis yang sesuai (PSAKI, business interruption, public liability), analisis pengecualian polis dan klausul penting, perbandingan penawaran antar-penanggung, prosedur klaim yang terdokumentasi, dan jadwal reviu polis berkala. Dokumen bukan pengganti nasihat broker/perusahaan asuransi berlisensi.",
+    interviewTopics: [
+      "aset yang diasuransikan (jenis properti, nilai bangunan, lokasi, konstruksi)",
+      "risiko yang paling dikhawatirkan (kebakaran, gempa, banjir, tanggung jawab hukum)",
+      "polis yang sudah dimiliki & pengalaman klaim sebelumnya",
+      "pendapatan sewa yang perlu dilindungi",
+      "anggaran premi & preferensi penanggung",
+    ],
+    structure: [
+      "Ringkasan Kebutuhan Perlindungan & Rekomendasi",
+      "Profil Aset & Inventarisasi Risiko",
+      "Nilai Pertanggungan & Basis Perhitungan",
+      "Jenis Polis & Cakupan yang Direkomendasikan",
+      "Pengecualian, Klausul Penting & Deductible",
+      "Perbandingan Penawaran Penanggung",
+      "Prosedur Klaim & Dokumentasi",
+      "Jadwal Reviu Polis & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ai-risiko",
+        role: "AI-RISIKO",
+        name: "AI-RISIKO — Pemeta Risiko & Nilai Pertanggungan",
+        mission:
+          "Susun inventarisasi risiko aset dan nilai pertanggungan: risiko per kategori dengan tingkat paparan, nilai penggantian bangunan dan isi (bukan harga pasar tanah), kebutuhan perlindungan pendapatan sewa, dan prioritas cakupan; nilai yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "ai-polis",
+        role: "AI-POLIS",
+        name: "AI-POLIS — Analis Polis & Klausul",
+        mission:
+          "Susun analisis polis: jenis polis yang sesuai kebutuhan (PSAKI, gempa, business interruption, liability), pengecualian dan klausul yang wajib dicermati, kerangka perbandingan penawaran antar-penanggung, prosedur klaim, dan daftar poin yang wajib dikonfirmasi ke broker berlisensi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua risiko material aset teridentifikasi dan terpetakan ke cakupan polis",
+      "Kepatuhan Legal & Regulasi — ketentuan asuransi Indonesia dirujuk benar, tanpa janji cakupan menyesatkan",
+      "Ketelitian — nilai pertanggungan, pengecualian, dan klausul dianalisis detail dan akurat",
+      "Kacamata Praktisi Ahli — kedalaman praktisi manajemen risiko properti, bukan brosur produk asuransi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "pajak-properti-claw",
+    name: "Pajak Properti Claw — Spesialis Dokumen Pajak Properti",
+    tagline: "Wawancara → Pemetaan Kewajiban → Perhitungan & Jadwal → Dokumen → Evaluasi Rubrik",
+    avatar: "🧾",
+    category: "property",
+    docLabel: "Dokumen Pajak Properti (Property Tax Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Pajak Properti yang akurat dan terperinci tentang kewajiban pajak properti — komprehensif dan terorganisir, memuat nilai ketetapan, tarif, pengecualian/keringanan, dan tenggat pembayaran — untuk dipakai pemilik dan investor memahami serta merencanakan kewajiban pajaknya. Terapkan praktik terbaik konteks Indonesia: pemetaan pajak per fase kepemilikan (perolehan: BPHTB; kepemilikan: PBB-P2 berbasis NJOP; penyewaan: PPh final sewa; penjualan: PPh final pengalihan; PPN untuk properti baru dari pengembang), perhitungan per pajak dengan dasar pengenaan dan tarif berlaku, keringanan/pengecualian yang tersedia (NJOPTKP, NPOPTKP), kalender tenggat pembayaran dan pelaporan, dokumentasi bukti bayar tertata, dan skenario perencanaan pajak yang legal. Dokumen bukan pengganti nasihat konsultan pajak — sarankan konsultasi untuk kasus kompleks.",
+    interviewTopics: [
+      "properti yang didokumentasikan (jenis, lokasi, NJOP, status kepemilikan)",
+      "fase yang relevan (baru beli, sedang disewakan, akan dijual)",
+      "SPPT PBB & bukti pajak yang sudah dimiliki",
+      "pendapatan sewa & rencana transaksi ke depan",
+      "masalah pajak yang pernah dialami (denda, sengketa NJOP)",
+    ],
+    structure: [
+      "Ringkasan Kewajiban Pajak & Total Estimasi",
+      "Profil Properti & Dasar Pengenaan (NJOP)",
+      "Pajak Perolehan (BPHTB) & Perhitungannya",
+      "Pajak Kepemilikan (PBB-P2) & Keringanan",
+      "Pajak Penyewaan & Penjualan (PPh Final, PPN)",
+      "Kalender Tenggat Pembayaran & Pelaporan",
+      "Dokumentasi Bukti Bayar & Kepatuhan",
+      "Perencanaan Pajak Legal & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "px-hitung",
+        role: "PX-HITUNG",
+        name: "PX-HITUNG — Pemeta & Penghitung Kewajiban",
+        mission:
+          "Petakan dan hitung kewajiban pajak per fase kepemilikan: BPHTB, PBB-P2 berbasis NJOP, PPh final sewa/pengalihan, dan PPN bila relevan — dengan dasar pengenaan, tarif berlaku, dan keringanan yang tersedia; tarif daerah yang bervariasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "px-patuh",
+        role: "PX-PATUH",
+        name: "PX-PATUH — Perencana Kepatuhan & Kalender",
+        mission:
+          "Susun kerangka kepatuhan: kalender tenggat pembayaran dan pelaporan per pajak, checklist dokumen bukti bayar, skenario perencanaan pajak legal, dan daftar kasus yang wajib dikonsultasikan ke konsultan pajak.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Informasi Komprehensif — semua pajak relevan per fase kepemilikan tercakup tanpa terlewat",
+      "Akurasi & Presisi — dasar pengenaan, tarif, dan perhitungan benar sesuai ketentuan berlaku",
+      "Kejelasan & Organisasi — pemilik non-ahli pajak dapat memahami kewajiban dan tenggatnya",
+      "Kacamata Praktisi Ahli — kedalaman praktisi pajak properti, bukan ringkasan peraturan mentah",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "dokumen-kpr-claw",
+    name: "Pembiayaan KPR Claw — Spesialis Dokumen Pembiayaan Properti",
+    tagline: "Wawancara → Struktur Pembiayaan → Kelengkapan Dokumen → Paket KPR → Evaluasi Rubrik",
+    avatar: "🏦",
+    category: "property",
+    docLabel: "Dokumen Pembiayaan Properti (Mortgage Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Pembiayaan Properti yang memuat informasi esensial untuk pembiayaan — komprehensif, akurat, dan patuh hukum — untuk dipakai calon pemberi pinjaman, peminjam, dan profesional hukum dalam transaksi properti hingga memperlancar proses pembiayaan. Terapkan praktik terbaik konteks Indonesia: profil pembiayaan lengkap (nilai properti, LTV sesuai ketentuan BI, tenor, jenis bunga fixed/floating), profil kelayakan peminjam (penghasilan, DBR, riwayat SLIK), struktur jaminan (APHT/Hak Tanggungan atas objek), dokumen persyaratan per pihak (identitas, penghasilan, legalitas objek), simulasi angsuran dengan skenario bunga, biaya-biaya pembiayaan (provisi, appraisal, notaris, asuransi jiwa/kebakaran), klausul penting perjanjian kredit yang wajib dicermati, dan proses tahap demi tahap sampai akad. Dokumen bukan pengganti nasihat bank/notaris — sarankan verifikasi ke lembaga pembiayaan.",
+    interviewTopics: [
+      "properti yang dibiayai (jenis, harga, status sertifikat)",
+      "kebutuhan pembiayaan (plafon, tenor, uang muka tersedia)",
+      "profil peminjam (penghasilan, kewajiban berjalan, riwayat kredit)",
+      "penawaran bank yang sedang dipertimbangkan",
+      "kekhawatiran utama (bunga floating, penalti pelunasan, take-over)",
+    ],
+    structure: [
+      "Ringkasan Struktur Pembiayaan yang Diusulkan",
+      "Profil Properti & Legalitas Objek Jaminan",
+      "Profil & Kelayakan Peminjam (DBR, SLIK)",
+      "Struktur Kredit: Plafon, LTV, Tenor, Bunga",
+      "Simulasi Angsuran & Skenario Bunga",
+      "Biaya-Biaya Pembiayaan & Asuransi",
+      "Klausul Penting Perjanjian Kredit & Hak Tanggungan",
+      "Proses Pengajuan hingga Akad & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "mg-struktur",
+        role: "MG-STRUKTUR",
+        name: "MG-STRUKTUR — Perancang Struktur Pembiayaan",
+        mission:
+          "Susun struktur pembiayaan: plafon dan LTV sesuai ketentuan, tenor dan jenis bunga dengan simulasi angsuran multi-skenario, kelayakan peminjam (DBR), dan total biaya pembiayaan; suku bunga dan ketentuan bank yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "mg-legal",
+        role: "MG-LEGAL",
+        name: "MG-LEGAL — Analis Dokumen & Klausul",
+        mission:
+          "Susun kelengkapan legal: daftar dokumen persyaratan per pihak, struktur jaminan Hak Tanggungan (APHT), klausul perjanjian kredit yang wajib dicermati (penalti, take-over, wanprestasi), dan checklist proses sampai akad berikut poin yang wajib diverifikasi ke bank/notaris.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Ketelitian — struktur pembiayaan, simulasi, dan biaya dihitung lengkap dan akurat",
+      "Kejelasan — peminjam non-ahli memahami kewajiban, risiko bunga, dan proses sampai akad",
+      "Kepatuhan Hukum — ketentuan LTV, Hak Tanggungan, dan perjanjian kredit sesuai regulasi Indonesia",
+      "Kacamata Praktisi Ahli — kedalaman praktisi pembiayaan properti, bukan brosur produk KPR",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "rent-roll-claw",
+    name: "Rent Roll Claw — Spesialis Dokumen Rent Roll",
+    tagline: "Wawancara → Data Sewa → Struktur Dokumen → Rent Roll → Evaluasi Rubrik",
+    avatar: "📋",
+    category: "property",
+    docLabel: "Dokumen Rent Roll (Rent Roll Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Rent Roll yang memuat informasi komprehensif tentang properti sewaan — terperinci dan akurat: nama penyewa, tarif sewa, jangka waktu sewa, dan riwayat pembayaran — untuk dipakai pengelola properti dan analis keuangan melacak pendapatan sewa dan menganalisis kinerja finansial. Terapkan praktik terbaik: struktur data per unit lengkap (nomor unit, luas, penyewa, tarif per m², mulai-akhir sewa, deposit, eskalasi, status pembayaran), ringkasan portofolio (tingkat hunian fisik dan ekonomis, WALE/rata-rata sisa masa sewa, total pendapatan efektif), penanda unit bermasalah (tunggakan, sewa di bawah pasar, kontrak segera berakhir), jadwal berakhirnya sewa (lease expiry profile), konsistensi format antar-periode agar tren terbaca, dan catatan sumber data per kolom.",
+    interviewTopics: [
+      "portofolio sewaan (jenis properti, jumlah unit, lokasi)",
+      "data sewa yang tersedia (kontrak, pembayaran, deposit)",
+      "format pelaporan yang dipakai saat ini & masalahnya",
+      "audiens dokumen (pemilik, bank, calon pembeli)",
+      "unit bermasalah yang diketahui (tunggakan, kosong, sengketa)",
+    ],
+    structure: [
+      "Ringkasan Portofolio (hunian, pendapatan efektif, WALE)",
+      "Tabel Rent Roll per Unit (penyewa, tarif, masa sewa, status)",
+      "Riwayat & Status Pembayaran per Penyewa",
+      "Jadwal Berakhirnya Sewa (Expiry Profile)",
+      "Unit Bermasalah & Tindak Lanjut",
+      "Analisis Tarif vs Pasar",
+      "Catatan Sumber Data & Definisi Kolom",
+      "Lampiran Kontrak & Bukti",
+    ],
+    tools: [
+      {
+        slug: "rr-data",
+        role: "RR-DATA",
+        name: "RR-DATA — Penyusun Struktur Data Sewa",
+        mission:
+          "Susun struktur rent roll per unit: kolom lengkap (unit, luas, penyewa, tarif, masa sewa, deposit, eskalasi, status bayar) dengan definisi konsisten antar-periode dan catatan sumber data; data yang belum diverifikasi ke kontrak ditandai [ASUMSI].",
+      },
+      {
+        slug: "rr-analisis",
+        role: "RR-ANALISIS",
+        name: "RR-ANALISIS — Analis Kinerja Sewa",
+        mission:
+          "Susun analisis portofolio: tingkat hunian fisik vs ekonomis, WALE, pendapatan efektif, profil berakhirnya sewa, unit bermasalah (tunggakan, di bawah pasar, segera berakhir) berikut rekomendasi tindak lanjut per unit.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua unit dan kolom kunci (penyewa, tarif, masa, status bayar) terekam",
+      "Organisasi — struktur tabel dan ringkasan mudah dibaca pengelola maupun analis",
+      "Konsistensi — definisi kolom dan format seragam sehingga tren antar-periode terbaca",
+      "Kacamata Praktisi Ahli — kedalaman pengelola aset senior, bukan daftar penyewa tanpa analisis",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-biaya-operasional-claw",
+    name: "Biaya Operasional Claw — Spesialis Laporan Biaya Operasional Properti",
+    tagline: "Wawancara → Klasifikasi Biaya → Analisis & Benchmark → Laporan → Evaluasi Rubrik",
+    avatar: "💸",
+    category: "property",
+    docLabel: "Laporan Biaya Operasional (Operating Expense Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Biaya Operasional yang menyajikan informasi terperinci biaya operasional properti — akurat mencerminkan kinerja finansial dan membantu keputusan investasi — untuk dipakai investor dan pemangku kepentingan pengelola properti. Terapkan praktik terbaik: klasifikasi biaya standar (utilitas, pemeliharaan, keamanan-kebersihan, asuransi, pajak, manajemen, cadangan penggantian), pemisahan biaya operasional vs belanja modal (CapEx), analisis biaya per m² dan rasio biaya terhadap pendapatan (OER), perbandingan periode-ke-periode dengan penjelasan varian, benchmark terhadap properti sejenis, identifikasi kebocoran biaya dan peluang efisiensi, rekonsiliasi service charge bila multi-penyewa, dan rekomendasi pengendalian biaya yang terukur.",
+    interviewTopics: [
+      "properti yang dilaporkan (jenis, luas, jumlah unit/penyewa)",
+      "data biaya yang tersedia & periode pelaporan",
+      "pendapatan operasional untuk rasio biaya",
+      "biaya yang dirasa membengkak atau tidak wajar",
+      "audiens laporan & keputusan yang diharapkan",
+    ],
+    structure: [
+      "Ringkasan Biaya & Rasio Kunci (OER, biaya per m²)",
+      "Klasifikasi Biaya per Kategori",
+      "Pemisahan Biaya Operasional vs Belanja Modal",
+      "Analisis Varian Periode-ke-Periode",
+      "Benchmark terhadap Properti Sejenis",
+      "Kebocoran Biaya & Peluang Efisiensi",
+      "Rekonsiliasi Service Charge (bila relevan)",
+      "Rekomendasi Pengendalian Biaya & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ox-klasifikasi",
+        role: "OX-KLASIFIKASI",
+        name: "OX-KLASIFIKASI — Pengklasifikasi & Perekam Biaya",
+        mission:
+          "Susun klasifikasi biaya standar per kategori dengan pemisahan tegas biaya operasional vs belanja modal, biaya per m², dan rasio biaya terhadap pendapatan; alokasi biaya yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "ox-efisiensi",
+        role: "OX-EFISIENSI",
+        name: "OX-EFISIENSI — Analis Varian & Efisiensi",
+        mission:
+          "Susun analisis pengendalian: varian periode-ke-periode dengan akar penyebab, benchmark terhadap properti sejenis, identifikasi kebocoran biaya, dan rekomendasi efisiensi terukur dengan estimasi penghematan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kejelasan — struktur biaya dan rasio tersaji sehingga investor cepat memahami kinerja",
+      "Relevansi — kategori dan analisis sesuai jenis properti dan kebutuhan keputusan",
+      "Kedalaman Analisis — varian, benchmark, dan peluang efisiensi dianalisis dengan angka",
+      "Kacamata Praktisi Ahli — kedalaman pengelola keuangan properti senior, bukan rekap kuitansi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "kinerja-investasi-claw",
+    name: "Kinerja Investasi Claw — Spesialis Laporan Kinerja Investasi Properti",
+    tagline: "Wawancara → Data Kinerja → Analisis & Visual → Laporan → Evaluasi Rubrik",
+    avatar: "📈",
+    category: "property",
+    docLabel: "Laporan Kinerja Investasi (Investment Performance Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Kinerja Investasi yang memberi wawasan dan analisis komprehensif atas kinerja investasi properti — data akurat, visualisasi jelas, dan rekomendasi dapat ditindaklanjuti — untuk dipakai investor, penasihat keuangan, dan manajer portofolio menilai kinerja dan mengarahkan keputusan investasi berikutnya. Terapkan praktik terbaik: metrik kinerja standar (NOI, cash-on-cash return, cap rate aktual, total return termasuk apresiasi, IRR sejak akuisisi), perbandingan realisasi vs proyeksi awal (underwriting) dengan analisis varian, kinerja per aset dan agregat portofolio, tren multi-periode, atribusi kinerja (pendapatan, biaya, nilai), posisi terhadap benchmark pasar, dan rekomendasi aksi per aset (tahan, perbaiki, jual) tertelusur ke angka.",
+    interviewTopics: [
+      "portofolio/aset yang dilaporkan (jumlah, jenis, nilai akuisisi)",
+      "data kinerja yang tersedia (pendapatan, biaya, penilaian terkini)",
+      "proyeksi awal (underwriting) untuk perbandingan realisasi",
+      "periode pelaporan & frekuensi yang diinginkan",
+      "keputusan yang akan diambil dari laporan (tahan, jual, refinancing)",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Skor Kinerja Portofolio",
+      "Metrik Kinerja per Aset (NOI, cash-on-cash, cap rate)",
+      "Realisasi vs Proyeksi Awal & Analisis Varian",
+      "Tren Kinerja Multi-Periode",
+      "Atribusi Kinerja (pendapatan, biaya, nilai)",
+      "Posisi terhadap Benchmark Pasar",
+      "Rekomendasi Aksi per Aset (tahan/perbaiki/jual)",
+      "Metodologi, Sumber Data & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ki-metrik",
+        role: "KI-METRIK",
+        name: "KI-METRIK — Penghitung Metrik Kinerja",
+        mission:
+          "Hitung metrik kinerja per aset dan portofolio: NOI, cash-on-cash, cap rate aktual, total return, IRR sejak akuisisi, dan perbandingan realisasi vs underwriting dengan varian; data yang belum terverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ki-arah",
+        role: "KI-ARAH",
+        name: "KI-ARAH — Analis Atribusi & Rekomendasi",
+        mission:
+          "Susun analisis arah: atribusi kinerja (pendapatan, biaya, nilai), tren multi-periode, posisi vs benchmark pasar, dan rekomendasi aksi per aset (tahan/perbaiki/jual/refinancing) yang tertelusur ke metrik.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Data — metrik dihitung benar dari data terverifikasi dengan metodologi jelas",
+      "Kedalaman Analitis — varian, atribusi, dan tren dianalisis sampai akar penyebab",
+      "Rekomendasi Dapat Ditindaklanjuti — aksi per aset konkret dan tertelusur ke angka",
+      "Kacamata Praktisi Ahli — kedalaman manajer portofolio senior, bukan dasbor angka tanpa makna",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+
+  // ── Batch 8: real-estate-analyst (property) ──
+  {
+    kind: "openclaw",
+    slug: "penilaian-peluang-investasi-claw",
+    name: "Peluang Investasi Claw — Spesialis Penilaian Peluang Investasi Properti",
+    tagline: "Wawancara → Skrining Peluang → Analisis Kelayakan → Penilaian → Evaluasi Rubrik",
+    avatar: "🎯",
+    category: "property",
+    docLabel: "Penilaian Peluang Investasi (Investment Opportunity Assessment)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Penilaian Peluang Investasi yang mengevaluasi peluang investasi di pasar properti secara akurat — untuk dipakai investor dan pemangku kepentingan mengambil keputusan investasi — dengan analisis menyeluruh, interpretasi data akurat, dan penilaian komprehensif. Terapkan praktik terbaik analis: kerangka skrining awal terhadap kriteria investasi, analisis fundamental pasar (permintaan-pasokan, demografi, infrastruktur), analisis finansial cepat (yield, cap rate, potensi apresiasi) dengan asumsi eksplisit, perbandingan antar-peluang dalam matriks skoring berbobot, identifikasi red flag sejak dini, tingkat keyakinan per temuan, dan rekomendasi lanjut/tidak dengan syarat yang jelas.",
+    interviewTopics: [
+      "peluang yang dinilai (properti/proyek, lokasi, harga, sumber informasi)",
+      "kriteria investasi organisasi (yield minimum, jenis aset, horizon)",
+      "data yang sudah tersedia (harga pembanding, pendapatan, kondisi)",
+      "batas waktu keputusan & proses persetujuan internal",
+      "peluang alternatif yang sedang dibandingkan",
+    ],
+    structure: [
+      "Ringkasan Penilaian & Rekomendasi Lanjut/Tidak",
+      "Deskripsi Peluang & Sumber Informasi",
+      "Skrining terhadap Kriteria Investasi",
+      "Analisis Fundamental Pasar",
+      "Analisis Finansial Cepat (yield, cap rate, apresiasi)",
+      "Matriks Skoring & Perbandingan Antar-Peluang",
+      "Red Flag & Tingkat Keyakinan per Temuan",
+      "Syarat Lanjut ke Uji Tuntas & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "io-skrining",
+        role: "IO-SKRINING",
+        name: "IO-SKRINING — Penyaring Peluang & Pasar",
+        mission:
+          "Susun skrining peluang: kesesuaian terhadap kriteria investasi, analisis fundamental pasar (permintaan-pasokan, demografi, infrastruktur), red flag awal, dan tingkat keyakinan per temuan; data yang belum terverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "io-skor",
+        role: "IO-SKOR",
+        name: "IO-SKOR — Penilai Finansial & Skoring",
+        mission:
+          "Susun penilaian finansial cepat: yield, cap rate, potensi apresiasi dengan asumsi eksplisit, matriks skoring berbobot antar-peluang, dan rekomendasi lanjut/tidak dengan syarat jelas menuju uji tuntas; angka asumsi ditandai [ASUMSI].",
+      },
+    ],
+    evaluatorCriteria: [
+      "Analisis Menyeluruh — pasar, finansial, dan risiko peluang dievaluasi dengan kerangka jelas",
+      "Interpretasi Data Akurat — kesimpulan tertelusur ke data dengan tingkat keyakinan jujur",
+      "Penilaian Komprehensif — matriks skoring dan rekomendasi mempertimbangkan semua faktor material",
+      "Kacamata Praktisi Ahli — kedalaman analis investasi senior, bukan opini tanpa kerangka",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "laporan-valuasi-properti-claw",
+    name: "Valuasi Properti Claw — Spesialis Laporan Valuasi Properti",
+    tagline: "Wawancara → Pendekatan Nilai → Data Pasar → Laporan Valuasi → Evaluasi Rubrik",
+    avatar: "⚖️",
+    category: "property",
+    docLabel: "Laporan Valuasi Properti (Property Valuation Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Valuasi Properti yang akurat dan komprehensif — terperinci, berbasis riset, dengan data dan analisis pasar relevan — untuk dipakai investor, pemberi pinjaman, dan pemilik properti mengambil keputusan investasi, pembiayaan, dan penjualan. Terapkan praktik terbaik penilaian (selaras KEPI/SPI di Indonesia): tiga pendekatan nilai dengan justifikasi pemilihan (pendekatan pasar/data pembanding, pendekatan pendapatan/kapitalisasi & DCF, pendekatan biaya), penyesuaian pembanding yang transparan, dasar nilai dinyatakan jelas (nilai pasar vs nilai likuidasi), tanggal penilaian dan asumsi pembatas, rekonsiliasi indikasi nilai antar-pendekatan, dan sensitivitas terhadap parameter kunci. Laporan bukan pengganti penilaian resmi KJPP — sarankan KJPP berlisensi untuk keperluan legal/perbankan.",
+    interviewTopics: [
+      "properti yang dinilai (jenis, lokasi, luas tanah-bangunan, kondisi)",
+      "tujuan valuasi (jual-beli, pembiayaan, pelaporan, internal)",
+      "data pembanding yang tersedia (transaksi/penawaran sekitar)",
+      "data pendapatan bila properti komersial (sewa, hunian, biaya)",
+      "tanggal penilaian & dasar nilai yang dibutuhkan",
+    ],
+    structure: [
+      "Ringkasan Nilai & Dasar Penilaian",
+      "Identifikasi Properti & Tujuan Valuasi",
+      "Analisis Pasar & Lingkungan",
+      "Pendekatan Pasar: Data Pembanding & Penyesuaian",
+      "Pendekatan Pendapatan: Kapitalisasi & DCF",
+      "Pendekatan Biaya (bila relevan)",
+      "Rekonsiliasi Nilai & Sensitivitas",
+      "Asumsi Pembatas, Disclaimer & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "vl-pembanding",
+        role: "VL-PEMBANDING",
+        name: "VL-PEMBANDING — Analis Data Pembanding",
+        mission:
+          "Susun pendekatan pasar: pemilihan pembanding yang relevan, tabel penyesuaian transparan (lokasi, luas, kondisi, waktu, legalitas), indikasi nilai per m², dan kewajaran rentang nilai; pembanding tanpa verifikasi transaksi ditandai [ASUMSI].",
+      },
+      {
+        slug: "vl-pendapatan",
+        role: "VL-PENDAPATAN",
+        name: "VL-PENDAPATAN — Analis Pendekatan Pendapatan & Rekonsiliasi",
+        mission:
+          "Susun pendekatan pendapatan: NOI ternormalisasi, pemilihan cap rate/discount rate berjustifikasi, DCF bila relevan, rekonsiliasi indikasi nilai antar-pendekatan dengan bobot beralasan, dan sensitivitas parameter kunci; asumsi ditandai [ASUMSI].",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi — pendekatan nilai diterapkan benar dengan penyesuaian dan parameter berjustifikasi",
+      "Ketelitian — data pembanding dan pendapatan diverifikasi dan didokumentasikan sumbernya",
+      "Kelengkapan — dasar nilai, asumsi pembatas, dan rekonsiliasi dinyatakan eksplisit",
+      "Kacamata Praktisi Ahli — kedalaman penilai properti senior, bukan tebakan harga pasaran",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "proposal-disposisi-claw",
+    name: "Disposisi Claw — Spesialis Proposal Disposisi Aset Properti",
+    tagline: "Wawancara → Analisis Opsi → Strategi Pelepasan → Proposal → Evaluasi Rubrik",
+    avatar: "🏷️",
+    category: "property",
+    docLabel: "Proposal Disposisi (Disposition Proposal)",
+    mission:
+      "Membantu pengguna menyusun Proposal Disposisi yang komprehensif dan berbasis riset — dengan analisis terperinci dan rekomendasi — untuk dipakai tim properti dan manajemen senior menentukan langkah terbaik melepas sebuah aset. Terapkan praktik terbaik: alasan disposisi tertelusur ke strategi portofolio, analisis kinerja aset saat ini vs potensi, perbandingan opsi pelepasan (jual langsung, lelang, sale-and-leaseback, tukar guling, tahan-perbaiki-jual) dengan analisis finansial per opsi, estimasi nilai realisasi bersih setelah pajak dan biaya transaksi, timing pasar dan strategi pemasaran aset, analisis dampak ke portofolio (alokasi, arus kas), risiko eksekusi per opsi, dan rekomendasi dengan syarat harga minimum (reserve price).",
+    interviewTopics: [
+      "aset yang akan dilepas (jenis, lokasi, nilai buku, kondisi)",
+      "alasan pelepasan (kinerja, strategi, kebutuhan dana)",
+      "kinerja aset saat ini (pendapatan, biaya, hunian)",
+      "opsi yang sedang dipertimbangkan & preferensi manajemen",
+      "target waktu & harga minimum yang diharapkan",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Rekomendasi Opsi",
+      "Profil Aset & Alasan Disposisi",
+      "Kinerja Aset Saat Ini vs Potensi",
+      "Perbandingan Opsi Pelepasan & Analisis Finansial",
+      "Estimasi Nilai Realisasi Bersih (setelah pajak & biaya)",
+      "Timing Pasar & Strategi Pemasaran Aset",
+      "Dampak ke Portofolio & Risiko Eksekusi",
+      "Syarat Harga Minimum, Jadwal & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "dz-opsi",
+        role: "DZ-OPSI",
+        name: "DZ-OPSI — Analis Opsi Pelepasan",
+        mission:
+          "Susun perbandingan opsi disposisi: analisis finansial per opsi (jual langsung, lelang, sale-and-leaseback, tukar guling, tahan-perbaiki-jual), nilai realisasi bersih setelah PPh final dan biaya transaksi, dan risiko eksekusi per opsi; estimasi nilai ditandai [ASUMSI].",
+      },
+      {
+        slug: "dz-eksekusi",
+        role: "DZ-EKSEKUSI",
+        name: "DZ-EKSEKUSI — Perancang Strategi Eksekusi",
+        mission:
+          "Susun strategi eksekusi opsi terpilih: timing pasar, strategi pemasaran aset dan target pembeli, syarat harga minimum (reserve price), jadwal proses sampai serah terima, dan dampak pelepasan ke alokasi portofolio dan arus kas.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Analisis — kinerja aset dan nilai realisasi dihitung benar dengan pajak dan biaya nyata",
+      "Kelayakan Rekomendasi — opsi terpilih realistis dieksekusi di kondisi pasar saat ini",
+      "Keselarasan Strategis — keputusan pelepasan tertelusur ke sasaran portofolio perusahaan",
+      "Kacamata Praktisi Ahli — kedalaman manajer aset senior, bukan iklan jual properti",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "prakiraan-tren-pasar-claw",
+    name: "Tren Pasar Claw — Spesialis Prakiraan Tren Pasar Properti",
+    tagline: "Wawancara → Data Historis → Model Prakiraan → Dokumen Tren → Evaluasi Rubrik",
+    avatar: "🔮",
+    category: "property",
+    docLabel: "Dokumen Prakiraan Tren Pasar (Market Trend Forecast Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Prakiraan Tren Pasar properti yang membantu mengantisipasi arah pasar dan mengambil posisi investasi lebih awal — untuk dipakai tim investasi dan manajemen senior. Terapkan praktik terbaik analis: baseline data historis multi-periode (harga, volume transaksi, pasokan baru, penyerapan, hunian), pemetaan pendorong pasar (suku bunga, kebijakan pemerintah, infrastruktur, demografi), metodologi prakiraan yang dinyatakan jujur (ekstrapolasi tren, analisis siklus, indikator awal), skenario dasar-optimis-pesimis dengan probabilitas kualitatif, implikasi per segmen (residensial, komersial, industri) dan per kawasan, sinyal pemicu yang harus dipantau, batas ketidakpastian prakiraan yang transparan, dan rekomendasi posisi investasi per skenario.",
+    interviewTopics: [
+      "pasar yang diprakirakan (segmen, kawasan, horizon waktu)",
+      "data historis yang tersedia (harga, transaksi, pasokan)",
+      "keputusan yang bergantung pada prakiraan ini",
+      "faktor eksternal yang dikhawatirkan (suku bunga, regulasi, ekonomi)",
+      "toleransi risiko & fleksibilitas posisi investasi",
+    ],
+    structure: [
+      "Ringkasan Prakiraan & Arah Pasar",
+      "Baseline Data Historis & Kondisi Saat Ini",
+      "Pendorong Pasar & Analisis Dampaknya",
+      "Metodologi Prakiraan & Batas Ketidakpastian",
+      "Skenario Dasar–Optimis–Pesimis",
+      "Implikasi per Segmen & Kawasan",
+      "Sinyal Pemicu yang Harus Dipantau",
+      "Rekomendasi Posisi per Skenario & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "tf-data",
+        role: "TF-DATA",
+        name: "TF-DATA — Analis Data & Pendorong Pasar",
+        mission:
+          "Susun baseline dan pendorong: tren historis multi-periode (harga, volume, pasokan, penyerapan), pemetaan pendorong pasar dengan arah dampaknya, dan kondisi siklus saat ini; data tanpa sumber terverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "tf-skenario",
+        role: "TF-SKENARIO",
+        name: "TF-SKENARIO — Penyusun Skenario & Implikasi",
+        mission:
+          "Susun prakiraan berskenario: dasar-optimis-pesimis dengan asumsi eksplisit per skenario, implikasi per segmen dan kawasan, sinyal pemicu yang harus dipantau, dan rekomendasi posisi investasi per skenario dengan batas ketidakpastian jujur.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset Menyeluruh — baseline historis dan pendorong pasar didukung data bersumber",
+      "Metodologi Jujur — cara prakiraan dan batas ketidakpastiannya dinyatakan transparan",
+      "Implikasi Dapat Ditindaklanjuti — skenario diterjemahkan ke posisi investasi konkret",
+      "Kacamata Praktisi Ahli — kedalaman analis riset pasar senior, bukan ramalan tanpa dasar",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "perbandingan-properti-claw",
+    name: "Perbandingan Properti Claw — Spesialis Laporan Perbandingan Properti",
+    tagline: "Wawancara → Kriteria Berbobot → Matriks Perbandingan → Laporan → Evaluasi Rubrik",
+    avatar: "🆚",
+    category: "property",
+    docLabel: "Laporan Perbandingan Properti (Property Comparison Report)",
+    mission:
+      "Membantu pengguna menyusun Laporan Perbandingan Properti yang membandingkan beberapa kandidat secara adil dan terukur — untuk dipakai investor memilih properti terbaik sesuai tujuannya. Terapkan praktik terbaik: kriteria perbandingan yang relevan dengan tujuan investasi (lokasi, harga per m², kondisi, legalitas, yield, potensi apresiasi, risiko), bobot kriteria yang dinyatakan eksplisit dan disepakati, data per kandidat dari sumber yang dicatat, normalisasi agar perbandingan apple-to-apple (harga per m², yield bersih), matriks skoring dengan perhitungan transparan, analisis kelebihan-kekurangan naratif per kandidat, uji sensitivitas peringkat terhadap perubahan bobot, dan rekomendasi peringkat dengan justifikasi.",
+    interviewTopics: [
+      "kandidat yang dibandingkan (jumlah, jenis, lokasi, harga)",
+      "tujuan investasi & kriteria yang paling penting",
+      "data yang tersedia per kandidat (harga, kondisi, pendapatan)",
+      "bobot preferensi antar-kriteria",
+      "batas waktu & proses keputusan",
+    ],
+    structure: [
+      "Ringkasan & Rekomendasi Peringkat",
+      "Tujuan Investasi & Kriteria Berbobot",
+      "Profil per Kandidat & Sumber Data",
+      "Normalisasi Data (harga per m², yield bersih)",
+      "Matriks Skoring & Perhitungan",
+      "Kelebihan–Kekurangan per Kandidat",
+      "Sensitivitas Peringkat terhadap Bobot",
+      "Rekomendasi, Langkah Lanjut & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "pc-matriks",
+        role: "PC-MATRIKS",
+        name: "PC-MATRIKS — Penyusun Kriteria & Matriks",
+        mission:
+          "Susun kerangka perbandingan: kriteria relevan dengan bobot eksplisit, normalisasi data antar-kandidat (harga per m², yield bersih), dan matriks skoring dengan perhitungan transparan; data kandidat yang belum diverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "pc-putusan",
+        role: "PC-PUTUSAN",
+        name: "PC-PUTUSAN — Analis Peringkat & Sensitivitas",
+        mission:
+          "Susun analisis keputusan: kelebihan-kekurangan naratif per kandidat, uji sensitivitas peringkat terhadap perubahan bobot, risiko spesifik per kandidat, dan rekomendasi peringkat berjustifikasi dengan langkah lanjut.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Perbandingan Adil — data ternormalisasi dan bobot eksplisit, tanpa bias ke kandidat tertentu",
+      "Ketelusuran — skor dan peringkat tertelusur ke data bersumber dan perhitungan transparan",
+      "Kedalaman Analisis — kelebihan-kekurangan dan sensitivitas dianalisis, bukan sekadar tabel skor",
+      "Kacamata Praktisi Ahli — kedalaman analis investasi senior, bukan daftar iklan properti",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-sewa-claw",
+    name: "Analisis Sewa Claw — Spesialis Dokumen Analisis Sewa",
+    tagline: "Wawancara → Bedah Kontrak → Analisis Finansial Sewa → Dokumen → Evaluasi Rubrik",
+    avatar: "📃",
+    category: "property",
+    docLabel: "Dokumen Analisis Sewa (Lease Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Sewa yang membedah kontrak sewa secara menyeluruh — untuk dipakai investor, pengelola, dan calon penyewa memahami nilai dan risiko sebuah perjanjian sewa. Terapkan praktik terbaik: abstraksi ketentuan kunci kontrak (para pihak, objek, masa sewa, opsi perpanjangan, tarif dan eskalasi, deposit, service charge, kewajiban pemeliharaan, klausul pemutusan), analisis finansial sewa (tarif efektif setelah insentif, beban total okupansi, perbandingan terhadap pasar), identifikasi klausul berisiko dan tidak seimbang, analisis posisi negosiasi (leverage masing-masing pihak), skenario perpanjangan vs relokasi bila relevan, dan rekomendasi negosiasi dengan prioritas.",
+    interviewTopics: [
+      "kontrak yang dianalisis (jenis properti, posisi pengguna: pemilik/penyewa)",
+      "ketentuan utama yang sudah diketahui (tarif, masa, eskalasi)",
+      "tujuan analisis (negosiasi baru, perpanjangan, audit portofolio)",
+      "data pasar sewa pembanding yang tersedia",
+      "masalah sewa yang pernah terjadi (sengketa, tunggakan, service charge)",
+    ],
+    structure: [
+      "Ringkasan Analisis & Rekomendasi",
+      "Abstraksi Ketentuan Kunci Kontrak",
+      "Analisis Tarif Efektif & Beban Total Okupansi",
+      "Perbandingan terhadap Pasar",
+      "Klausul Berisiko & Ketidakseimbangan",
+      "Posisi Negosiasi & Leverage",
+      "Skenario Perpanjangan vs Alternatif",
+      "Rekomendasi Negosiasi Berprioritas & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ls-abstrak",
+        role: "LS-ABSTRAK",
+        name: "LS-ABSTRAK — Pengabstraksi Kontrak",
+        mission:
+          "Susun abstraksi kontrak sewa: ketentuan kunci terstruktur (tarif, eskalasi, masa, opsi, deposit, service charge, pemeliharaan, pemutusan), klausul berisiko atau tidak seimbang dengan tingkat keparahan; ketentuan yang belum terkonfirmasi dari dokumen ditandai [ASUMSI].",
+      },
+      {
+        slug: "ls-nilai",
+        role: "LS-NILAI",
+        name: "LS-NILAI — Analis Nilai & Negosiasi",
+        mission:
+          "Susun analisis nilai: tarif efektif setelah insentif, beban total okupansi, posisi terhadap pasar pembanding, leverage negosiasi kedua pihak, skenario perpanjangan vs alternatif, dan rekomendasi negosiasi berprioritas.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Ketelitian Abstraksi — semua ketentuan material kontrak terekam akurat dan terstruktur",
+      "Kedalaman Finansial — tarif efektif dan beban total dihitung benar dan dibandingkan ke pasar",
+      "Rekomendasi Tajam — poin negosiasi berprioritas dan tertelusur ke temuan analisis",
+      "Kacamata Praktisi Ahli — kedalaman analis sewa komersial senior, bukan rangkuman kontrak",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-kredit-penyewa-claw",
+    name: "Kredit Penyewa Claw — Spesialis Analisis Kredit Penyewa",
+    tagline: "Wawancara → Data Keuangan → Skoring Risiko → Dokumen Analisis → Evaluasi Rubrik",
+    avatar: "🧮",
+    category: "property",
+    docLabel: "Dokumen Analisis Kredit Penyewa (Tenant Credit Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Kredit Penyewa yang menilai kemampuan dan kemauan bayar calon/eksisting penyewa — untuk dipakai pemilik dan pengelola properti memutuskan penerimaan penyewa, syarat sewa, dan mitigasi risiko. Terapkan praktik terbaik: profil penyewa lengkap (individu: penghasilan, pekerjaan, riwayat sewa; badan usaha: laporan keuangan, lama beroperasi, industri), analisis kemampuan bayar (rasio sewa terhadap penghasilan/pendapatan), verifikasi dokumen dan referensi, skoring risiko dengan kriteria eksplisit, mitigasi per tingkat risiko (deposit lebih besar, penjamin, jaminan bank), pemantauan berkala penyewa eksisting, dan kepatuhan pada etika serta privasi data dalam pengumpulan informasi.",
+    interviewTopics: [
+      "penyewa yang dianalisis (individu/badan usaha, sektor, ukuran)",
+      "nilai sewa & syarat yang direncanakan",
+      "dokumen keuangan yang tersedia (slip gaji, laporan keuangan, referensi)",
+      "pengalaman buruk penyewa sebelumnya yang ingin dihindari",
+      "kebijakan risiko pemilik (toleransi, deposit standar)",
+    ],
+    structure: [
+      "Ringkasan Skor Risiko & Rekomendasi",
+      "Profil Penyewa & Verifikasi Dokumen",
+      "Analisis Kemampuan Bayar (rasio sewa/penghasilan)",
+      "Riwayat Sewa & Referensi",
+      "Skoring Risiko & Kriteria Penilaian",
+      "Mitigasi per Tingkat Risiko (deposit, penjamin)",
+      "Rencana Pemantauan Berkala",
+      "Catatan Etika & Privasi Data, Lampiran",
+    ],
+    tools: [
+      {
+        slug: "tc-profil",
+        role: "TC-PROFIL",
+        name: "TC-PROFIL — Penyusun Profil & Verifikasi",
+        mission:
+          "Susun profil kredit penyewa: data keuangan terstruktur (penghasilan/laporan keuangan), checklist verifikasi dokumen dan referensi, riwayat sewa, dan rasio kemampuan bayar; data yang belum terverifikasi ditandai [ASUMSI], dengan kepatuhan etika dan privasi data.",
+      },
+      {
+        slug: "tc-skor",
+        role: "TC-SKOR",
+        name: "TC-SKOR — Penilai Risiko & Mitigasi",
+        mission:
+          "Susun skoring risiko dengan kriteria eksplisit dan bobot transparan, rekomendasi terima/tolak/terima-dengan-syarat, mitigasi per tingkat risiko (deposit lebih besar, penjamin, jaminan bank), dan rencana pemantauan penyewa eksisting.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Informasi Komprehensif — profil keuangan, riwayat, dan referensi penyewa tercakup",
+      "Akurasi & Presisi — rasio kemampuan bayar dan skor dihitung benar dengan kriteria eksplisit",
+      "Kejelasan & Organisasi — rekomendasi dan mitigasi mudah dieksekusi pengelola",
+      "Kacamata Praktisi Ahli — kedalaman analis kredit senior, bukan formulir data penyewa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-capex-claw",
+    name: "CapEx Claw — Spesialis Analisis Belanja Modal Properti",
+    tagline: "Wawancara → Identifikasi Kebutuhan → Analisis Kelayakan → Dokumen CapEx → Evaluasi Rubrik",
+    avatar: "🏗️",
+    category: "property",
+    docLabel: "Dokumen Analisis Belanja Modal (Capital Expenditure Analysis)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Belanja Modal (CapEx) yang memberi wawasan komprehensif atas kelayakan finansial proyek properti — analisis terperinci, proyeksi, dan rekomendasi — untuk dipakai eksekutif dan pemangku kepentingan memutuskan investasi modal. Terapkan praktik terbaik: inventarisasi kebutuhan CapEx (penggantian wajib vs peningkatan nilai vs kepatuhan regulasi), estimasi biaya per item dengan basis jelas, analisis kelayakan per investasi (dampak ke NOI/nilai aset, payback, ROI), prioritisasi berbasis urgensi-risiko-imbal hasil, jadwal pelaksanaan multi-tahun dengan kebutuhan dana per periode, sumber pendanaan (cadangan, pinjaman, arus kas), dampak pelaksanaan ke operasi dan penyewa, dan sensitivitas terhadap eskalasi biaya.",
+    interviewTopics: [
+      "aset & kebutuhan CapEx yang teridentifikasi (penggantian, upgrade, kepatuhan)",
+      "kondisi aset saat ini & usia sistem utama",
+      "anggaran/cadangan yang tersedia & sumber pendanaan",
+      "target imbal hasil dari investasi modal (kenaikan sewa, nilai)",
+      "batasan pelaksanaan (penyewa aktif, musim, izin)",
+    ],
+    structure: [
+      "Ringkasan Kebutuhan CapEx & Rekomendasi Prioritas",
+      "Inventarisasi Kebutuhan per Kategori",
+      "Estimasi Biaya per Item & Basisnya",
+      "Analisis Kelayakan per Investasi (ROI, payback, dampak NOI)",
+      "Matriks Prioritisasi (urgensi–risiko–imbal hasil)",
+      "Jadwal Multi-Tahun & Kebutuhan Dana per Periode",
+      "Sumber Pendanaan & Dampak ke Operasi",
+      "Sensitivitas Eskalasi Biaya & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "cx-kebutuhan",
+        role: "CX-KEBUTUHAN",
+        name: "CX-KEBUTUHAN — Inventarisator Kebutuhan & Biaya",
+        mission:
+          "Susun inventarisasi CapEx: klasifikasi kebutuhan (penggantian wajib, peningkatan nilai, kepatuhan), estimasi biaya per item dengan basis jelas, dan urgensi berbasis kondisi-usia sistem; biaya yang diperkirakan tanpa penawaran ditandai [ASUMSI].",
+      },
+      {
+        slug: "cx-kelayakan",
+        role: "CX-KELAYAKAN",
+        name: "CX-KELAYAKAN — Analis Kelayakan & Prioritas",
+        mission:
+          "Susun analisis kelayakan: dampak per investasi ke NOI dan nilai aset, ROI dan payback, matriks prioritisasi urgensi-risiko-imbal hasil, jadwal multi-tahun dengan kebutuhan dana, sumber pendanaan, dan sensitivitas eskalasi biaya.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Estimasi — biaya per item punya basis jelas dan realistis di pasar konstruksi",
+      "Kedalaman Kelayakan — ROI, payback, dan dampak NOI dihitung per investasi, bukan agregat kabur",
+      "Prioritisasi Beralasan — urutan pelaksanaan tertelusur ke urgensi, risiko, dan imbal hasil",
+      "Kacamata Praktisi Ahli — kedalaman manajer aset senior, bukan daftar keinginan renovasi",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-proforma-claw",
+    name: "Proforma Claw — Spesialis Analisis Proforma Properti",
+    tagline: "Wawancara → Asumsi Model → Proyeksi Multi-Tahun → Dokumen Proforma → Evaluasi Rubrik",
+    avatar: "📑",
+    category: "property",
+    docLabel: "Dokumen Analisis Proforma (Proforma Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Proforma yang menganalisis kinerja dan potensi finansial sebuah investasi properti secara akurat — untuk dipakai investor dan pemangku kepentingan mengambil keputusan — dengan analisis finansial menyeluruh, proyeksi akurat, dan analisis pasar komprehensif. Terapkan praktik terbaik: struktur proforma standar (pendapatan potensial bruto → kekosongan & kehilangan → pendapatan efektif → biaya operasional → NOI → debt service → arus kas sebelum pajak), asumsi eksplisit per baris dengan sumber (pertumbuhan sewa, kekosongan, eskalasi biaya, exit cap rate), proyeksi multi-tahun sampai exit, indikator kelayakan (IRR leveraged/unleveraged, equity multiple, cash-on-cash per tahun), uji kewajaran asumsi terhadap data pasar, dan keterbukaan atas keterbatasan model.",
+    interviewTopics: [
+      "investasi yang dimodelkan (properti, harga akuisisi, rencana)",
+      "struktur pembiayaan (ekuitas, pinjaman, bunga, tenor)",
+      "asumsi pendapatan & biaya yang sudah ada",
+      "horizon investasi & rencana exit",
+      "data pasar untuk uji kewajaran asumsi",
+    ],
+    structure: [
+      "Ringkasan Indikator Kelayakan (IRR, equity multiple, CoC)",
+      "Deskripsi Investasi & Struktur Pembiayaan",
+      "Tabel Asumsi per Baris & Sumbernya",
+      "Proforma Operasional Multi-Tahun (GPI → NOI → arus kas)",
+      "Analisis Exit & Nilai Terminal",
+      "Uji Kewajaran Asumsi vs Pasar",
+      "Keterbatasan Model & Risiko Utama",
+      "Kesimpulan & Lampiran Perhitungan",
+    ],
+    tools: [
+      {
+        slug: "pf-model",
+        role: "PF-MODEL",
+        name: "PF-MODEL — Penyusun Model Proforma",
+        mission:
+          "Susun proforma multi-tahun terstruktur: pendapatan potensial → efektif → NOI → debt service → arus kas, dengan asumsi eksplisit per baris berikut sumbernya, dan analisis exit dengan nilai terminal; setiap asumsi tanpa data pendukung ditandai [ASUMSI].",
+      },
+      {
+        slug: "pf-uji",
+        role: "PF-UJI",
+        name: "PF-UJI — Penguji Kewajaran & Indikator",
+        mission:
+          "Hitung indikator kelayakan (IRR leveraged/unleveraged, equity multiple, cash-on-cash per tahun), uji kewajaran asumsi terhadap data pasar pembanding, tandai asumsi agresif, dan nyatakan keterbatasan model secara jujur.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Analisis Finansial Menyeluruh — struktur proforma lengkap dari GPI sampai arus kas ekuitas",
+      "Akurasi Proyeksi — perhitungan benar dan indikator kelayakan konsisten dengan model",
+      "Kewajaran Asumsi — asumsi diuji terhadap pasar dan yang agresif ditandai jujur",
+      "Kacamata Praktisi Ahli — kedalaman analis underwriting senior, bukan spreadsheet optimis",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-rent-roll-claw",
+    name: "Analisis Rent Roll Claw — Spesialis Analisis Rent Roll",
+    tagline: "Wawancara → Data Rent Roll → Analisis Kinerja & Risiko → Dokumen → Evaluasi Rubrik",
+    avatar: "🗂️",
+    category: "property",
+    docLabel: "Dokumen Analisis Rent Roll (Rent Roll Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Rent Roll yang mengubah data rent roll mentah menjadi wawasan investasi — untuk dipakai analis, investor, dan calon pembeli menilai kualitas pendapatan sebuah properti. Terapkan praktik terbaik: validasi kualitas data rent roll (kelengkapan, konsistensi dengan kontrak), analisis kualitas pendapatan (konsentrasi penyewa, WALE, profil berakhirnya sewa, sewa di bawah/di atas pasar), tingkat hunian fisik vs ekonomis, analisis tunggakan dan tren pembayaran, potensi kenaikan pendapatan (mark-to-market, unit kosong), risiko pendapatan (penyewa dominan jatuh tempo bersamaan, klausul putus), dampak temuan ke valuasi dan underwriting, dan rekomendasi aksi per temuan.",
+    interviewTopics: [
+      "properti & rent roll yang dianalisis (jumlah unit, jenis penyewa)",
+      "tujuan analisis (akuisisi, pembiayaan, audit internal)",
+      "data pendukung yang tersedia (kontrak, riwayat pembayaran)",
+      "data pasar sewa pembanding",
+      "kekhawatiran spesifik (konsentrasi, tunggakan, expiry menumpuk)",
+    ],
+    structure: [
+      "Ringkasan Temuan & Kualitas Pendapatan",
+      "Validasi Kualitas Data Rent Roll",
+      "Analisis Hunian Fisik vs Ekonomis",
+      "Konsentrasi Penyewa, WALE & Profil Expiry",
+      "Posisi Sewa vs Pasar (mark-to-market)",
+      "Tunggakan & Tren Pembayaran",
+      "Risiko Pendapatan & Dampak ke Valuasi",
+      "Rekomendasi Aksi per Temuan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ra-kualitas",
+        role: "RA-KUALITAS",
+        name: "RA-KUALITAS — Validator Data & Kualitas Pendapatan",
+        mission:
+          "Susun validasi dan analisis kualitas: kelengkapan-konsistensi data rent roll terhadap kontrak, hunian fisik vs ekonomis, konsentrasi penyewa, WALE, profil expiry, dan tunggakan; data yang tidak konsisten atau belum terverifikasi ditandai [ASUMSI].",
+      },
+      {
+        slug: "ra-potensi",
+        role: "RA-POTENSI",
+        name: "RA-POTENSI — Analis Potensi & Risiko Pendapatan",
+        mission:
+          "Susun analisis potensi dan risiko: mark-to-market sewa terhadap pasar, potensi kenaikan pendapatan (unit kosong, sewa di bawah pasar), risiko pendapatan (expiry menumpuk, penyewa dominan), dampak ke valuasi/underwriting, dan rekomendasi aksi per temuan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Kelengkapan — semua dimensi kualitas pendapatan (hunian, konsentrasi, expiry, tunggakan) dianalisis",
+      "Organisasi — temuan tersaji terstruktur dari data → analisis → dampak → aksi",
+      "Konsistensi — angka analisis konsisten dengan data rent roll dan kontrak sumber",
+      "Kacamata Praktisi Ahli — kedalaman analis akuisisi senior, bukan rekap tabel sewa",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-sensitivitas-claw",
+    name: "Sensitivitas Claw — Spesialis Analisis Sensitivitas Investasi Properti",
+    tagline: "Wawancara → Variabel Kunci → Skenario & Batas → Dokumen Sensitivitas → Evaluasi Rubrik",
+    avatar: "🎚️",
+    category: "property",
+    docLabel: "Dokumen Analisis Sensitivitas (Sensitivity Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Sensitivitas yang menganalisis dampak berbagai faktor terhadap investasi properti — komprehensif dan akurat, memberi wawasan risiko dan imbal hasil pada berbagai skenario — untuk dipakai tim properti dan manajemen senior mengambil keputusan investasi. Terapkan praktik terbaik: identifikasi variabel kunci yang paling berdampak (sewa, kekosongan, biaya, suku bunga, exit cap rate, biaya konstruksi), rentang variasi realistis per variabel berbasis data historis, analisis satu-variabel (tornado chart) untuk mengurutkan dampak, analisis skenario kombinasi (dasar-optimis-pesimis-stres), titik impas per variabel (break-even), probabilitas kualitatif per skenario, implikasi ke struktur transaksi (margin pengaman, kontinjensi), dan rekomendasi mitigasi per risiko dominan.",
+    interviewTopics: [
+      "investasi yang diuji (model dasar & indikator kelayakannya)",
+      "variabel yang paling dikhawatirkan (sewa, bunga, biaya, exit)",
+      "data historis untuk rentang variasi realistis",
+      "batas kelayakan minimum investor (IRR floor, DSCR minimum)",
+      "keputusan yang bergantung pada hasil analisis",
+    ],
+    structure: [
+      "Ringkasan: Variabel Dominan & Ketahanan Investasi",
+      "Model Dasar & Indikator Acuan",
+      "Variabel Kunci & Rentang Variasi Berbasis Data",
+      "Analisis Satu-Variabel (urutan dampak)",
+      "Skenario Kombinasi (dasar–optimis–pesimis–stres)",
+      "Titik Impas per Variabel",
+      "Implikasi ke Struktur Transaksi & Margin Pengaman",
+      "Rekomendasi Mitigasi & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "sn-variabel",
+        role: "SN-VARIABEL",
+        name: "SN-VARIABEL — Pemeta Variabel & Rentang",
+        mission:
+          "Susun peta variabel kunci: variabel paling berdampak ke kelayakan, rentang variasi realistis berbasis data historis, analisis satu-variabel dengan urutan dampak (tornado), dan titik impas per variabel; rentang tanpa data historis ditandai [ASUMSI].",
+      },
+      {
+        slug: "sn-skenario",
+        role: "SN-SKENARIO",
+        name: "SN-SKENARIO — Penyusun Skenario & Mitigasi",
+        mission:
+          "Susun analisis skenario kombinasi (dasar-optimis-pesimis-stres) dengan probabilitas kualitatif, dampak ke indikator kelayakan per skenario, implikasi ke struktur transaksi (margin pengaman, kontinjensi), dan rekomendasi mitigasi per risiko dominan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Riset & Rentang Realistis — variasi variabel berbasis data historis, bukan angka sembarang",
+      "Akurasi Perhitungan — dampak per variabel dan skenario konsisten dengan model dasar",
+      "Wawasan Keputusan — analisis diterjemahkan ke batas aman dan mitigasi konkret",
+      "Kacamata Praktisi Ahli — kedalaman analis risiko investasi senior, bukan tabel what-if tanpa makna",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "proyeksi-arus-kas-claw",
+    name: "Arus Kas Claw — Spesialis Proyeksi Arus Kas Properti",
+    tagline: "Wawancara → Pendapatan & Biaya → Proyeksi & Risiko → Dokumen Arus Kas → Evaluasi Rubrik",
+    avatar: "💵",
+    category: "property",
+    docLabel: "Dokumen Proyeksi Arus Kas (Cash Flow Projection Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Proyeksi Arus Kas yang memberikan proyeksi finansial akurat untuk investasi properti — terperinci, memperhitungkan pendapatan, biaya, dan potensi risiko — untuk dipakai investor dan pemangku kepentingan menilai profitabilitas dan kelayakan investasi. Terapkan praktik terbaik: proyeksi berbasis bulanan/tahunan sesuai kebutuhan, komponen pendapatan lengkap (sewa, pendapatan lain, penyesuaian kekosongan), komponen biaya lengkap (operasional, pemeliharaan, pajak, asuransi, manajemen, cadangan CapEx), jadwal debt service bila berutang, arus kas bersih sebelum dan sesudah pajak, saldo kas kumulatif dan kebutuhan modal kerja, penanda periode defisit dan sumber penutupnya, uji stres pada asumsi kritis, dan rekonsiliasi dengan realisasi bila ada data.",
+    interviewTopics: [
+      "investasi yang diproyeksikan (properti, tahap, kepemilikan)",
+      "sumber pendapatan & kontrak sewa berjalan",
+      "struktur biaya & kewajiban utang",
+      "periode proyeksi & granularitas (bulanan/tahunan)",
+      "risiko arus kas yang dikhawatirkan (kekosongan, tunggakan, bunga)",
+    ],
+    structure: [
+      "Ringkasan Arus Kas & Indikator Kunci",
+      "Asumsi Pendapatan & Biaya per Baris",
+      "Proyeksi Pendapatan (sewa, lain-lain, kekosongan)",
+      "Proyeksi Biaya (operasional, pajak, cadangan CapEx)",
+      "Debt Service & Arus Kas Bersih",
+      "Saldo Kumulatif & Periode Defisit",
+      "Uji Stres Asumsi Kritis",
+      "Rekonsiliasi vs Realisasi & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "ck-proyeksi",
+        role: "CK-PROYEKSI",
+        name: "CK-PROYEKSI — Penyusun Proyeksi Terstruktur",
+        mission:
+          "Susun proyeksi arus kas per periode: pendapatan lengkap dengan penyesuaian kekosongan, biaya lengkap termasuk cadangan CapEx, debt service, arus kas bersih, dan saldo kumulatif dengan penanda periode defisit; setiap asumsi per baris ditandai [ASUMSI] bila tanpa data pendukung.",
+      },
+      {
+        slug: "ck-risiko",
+        role: "CK-RISIKO",
+        name: "CK-RISIKO — Penguji Stres & Kebutuhan Dana",
+        mission:
+          "Susun analisis ketahanan: uji stres asumsi kritis (kekosongan naik, sewa turun, bunga naik), kebutuhan modal kerja dan sumber penutup defisit, indikator kesehatan (DSCR per periode), dan rekomendasi penjadwalan kewajiban agar arus kas aman.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Akurasi Proyeksi — perhitungan per periode benar dan konsisten dari pendapatan sampai saldo",
+      "Kelengkapan Komponen — semua pos pendapatan, biaya, cadangan, dan utang tercakup",
+      "Kesadaran Risiko — periode defisit dan hasil uji stres ditampilkan jujur dengan mitigasi",
+      "Kacamata Praktisi Ahli — kedalaman analis keuangan properti senior, bukan tabel optimis tanpa cadangan",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "proposal-akuisisi-properti-claw",
+    name: "Proposal Akuisisi Claw — Spesialis Proposal Akuisisi Properti",
+    tagline: "Wawancara → Analisis & Underwriting → Struktur Transaksi → Proposal → Evaluasi Rubrik",
+    avatar: "🏠",
+    category: "property",
+    docLabel: "Proposal Akuisisi (Acquisition Proposal)",
+    mission:
+      "Membantu pengguna menyusun Proposal Akuisisi yang memberikan analisis dan rekomendasi komprehensif untuk akuisisi properti — proyeksi finansial terperinci, riset pasar, dan penilaian risiko — untuk dipakai tim eksekutif dan investor mengevaluasi investasi dan mengambil keputusan strategis. Terapkan praktik terbaik: tesis akuisisi yang jelas (mengapa aset ini, mengapa sekarang), riset pasar berbasis data (pembanding, permintaan-pasokan, tren), underwriting disiplin (pendapatan ternormalisasi, biaya realistis, cadangan), penentuan harga penawaran dengan rentang (walk-away price), struktur transaksi dan pendanaan, penilaian risiko dengan mitigasi per risiko, rencana nilai tambah pasca-akuisisi (value-add plan), jadwal proses sampai closing, dan rekomendasi tegas dengan syarat.",
+    interviewTopics: [
+      "aset target (jenis, lokasi, harga penawaran, penjual)",
+      "tesis akuisisi & kesesuaian dengan strategi portofolio",
+      "data underwriting yang tersedia (rent roll, biaya, kondisi)",
+      "rencana pendanaan (ekuitas, pinjaman, partner)",
+      "rencana nilai tambah pasca-akuisisi",
+    ],
+    structure: [
+      "Ringkasan Eksekutif & Rekomendasi Harga",
+      "Tesis Akuisisi & Keselarasan Strategis",
+      "Profil Aset & Riset Pasar",
+      "Underwriting: Pendapatan, Biaya & Indikator Kelayakan",
+      "Harga Penawaran, Rentang & Walk-Away Price",
+      "Struktur Transaksi & Pendanaan",
+      "Penilaian Risiko & Mitigasi",
+      "Rencana Nilai Tambah, Jadwal Closing & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "aq-underwriting",
+        role: "AQ-UNDERWRITING",
+        name: "AQ-UNDERWRITING — Analis Underwriting & Harga",
+        mission:
+          "Susun underwriting disiplin: pendapatan ternormalisasi dari rent roll, biaya realistis dengan cadangan, indikator kelayakan (IRR, cap rate masuk, cash-on-cash), dan penentuan harga penawaran dengan rentang serta walk-away price; asumsi ditandai [ASUMSI].",
+      },
+      {
+        slug: "aq-transaksi",
+        role: "AQ-TRANSAKSI",
+        name: "AQ-TRANSAKSI — Perancang Struktur & Rencana",
+        mission:
+          "Susun struktur transaksi dan rencana eksekusi: skema pendanaan, penilaian risiko dengan mitigasi per risiko, rencana nilai tambah pasca-akuisisi dengan target terukur, jadwal proses sampai closing, dan syarat-syarat rekomendasi.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Proyeksi Finansial Terperinci — underwriting lengkap dengan asumsi eksplisit dan indikator benar",
+      "Riset Pasar Kuat — tesis dan harga didukung data pembanding dan analisis kawasan",
+      "Penilaian Risiko Jujur — risiko material diungkap dengan mitigasi, bukan disembunyikan",
+      "Kacamata Praktisi Ahli — kedalaman kepala akuisisi senior, bukan proposal pemasaran",
+    ],
+    licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
+  },
+  {
+    kind: "openclaw",
+    slug: "analisis-pembiayaan-claw",
+    name: "Analisis Pembiayaan Claw — Spesialis Analisis Pembiayaan Proyek Properti",
+    tagline: "Wawancara → Opsi Pembiayaan → Analisis & Risiko → Dokumen → Evaluasi Rubrik",
+    avatar: "💳",
+    category: "property",
+    docLabel: "Dokumen Analisis Pembiayaan (Financing Analysis Document)",
+    mission:
+      "Membantu pengguna menyusun Dokumen Analisis Pembiayaan yang mengevaluasi opsi pembiayaan proyek properti secara komprehensif — proyeksi finansial akurat, penilaian risiko, dan rekomendasi strategi pembiayaan — untuk dipakai pengembang, investor, dan lembaga keuangan mengambil keputusan. Terapkan praktik terbaik: pemetaan opsi pembiayaan relevan (kredit konstruksi, kredit investasi, obligasi/MTN, ekuitas partner, pembiayaan syariah, pre-sales), perbandingan biaya modal efektif per opsi (bunga, provisi, biaya lain), struktur leverage optimal (LTV/LTC, DSCR minimum), jadwal penarikan dan pembayaran sesuai arus kas proyek, analisis risiko pembiayaan (bunga naik, refinancing, covenant), dampak struktur ke imbal hasil ekuitas (leverage effect), persyaratan dan jaminan per opsi, dan rekomendasi struktur dengan skenario cadangan.",
+    interviewTopics: [
+      "proyek yang dibiayai (jenis, nilai, tahap, jadwal)",
+      "kebutuhan dana & struktur modal saat ini",
+      "opsi pembiayaan yang tersedia/ditawarkan (bank, partner, lainnya)",
+      "arus kas proyek untuk jadwal penarikan-pembayaran",
+      "batasan & preferensi (syariah, covenant, jaminan yang bisa diberikan)",
+    ],
+    structure: [
+      "Ringkasan & Rekomendasi Struktur Pembiayaan",
+      "Profil Proyek & Kebutuhan Dana",
+      "Pemetaan Opsi Pembiayaan yang Relevan",
+      "Perbandingan Biaya Modal Efektif per Opsi",
+      "Struktur Leverage & Indikator Aman (LTV/LTC, DSCR)",
+      "Jadwal Penarikan–Pembayaran vs Arus Kas Proyek",
+      "Risiko Pembiayaan & Dampak ke Imbal Hasil Ekuitas",
+      "Persyaratan, Jaminan, Skenario Cadangan & Lampiran",
+    ],
+    tools: [
+      {
+        slug: "fn-opsi",
+        role: "FN-OPSI",
+        name: "FN-OPSI — Pemeta Opsi & Biaya Modal",
+        mission:
+          "Susun pemetaan opsi pembiayaan: opsi relevan untuk tahap proyek, biaya modal efektif per opsi (bunga, provisi, biaya lain), persyaratan dan jaminan masing-masing, dan kesesuaian dengan profil proyek; suku bunga dan syarat yang diperkirakan ditandai [ASUMSI].",
+      },
+      {
+        slug: "fn-struktur",
+        role: "FN-STRUKTUR",
+        name: "FN-STRUKTUR — Analis Struktur & Risiko",
+        mission:
+          "Susun analisis struktur: leverage optimal dengan indikator aman (LTV/LTC, DSCR minimum), jadwal penarikan-pembayaran selaras arus kas proyek, dampak leverage ke imbal hasil ekuitas, risiko pembiayaan (bunga, refinancing, covenant) dengan mitigasi, dan skenario cadangan.",
+      },
+    ],
+    evaluatorCriteria: [
+      "Proyeksi Akurat — biaya modal dan dampak leverage dihitung benar dan dapat diperbandingkan",
+      "Penilaian Risiko — risiko bunga, refinancing, dan covenant dianalisis dengan mitigasi konkret",
+      "Rekomendasi Strategis — struktur terpilih beralasan dengan skenario cadangan yang realistis",
+      "Kacamata Praktisi Ahli — kedalaman analis pembiayaan proyek senior, bukan brosur produk kredit",
     ],
     licenseClass: 2, licensePrice: 2_500_000, monthlyPrice: 199_000,
   },
