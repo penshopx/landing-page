@@ -177,6 +177,7 @@ import * as M_ossClaw from "./seed-oss-claw";
 import * as M_terasLpjk1 from "./seed-teras-lpjk1";
 import * as M_penulisCerdasPkb from "./seed-penulis-cerdas";
 import * as M_desainProyekClaw from "./seed-desain-proyek-claw";
+import * as M_rencanaProyekClaw from "./seed-rencana-proyek-claw";
 import { seedStoreProducts } from "./seed-store-products";
 
 const seedModuleRegistry: Record<string, any> = {
@@ -2230,6 +2231,7 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
       try { await M_terasLpjk1.seedTerasLpjk1(); } catch (err) { log("[Seed TerasLPJK1] Error: " + (err as Error).message); }
       try { await M_penulisCerdasPkb.seedPenulisCerdasPKB(); } catch (err) { log("[Seed PenulisCerdasPKB] Error: " + (err as Error).message); }
       try { await M_desainProyekClaw.seedDesainProyekClaw(); } catch (err) { log("[Seed DesainProyekClaw] Error: " + (err as Error).message); }
+      try { await M_rencanaProyekClaw.seedRencanaProyekClaw(); } catch (err) { log("[Seed RencanaProyekClaw] Error: " + (err as Error).message); }
 
       // ── Store Products — produk unggulan di katalog marketplace ──────────
       try { await seedStoreProducts(); } catch (err) { log("[Seed StoreProducts] Error: " + (err as Error).message); }
