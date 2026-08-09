@@ -1105,6 +1105,10 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
   // rows at the DB level.  The explicit progress delete below is defence-in-depth
   // for environments where the FK migration has not yet run; both operations
   // execute inside a single transaction so no partial state is ever committed.
+  //
+  // After the lesson and its progress rows are removed, the enrollment progress%
+  // for every enrolled student is recalculated so stale / inflated values never
+  // reach the student UI.
   app.delete("/api/admin/lms/lessons/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -1116,6 +1120,48 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
         await tx.delete(lmsLessonProgress).where(eq(lmsLessonProgress.lessonId, id));
         const [row] = await tx.delete(lmsLessons).where(eq(lmsLessons.id, id)).returning();
         deleted = row;
+
+        if (deleted) {
+          const courseId = deleted.courseId;
+          // Recalculate progress for all enrolled students in the affected course.
+          // At this point inside the transaction the deleted lesson is already gone,
+          // so both lesson count and completed-lesson count are already correct.
+          await tx.execute(sql`
+            UPDATE lms_enrollments e
+            SET
+              progress = ROUND(
+                COALESCE(
+                  (
+                    SELECT COUNT(*) FROM lms_lesson_progress lp
+                    WHERE lp.user_id = e.user_id AND lp.course_id = e.course_id
+                  )::numeric /
+                  NULLIF(
+                    (SELECT COUNT(*) FROM lms_lessons l WHERE l.course_id = e.course_id),
+                    0
+                  ) * 100,
+                  0
+                )
+              ),
+              -- Clear completedAt if the student no longer has 100% progress.
+              completed_at = CASE
+                WHEN ROUND(
+                  COALESCE(
+                    (
+                      SELECT COUNT(*) FROM lms_lesson_progress lp
+                      WHERE lp.user_id = e.user_id AND lp.course_id = e.course_id
+                    )::numeric /
+                    NULLIF(
+                      (SELECT COUNT(*) FROM lms_lessons l WHERE l.course_id = e.course_id),
+                      0
+                    ) * 100,
+                    0
+                  )
+                ) >= 100 THEN e.completed_at
+                ELSE NULL
+              END
+            WHERE e.course_id = ${courseId}
+          `);
+        }
       });
 
       if (!deleted) return res.status(404).json({ error: "Lesson tidak ditemukan" });
