@@ -202,7 +202,18 @@ export default function Store() {
 
   const handleBuyNow = (agent: AgentProduct) => {
     trackViewContent({ content_name: agent.name, content_category: agent.category ?? "chatbot" });
-    // Direct checkout link (set by admin per-product)
+    // Priority rule: scalevVariantId always wins over paymentUrl.
+    // If the product has a Scalev variant, always use the variant-specific
+    // checkout URL — even if a plain paymentUrl is also set — so the Scalev
+    // order is created correctly and webhooks fire.
+    if (agent.scalevVariantId) {
+      const qs = new URLSearchParams();
+      qs.set("variant_ids", String(agent.scalevVariantId));
+      qs.set("qty", "1");
+      window.open(`${PAYMENT_BASE_URL}/c/checkout?${qs.toString()}`, "_blank");
+      return;
+    }
+    // Direct checkout link (set by admin per-product, no Scalev variant)
     // Append product_ref so Scalev webhook can identify the exact product by ID
     if (agent.paymentUrl) {
       try {
@@ -212,14 +223,6 @@ export default function Store() {
       } catch {
         window.open(agent.paymentUrl, "_blank");
       }
-      return;
-    }
-    // Scalev-integrated product → variant-specific checkout URL
-    if (agent.scalevVariantId) {
-      const qs = new URLSearchParams();
-      qs.set("variant_ids", String(agent.scalevVariantId));
-      qs.set("qty", "1");
-      window.open(`${PAYMENT_BASE_URL}/c/checkout?${qs.toString()}`, "_blank");
       return;
     }
     // Fallback → WA inquiry

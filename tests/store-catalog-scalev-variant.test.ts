@@ -201,3 +201,35 @@ test("use-cart.tsx: buildCheckoutUrl membangun URL dengan variant_ids dan qty", 
     "buildCheckoutUrl harus menggunakan scalevVariantId dari item keranjang"
   );
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BAGIAN 4 — Penjagaan statis: aturan prioritas scalevVariantId > paymentUrl
+// ═════════════════════════════════════════════════════════════════════════════
+
+test("store.tsx: handleBuyNow memeriksa scalevVariantId SEBELUM paymentUrl (prioritas Scalev variant)", () => {
+  const src = fs.readFileSync(
+    path.join(process.cwd(), "client", "src", "pages", "store.tsx"),
+    "utf-8"
+  );
+
+  // Temukan blok handleBuyNow
+  const buyNowStart = src.indexOf("const handleBuyNow");
+  assert.ok(buyNowStart !== -1, "handleBuyNow harus ada di store.tsx");
+
+  // Ambil isi fungsi sampai tanda } penutup pertama yang relevan
+  const fnBody = src.slice(buyNowStart, buyNowStart + 1500);
+
+  // Posisi pemeriksaan scalevVariantId dan paymentUrl di dalam fungsi
+  const variantPos = fnBody.indexOf("scalevVariantId");
+  const paymentPos = fnBody.indexOf("paymentUrl");
+
+  assert.ok(variantPos !== -1, "handleBuyNow harus memeriksa scalevVariantId");
+  assert.ok(paymentPos !== -1, "handleBuyNow harus memeriksa paymentUrl");
+
+  assert.ok(
+    variantPos < paymentPos,
+    `scalevVariantId harus diperiksa SEBELUM paymentUrl di handleBuyNow ` +
+    `(posisi variant=${variantPos}, posisi payment=${paymentPos}) — ` +
+    `aturan prioritas: scalevVariantId selalu menang atas paymentUrl`
+  );
+});
