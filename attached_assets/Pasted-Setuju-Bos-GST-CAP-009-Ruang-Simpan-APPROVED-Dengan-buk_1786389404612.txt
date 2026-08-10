@@ -1,0 +1,55 @@
+Setuju, Bos. **GST-CAP-009 — Ruang Simpan: APPROVED.** Dengan bukti `pricing.ts` tersebut, Rp79.000 sekarang jelas merupakan **harga existing resmi**, bukan asumsi.
+
+### Keputusan final GST-CAP-009
+
+| Field                  | Nilai final                                                                                                                                                                                         |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `price`                | **79000**                                                                                                                                                                                           |
+| `billing_type`         | **MONTHLY**                                                                                                                                                                                         |
+| `visibility`           | **INCLUDED_AND_STANDALONE**                                                                                                                                                                         |
+| `gaia_enabled`         | **true**                                                                                                                                                                                            |
+| `standalone_enabled`   | **true**                                                                                                                                                                                            |
+| `subscription_enabled` | **true** — tetap                                                                                                                                                                                    |
+| `dp_enabled`           | **false** — tetap                                                                                                                                                                                   |
+| `ai_enabled`           | **false** — tetap                                                                                                                                                                                   |
+| `usage_profile`        | **["STORAGE"]** — tetap                                                                                                                                                                             |
+| `status`               | **ACTIVE** — tetap                                                                                                                                                                                  |
+| `short_description`    | **Memori bisnis digital perusahaan Anda: simpan, cari, dan amankan semua dokumen penting dengan AI. Mulai gratis 15 MB — plan Profesional 5 GB Rp79rb/bulan, tersedia plan lain sesuai kebutuhan.** |
+
+### Kenapa saya approve
+
+Ini sekarang punya dasar yang jauh lebih kuat:
+
+**Gratis 15 MB**
+↓
+**Esensial Rp29k/bulan**
+↓
+**Profesional Rp79k/bulan — Paling Populer**
+↓
+**Perusahaan Rp199k/bulan**
+↓
+**Upgrade ke ekosistem/paket Gustafta**
+
+Yang penting, registry **tidak perlu membuat empat SKU baru**. GST-CAP-009 menjadi **representasi produk Ruang Simpan**, sementara detail tier dan kuotanya tetap dikelola oleh sistem Ruang Simpan yang memang sudah punya pricing/checkout sendiri.
+
+Saya juga setuju dengan `ai_enabled = false`. Walaupun ada AI search/OCR, **nilai utama SKU-nya adalah storage/memori**, bukan menjual produk AI specialist.
+
+### Instruksi eksekusi
+
+**PATCH GST-CAP-009 saja**, persis sesuai tabel final di atas.
+
+Kemudian:
+
+1. GET/read-back GST-CAP-009.
+2. Pastikan seluruh perubahan cocok 100%.
+3. Cross-check **GST-CAP-002, 003, 004, 006, 008** — tidak boleh berubah.
+4. Catalog development harus naik dari **3 → 4 produk standalone**.
+5. Pastikan Toolkit dan Ruang Kelola tetap tidak ikut muncul sebagai standalone.
+6. **LOCK GST-CAP-009.**
+7. Production dan GAIA publish **tetap jangan disentuh**.
+
+Setelah ini kita punya **4 produk yang benar-benar layak tampil di GAIA**:
+
+**Bedah Dokumen Rp149k → Klinik Rp150k → Brain Project Rp499k → Ruang Simpan Rp79k/bulan.**
+
+Lalu kita lanjut ke **GST-CAP-010 — Jasa Dokumen**.
