@@ -74,6 +74,7 @@
     "framer-motion": "^11.13.1",
     "input-otp": "^1.4.2",
     "jspdf": "^4.2.1",
+    "jszip": "^3.10.1",
     "katex": "^0.16.45",
     "lucide-react": "^0.453.0",
     "mammoth": "^1.11.0",

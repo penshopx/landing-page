@@ -2776,6 +2776,60 @@ export const ruangKelolaBiroRequests = pgTable("ruang_kelola_biro_requests", {
   index("idx_rk_biro_user").on(table.userId, table.createdAt),
 ]);
 
+// ─── PRODUCT REGISTRY + GAIA PUBLISHING (V1: export bundle) ────────────────
+// Gustafta = MASTER product database; GAIA Store = published commerce view.
+// Semua create/edit/version/archive/publish dilakukan di Gustafta.
+// DDL idempotent dijalankan saat boot di server/index.ts (drizzle push dihindari).
+export const productRegistry = pgTable("product_registry", {
+  id:               serial("id").primaryKey(),
+  productId:        varchar("product_id", { length: 40 }).notNull().unique(), // GST-XXX-001, PERMANEN
+  name:             text("name").notNull(),
+  slug:             text("slug").notNull().unique(),
+  productType:      text("product_type").notNull(),   // AI_SPECIALIST | MINI_APP | DOCUMENT_TOOL | KNOWLEDGE | BUSINESS_KIT | PRODUCTIVITY_TOOL
+  category:         text("category").notNull(),
+  subcategory:      text("subcategory"),
+  shortDescription: text("short_description"),
+  longDescription:  text("long_description"),
+  targetUsers:      text("target_users"),
+  features:         jsonb("features").$type<string[]>().default([]),
+  benefits:         jsonb("benefits").$type<string[]>().default([]),
+  thumbnail:        text("thumbnail"),
+  gallery:          jsonb("gallery").$type<string[]>().default([]),
+  demoUrl:          text("demo_url"),
+  productUrl:       text("product_url"),
+  price:            integer("price").notNull().default(0), // 0 = FREE
+  currency:         text("currency").notNull().default("IDR"),
+  billingType:      text("billing_type").notNull().default("ONE_TIME"), // ONE_TIME | MONTHLY | LICENSE_PLUS_MONTHLY | FREE
+  status:           text("status").notNull().default("DRAFT"),          // DRAFT | ACTIVE | ARCHIVED | DEPRECATED
+  version:          text("version").notNull().default("1.0.0"),
+  engineType:       text("engine_type"),               // mis. GUSTAFTA_AGENT, STATIC_ASSET
+  accessType:       text("access_type"),               // mis. LOGIN_GUSTAFTA, DOWNLOAD, EXTERNAL_URL
+  accessUrl:        text("access_url"),
+  gaiaEnabled:      boolean("gaia_enabled").notNull().default(false),
+  gaiaFeatured:     boolean("gaia_featured").notNull().default(false),
+  gaiaStatus:       text("gaia_status").notNull().default("NOT_READY"), // NOT_READY | READY | PUBLISHED | UPDATE_AVAILABLE
+  lastPublishedAt:  timestamp("last_published_at"),
+  lastPublishedVersion: text("last_published_version"),
+  createdAt:        timestamp("created_at").defaultNow().notNull(),
+  updatedAt:        timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const gaiaExportHistory = pgTable("gaia_export_history", {
+  id:             serial("id").primaryKey(),
+  productId:      varchar("product_id", { length: 40 }).notNull(), // ref product_registry.product_id
+  productVersion: text("product_version").notNull(),
+  bundleVersion:  text("bundle_version").notNull(),
+  exportStatus:   text("export_status").notNull(), // SUCCESS | FAILED
+  checksum:       text("checksum"),
+  detail:         jsonb("detail"),                  // mis. missing fields saat FAILED
+  exportedAt:     timestamp("exported_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_gaia_export_product").on(table.productId, table.exportedAt),
+]);
+
+export type ProductRegistryRow = typeof productRegistry.$inferSelect;
+export type GaiaExportHistoryRow = typeof gaiaExportHistory.$inferSelect;
+
 export type RuangKelolaProfile = typeof ruangKelolaProfiles.$inferSelect;
 export type RuangKelolaDocument = typeof ruangKelolaDocuments.$inferSelect;
 export type RuangKelolaAuditLog = typeof ruangKelolaAuditLog.$inferSelect;

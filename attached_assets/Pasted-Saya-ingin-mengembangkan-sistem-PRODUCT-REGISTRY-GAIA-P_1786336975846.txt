@@ -1,0 +1,513 @@
+Saya ingin mengembangkan sistem PRODUCT REGISTRY + GAIA PUBLISHING SYSTEM pada aplikasi Gustafta yang sudah ada.
+
+PENTING:
+Jangan membangun ulang aplikasi Gustafta.
+Jangan menghapus fitur existing.
+Jangan mengubah engine existing tanpa alasan.
+Sebelum coding, audit struktur aplikasi, database, authentication, product model, dan arsitektur existing.
+
+==================================================
+KONSEP BISNIS FINAL
+==================================================
+
+Gustafta adalah ENGINE dan MASTER PRODUCT SYSTEM.
+
+Seluruh produk digital dibuat, dikembangkan, dikelola, dan dijalankan dari ekosistem Gustafta.
+
+Produk tersebut nantinya dipasarkan melalui:
+
+DOKUMENPROYEK.COM
+        |
+        └── GAIA STORE
+
+GAIA Store adalah commerce layer khusus produk digital yang dapat dibeli dan digunakan secara instan.
+
+DP Store TIDAK termasuk dalam scope implementasi ini.
+DP Store akan menjadi aplikasi terpisah karena produknya berbasis service/project/high-touch commerce.
+
+Gustafta tetap menjadi source of truth.
+
+==================================================
+PRINSIP UTAMA
+==================================================
+
+GUSTAFTA = MASTER
+
+GAIA = PUBLISHED COMMERCE VIEW
+
+Artinya:
+
+Semua data inti produk dikelola di Gustafta.
+
+GAIA tidak boleh menjadi master product database.
+
+GAIA tidak boleh mengubah data inti produk secara bebas.
+
+Jika ada perubahan:
+
+Create
+Edit
+Price
+Description
+Features
+Category
+Status
+Version
+Archive
+Publish
+
+semuanya dilakukan dari Gustafta.
+
+Kemudian produk dipublish ke GAIA.
+
+==================================================
+PRODUCT TYPES
+==================================================
+
+Sistem harus mendukung minimal:
+
+AI_SPECIALIST
+MINI_APP
+DOCUMENT_TOOL
+KNOWLEDGE
+BUSINESS_KIT
+PRODUCTIVITY_TOOL
+
+Contoh produk:
+- Chatbot / AI Specialist
+- Ebook
+- Mini App
+- Document Generator
+- Template
+- Checklist
+- Digital Business Tool
+
+==================================================
+PRODUCT REGISTRY
+==================================================
+
+Buat atau integrasikan Product Registry dengan database existing.
+
+Jangan membuat database kedua jika database produk existing dapat digunakan.
+
+Setiap produk memiliki Product ID permanen.
+
+Contoh:
+
+GST-TND-001
+GST-SBU-001
+GST-SMAP-001
+GST-EBOOK-001
+
+Product ID tidak boleh berubah walaupun nama atau versi produk berubah.
+
+Field minimal:
+
+product_id
+name
+slug
+product_type
+category
+subcategory
+short_description
+long_description
+target_users
+features
+benefits
+thumbnail
+gallery
+demo_url
+product_url
+price
+currency
+billing_type
+status
+version
+engine_type
+access_type
+access_url
+gaia_enabled
+gaia_featured
+created_at
+updated_at
+
+==================================================
+PRODUCT STATUS
+==================================================
+
+Gunakan:
+
+DRAFT
+ACTIVE
+ARCHIVED
+DEPRECATED
+
+DRAFT:
+produk belum boleh dipublish.
+
+ACTIVE:
+produk dapat dipublish ke GAIA.
+
+ARCHIVED:
+produk tidak boleh ditampilkan sebagai produk aktif.
+
+DEPRECATED:
+produk lama yang masih perlu disimpan sebagai historical record.
+
+==================================================
+VERSIONING
+==================================================
+
+Gunakan semantic versioning:
+
+1.0.0
+1.1.0
+1.2.0
+2.0.0
+
+Product ID tetap.
+
+Versi berubah jika product metadata atau konfigurasi produk berubah secara signifikan.
+
+==================================================
+PRODUCT MANAGEMENT
+==================================================
+
+Admin Gustafta harus dapat:
+
+Create Product
+Edit Product
+Duplicate Product
+Preview Product
+Archive Product
+Restore Product jika diperlukan
+Create New Version
+Publish to GAIA
+
+Tambahkan tombol:
+
+[ PUBLISH TO GAIA ]
+
+==================================================
+GAIA READINESS
+==================================================
+
+Setiap produk harus memiliki informasi:
+
+GAIA Status
+
+NOT_READY
+READY
+PUBLISHED
+UPDATE_AVAILABLE
+
+Tampilkan:
+
+Product ID
+Product Version
+GAIA Status
+Last Published
+Last Published Version
+Last Updated
+
+==================================================
+PUBLISH WORKFLOW
+==================================================
+
+Workflow:
+
+Create Product
+        ↓
+Draft
+        ↓
+Complete Required Fields
+        ↓
+Validate
+        ↓
+Ready
+        ↓
+Publish to GAIA
+        ↓
+GAIA receives product
+        ↓
+Published
+
+Jangan langsung mempublikasikan setiap perubahan kecil.
+
+Admin harus secara sadar melakukan:
+
+[PUBLISH TO GAIA]
+
+==================================================
+GAIA PRODUCT PAYLOAD
+==================================================
+
+Buat standar payload bernama:
+
+GAIA PRODUCT PAYLOAD v1
+
+Payload hanya berisi data yang dibutuhkan GAIA Store.
+
+Contoh:
+
+{
+  product_id,
+  product_version,
+  name,
+  slug,
+  product_type,
+  category,
+  subcategory,
+  short_description,
+  long_description,
+  target_users,
+  features,
+  benefits,
+  thumbnail,
+  gallery,
+  demo_url,
+  price,
+  currency,
+  billing_type,
+  status,
+  access_type,
+  access_url,
+  engine_type,
+  source
+}
+
+source harus:
+
+GUSTAFTA
+
+==================================================
+SECURITY
+==================================================
+
+SANGAT PENTING:
+
+Jangan pernah mengirim ke GAIA:
+
+API keys
+secret keys
+passwords
+database credentials
+environment variables
+private system prompts
+private knowledge base
+internal credentials
+source code rahasia
+internal infrastructure configuration
+
+GAIA hanya menerima metadata dan access reference.
+
+Gunakan whitelist fields.
+
+Jangan serialize seluruh database object ke payload.
+
+==================================================
+PUBLISH METHOD
+==================================================
+
+Untuk V1 gunakan:
+
+Gustafta → Export GAIA Bundle → GAIA Import
+
+Buat format:
+
+GAIA PRODUCT BUNDLE v1
+
+Struktur:
+
+manifest.json
+product.json
+pricing.json
+access.json
+assets/
+
+Bundle harus dapat di-download.
+
+Contoh:
+
+TenderaClaw/
+    manifest.json
+    product.json
+    pricing.json
+    access.json
+    assets/
+        thumbnail
+        gallery
+
+==================================================
+EXPORT HISTORY
+==================================================
+
+Simpan:
+
+product_id
+product_version
+bundle_version
+exported_at
+export_status
+checksum
+
+Status:
+
+SUCCESS
+FAILED
+
+==================================================
+VALIDATION
+==================================================
+
+Sebelum publish/export:
+
+Periksa:
+
+product_id
+name
+slug
+product_type
+category
+description
+price atau FREE
+billing_type
+status
+version
+
+Jika belum lengkap:
+
+Jangan publish.
+
+Tampilkan field yang kurang.
+
+==================================================
+IMPORTANT ARCHITECTURE
+==================================================
+
+Jangan memindahkan source code produk ke GAIA.
+
+Misalnya TenderaClaw sudah berjalan di Gustafta.
+
+GAIA hanya menerima:
+
+Product Metadata
+Pricing
+Images
+Demo Reference
+Access Reference
+
+Engine tetap berada di Gustafta.
+
+Dengan demikian:
+
+Gustafta = Engine
+Gustafta = Master Product
+GAIA = Commerce
+
+==================================================
+FUTURE ARCHITECTURE
+==================================================
+
+Bangun V1 terlebih dahulu.
+
+V1:
+Export Bundle → Import GAIA
+
+Arsitektur harus memungkinkan:
+
+V2:
+Publish via API
+
+V3:
+Automatic Sync
+
+Tetapi JANGAN implementasikan V2/V3 sekarang.
+
+==================================================
+ADMIN UI
+==================================================
+
+Tambahkan:
+
+Products
+  ├── All Products
+  ├── AI Specialists
+  ├── Mini Apps
+  ├── Document Tools
+  ├── Knowledge
+  ├── Business Kits
+  └── GAIA Publishing
+
+Product detail:
+
+[Edit]
+[Preview]
+[Create Version]
+[Publish to GAIA]
+
+GAIA Publishing:
+
+Product
+Version
+Status
+Last Published
+Publish History
+
+==================================================
+IMPORTANT
+==================================================
+
+GAIA TIDAK BOLEH menjadi tempat utama untuk:
+
+Create Product
+Edit Product Core Data
+Change Product ID
+Change Product Version
+Archive Product
+Change Engine Configuration
+
+Semua itu dilakukan di Gustafta.
+
+GAIA hanya menerima published version.
+
+==================================================
+TESTING
+==================================================
+
+Setelah implementasi test:
+
+1. Create product
+2. Edit product
+3. Validate product
+4. Export bundle
+5. Import bundle compatibility
+6. Duplicate product prevention
+7. Version update
+8. Archive
+9. Invalid product
+10. Security field filtering
+
+Gunakan minimal satu produk nyata sebagai test.
+
+Jangan mengubah produk existing secara destructive.
+
+==================================================
+OUTPUT
+==================================================
+
+Setelah selesai jelaskan:
+
+1. Existing architecture yang ditemukan
+2. Product Registry yang digunakan
+3. Database changes
+4. Files created/modified
+5. GAIA payload schema
+6. Bundle structure
+7. Export workflow
+8. Versioning workflow
+9. Security implementation
+10. Testing result
+11. Cara melakukan Publish to GAIA
+
+Implementasikan secara production-minded dan pertahankan sistem Gustafta yang sudah ada.

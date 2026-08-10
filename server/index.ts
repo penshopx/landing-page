@@ -561,6 +561,59 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] store_products.price_override DDL error:`, e);
   }
 
+  // ── Product Registry + GAIA Publishing tables (idempotent DDL) ────────────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS product_registry (
+        id serial PRIMARY KEY,
+        product_id varchar(40) NOT NULL UNIQUE,
+        name text NOT NULL,
+        slug text NOT NULL UNIQUE,
+        product_type text NOT NULL,
+        category text NOT NULL,
+        subcategory text,
+        short_description text,
+        long_description text,
+        target_users text,
+        features jsonb DEFAULT '[]'::jsonb,
+        benefits jsonb DEFAULT '[]'::jsonb,
+        thumbnail text,
+        gallery jsonb DEFAULT '[]'::jsonb,
+        demo_url text,
+        product_url text,
+        price integer NOT NULL DEFAULT 0,
+        currency text NOT NULL DEFAULT 'IDR',
+        billing_type text NOT NULL DEFAULT 'ONE_TIME',
+        status text NOT NULL DEFAULT 'DRAFT',
+        version text NOT NULL DEFAULT '1.0.0',
+        engine_type text,
+        access_type text,
+        access_url text,
+        gaia_enabled boolean NOT NULL DEFAULT false,
+        gaia_featured boolean NOT NULL DEFAULT false,
+        gaia_status text NOT NULL DEFAULT 'NOT_READY',
+        last_published_at timestamp,
+        last_published_version text,
+        created_at timestamp NOT NULL DEFAULT now(),
+        updated_at timestamp NOT NULL DEFAULT now()
+      )`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS gaia_export_history (
+        id serial PRIMARY KEY,
+        product_id varchar(40) NOT NULL,
+        product_version text NOT NULL,
+        bundle_version text NOT NULL,
+        export_status text NOT NULL,
+        checksum text,
+        detail jsonb,
+        exported_at timestamp NOT NULL DEFAULT now()
+      )`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_gaia_export_product ON gaia_export_history (product_id, exported_at)`);
+    console.log(`${new Date().toLocaleTimeString()} [express] product_registry + gaia_export_history ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] product_registry DDL error:`, e);
+  }
+
   // ── store_products.download_path column (idempotent DDL) ──────────────────
   try {
     await pool.query(`ALTER TABLE store_products ADD COLUMN IF NOT EXISTS download_path text`);

@@ -1154,6 +1154,14 @@ export default function AdminPage() {
               </Button>
             </Link>
             {isSuperAdmin && (
+              <Link href="/admin/registry">
+                <Button variant="outline" size="sm" className="gap-1.5 text-xs hidden sm:flex border-cyan-500/40 text-cyan-600 hover:bg-cyan-500/10" data-testid="button-product-registry">
+                  <FileText className="h-3.5 w-3.5" />
+                  Product Registry
+                </Button>
+              </Link>
+            )}
+            {isSuperAdmin && (
               <Link href="/admin/product-bible">
                 <Button variant="outline" size="sm" className="gap-1.5 text-xs hidden sm:flex border-purple-500/40 text-purple-600 dark:text-purple-400 hover:bg-purple-500/10" data-testid="button-product-bible">
                   <BookOpen className="h-3.5 w-3.5" />
