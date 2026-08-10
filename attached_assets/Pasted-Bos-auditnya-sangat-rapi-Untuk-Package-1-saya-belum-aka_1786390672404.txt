@@ -1,0 +1,55 @@
+Bos, auditnya **sangat rapi**. Untuk Package #1 saya belum akan approve harga secara otomatis, karena memang **belum ada harga existing**. Ini keputusan bisnis baru.
+
+### Keputusan saya untuk Package #1
+
+Saya pilih **Rp1.999.000 untuk 6 bulan**.
+
+Alasannya cukup kuat:
+
+* Nilai eceran komponen yang sudah punya harga sekitar **Rp1,968 juta**:
+
+  * Klinik: 4 × Rp150.000 = Rp600.000
+  * Bedah Dokumen: 6 × Rp149.000 = Rp894.000
+  * Ruang Simpan: 6 × Rp79.000 = Rp474.000
+* Total = **Rp1.968.000**
+* Itu **belum memasukkan Jasa Dokumen, Toolkit, dan Ruang Kelola**.
+* Jadi Rp1.999.000 memberikan positioning paket yang masuk akal tanpa membuat paket terlihat terlalu murah dibanding nilai komponennya.
+* Dan yang penting, kita tidak perlu berpura-pura memberikan diskon besar yang tidak punya dasar.
+
+### Usage limit — saya setujui
+
+| Produk                | Access  |               Usage limit |
+| --------------------- | ------- | ------------------------: |
+| **Klinik Konsultasi** | FULL    |      **4 sesi / 6 bulan** |
+| **Bedah Dokumen**     | FULL    |   **6 dokumen / 6 bulan** |
+| **Jasa Dokumen**      | LIMITED | **1 pekerjaan / 6 bulan** |
+| **Toolkit**           | FULL    |             **Unlimited** |
+| **Ruang Kelola**      | FULL    |             **Unlimited** |
+| **Ruang Simpan**      | LIMITED |        **5 GB / 6 bulan** |
+
+Untuk Ruang Simpan, saya lebih suka menulis **5 GB** daripada “setara plan Profesional”, supaya snapshot package punya batas yang eksplisit dan tidak bergantung pada perubahan plan Ruang Simpan di masa depan.
+
+### Package #1 — APPROVED
+
+**Gustafta SBU — Konstruksi Professional 6 Bulan**
+
+* **Price:** Rp1.999.000
+* **Billing:** ONE_TIME / durasi 6 bulan
+* **Solution:** SBU
+* **Sector:** Konstruksi
+* **Tier:** Professional
+* **Status saat dibuat:** DRAFT
+* **GAIA:** nantinya ON setelah validasi
+* **Komposisi:** 6 produk seperti audit di atas
+
+**Jangan PATCH 10 product registry.** Semua produk tetap terkunci.
+
+### Urutan eksekusi
+
+Saya setujui pola yang Anda usulkan:
+
+**CREATE DRAFT → READ-BACK → verifikasi 6 anggota + harga + durasi → cross-check 10 product registry → LOCK Package #1.**
+
+**Jangan publish ke GAIA dulu.** Kita selesaikan keenam package terlebih dahulu.
+
+Setelah Package #1 berhasil di-create dan read-back, **langsung kirim hasilnya**, lalu kita lanjut ke **Package #2 — SKK Basic 3 Bulan**.
