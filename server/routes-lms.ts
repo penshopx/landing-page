@@ -1052,6 +1052,36 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
     }
   });
 
+  // DELETE /api/admin/lms/courses/:courseId/enrollments/:userId — reset a
+  // student's enrollment. MUST also clear lms_lesson_progress rows for the
+  // same (user, course); otherwise a re-enroll would recalculate completion
+  // from stale progress rows and instantly jump back to 100%.
+  app.delete("/api/admin/lms/courses/:courseId/enrollments/:userId", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const userId = String(req.params.userId || "");
+      if (!Number.isFinite(courseId) || !userId) {
+        return res.status(400).json({ error: "courseId dan userId wajib diisi" });
+      }
+      const result = await db.transaction(async (tx) => {
+        const progressDeleted = await tx.delete(lmsLessonProgress)
+          .where(and(eq(lmsLessonProgress.userId, userId), eq(lmsLessonProgress.courseId, courseId)))
+          .returning({ id: lmsLessonProgress.id });
+        const enrollmentDeleted = await tx.delete(lmsEnrollments)
+          .where(and(eq(lmsEnrollments.userId, userId), eq(lmsEnrollments.courseId, courseId)))
+          .returning({ id: lmsEnrollments.id });
+        return { progressDeleted: progressDeleted.length, enrollmentDeleted: enrollmentDeleted.length };
+      });
+      if (result.enrollmentDeleted === 0 && result.progressDeleted === 0) {
+        return res.status(404).json({ error: "Enrollment tidak ditemukan" });
+      }
+      res.json({ success: true, ...result });
+    } catch (e) {
+      console.error("[LMS-ADMIN] DELETE enrollment:", e);
+      res.status(500).json({ error: "Gagal mereset enrollment" });
+    }
+  });
+
   // DELETE /api/admin/lms/courses/:id — delete a course (and its lessons)
   // If students are enrolled, returns 409 unless ?force=true is passed.
   // Prefer deactivating (PATCH isActive=false) when enrollments exist.
