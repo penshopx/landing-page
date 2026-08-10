@@ -147,7 +147,7 @@ export default function AdminAiHealthPage() {
     refetchIntervalInBackground: false,
   });
 
-  const [testEmailResult, setTestEmailResult] = useState<{ sent: boolean; to?: string; reason?: string; detail?: string; error?: string } | null>(null);
+  const [testEmailResult, setTestEmailResult] = useState<{ sent: boolean; to?: string; sentAt?: string; reason?: string; detail?: string; error?: string } | null>(null);
 
   const testEmailMutation = useMutation({
     mutationFn: async () => {
@@ -268,7 +268,14 @@ export default function AdminAiHealthPage() {
                 : <XCircle className="h-4 w-4 mt-0.5 shrink-0" />}
               <span>
                 {testEmailResult.sent
-                  ? <>Email uji berhasil dikirim ke <b>{testEmailResult.to}</b>. Cek kotak masuk kamu.</>
+                  ? <>
+                      Email uji berhasil dikirim ke <b>{testEmailResult.to}</b>. Cek kotak masuk kamu.
+                      {testEmailResult.sentAt && (
+                        <span className="block text-xs mt-0.5 opacity-80" data-testid="text-test-email-sent-at">
+                          Dikirim pada: {new Date(testEmailResult.sentAt).toLocaleString("id-ID", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Jakarta" })} WIB
+                        </span>
+                      )}
+                    </>
                   : <>Gagal mengirim email uji: {testEmailResult.detail || testEmailResult.error || testEmailResult.reason || "Kesalahan tidak diketahui."}</>}
               </span>
             </div>

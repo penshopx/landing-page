@@ -18959,7 +18959,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
             set: { value: sqlExpr`excluded.value` },
           })
           .catch((e: any) => console.error("[email-test] failed to persist last-sent:", e));
-        return res.json({ sent: true, to: adminEmail });
+        return res.json({ sent: true, to: adminEmail, sentAt: now });
       } else {
         return res.status(502).json({ sent: false, reason: result.reason, detail: result.detail || null, to: adminEmail });
       }
