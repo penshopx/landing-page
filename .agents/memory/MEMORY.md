@@ -71,4 +71,5 @@
 - [AI Specialist Platform positioning](ai-specialist-platform.md) — Gustafta = AI Specialist Platform (bukan chatbot/SaaS); Standard=Coach, Premium=Claw; 5-level hierarchy; paket profesi Kontraktor/Konsultan/Biro Jasa; 3-fase roadmap; 7 revenue streams.
 - [Terminologi customer-facing](terminologi-customer-facing.md) — "chatbot" dilarang di halaman pelanggan; ganti "Asisten AI" (default) atau "AI Specialist" (produk Store/Claw); kode internal boleh tetap chatbot/getChatbot.
 - [Payment domain & PAYMENT_BASE_URL](payment-domain-migration.md) — storefront = bayar.dokumenproyek.com; domain env-driven (PAYMENT_BASE_URL/VITE_), jangan hardcode; DB prod payment_url perlu update terpisah.
+- [Solution Package Engine](solution-package-engine.md) — komersial = SOLUTION×SECTOR×TIER×DURATION; package_products = access matrix; versi live IMMUTABLE via package_version_snapshots (snapshot dalam tx yang sama dengan perubahan).
 - [Landing page segmen](segment-landing-pages.md) — 4 halaman solusi per segmen: /kontraktor /biro-jasa /konsultan-iso /skk (portal ekosistem interaktif); nav header punya baris "Solusi untuk:" di shared-header navSolusi.

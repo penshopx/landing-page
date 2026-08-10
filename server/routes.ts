@@ -84,6 +84,7 @@ import { registerLegalRoutes } from "./routes-legal";
 import { registerLmsRoutes } from "./routes-lms";
 import { registerDataMasterRoutes, buildDataMasterContext } from "./routes-data-master";
 import { registerGaiaRegistryRoutes } from "./gaia-registry";
+import { registerPackageEngineRoutes } from "./package-engine";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 
 const _require = createRequire(import.meta.url);
@@ -22464,6 +22465,8 @@ Min 300 kata. Bahasa Indonesia profesional. Sitasi regulasi spesifik domain ini.
   registerDataMasterRoutes(app);
   // Product Registry + GAIA Publishing (Gustafta = MASTER, GAIA = commerce view)
   registerGaiaRegistryRoutes(app, { isAuthenticated, getDbRole });
+  // Phase 1: Solution Package Engine (SOLUTION × SECTOR × TIER × DURATION)
+  registerPackageEngineRoutes(app, { isAuthenticated, getDbRole });
 
   // ── Admin Agent System Endpoints ──────────────────────────────────────────
 

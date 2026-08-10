@@ -2810,9 +2810,113 @@ export const productRegistry = pgTable("product_registry", {
   gaiaStatus:       text("gaia_status").notNull().default("NOT_READY"), // NOT_READY | READY | PUBLISHED | UPDATE_AVAILABLE
   lastPublishedAt:  timestamp("last_published_at"),
   lastPublishedVersion: text("last_published_version"),
+  // ── Phase 1: Solution Package Engine (additive) ──
+  visibility:       text("visibility").notNull().default("INTERNAL_ONLY"), // INCLUDED_ONLY | STANDALONE_ONLY | INCLUDED_AND_STANDALONE | INTERNAL_ONLY | DP_ONLY
+  standaloneEnabled: boolean("standalone_enabled").notNull().default(false),
+  subscriptionEnabled: boolean("subscription_enabled").notNull().default(false),
+  dpEnabled:        boolean("dp_enabled").notNull().default(false),
+  aiEnabled:        boolean("ai_enabled").notNull().default(false),
+  usageProfile:     jsonb("usage_profile").$type<string[]>().default([]), // AI_CHAT | DOCUMENT_ANALYSIS | DOCUMENT_GENERATION | KNOWLEDGE_PROCESSING | AGENT_EXECUTION | STORAGE
+  storageProfile:   text("storage_profile"),
   createdAt:        timestamp("created_at").defaultNow().notNull(),
   updatedAt:        timestamp("updated_at").defaultNow().notNull(),
 });
+
+// ── Solution / Sector / Tier / Package Registries (Phase 1) ────────────────
+export const solutionRegistry = pgTable("solution_registry", {
+  id:          serial("id").primaryKey(),
+  name:        text("name").notNull(),
+  slug:        text("slug").notNull().unique(),
+  description: text("description"),
+  status:      text("status").notNull().default("ACTIVE"), // ACTIVE | INACTIVE | ARCHIVED
+  createdAt:   timestamp("created_at").defaultNow().notNull(),
+  updatedAt:   timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const sectorRegistry = pgTable("sector_registry", {
+  id:          serial("id").primaryKey(),
+  name:        text("name").notNull(),
+  slug:        text("slug").notNull().unique(),
+  description: text("description"),
+  status:      text("status").notNull().default("ACTIVE"),
+  createdAt:   timestamp("created_at").defaultNow().notNull(),
+  updatedAt:   timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const tierRegistry = pgTable("tier_registry", {
+  id:          serial("id").primaryKey(),
+  name:        text("name").notNull(),
+  slug:        text("slug").notNull().unique(),
+  description: text("description"),
+  level:       integer("level").notNull().default(1),
+  status:      text("status").notNull().default("ACTIVE"),
+  createdAt:   timestamp("created_at").defaultNow().notNull(),
+  updatedAt:   timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Package = SOLUTION × SECTOR × TIER × DURATION (tidak ada generic unlimited)
+export const packageRegistry = pgTable("package_registry", {
+  id:             serial("id").primaryKey(),
+  packageId:      varchar("package_id", { length: 60 }).notNull().unique(), // mis. SBU-KONSTRUKSI-PRO, PERMANEN
+  solutionId:     integer("solution_id").notNull().references(() => solutionRegistry.id),
+  sectorId:       integer("sector_id").notNull().references(() => sectorRegistry.id),
+  tierId:         integer("tier_id").notNull().references(() => tierRegistry.id),
+  name:           text("name").notNull(),
+  slug:           text("slug").notNull().unique(),
+  description:    text("description"),
+  status:         text("status").notNull().default("DRAFT"), // DRAFT | ACTIVE | PAUSED | ARCHIVED
+  durationValue:  integer("duration_value").notNull().default(6),
+  durationUnit:   text("duration_unit").notNull().default("MONTH"), // MONTH | YEAR
+  price:          integer("price").notNull().default(0),
+  currency:       text("currency").notNull().default("IDR"),
+  version:        integer("version").notNull().default(1),
+  effectiveFrom:  timestamp("effective_from"),
+  effectiveUntil: timestamp("effective_until"),
+  gaiaEnabled:    boolean("gaia_enabled").notNull().default(false),
+  createdAt:      timestamp("created_at").defaultNow().notNull(),
+  updatedAt:      timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Komposisi package (many-to-many) — Access Matrix source of truth.
+export const packageProducts = pgTable("package_products", {
+  id:          serial("id").primaryKey(),
+  packageId:   integer("package_id").notNull().references(() => packageRegistry.id, { onDelete: "cascade" }),
+  productId:   integer("product_id").notNull().references(() => productRegistry.id),
+  accessLevel: text("access_level").notNull().default("FULL"), // FULL | LIMITED | VIEW_ONLY
+  usageLimit:  integer("usage_limit"),
+  isRequired:  boolean("is_required").notNull().default(true),
+  sortOrder:   integer("sort_order").notNull().default(0),
+}, (table) => [
+  uniqueIndex("uq_package_product").on(table.packageId, table.productId),
+  index("idx_package_products_pkg").on(table.packageId),
+]);
+
+// Snapshot immutable per (package, version) — dibuat saat publish & setiap bump versi.
+// Order/subscription masa depan resolve harga/durasi/komposisi historis dari sini,
+// BUKAN dari row package_registry yang mutable.
+export const packageVersionSnapshots = pgTable("package_version_snapshots", {
+  id:            serial("id").primaryKey(),
+  packageDbId:   integer("package_db_id").notNull().references(() => packageRegistry.id, { onDelete: "cascade" }),
+  packageId:     varchar("package_id", { length: 60 }).notNull(),
+  version:       integer("version").notNull(),
+  name:          text("name").notNull(),
+  price:         integer("price").notNull(),
+  currency:      text("currency").notNull(),
+  durationValue: integer("duration_value").notNull(),
+  durationUnit:  text("duration_unit").notNull(),
+  composition:   jsonb("composition").$type<Array<{ productId: number; productRegistryId: string; productName: string; accessLevel: string; usageLimit: number | null; isRequired: boolean; sortOrder: number }>>().notNull(),
+  createdAt:     timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("uq_pkg_version_snapshot").on(table.packageDbId, table.version),
+]);
+
+export type PackageVersionSnapshotRow = typeof packageVersionSnapshots.$inferSelect;
+
+export type SolutionRegistryRow = typeof solutionRegistry.$inferSelect;
+export type SectorRegistryRow = typeof sectorRegistry.$inferSelect;
+export type TierRegistryRow = typeof tierRegistry.$inferSelect;
+export type PackageRegistryRow = typeof packageRegistry.$inferSelect;
+export type PackageProductRow = typeof packageProducts.$inferSelect;
 
 export const gaiaExportHistory = pgTable("gaia_export_history", {
   id:             serial("id").primaryKey(),

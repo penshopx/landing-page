@@ -614,6 +614,123 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] product_registry DDL error:`, e);
   }
 
+  // ── Phase 1: Solution Package Engine — additive DDL + seed default ────────
+  try {
+    // Kolom baru product_registry (additive, aman untuk data existing)
+    await pool.query(`
+      ALTER TABLE product_registry
+        ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'INTERNAL_ONLY',
+        ADD COLUMN IF NOT EXISTS standalone_enabled boolean NOT NULL DEFAULT false,
+        ADD COLUMN IF NOT EXISTS subscription_enabled boolean NOT NULL DEFAULT false,
+        ADD COLUMN IF NOT EXISTS dp_enabled boolean NOT NULL DEFAULT false,
+        ADD COLUMN IF NOT EXISTS ai_enabled boolean NOT NULL DEFAULT false,
+        ADD COLUMN IF NOT EXISTS usage_profile jsonb DEFAULT '[]'::jsonb,
+        ADD COLUMN IF NOT EXISTS storage_profile text`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS solution_registry (
+        id serial PRIMARY KEY, name text NOT NULL, slug text NOT NULL UNIQUE,
+        description text, status text NOT NULL DEFAULT 'ACTIVE',
+        created_at timestamp NOT NULL DEFAULT now(), updated_at timestamp NOT NULL DEFAULT now())`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS sector_registry (
+        id serial PRIMARY KEY, name text NOT NULL, slug text NOT NULL UNIQUE,
+        description text, status text NOT NULL DEFAULT 'ACTIVE',
+        created_at timestamp NOT NULL DEFAULT now(), updated_at timestamp NOT NULL DEFAULT now())`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS tier_registry (
+        id serial PRIMARY KEY, name text NOT NULL, slug text NOT NULL UNIQUE,
+        description text, level integer NOT NULL DEFAULT 1, status text NOT NULL DEFAULT 'ACTIVE',
+        created_at timestamp NOT NULL DEFAULT now(), updated_at timestamp NOT NULL DEFAULT now())`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS package_registry (
+        id serial PRIMARY KEY,
+        package_id varchar(60) NOT NULL UNIQUE,
+        solution_id integer NOT NULL REFERENCES solution_registry(id),
+        sector_id integer NOT NULL REFERENCES sector_registry(id),
+        tier_id integer NOT NULL REFERENCES tier_registry(id),
+        name text NOT NULL, slug text NOT NULL UNIQUE, description text,
+        status text NOT NULL DEFAULT 'DRAFT',
+        duration_value integer NOT NULL DEFAULT 6,
+        duration_unit text NOT NULL DEFAULT 'MONTH',
+        price integer NOT NULL DEFAULT 0, currency text NOT NULL DEFAULT 'IDR',
+        version integer NOT NULL DEFAULT 1,
+        effective_from timestamp, effective_until timestamp,
+        gaia_enabled boolean NOT NULL DEFAULT false,
+        created_at timestamp NOT NULL DEFAULT now(), updated_at timestamp NOT NULL DEFAULT now())`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS package_products (
+        id serial PRIMARY KEY,
+        package_id integer NOT NULL REFERENCES package_registry(id) ON DELETE CASCADE,
+        product_id integer NOT NULL REFERENCES product_registry(id),
+        access_level text NOT NULL DEFAULT 'FULL',
+        usage_limit integer, is_required boolean NOT NULL DEFAULT true,
+        sort_order integer NOT NULL DEFAULT 0)`);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS uq_package_product ON package_products (package_id, product_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_package_products_pkg ON package_products (package_id)`);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS package_version_snapshots (
+        id serial PRIMARY KEY,
+        package_db_id integer NOT NULL REFERENCES package_registry(id) ON DELETE CASCADE,
+        package_id varchar(60) NOT NULL,
+        version integer NOT NULL,
+        name text NOT NULL,
+        price integer NOT NULL,
+        currency text NOT NULL,
+        duration_value integer NOT NULL,
+        duration_unit text NOT NULL,
+        composition jsonb NOT NULL,
+        created_at timestamp NOT NULL DEFAULT now())`);
+    await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS uq_pkg_version_snapshot ON package_version_snapshots (package_db_id, version)`);
+
+    // Seed default (idempotent, ON CONFLICT DO NOTHING) — admin bisa menambah lagi
+    await pool.query(`
+      INSERT INTO tier_registry (name, slug, level) VALUES
+        ('Basic','basic',1), ('Professional','professional',2), ('Business','business',3)
+      ON CONFLICT (slug) DO NOTHING`);
+    await pool.query(`
+      INSERT INTO solution_registry (name, slug) VALUES
+        ('Legalitas','legalitas'), ('OSS','oss'), ('SBU','sbu'), ('SKK','skk'),
+        ('Tender','tender'), ('Proyek','proyek'), ('Compliance','compliance'),
+        ('Kompetensi','kompetensi'), ('Finance','finance')
+      ON CONFLICT (slug) DO NOTHING`);
+    await pool.query(`
+      INSERT INTO sector_registry (name, slug) VALUES
+        ('Konstruksi','konstruksi'), ('Konsultan','konsultan'), ('Perdagangan','perdagangan'),
+        ('Manufaktur','manufaktur'), ('Teknologi','teknologi'), ('Jasa','jasa'), ('Lainnya','lainnya')
+      ON CONFLICT (slug) DO NOTHING`);
+
+    // Petakan capability existing Gustafta ke Product Registry (idempotent by slug).
+    // Status ACTIVE, visibility INCLUDED_ONLY — TIDAK otomatis jadi produk standalone.
+    const caps: Array<[string, string, string, string, string[]]> = [
+      // [product_id, name, slug, product_type, usage_profile]
+      ["GST-CAP-001", "Peta Jalan Mulai", "peta-jalan-mulai", "MODULE", ["AI_CHAT"]],
+      ["GST-CAP-002", "Klinik Konsultasi", "klinik-konsultasi", "DIGITAL_CONSULTATION", ["AI_CHAT"]],
+      ["GST-CAP-003", "Bedah Dokumen", "bedah-dokumen", "DOCUMENT_AI", ["DOCUMENT_ANALYSIS"]],
+      ["GST-CAP-004", "Brain Project", "brain-project", "AI_WORKSPACE", ["AI_CHAT","KNOWLEDGE_PROCESSING"]],
+      ["GST-CAP-005", "Ekosistem Kompetensi", "ekosistem-kompetensi", "MODULE", ["AI_CHAT"]],
+      ["GST-CAP-006", "Toolkit", "toolkit", "DIGITAL_TOOL", ["DOCUMENT_GENERATION"]],
+      ["GST-CAP-007", "Mitra", "mitra", "MODULE", []],
+      ["GST-CAP-008", "Ruang Kelola", "ruang-kelola", "DIGITAL_WORKSPACE", ["STORAGE"]],
+      ["GST-CAP-009", "Ruang Simpan", "ruang-simpan", "DIGITAL_WORKSPACE", ["STORAGE"]],
+      ["GST-CAP-010", "Jasa Dokumen", "jasa-dokumen", "OTHER_DIGITAL_PRODUCT", []],
+      ["GST-CAP-011", "Jasa Keuangan", "jasa-keuangan", "OTHER_DIGITAL_PRODUCT", []],
+      ["GST-CAP-012", "Bimtek SKK", "bimtek-skk", "E_COURSE", []],
+      ["GST-CAP-013", "Executive Summary", "executive-summary", "GENERATOR", ["DOCUMENT_GENERATION"]],
+      ["GST-CAP-014", "Produk AI / AI Specialist", "ai-specialist", "AI_SPECIALIST", ["AI_CHAT","AGENT_EXECUTION"]],
+    ];
+    for (const [pid, name, slug, ptype, usage] of caps) {
+      await pool.query(
+        `INSERT INTO product_registry (product_id, name, slug, product_type, category, status, visibility, subscription_enabled, ai_enabled, usage_profile, billing_type)
+         VALUES ($1,$2,$3,$4,'CAPABILITY','ACTIVE','INCLUDED_ONLY',true,$5,$6,'FREE')
+         ON CONFLICT (slug) DO NOTHING`,
+        [pid, name, slug, ptype, ["AI_CHAT","AGENT_EXECUTION","DOCUMENT_ANALYSIS","DOCUMENT_GENERATION","KNOWLEDGE_PROCESSING"].some(u => usage.includes(u)), JSON.stringify(usage)]
+      );
+    }
+    console.log(`${new Date().toLocaleTimeString()} [express] solution/sector/tier/package registries ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] package engine DDL error:`, e);
+  }
+
   // ── store_products.download_path column (idempotent DDL) ──────────────────
   try {
     await pool.query(`ALTER TABLE store_products ADD COLUMN IF NOT EXISTS download_path text`);

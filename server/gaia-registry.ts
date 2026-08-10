@@ -21,15 +21,21 @@ import { productRegistry, gaiaExportHistory, type ProductRegistryRow } from "@sh
 
 // ── Konstanta domain ─────────────────────────────────────────────────────────
 export const PRODUCT_TYPES = [
-  "AI_SPECIALIST",
-  "MINI_APP",
-  "DOCUMENT_TOOL",
-  "KNOWLEDGE",
-  "BUSINESS_KIT",
-  "PRODUCTIVITY_TOOL",
+  // Set awal (GAIA Publishing V1)
+  "AI_SPECIALIST", "MINI_APP", "DOCUMENT_TOOL", "KNOWLEDGE", "BUSINESS_KIT", "PRODUCTIVITY_TOOL",
+  // Phase 1: Solution Package Engine — tipe diperluas
+  "AI_WORKSPACE", "DIGITAL_WORKSPACE", "DOCUMENT_AI", "DIGITAL_TOOL", "GENERATOR",
+  "ASSESSMENT", "KNOWLEDGE_PRODUCT", "EBOOK", "MODULE", "TEMPLATE", "CHECKLIST",
+  "E_COURSE", "DIGITAL_CONSULTATION", "OTHER_DIGITAL_PRODUCT",
 ] as const;
 
-export const PRODUCT_STATUSES = ["DRAFT", "ACTIVE", "ARCHIVED", "DEPRECATED"] as const;
+export const PRODUCT_STATUSES = ["DRAFT", "ACTIVE", "PAUSED", "ARCHIVED", "DEPRECATED"] as const;
+export const PRODUCT_VISIBILITIES = [
+  "INCLUDED_ONLY", "STANDALONE_ONLY", "INCLUDED_AND_STANDALONE", "INTERNAL_ONLY", "DP_ONLY",
+] as const;
+export const USAGE_PROFILE_KEYS = [
+  "AI_CHAT", "DOCUMENT_ANALYSIS", "DOCUMENT_GENERATION", "KNOWLEDGE_PROCESSING", "AGENT_EXECUTION", "STORAGE",
+] as const;
 export const GAIA_STATUSES = ["NOT_READY", "READY", "PUBLISHED", "UPDATE_AVAILABLE"] as const;
 export const BILLING_TYPES = ["FREE", "ONE_TIME", "MONTHLY", "LICENSE_PLUS_MONTHLY"] as const;
 
@@ -45,6 +51,9 @@ const EDITABLE_FIELDS = [
   "price", "currency", "billingType",
   "status", "engineType", "accessType", "accessUrl",
   "gaiaEnabled", "gaiaFeatured",
+  // Phase 1: Solution Package Engine
+  "visibility", "standaloneEnabled", "subscriptionEnabled", "dpEnabled", "aiEnabled",
+  "usageProfile", "storageProfile",
 ] as const;
 
 // ── Product ID generator: GST-<PREFIX>-NNN, permanen ────────────────────────
@@ -167,8 +176,15 @@ function sanitizePatch(body: any): Partial<ProductRegistryRow> {
   if (out.status && !(PRODUCT_STATUSES as readonly string[]).includes(out.status)) delete out.status;
   if (out.billingType && !(BILLING_TYPES as readonly string[]).includes(out.billingType)) delete out.billingType;
   if (out.price !== undefined) out.price = Math.max(0, parseInt(out.price, 10) || 0);
-  for (const k of ["features", "benefits", "gallery"]) {
+  for (const k of ["features", "benefits", "gallery", "usageProfile"]) {
     if (out[k] !== undefined && !Array.isArray(out[k])) delete out[k];
+  }
+  if (out.visibility && !(PRODUCT_VISIBILITIES as readonly string[]).includes(out.visibility)) delete out.visibility;
+  if (Array.isArray(out.usageProfile)) {
+    out.usageProfile = out.usageProfile.filter((u: string) => (USAGE_PROFILE_KEYS as readonly string[]).includes(u));
+  }
+  for (const k of ["standaloneEnabled", "subscriptionEnabled", "dpEnabled", "aiEnabled", "gaiaEnabled", "gaiaFeatured"]) {
+    if (out[k] !== undefined) out[k] = Boolean(out[k]);
   }
   return out;
 }
