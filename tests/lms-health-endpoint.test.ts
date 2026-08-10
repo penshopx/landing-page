@@ -381,6 +381,88 @@ test("health: pendingCertificates increments when cert row is deleted", { skip: 
   );
 });
 
+// ── Cert-repair round-trip: pendingCertificates back to 0 ────────────────────
+
+/**
+ * End-to-end: a completed enrollment with NO certificate row makes
+ * pendingCertificates > 0; POST /api/admin/lms/cert-repair backfills the
+ * missing certificate(s); health must then report pendingCertificates === 0
+ * and totalCertificates incremented accordingly.
+ */
+test("cert-repair: clears pendingCertificates back to zero and increments totalCertificates", { skip: SKIP }, async () => {
+  // 1. Create a completed enrollment WITHOUT a certificate row.
+  const courseId  = await seedCourse();
+  await seedLesson(courseId);
+  const studentId = `cert-repair-student-${RUN}`;
+  await queryDb(
+    `INSERT INTO lms_enrollments (user_id, course_id, progress, completed_at)
+     VALUES ($1, $2, 100, NOW())`,
+    [studentId, courseId]
+  );
+
+  // 2. Health must now show at least one pending certificate.
+  const res0 = await getHealth(TEST_ADMIN_ID);
+  assert.equal(res0.status, 200);
+  const { counts: before } = await res0.json() as any;
+  assert.ok(
+    before.pendingCertificates > 0,
+    `pendingCertificates must be > 0 after creating a cert-less completion, got ${before.pendingCertificates}`
+  );
+  const expectedBackfill = before.pendingCertificates;
+
+  // 3. Auth gates on the repair endpoint itself.
+  const resNoAuth = await fetch(`${baseUrl}/api/admin/lms/cert-repair`, { method: "POST" });
+  assert.equal(resNoAuth.status, 401, `cert-repair without auth expected 401, got ${resNoAuth.status}`);
+  const resNonAdmin = await fetch(`${baseUrl}/api/admin/lms/cert-repair`, {
+    method: "POST",
+    headers: { "x-test-user": TEST_NON_ADMIN_ID },
+  });
+  assert.equal(resNonAdmin.status, 403, `cert-repair as non-admin expected 403, got ${resNonAdmin.status}`);
+
+  // 4. Run the repair as admin.
+  const repairRes = await fetch(`${baseUrl}/api/admin/lms/cert-repair`, {
+    method: "POST",
+    headers: { "x-test-user": TEST_ADMIN_ID },
+  });
+  assert.equal(repairRes.status, 200, `cert-repair expected 200, got ${repairRes.status}`);
+  const repairBody = await repairRes.json() as any;
+  assert.equal(repairBody.ok, true, `cert-repair body must have ok:true, got ${JSON.stringify(repairBody)}`);
+  assert.equal(
+    repairBody.total, expectedBackfill,
+    `cert-repair must target every pending completion (expected ${expectedBackfill}, got ${repairBody.total})`
+  );
+  assert.equal(
+    repairBody.backfilled, expectedBackfill,
+    `cert-repair must backfill every gap (expected ${expectedBackfill}, got ${repairBody.backfilled})`
+  );
+  assert.equal(repairBody.stillPending, 0, `stillPending must be 0, got ${repairBody.stillPending}`);
+
+  // 5. Health must now report pendingCertificates === 0 and the cert total up
+  //    by exactly the number of backfilled gaps.
+  const res1 = await getHealth(TEST_ADMIN_ID);
+  assert.equal(res1.status, 200);
+  const { counts: after } = await res1.json() as any;
+  assert.equal(
+    after.pendingCertificates, 0,
+    `pendingCertificates must be 0 after cert-repair, got ${after.pendingCertificates}`
+  );
+  assert.equal(
+    after.totalCertificates, before.totalCertificates + expectedBackfill,
+    `totalCertificates must increase by ${expectedBackfill} (expected ${before.totalCertificates + expectedBackfill}, got ${after.totalCertificates})`
+  );
+
+  // 6. Verify the certificate row actually exists in the DB for our fixture.
+  const certRows = await queryDb(
+    `SELECT certificate_code FROM lms_certificates WHERE user_id = $1 AND course_id = $2`,
+    [studentId, courseId]
+  );
+  assert.equal(certRows.length, 1, `Exactly one certificate must exist for the repaired completion, got ${certRows.length}`);
+  assert.match(
+    String(certRows[0].certificate_code), /^GUSTAFTA-\d{4}-[A-Z2-9]{8}$/,
+    `Backfilled certificate_code must follow the GUSTAFTA-YYYY-XXXXXXXX format, got ${certRows[0].certificate_code}`
+  );
+});
+
 // ── Reseed resets seedStatus to "done" ───────────────────────────────────────
 
 /**
