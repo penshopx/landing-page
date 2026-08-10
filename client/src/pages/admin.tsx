@@ -416,6 +416,141 @@ export function AcademyStatCards({
   );
 }
 
+// ---- Modul WA Dialog body (named export so tests can exercise the real logic) ----
+// Renders the content of the "Kirim Link Akses Modul via WA" dialog:
+// - Valid Indonesian E.164 phone → button label "WA Langsung", opens wa.me/<phone>
+// - Malformed phone (e.g. "08abc") → clicking "Buka WA" shows a destructive toast
+//   instead of opening a broken link
+// - No phone → "Buka WA" opens wa.me with text only
+export function ModulWaDialogBody({
+  sub,
+  appUrl,
+  contactDisplay,
+  contactDisplay2,
+}: {
+  sub: ModulSub;
+  appUrl: string;
+  contactDisplay: string;
+  contactDisplay2: string;
+}) {
+  const { toast } = useToast();
+  const isChatbot = sub.productType === "chatbot";
+  const accessLink = isChatbot
+    ? `${appUrl}/bot/${sub.agentId}`
+    : `${appUrl}/modul/${sub.bigIdeaId}?email=${encodeURIComponent(sub.customerEmail)}`;
+  const planMap: Record<string, string> = { trial: "Trial", monthly: "Bulanan", yearly: "Tahunan", lifetime: "Seumur Hidup", scalev: "Scalev" };
+  const msg = isChatbot
+    ? `Halo ${sub.customerName}! 👋
+
+Akses *Chatbot AI ${sub.productName}* Anda sudah *AKTIF* 🎉
+
+Klik link di bawah untuk langsung chat:
+${accessLink}
+
+Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new Date(sub.endDate).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}` : ""}
+
+💡 Simpan link di atas agar mudah dibuka kapan saja!
+
+Butuh bantuan? Hubungi kami:
+📱 WA: ${contactDisplay} / ${contactDisplay2}
+
+Selamat menggunakan! 🚀
+— Tim Gustafta`
+    : `Halo ${sub.customerName}! 👋
+
+Akses Paket Modul *${sub.productName}* Anda sudah *AKTIF* 🎉
+
+Klik link di bawah untuk langsung masuk:
+${accessLink}
+
+Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new Date(sub.endDate).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}` : ""}
+
+💡 Bookmark link di atas agar mudah dibuka kapan saja — bahkan dari HP berbeda sekalipun!
+
+Butuh bantuan? Hubungi kami:
+📱 WA: ${contactDisplay} / ${contactDisplay2}
+
+Selamat menggunakan! 🚀
+— Tim Gustafta`;
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  const rawPhone = sub.customerPhone?.replace(/\D/g, "") ?? "";
+  const phoneNum = rawPhone.startsWith("0") ? "62" + rawPhone.slice(1) : rawPhone;
+  // Strict E.164 validation: must start with 62 and have at least 8 trailing digits
+  const validPhone = /^62\d{8,}$/.test(phoneNum);
+  const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : null;
+  return (
+    <div className="space-y-4">
+      <div className="bg-muted/50 rounded-lg p-3 text-sm">
+        <p className="font-medium">{sub.customerName}</p>
+        <p className="text-xs text-muted-foreground">{sub.customerEmail}</p>
+        {sub.customerPhone && <p className="text-xs text-muted-foreground">{sub.customerPhone}</p>}
+        <p className="text-xs text-muted-foreground">{isChatbot ? "Chatbot" : "Modul"}: {sub.productName}</p>
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Link Akses</p>
+        <div className="flex gap-2">
+          <Input value={accessLink} readOnly className="text-xs font-mono" data-testid="input-modul-access-link" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { navigator.clipboard.writeText(accessLink); toast({ title: "Link disalin!" }); }}
+            data-testid="button-copy-modul-link"
+          >
+            <Copy className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Preview Pesan WA</p>
+        <div className="bg-[#dcf8c6] dark:bg-green-900/30 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap text-foreground leading-relaxed max-h-56 overflow-y-auto border border-green-200 dark:border-green-800">
+          {msg}
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          className="flex-1 text-xs"
+          onClick={() => { navigator.clipboard.writeText(msg); toast({ title: "Pesan disalin!" }); }}
+          data-testid="button-copy-modul-wa-msg"
+        >
+          <Copy className="h-3.5 w-3.5 mr-1.5" /> Salin Teks
+        </Button>
+        <Button
+          className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+          onClick={() => {
+            if (waDirectUrl) {
+              window.open(waDirectUrl, "_blank");
+            } else if (rawPhone) {
+              // Phone present but not a valid Indonesian E.164 number
+              toast({
+                title: "Nomor tidak valid",
+                description: `"${sub.customerPhone}" bukan nomor WA yang valid. Salin teks dan kirim manual.`,
+                variant: "destructive",
+              });
+            } else {
+              // No phone stored — open WA with text only
+              window.open(waUrl, "_blank");
+            }
+          }}
+          data-testid="button-open-modul-wa"
+        >
+          <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> {validPhone ? "WA Langsung" : "Buka WA"}
+        </Button>
+      </div>
+      {validPhone && (
+        <p className="text-xs text-muted-foreground text-center">
+          "WA Langsung" membuka chat ke nomor {sub.customerPhone} dengan pesan sudah terisi.
+        </p>
+      )}
+      {!validPhone && (
+        <p className="text-xs text-muted-foreground text-center">
+          Link berisi email subscriber — mereka langsung masuk tanpa perlu input email ulang.
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ---- WA contact form state (named export so tests can exercise the real logic) ----
 // Pre-fills from the contact cache but never overwrites in-progress admin edits:
 // a dirty flag is set on the first edit, the pre-fill effect skips while dirty,
@@ -3808,124 +3943,14 @@ export default function AdminPage() {
               Kirim Link Akses Modul via WA
             </DialogTitle>
           </DialogHeader>
-          {modulWaDialog.sub && (() => {
-            const sub = modulWaDialog.sub!;
-            const isChatbot = sub.productType === "chatbot";
-            const accessLink = isChatbot
-              ? `${appUrl}/bot/${sub.agentId}`
-              : `${appUrl}/modul/${sub.bigIdeaId}?email=${encodeURIComponent(sub.customerEmail)}`;
-            const planMap: Record<string, string> = { trial: "Trial", monthly: "Bulanan", yearly: "Tahunan", lifetime: "Seumur Hidup", scalev: "Scalev" };
-            const msg = isChatbot
-              ? `Halo ${sub.customerName}! 👋
-
-Akses *Chatbot AI ${sub.productName}* Anda sudah *AKTIF* 🎉
-
-Klik link di bawah untuk langsung chat:
-${accessLink}
-
-Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new Date(sub.endDate).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}` : ""}
-
-💡 Simpan link di atas agar mudah dibuka kapan saja!
-
-Butuh bantuan? Hubungi kami:
-📱 WA: ${contact.display} / ${contact.display2}
-
-Selamat menggunakan! 🚀
-— Tim Gustafta`
-              : `Halo ${sub.customerName}! 👋
-
-Akses Paket Modul *${sub.productName}* Anda sudah *AKTIF* 🎉
-
-Klik link di bawah untuk langsung masuk:
-${accessLink}
-
-Paket: *${planMap[sub.plan] ?? sub.plan}*${sub.endDate ? `\nAktif hingga: ${new Date(sub.endDate).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}` : ""}
-
-💡 Bookmark link di atas agar mudah dibuka kapan saja — bahkan dari HP berbeda sekalipun!
-
-Butuh bantuan? Hubungi kami:
-📱 WA: ${contact.display} / ${contact.display2}
-
-Selamat menggunakan! 🚀
-— Tim Gustafta`;
-            const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-            const rawPhone = sub.customerPhone?.replace(/\D/g, "") ?? "";
-            const phoneNum = rawPhone.startsWith("0") ? "62" + rawPhone.slice(1) : rawPhone;
-            // Strict E.164 validation: must start with 62 and have at least 8 trailing digits
-            const validPhone = /^62\d{8,}$/.test(phoneNum);
-            const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : null;
-            return (
-              <div className="space-y-4">
-                <div className="bg-muted/50 rounded-lg p-3 text-sm">
-                  <p className="font-medium">{sub.customerName}</p>
-                  <p className="text-xs text-muted-foreground">{sub.customerEmail}</p>
-                  {sub.customerPhone && <p className="text-xs text-muted-foreground">{sub.customerPhone}</p>}
-                  <p className="text-xs text-muted-foreground">{isChatbot ? "Chatbot" : "Modul"}: {sub.productName}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Link Akses</p>
-                  <div className="flex gap-2">
-                    <Input value={accessLink} readOnly className="text-xs font-mono" data-testid="input-modul-access-link" />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => { navigator.clipboard.writeText(accessLink); toast({ title: "Link disalin!" }); }}
-                      data-testid="button-copy-modul-link"
-                    >
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Preview Pesan WA</p>
-                  <div className="bg-[#dcf8c6] dark:bg-green-900/30 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap text-foreground leading-relaxed max-h-56 overflow-y-auto border border-green-200 dark:border-green-800">
-                    {msg}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1 text-xs"
-                    onClick={() => { navigator.clipboard.writeText(msg); toast({ title: "Pesan disalin!" }); }}
-                    data-testid="button-copy-modul-wa-msg"
-                  >
-                    <Copy className="h-3.5 w-3.5 mr-1.5" /> Salin Teks
-                  </Button>
-                  <Button
-                    className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => {
-                      if (waDirectUrl) {
-                        window.open(waDirectUrl, "_blank");
-                      } else if (rawPhone) {
-                        // Phone present but not a valid Indonesian E.164 number
-                        toast({
-                          title: "Nomor tidak valid",
-                          description: `"${sub.customerPhone}" bukan nomor WA yang valid. Salin teks dan kirim manual.`,
-                          variant: "destructive",
-                        });
-                      } else {
-                        // No phone stored — open WA with text only
-                        window.open(waUrl, "_blank");
-                      }
-                    }}
-                    data-testid="button-open-modul-wa"
-                  >
-                    <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> {validPhone ? "WA Langsung" : "Buka WA"}
-                  </Button>
-                </div>
-                {validPhone && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    "WA Langsung" membuka chat ke nomor {sub.customerPhone} dengan pesan sudah terisi.
-                  </p>
-                )}
-                {!validPhone && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    Link berisi email subscriber — mereka langsung masuk tanpa perlu input email ulang.
-                  </p>
-                )}
-              </div>
-            );
-          })()}
+          {modulWaDialog.sub && (
+            <ModulWaDialogBody
+              sub={modulWaDialog.sub}
+              appUrl={appUrl}
+              contactDisplay={contact.display}
+              contactDisplay2={contact.display2}
+            />
+          )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setModulWaDialog({ open: false, sub: null })}>Tutup</Button>
           </DialogFooter>
