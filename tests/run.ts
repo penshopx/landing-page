@@ -77,6 +77,12 @@ const files = [
   // never stays inflated after a lesson is deleted. Also checks the 409
   // enrollment guard and 401 without auth. Skipped when DATABASE_URL is absent.
   resolve(__dirname, "lms-lesson-delete-progress.test.ts"),
+  // HTTP mirror + unit + static: confirms the email-health test endpoint's
+  // no-admin-email guard returns 400 with the friendly message the UI renders.
+  resolve(__dirname, "admin-email-test-no-email.test.ts"),
+  // Real sendEmail (no BREVO_API_KEY) → not_configured; endpoint 502 contract;
+  // static checks against server/routes.ts + admin-ai-health.tsx fallback chain.
+  resolve(__dirname, "admin-email-test-brevo-not-configured.test.ts"),
 ];
 
 let hadFailure = false;
