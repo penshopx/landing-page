@@ -20,6 +20,7 @@ import {
   productRegistry, solutionRegistry, sectorRegistry, tierRegistry,
   packageRegistry, packageProducts, packageVersionSnapshots,
 } from "@shared/schema";
+import { getWaContact } from "./lib/wa-contact";
 
 const CACHE_TTL_MS = 60_000;
 const cache = new Map<string, { at: number; data: any }>();
@@ -77,6 +78,31 @@ const publicSimple = (r: any) => ({
   ...(r.level !== undefined ? { level: r.level } : {}),
 });
 
+// ── Order CTA (Opsi 1 — "Pesan Paket" via WA, tanpa checkout otomatis) ───────
+// Pesan WA WAJIB membawa identitas paket: package_id, nama, versi, harga —
+// admin tidak boleh menebak paket apa yang dipesan. Nomor WA diambil live dari
+// rotasi runtime (system_config), BUKAN nilai build-time.
+const formatIdr = (n: number) => `Rp ${Number(n || 0).toLocaleString("id-ID")}`;
+export const buildOrderCta = (pkg: any) => {
+  const wa = getWaContact().primary;
+  const message =
+    `Halo Gustafta, saya ingin memesan paket berikut:\n` +
+    `\u2022 Paket: ${pkg.name}\n` +
+    `\u2022 ID Paket: ${pkg.packageId}\n` +
+    `\u2022 Versi: v${pkg.version}\n` +
+    `\u2022 Harga: ${formatIdr(pkg.price)} / ${pkg.durationValue} ${pkg.durationUnit === "MONTH" ? "bulan" : pkg.durationUnit}\n` +
+    `Nama saya: ___\n` +
+    `Mohon info cara pembayarannya. Terima kasih.`;
+  return {
+    type: "wa_order" as const,
+    label: "Pesan Paket",
+    wa_number: wa,
+    url: `https://wa.me/${wa}?text=${encodeURIComponent(message)}`,
+    message,
+    note: "Checkout otomatis belum tersedia; order diproses manual oleh admin. Pesan harus tetap memuat ID Paket & versi.",
+  };
+};
+
 const publicPackage = (pkg: any, names: { solution: string; sector: string; tier: string }) => ({
   package_id: pkg.packageId,
   name: pkg.name,
@@ -95,6 +121,7 @@ const publicPackage = (pkg: any, names: { solution: string; sector: string; tier
   effective_until: pkg.effectiveUntil ?? null,
   gaia_enabled: true,
   source: "GUSTAFTA",
+  order_cta: buildOrderCta(pkg),
 });
 
 const publicPackageProduct = (pp: any) => ({
@@ -367,6 +394,7 @@ export function registerCatalogApiRoutes(app: Express, deps: {
             solution: nameOf(sols, pkg.solutionId), sector: nameOf(secs, pkg.sectorId), tier: nameOf(tiers, pkg.tierId),
             duration: `${pkg.durationValue} ${pkg.durationUnit}`, price: pkg.price,
             includedProducts: visible.map(publicPackageProduct),
+            orderCta: buildOrderCta(pkg),
             eligible: packageEligible(pkg, visible.length),
             reasons: [
               pkg.status !== "ACTIVE" && `status ${pkg.status}`,

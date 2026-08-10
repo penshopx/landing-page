@@ -19,3 +19,6 @@ description: Konvensi & keputusan 6 Launch Package GAIA — harga, komposisi, sa
 - Alur wajib per paket: AUDIT read-only → APPROVE → CREATE DRAFT → READ-BACK → CROSS-CHECK (paket lain + 10 produk utuh) → LOCK.
 
 **How to apply:** create dilakukan via SQL langsung yang mencerminkan logika engine (packageId auto `SOL-SEC-TIER-<n>M`, DRAFT tanpa snapshot — snapshot hanya saat publish ACTIVE). Publish butuh price>0 + ≥1 anggota; promote ke production ditahan (task #ada) sampai 6/6 lolos cross-check final.
+
+## CTA Pesan Paket (Opsi 1 — launch)
+Keputusan: TIDAK ada checkout otomatis paket saat launch; catalog API menyertakan `order_cta` per paket (buildOrderCta di server/catalog-api.ts): wa.me URL + pesan prefilled WAJIB memuat package_id, nama, versi, harga. Nomor WA diambil live via getWaContact() saat mapping response (bukan di cache 60s) sehingga rotasi admin langsung berlaku. Checkout otomatis (Scalev + webhook + aktivasi hak) = fase setelah traction, jangan dibangun tanpa approval.
