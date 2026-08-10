@@ -51,6 +51,12 @@ const files = [
   // (https://gustafta.my.id/lms/verify/<code>) — not a relative path — so
   // students never paste a broken link into email or chat.
   resolve(__dirname, "lms-certificate-copy-link.test.ts"),
+  // Static + unit: confirms POST /api/store/order/manual calls
+  // sendDigitalProductDeliveryEmail with the buyer's email and resolved
+  // download URL, and surfaces emailSent in the JSON response. Also unit-tests
+  // the real email helper and resolveDownloadUrl directly so signature
+  // regressions are caught without booting a full server.
+  resolve(__dirname, "store-manual-order-digital-email.test.ts"),
 ];
 
 let hadFailure = false;
