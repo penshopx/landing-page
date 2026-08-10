@@ -182,6 +182,7 @@ export default function LmsLesson() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/lms/progress", id] });
       queryClient.invalidateQueries({ queryKey: ["/api/lms/my-courses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lms/certificates"] });
       setMarkingDone(true);
       toast({ title: "Selesai!", description: "Progress kursus diperbarui." });
     },
