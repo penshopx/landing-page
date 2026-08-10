@@ -326,7 +326,7 @@ const SEED_COURSES = [
 // Reconcile-per-slug: upsert courses and lessons so content changes in
 // SEED_COURSES are reflected in an already-seeded database.
 // Returns separate "added" and "updated" counts.
-async function seedLmsData(): Promise<{ added: number; updated: number }> {
+export async function seedLmsData(): Promise<{ added: number; updated: number }> {
   try {
     let added = 0;
     let updated = 0;
@@ -445,7 +445,8 @@ async function seedLmsData(): Promise<{ added: number; updated: number }> {
               existingLesson.type !== lesson.type ||
               existingLesson.durationMinutes !== lesson.durationMinutes ||
               existingLesson.isPreview !== (lesson.isPreview ?? false) ||
-              existingLesson.sortOrder !== i + 1;
+              existingLesson.sortOrder !== i + 1 ||
+              existingLesson.isActive !== true;
 
             if (lessonChanged) {
               await db.update(lmsLessons)
@@ -456,11 +457,26 @@ async function seedLmsData(): Promise<{ added: number; updated: number }> {
                   durationMinutes: lesson.durationMinutes,
                   isPreview: lesson.isPreview ?? false,
                   sortOrder: i + 1,
+                  isActive: true,
                 })
                 .where(eq(lmsLessons.id, existingLesson.id));
               courseWasUpdated = true;
             }
           }
+        }
+
+        // Deactivate lessons that were removed from the seed definition:
+        // present in the DB but absent from SEED_COURSES for this course.
+        const seedSlugs = new Set(lessons.map((l) => l.slug));
+        const staleLessonIds = existingLessons
+          .filter((l) => !seedSlugs.has(l.slug) && l.isActive !== false)
+          .map((l) => l.id);
+        if (staleLessonIds.length > 0) {
+          await db.update(lmsLessons)
+            .set({ isActive: false })
+            .where(inArray(lmsLessons.id, staleLessonIds));
+          courseWasUpdated = true;
+          console.log(`[LMS] ${staleLessonIds.length} pelajaran usang dinonaktifkan di kursus "${course.slug}".`);
         }
 
         if (courseWasUpdated) updated++;
