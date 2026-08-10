@@ -67,6 +67,12 @@ const files = [
   // added = 0 and gets restored to seed content; an unchanged second pass
   // yields added = 0 and updated = 0. Skipped when DATABASE_URL is absent.
   resolve(__dirname, "lms-reseed-updated-counts.test.ts"),
+  // DB integration: confirms DELETE /api/admin/lms/lessons/:id?force=true
+  // removes the deleted lesson's lms_lesson_progress rows and recalculates
+  // enrollment progress/completed_at so a student's completion percentage
+  // never stays inflated after a lesson is deleted. Also checks the 409
+  // enrollment guard and 401 without auth. Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "lms-lesson-delete-progress.test.ts"),
 ];
 
 let hadFailure = false;
