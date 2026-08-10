@@ -559,6 +559,123 @@ test("reseed: POST reseed resets seedStatus to 'done' and seeding to false immed
   }
 });
 
+// ── Reseed failure sets seedStatus to "error" ────────────────────────────────
+
+/**
+ * Verifies the error branch of POST /api/admin/lms/reseed: when the seed
+ * function throws, the endpoint must respond 500 AND set lmsSeedStatus to
+ * "error" so a subsequent GET /api/admin/lms/health immediately reports
+ * seedStatus === "error" and seeding === false — instead of leaving admins
+ * staring at a stale "pending" spinner.
+ */
+test("reseed: a failed reseed returns 500 and health reports seedStatus 'error', seeding false", { skip: SKIP }, async () => {
+  const { registerLmsRoutes } = await import("../server/routes-lms");
+
+  // Seed override that always throws — simulates a fatal seed failure.
+  const failingSeedFn = async (): Promise<{ added: number; updated: number }> => {
+    throw new Error("simulated seed failure (test fixture)");
+  };
+
+  const failApp = express();
+  failApp.use(express.json());
+
+  // Auth shim reused from the main before() setup.
+  failApp.use((req: any, _res: any, next: any) => {
+    const uid = req.headers["x-test-user"];
+    if (uid) {
+      req.user = { id: String(uid), claims: { sub: String(uid) } };
+      req.isAuthenticated = () => true;
+    } else {
+      req.isAuthenticated = () => false;
+    }
+    next();
+  });
+
+  // Register routes with the failing seed function. The boot-time trackedSeed
+  // will also fail, flipping seedStatus to "error" — a terminal state, so the
+  // reseed endpoint's 409 "pending" guard will not block the manual call.
+  registerLmsRoutes(failApp, failingSeedFn);
+
+  const failServer: Server = createServer(failApp);
+  await new Promise<void>((resolve) => failServer.listen(0, "127.0.0.1", resolve));
+  const { port } = failServer.address() as AddressInfo;
+  const fBase = `http://127.0.0.1:${port}`;
+
+  try {
+    // 1. Wait for the boot-time async seed to settle in a terminal state so the
+    //    manual reseed below is not rejected with 409 while status is 'pending'.
+    const TERMINAL = new Set(["done", "skipped", "error"]);
+    const deadline = Date.now() + 15_000;
+    while (Date.now() < deadline) {
+      const r = await fetch(`${fBase}/api/admin/lms/health`, {
+        headers: { "x-test-user": TEST_ADMIN_ID },
+      });
+      if (r.status === 200) {
+        const b = await r.json() as any;
+        if (TERMINAL.has(b.seedStatus)) break;
+      }
+      await new Promise((r) => setTimeout(r, 200));
+    }
+
+    // 2. POST /api/admin/lms/reseed as admin — the seed fn throws, so the
+    //    endpoint must respond 500 with an error body.
+    const reseedRes = await fetch(`${fBase}/api/admin/lms/reseed`, {
+      method: "POST",
+      headers: {
+        "x-test-user": TEST_ADMIN_ID,
+        "Content-Type": "application/json",
+      },
+    });
+    assert.equal(
+      reseedRes.status, 500,
+      `POST /api/admin/lms/reseed with a throwing seed fn expected 500, got ${reseedRes.status}`
+    );
+    const reseedBody = await reseedRes.json() as any;
+    assert.ok(
+      typeof reseedBody.error === "string" && reseedBody.error.length > 0,
+      `500 response must carry an 'error' message, got ${JSON.stringify(reseedBody)}`
+    );
+
+    // 3. Immediately call GET /api/admin/lms/health — no polling: the reseed
+    //    endpoint sets lmsSeedStatus synchronously before responding.
+    const healthRes = await fetch(`${fBase}/api/admin/lms/health`, {
+      headers: { "x-test-user": TEST_ADMIN_ID },
+    });
+    assert.equal(
+      healthRes.status, 200,
+      `GET /api/admin/lms/health expected 200, got ${healthRes.status}`
+    );
+    const healthBody = await healthRes.json() as any;
+
+    // 4. Assert seedStatus is "error" (admin sees the error alert, not a stale
+    //    "pending" spinner) and seeding is false.
+    assert.equal(
+      healthBody.seedStatus, "error",
+      `seedStatus must be "error" immediately after a failed reseed, got "${healthBody.seedStatus}"`
+    );
+    assert.equal(
+      healthBody.seeding, false,
+      `seeding must be false after a failed reseed, got ${healthBody.seeding}`
+    );
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      failServer.close((err) => (err ? reject(err) : resolve()))
+    );
+
+    // lmsSeedStatus is module-level state shared with the main test app; the
+    // failed reseed left it at "error". Restore a successful terminal state so
+    // later tests (and reruns in the same process) aren't polluted.
+    const okRes = await fetch(`${baseUrl}/api/admin/lms/reseed`, {
+      method: "POST",
+      headers: { "x-test-user": TEST_ADMIN_ID },
+    });
+    assert.ok(
+      okRes.status === 200 || okRes.status === 409,
+      `cleanup reseed against main app expected 200/409, got ${okRes.status}`
+    );
+  }
+});
+
 // ── Lesson delete decrements totalLessons ─────────────────────────────────────
 
 test("health: totalLessons decrements by exactly 1 after a lesson is deleted mid-course", { skip: SKIP }, async () => {
