@@ -726,3 +726,110 @@ test("health: totalLessons decrements by exactly 1 after a lesson is deleted mid
     `totalLessons endpoint (${withOne.totalLessons}) must match DB (${dbAfter.totalLessons}) after deletion`
   );
 });
+
+// ── Concurrent reseed guard: second POST while pending → 409 ─────────────────
+
+/**
+ * Verifies the concurrency guard on POST /api/admin/lms/reseed: while a seed is
+ * still running (lmsSeedStatus === "pending"), a second reseed request must be
+ * rejected with 409 instead of starting a parallel seed.
+ *
+ * Uses a controllable seed fn that blocks on a deferred promise so the first
+ * reseed is guaranteed to still be in-flight when the second one arrives.
+ */
+test("reseed: second concurrent POST while a seed is running returns 409", { skip: SKIP }, async () => {
+  const { registerLmsRoutes } = await import("../server/routes-lms");
+
+  // Deferred the test controls: the seed fn stays "running" until we release it.
+  let releaseSeed!: (v: { added: number; updated: number }) => void;
+  const seedGate = new Promise<{ added: number; updated: number }>((resolve) => {
+    releaseSeed = resolve;
+  });
+  let seedCalls = 0;
+  const slowSeedFn = () => {
+    seedCalls++;
+    return seedGate;
+  };
+
+  const slowApp = express();
+  slowApp.use(express.json());
+  slowApp.use((req: any, _res: any, next: any) => {
+    const uid = req.headers["x-test-user"];
+    if (uid) {
+      req.user = { id: String(uid), claims: { sub: String(uid) } };
+      req.isAuthenticated = () => true;
+    } else {
+      req.isAuthenticated = () => false;
+    }
+    next();
+  });
+
+  registerLmsRoutes(slowApp, slowSeedFn);
+
+  const slowServer: Server = createServer(slowApp);
+  await new Promise<void>((resolve) => slowServer.listen(0, "127.0.0.1", resolve));
+  const { port } = slowServer.address() as AddressInfo;
+  const sBase = `http://127.0.0.1:${port}`;
+  const callsAtBoot = seedCalls; // boot-time trackedSeed also invokes the fn
+
+  try {
+    // 1. Fire the FIRST reseed. The seed fn never resolves within this window,
+    //    so lmsSeedStatus flips to "pending" synchronously and stays there.
+    //    Do NOT await the response yet — it only completes after release.
+    const firstReseed = fetch(`${sBase}/api/admin/lms/reseed`, {
+      method: "POST",
+      headers: { "x-test-user": TEST_ADMIN_ID },
+    });
+
+    // Wait until the endpoint has actually invoked the seed fn (i.e. it passed
+    // the guard and set status to "pending") before firing the second request.
+    const deadline = Date.now() + 5_000;
+    while (seedCalls <= callsAtBoot && Date.now() < deadline) {
+      await new Promise((r) => setTimeout(r, 20));
+    }
+    assert.ok(seedCalls > callsAtBoot, "first reseed must have invoked the seed fn");
+
+    // 2. Health must report the seed as running.
+    const healthRes = await fetch(`${sBase}/api/admin/lms/health`, {
+      headers: { "x-test-user": TEST_ADMIN_ID },
+    });
+    assert.equal(healthRes.status, 200);
+    const healthBody = await healthRes.json() as any;
+    assert.equal(healthBody.seedStatus, "pending", "seedStatus must be 'pending' while the first seed runs");
+    assert.equal(healthBody.seeding, true, "'seeding' must be true while the first seed runs");
+
+    // 3. SECOND concurrent reseed → 409, and it must NOT invoke the seed fn.
+    const secondRes = await fetch(`${sBase}/api/admin/lms/reseed`, {
+      method: "POST",
+      headers: { "x-test-user": TEST_ADMIN_ID },
+    });
+    assert.equal(secondRes.status, 409, `Second concurrent reseed expected 409, got ${secondRes.status}`);
+    const secondBody = await secondRes.json() as any;
+    assert.ok(secondBody.error, "409 response must carry an error message");
+    assert.equal(
+      seedCalls, callsAtBoot + 1,
+      "The rejected second reseed must NOT invoke the seed fn again"
+    );
+
+    // 4. Release the blocked seed — the first request must now complete 200
+    //    and the status must settle in a terminal state, unblocking future reseeds.
+    releaseSeed({ added: 1, updated: 0 });
+    const firstRes = await firstReseed;
+    assert.equal(firstRes.status, 200, `First reseed expected 200 after release, got ${firstRes.status}`);
+    const firstBody = await firstRes.json() as any;
+    assert.equal(firstBody.ok, true);
+
+    const afterRes = await fetch(`${sBase}/api/admin/lms/health`, {
+      headers: { "x-test-user": TEST_ADMIN_ID },
+    });
+    const afterBody = await afterRes.json() as any;
+    assert.equal(afterBody.seedStatus, "done", "seedStatus must be 'done' after the released seed finishes");
+    assert.equal(afterBody.seeding, false, "'seeding' must be false after the seed finishes");
+  } finally {
+    // Ensure the gate is released even on assertion failure so no fetch hangs.
+    releaseSeed({ added: 0, updated: 0 });
+    await new Promise<void>((resolve, reject) =>
+      slowServer.close((err) => (err ? reject(err) : resolve()))
+    );
+  }
+});
