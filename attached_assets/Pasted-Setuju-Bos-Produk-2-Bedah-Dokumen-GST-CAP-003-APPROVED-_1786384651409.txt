@@ -1,0 +1,51 @@
+Setuju, Bos. **Produk #2 — Bedah Dokumen (GST-CAP-003) APPROVED.**
+
+Konfigurasinya sudah konsisten dengan pola Produk #1 dan secara komersial justru bagus sebagai **produk entry kedua**.
+
+### Keputusan final GST-CAP-003
+
+| Field                  | Nilai final                                                                                                                                    |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `price`                | **149000**                                                                                                                                     |
+| `billing_type`         | **ONE_TIME**                                                                                                                                   |
+| `visibility`           | **INCLUDED_AND_STANDALONE**                                                                                                                    |
+| `gaia_enabled`         | **true**                                                                                                                                       |
+| `standalone_enabled`   | **true**                                                                                                                                       |
+| `subscription_enabled` | **true** — tetap                                                                                                                               |
+| `dp_enabled`           | **false** — tetap                                                                                                                              |
+| `ai_enabled`           | **true** — tetap                                                                                                                               |
+| `usage_profile`        | **DOCUMENT_ANALYSIS** — tetap                                                                                                                  |
+| `status`               | **ACTIVE** — tetap                                                                                                                             |
+| `short_description`    | **Analisis AI mendalam untuk dokumen kontrak, tender, dan persyaratan proyek — temukan risiko dan kekurangan sebelum terlambat. Per dokumen.** |
+
+### Pola GAIA mulai terbentuk
+
+Sekarang positioning-nya bagus:
+
+**Klinik Konsultasi — Rp150.000**
+→ konsultasi / problem diagnosis
+
+**Bedah Dokumen — Rp149.000**
+→ problem konkret berbasis dokumen
+
+Keduanya bisa:
+
+* dijual **standalone**
+* tetap menjadi **komponen package**
+* menjadi pintu masuk menuju layanan/paket yang lebih tinggi.
+
+### Instruksi eksekusi
+
+**Silakan PATCH GST-CAP-003 saja** dengan field yang sudah disetujui.
+
+Setelah itu:
+
+1. **GET/read-back GST-CAP-003**
+2. Pastikan seluruh field cocok 100%
+3. Pastikan GST-CAP-002 tidak berubah
+4. Pastikan catalog endpoint sekarang menampilkan **2 produk**
+5. **Jangan sync/publish production dulu**
+
+Kalau semua lolos, **GST-CAP-003 dikunci**, lalu kita lanjut ke **Produk #3 — Brain Project (GST-CAP-004)**.
+
+Dan keputusan untuk menunggu sampai seluruh 10 produk selesai sebelum production menurut saya **tepat**. Development → verifikasi seluruh registry → baru satu kali deployment/promosi ke production.
