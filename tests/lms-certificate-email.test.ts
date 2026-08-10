@@ -381,6 +381,84 @@ test(
 );
 
 test(
+  "certificate email: logs console.error when sendEmail returns sent:false",
+  { skip: SKIP },
+  async () => {
+    const courseTitle = `Email Fail Course ${RUN}`;
+    const courseId = await seedCourse(courseTitle);
+
+    const lesson1 = await seedLesson(courseId, 1);
+    await seedEnrollment(TEST_USER_ID, courseId);
+
+    // Temporarily override global fetch so Brevo returns a 500 error.
+    const failFetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
+      const urlStr = typeof url === "string" ? url : url instanceof URL ? url.href : (url as Request).url;
+      if (urlStr.includes("api.brevo.com")) {
+        return new Response(JSON.stringify({ message: "Internal Server Error" }), { status: 500 });
+      }
+      return originalFetch(url as any, init);
+    };
+    (globalThis as any).fetch = failFetch;
+
+    // Capture console.error calls.
+    const errorMessages: string[] = [];
+    const origConsoleError = console.error;
+    console.error = (...args: any[]) => {
+      errorMessages.push(args.map(String).join(" "));
+    };
+
+    try {
+      const res = await markProgress(TEST_USER_ID, lesson1, courseId);
+      assert.equal(res.status, 200, `Expected 200, got ${res.status}`);
+
+      const body = await res.json() as any;
+      assert.equal(body.progress, 100, "Progress should be 100 after the only lesson");
+      assert.ok(body.certificateCode, "Response should contain certificateCode");
+
+      // Wait long enough for the fire-and-forget email attempt to complete.
+      await new Promise((r) => setTimeout(r, 1500));
+
+      // At least one [LMS] certificate error log must have been emitted.
+      const lmsErrors = errorMessages.filter((m) => m.includes("[LMS] Certificate email failed"));
+      assert.ok(
+        lmsErrors.length > 0,
+        `Expected a console.error with "[LMS] Certificate email failed" prefix but got: ${JSON.stringify(errorMessages)}`
+      );
+
+      // The log must mention the userId and courseId.
+      assert.ok(
+        lmsErrors.some((m) => m.includes(TEST_USER_ID)),
+        `Error log must include userId "${TEST_USER_ID}", got: ${JSON.stringify(lmsErrors)}`
+      );
+      assert.ok(
+        lmsErrors.some((m) => m.includes(String(courseId))),
+        `Error log must include courseId "${courseId}", got: ${JSON.stringify(lmsErrors)}`
+      );
+    } finally {
+      // Restore fetch and console.error regardless of outcome.
+      console.error = origConsoleError;
+      (globalThis as any).fetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
+        const urlStr = typeof url === "string" ? url : url instanceof URL ? url.href : (url as Request).url;
+        if (urlStr.includes("api.brevo.com")) {
+          const body2 = init?.body ? JSON.parse(init.body as string) : {};
+          const headers: Record<string, string> = {};
+          if (init?.headers) {
+            if (init.headers instanceof Headers) {
+              init.headers.forEach((v, k) => { headers[k] = v; });
+            } else {
+              Object.assign(headers, init.headers);
+            }
+          }
+          capturedBrevoCalls.push({ body: body2, headers });
+          return new Response(JSON.stringify({ messageId: "test-message-id" }), { status: 201 });
+        }
+        return originalFetch(url as any, init);
+      };
+    }
+  }
+);
+
+test(
   "certificate email: fallback to 'Peserta' when student has no first_name or last_name",
   { skip: SKIP },
   async () => {

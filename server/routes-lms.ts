@@ -834,7 +834,7 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
 
 © 2026 Gustafta.`;
 
-              await sendEmail({
+              const result = await sendEmail({
                 to: email,
                 toName: studentName,
                 subject: `🎓 Selamat! Sertifikat "${courseTitle}" berhasil diraih`,
@@ -842,7 +842,17 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
                 textContent,
                 tags: ["certificate", "lms"],
               });
-            } catch { /* fire-and-forget — never block progress response */ }
+              if (!result.sent) {
+                console.error(
+                  `[LMS] Certificate email failed for user ${userId} course ${courseId}: ${result.reason}${result.detail ? ` — ${result.detail}` : ""}`
+                );
+              }
+            } catch (err) {
+              console.error(
+                `[LMS] Certificate email failed for user ${userId} course ${courseId}:`,
+                err
+              );
+            }
           })();
         }
       }
