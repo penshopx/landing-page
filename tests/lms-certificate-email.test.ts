@@ -24,6 +24,10 @@ const TEST_USER_ID = `test-user-${RUN}`;
 const TEST_USER_EMAIL = `student-${RUN}@example.com`;
 const TEST_USER_NAME = `Student ${RUN}`;
 
+// Null-name user: first_name and last_name are both NULL.
+const NULL_USER_ID = `test-null-${RUN}`;
+const NULL_USER_EMAIL = `null-name-${RUN}@example.com`;
+
 // ── Brevo fetch intercept ─────────────────────────────────────────────────────
 // Set a fake BREVO_API_KEY so sendEmail doesn't bail on "not_configured".
 // Clear REPLIT_DEV_DOMAIN so the cert URL uses the production base.
@@ -84,6 +88,14 @@ before(async () => {
     [TEST_USER_ID, TEST_USER_EMAIL, TEST_USER_NAME]
   );
 
+  // Seed a null-name user: first_name and last_name intentionally omitted (NULL).
+  await queryDb(
+    `INSERT INTO users (id, email, role, is_active)
+     VALUES ($1, $2, 'user', true)
+     ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email`,
+    [NULL_USER_ID, NULL_USER_EMAIL]
+  );
+
   // Import routes AFTER fetch is patched.
   const { registerLmsRoutes } = await import("../server/routes-lms");
 
@@ -125,8 +137,9 @@ after(async () => {
     await queryDb(`DELETE FROM lms_courses         WHERE id        IN (${ids})`);
   }
 
-  // Clean up test user.
+  // Clean up test users.
   await queryDb(`DELETE FROM users WHERE id = $1`, [TEST_USER_ID]).catch(() => {});
+  await queryDb(`DELETE FROM users WHERE id = $1`, [NULL_USER_ID]).catch(() => {});
 
   await new Promise<void>((resolve, reject) =>
     server.close((err) => (err ? reject(err) : resolve()))
@@ -363,6 +376,63 @@ test(
       emailBody.to[0].name,
       TEST_USER_NAME,
       "to[0].name must be the student's full name"
+    );
+  }
+);
+
+test(
+  "certificate email: fallback to 'Peserta' when student has no first_name or last_name",
+  { skip: SKIP },
+  async () => {
+    const courseTitle = `Null Name Course ${RUN}`;
+    const courseId = await seedCourse(courseTitle);
+
+    const lesson1 = await seedLesson(courseId, 1);
+    await seedEnrollment(NULL_USER_ID, courseId);
+
+    const callsBefore = capturedBrevoCalls.length;
+
+    // Trigger course completion for the null-name user.
+    const res = await markProgress(NULL_USER_ID, lesson1, courseId);
+    assert.equal(res.status, 200, `Expected 200, got ${res.status}`);
+
+    const body = await res.json() as any;
+    assert.equal(body.progress, 100, "Progress should be 100 after the only lesson");
+    assert.ok(body.certificateCode, "Response should contain certificateCode");
+
+    // Wait for the fire-and-forget email.
+    const emailArrived = await waitForNewBrevoCall(callsBefore);
+    assert.ok(emailArrived, "Email must still be sent even when the student has no name");
+
+    const emailBody = capturedBrevoCalls[callsBefore].body;
+
+    // Exactly one recipient.
+    assert.ok(
+      Array.isArray(emailBody.to) && emailBody.to.length === 1,
+      "Email must have exactly one recipient"
+    );
+    assert.equal(
+      emailBody.to[0].email,
+      NULL_USER_EMAIL,
+      "Email must be sent to the null-name student's address"
+    );
+
+    // htmlContent must use the "Peserta" fallback, not an empty string.
+    assert.ok(
+      typeof emailBody.htmlContent === "string" &&
+        emailBody.htmlContent.includes("Peserta"),
+      `htmlContent must contain the fallback greeting "Peserta" when name is NULL`
+    );
+
+    // to[0].name must be a non-empty fallback (not undefined, null, or "").
+    assert.ok(
+      typeof emailBody.to[0].name === "string" && emailBody.to[0].name.length > 0,
+      `to[0].name must be a non-empty fallback, got: ${JSON.stringify(emailBody.to[0].name)}`
+    );
+    assert.equal(
+      emailBody.to[0].name,
+      "Peserta",
+      "to[0].name must equal the 'Peserta' fallback when student has no name"
     );
   }
 );
