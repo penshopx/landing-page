@@ -264,6 +264,50 @@ describe("wa.me URL construction safety", () => {
    * - pages/admin.tsx — builds a wa.me link from a customer's stored phone
    *   number (E.164 formatted) to let admins message individual users.
    */
+  /**
+   * Returns the set of expressions in `src` that are provably derived from the
+   * `useContactNumbers()` hook (imported from @/lib/contact).  The hook always
+   * returns `primary` / `secondary` values that fall back to the canonical
+   * WA_CONTACT_NUMBER / WA_CONTACT_NUMBER_2 constants, so interpolating them
+   * into a wa.me URL can never produce `undefined` / `null`.
+   *
+   * Recognised declaration shapes:
+   *   const contact = useContactNumbers();            → contact.primary / contact.secondary
+   *   const { primary, secondary } = useContactNumbers();  → primary / secondary
+   *   const { secondary: waSecondary } = useContactNumbers(); → waSecondary
+   */
+  function contactHookSafeExprs(src: string): Set<string> {
+    const safe = new Set<string>();
+    // Only trust the hook when it's imported from the canonical module
+    const importsHook = src
+      .split("\n")
+      .some(
+        (l) =>
+          l.trimStart().startsWith("import") &&
+          l.includes("useContactNumbers") &&
+          l.includes("@/lib/contact"),
+      );
+    if (!importsHook) return safe;
+
+    // const <name> = useContactNumbers()
+    for (const m of src.matchAll(/const\s+([A-Za-z_$][\w$]*)\s*=\s*useContactNumbers\(\)/g)) {
+      safe.add(`${m[1]}.primary`);
+      safe.add(`${m[1]}.secondary`);
+    }
+    // const { primary, secondary: alias, ... } = useContactNumbers()
+    // Only the phone-number keys `primary` / `secondary` are safe to interpolate
+    // into a wa.me URL; any other destructured key (typo, `link`, nonexistent
+    // property, …) is NOT recognised and will fail the assertion below.
+    for (const m of src.matchAll(/const\s*\{([^}]+)\}\s*=\s*useContactNumbers\(\)/g)) {
+      for (const part of m[1].split(",")) {
+        const [key, alias] = part.split(":").map((s) => s.trim());
+        if (key !== "primary" && key !== "secondary") continue;
+        safe.add(alias || key);
+      }
+    }
+    return safe;
+  }
+
   const RUNTIME_DYNAMIC_ALLOWLIST = new Set([
     "lib/contact.ts",                          // source file itself — hook derives from its own fallback constants
     "components/panels/marketing-panel.tsx",   // template editor — wa from user input, guarded by `wa ?`
@@ -275,6 +319,52 @@ describe("wa.me URL construction safety", () => {
     "pages/admin.tsx",                         // admin → customer phone (validated /^62\d{8,}$/ after E.164 normalisation; toast error on invalid)
     "pages/pricing.tsx",                       // WHATSAPP_NUMBER = WA_CONTACT_NUMBER_2 (local alias)
   ]);
+
+  test("contactHookSafeExprs recognises only primary/secondary (and their aliases)", () => {
+    const hookImport = `import { useContactNumbers } from "@/lib/contact";\n`;
+
+    // Object form: contact.primary / contact.secondary safe, nothing else
+    const objSafe = contactHookSafeExprs(hookImport + `const contact = useContactNumbers();`);
+    assert.ok(objSafe.has("contact.primary") && objSafe.has("contact.secondary"));
+    assert.strictEqual(objSafe.size, 2);
+
+    // Destructured aliases of primary/secondary are safe
+    const aliasSafe = contactHookSafeExprs(
+      hookImport + `const { secondary: waSecondary, primary } = useContactNumbers();`,
+    );
+    assert.ok(aliasSafe.has("waSecondary"), "alias of secondary must be recognised");
+    assert.ok(aliasSafe.has("primary"), "plain primary must be recognised");
+    assert.strictEqual(aliasSafe.size, 2);
+
+    // Unknown / non-phone destructured keys must NOT be recognised
+    const badSafe = contactHookSafeExprs(
+      hookImport + `const { phone, link, waLink: w } = useContactNumbers();`,
+    );
+    assert.strictEqual(badSafe.size, 0, "unknown destructured keys must fail the guard");
+
+    // Without the canonical import, nothing is safe
+    const noImport = contactHookSafeExprs(`const contact = useContactNumbers();`);
+    assert.strictEqual(noImport.size, 0, "hook without @/lib/contact import must not be trusted");
+  });
+
+  test("every RUNTIME_DYNAMIC_ALLOWLIST entry has an explanatory comment", () => {
+    // No file may be allowlisted silently: each entry line inside the
+    // RUNTIME_DYNAMIC_ALLOWLIST literal must carry a trailing `// why safe` comment.
+    const selfSrc = readFileSync(fileURLToPath(import.meta.url), "utf8");
+    const start = selfSrc.indexOf("RUNTIME_DYNAMIC_ALLOWLIST = new Set([");
+    assert.ok(start !== -1, "RUNTIME_DYNAMIC_ALLOWLIST literal not found in this test file");
+    const end = selfSrc.indexOf("]);", start);
+    const block = selfSrc.slice(start, end);
+    const entryLines = block.split("\n").filter((l) => /^\s*["']/.test(l));
+    assert.ok(entryLines.length > 0, "allowlist appears empty — parsing failed?");
+    for (const line of entryLines) {
+      assert.match(
+        line,
+        /\/\/\s*\S/,
+        `Allowlist entry must have a trailing comment explaining why it's safe:\n  ${line.trim()}`,
+      );
+    }
+  });
 
   for (const filePath of allClientFiles) {
     const rel = filePath.replace(CLIENT_SRC + "/", "");
@@ -299,19 +389,23 @@ describe("wa.me URL construction safety", () => {
         return;
       }
 
-      // For all other files, every ${...} inside wa.me must reference a WA_CONTACT_* export
+      // For all other files, every ${...} inside wa.me must reference either a
+      // WA_CONTACT_* export or a value provably derived from useContactNumbers()
+      const hookSafe = contactHookSafeExprs(src);
       for (const [full, expr] of templateUrls) {
         const trimmed = expr.trim();
         const isFromContact =
           trimmed.startsWith("WA_CONTACT_") ||    // direct constant
           trimmed.startsWith("WA_NUMBER") ||       // local alias of a WA_CONTACT_* (e.g. checkout.tsx)
           trimmed.startsWith("WA_TRIAL_") ||       // premium-page-guard local alias
-          /^WA_/.test(trimmed);                    // any other WA_* alias of the same constants
+          /^WA_/.test(trimmed) ||                  // any other WA_* alias of the same constants
+          hookSafe.has(trimmed);                   // useContactNumbers() value (falls back to WA_CONTACT_*)
 
         assert.ok(
           isFromContact,
-          `${rel}: wa.me URL uses "\${${trimmed}}" — expected a WA_CONTACT_* constant from @/lib/contact. ` +
-            `If this is intentional runtime data, add "${rel}" to RUNTIME_DYNAMIC_ALLOWLIST.`,
+          `${rel}: wa.me URL uses "\${${trimmed}}" — expected a WA_CONTACT_* constant from @/lib/contact ` +
+            `or a value from useContactNumbers(). ` +
+            `If this is intentional runtime data, add "${rel}" to RUNTIME_DYNAMIC_ALLOWLIST with a comment explaining why it's safe.`,
         );
       }
     });
