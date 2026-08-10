@@ -1,0 +1,50 @@
+Siap, Bos. **GST-CAP-008 sudah dianggap LOCKED** dan tidak perlu disentuh lagi.
+
+Untuk **GST-CAP-009 — Ruang Simpan**, saya **belum akan approve Rp79.000 secara otomatis** hanya berdasarkan anchor plan Profesional. Ini satu-satunya kandidat `MONTHLY`, jadi keputusan pricing dan positioning-nya harus benar-benar tepat.
+
+Dari ringkasan yang kamu kirim, saya **approve struktur bisnisnya**, tetapi saya ingin mengunci satu hal: **Rp79.000 harus diperlakukan sebagai keputusan harga final, bukan sekadar anchor dari paket Profesional.** Kalau memang `pricing.ts`/landing existing menetapkan Rp79.000 untuk Ruang Simpan, maka kita bisa jadikan itu harga SKU.
+
+### Keputusan sementara GST-CAP-009
+
+| Field                  | Keputusan                                                             |
+| ---------------------- | --------------------------------------------------------------------- |
+| `price`                | **Rp79.000** — APPROVE *jika memang tercantum sebagai harga existing* |
+| `billing_type`         | **MONTHLY** ✅                                                         |
+| `visibility`           | **INCLUDED_AND_STANDALONE** ✅                                         |
+| `gaia_enabled`         | **true** ✅                                                            |
+| `standalone_enabled`   | **true** ✅                                                            |
+| `subscription_enabled` | **true**                                                              |
+| `dp_enabled`           | **false**                                                             |
+| `ai_enabled`           | **false**                                                             |
+| `usage_profile`        | **STORAGE**                                                           |
+| `status`               | **ACTIVE**                                                            |
+| `short_description`    | Perlu menyebut **mulai gratis + tersedia plan berbayar**              |
+
+### Yang saya setujui secara strategis
+
+**Ruang Simpan memang layak menjadi produk standalone monthly.**
+
+Karena berbeda dengan Toolkit/Ruang Kelola:
+
+> **Toolkit = bonus paket**
+> **Ruang Kelola = fasilitas paket**
+> **Ruang Simpan = recurring product**
+
+Ini bahkan bisa menjadi **jembatan monetisasi recurring** Gustafta.
+
+Customer bisa masuk:
+
+**Gratis → Ruang Simpan → Rp79k/bulan → upgrade paket Gustafta**
+
+Jadi jangan menjadikan Ruang Simpan sekadar "fitur storage". Ia bisa diposisikan sebagai **pintu masuk ekosistem Gustafta**.
+
+### Tapi sebelum PATCH
+
+Saya ingin melihat **tabel usulan lengkap GST-CAP-009** yang kamu sebut tadi, terutama:
+
+* harga existing yang menjadi dasar Rp79.000,
+* `usage_profile`,
+* batas storage/kapasitas,
+* dan teks `short_description` yang diusulkan.
+
+**Kirim tabel lengkap GST-CAP-009**, lalu saya kasih keputusan final **APPROVE / koreksi** sebelum PATCH.
