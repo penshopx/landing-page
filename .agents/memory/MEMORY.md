@@ -53,7 +53,7 @@
 - [system_config as lightweight persistence](system-config-persistence.md) — for in-memory stats/counters that must survive redeploy, use system_config JSONB key; upsert on change, load at boot. Avoids new tables for simple key-value durability.
 - [Scalev column rename (was Mayar)](scalev-column-rename.md) — mayar_order_id/mayar_payment_url → scalev_order_id/scalev_payment_url in all tables + code; getSubscriptionByMayarOrderId also renamed.
 - [Brevo attachment format](brevo-attachment-format.md) — Brevo 400s on .gz/.sql attachments; email DB backups must be .zip (build via jszip, no zip binary here); .gz ok only for on-demand download.
-- [Claw agent model & durability](claw-agent-model.md) — claw answers driven by model tier not KB; dev upgrade never reaches prod (separate DB, seeds skip existing); durable fix = boot-time idempotent UPDATE in index.ts after seeds, effective only after redeploy.
+- [Claw agent model & durability](claw-agent-model.md) — claw answers driven by model tier not KB; NOTE: prod now shares dev DB (see prod-shares-dev-db.md), boot-time idempotent UPDATE pattern still useful for code-coupled fixes.
 - [Pure-ESM dep needs build.ts allowlist](esm-dep-prod-bundle-allowlist.md) — ESM-only dep left off script/build.ts allowlist → prod boot crash `(0,x.default) is not a function` in dist/index.cjs; dev (tsx) hides it. Fix = add pkg to allowlist so esbuild inlines ESM.
 - [drizzle-kit push blocked](drizzle-push-blocked.md) — push hangs on interactive access_codes unique-constraint drift prompt; add NEW tables via direct executeSql DDL, keep schema.ts in sync separately.
 - [Store catalog cache](store-catalog-cache.md) — /api/store/catalog enriches ALL agents per request (p95 2.5s); cache per (category,search) w/ single-flight + stale-while-revalidate + boot warm; ~30s staleness.
@@ -74,3 +74,4 @@
 - [Solution Package Engine](solution-package-engine.md) — komersial = SOLUTION×SECTOR×TIER×DURATION; package_products = access matrix; versi live IMMUTABLE via package_version_snapshots (snapshot dalam tx yang sama dengan perubahan).
 - [DB-test abort recovery](db-test-abort-recovery.md) — DB-mutating tests must write a durable recovery record before mutating + self-heal next run; after() never fires on SIGKILL/OOM.
 - [Landing page segmen](segment-landing-pages.md) — 4 halaman solusi per segmen: /kontraktor /biro-jasa /konsultan-iso /skk (portal ekosistem interaktif); nav header punya baris "Solusi untuk:" di shared-header navSolusi.
+- [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.
