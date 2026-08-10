@@ -12,6 +12,17 @@ function generateCertCode(): string {
   return `GUSTAFTA-${year}-${code}`;
 }
 
+/**
+ * Mask a phone number for public display on certificates:
+ * keep the first 4 and last 3 digits, mask the middle.
+ * Returns "" when the phone is missing or too short to mask meaningfully.
+ */
+function maskPhone(phone: unknown): string {
+  const digits = String(phone ?? "").replace(/\D/g, "");
+  if (digits.length < 8) return "";
+  return `${digits.slice(0, 4)}****${digits.slice(-3)}`;
+}
+
 function isAuthenticated(req: any, res: any, next: any) {
   if (req.isAuthenticated?.() || req.user) return next();
   return res.status(401).json({ error: "Unauthorized" });
@@ -766,7 +777,7 @@ export function registerLmsRoutes(
           (async () => {
             try {
               const uRows = await db.execute(sql.raw(
-                `SELECT u.email, u.first_name, u.last_name, up.display_name
+                `SELECT u.email, u.first_name, u.last_name, u.phone, up.display_name
                  FROM users u
                  LEFT JOIN user_profiles up ON up.user_id = u.id
                  WHERE u.id = '${userId.replace(/'/g, "''")}'
@@ -780,7 +791,7 @@ export function registerLmsRoutes(
               const courseTitle = course?.title ?? "Kursus";
               const rawName = [uRow?.first_name, uRow?.last_name].filter(Boolean).join(" ").trim();
               const emailPrefix = email.split("@")[0] ?? "";
-              const studentName = rawName || (uRow?.display_name as string | undefined) || emailPrefix || "Peserta";
+              const studentName = rawName || (uRow?.display_name as string | undefined) || emailPrefix || maskPhone(uRow?.phone) || "Peserta";
               const issueDate = now.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
               const appBase = (process.env.APP_URL || "https://gustafta.my.id").replace(/\/$/, "");
               const certsUrl = `${appBase}/lms/certificates`;
@@ -918,9 +929,9 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
         instructor: lmsCourses.instructor,
       }).from(lmsCourses).where(eq(lmsCourses.id, cert.courseId));
       // Get student name — prefer first_name+last_name from users (matches congrats email),
-      // fall back to display_name from user_profiles, then email prefix.
+      // fall back to display_name from user_profiles, then email prefix, then masked phone.
       const nameRows = await db.execute(sql.raw(
-        `SELECT u.first_name, u.last_name, u.email, up.display_name
+        `SELECT u.first_name, u.last_name, u.email, u.phone, up.display_name
          FROM users u
          LEFT JOIN user_profiles up ON up.user_id = u.id
          WHERE u.id = '${cert.userId.replace(/'/g, "''")}'
@@ -930,7 +941,7 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
       const nr = nameArr[0] as any;
       const fullName = [nr?.first_name, nr?.last_name].filter(Boolean).join(" ").trim();
       const emailPrefix = (nr?.email as string | undefined)?.split("@")[0] ?? "";
-      const studentName = fullName || nr?.display_name || emailPrefix || "Peserta";
+      const studentName = fullName || nr?.display_name || emailPrefix || maskPhone(nr?.phone) || "Peserta";
       res.json({ ...cert, course, studentName });
     } catch (e) {
       res.status(500).json({ error: "Gagal verifikasi sertifikat" });

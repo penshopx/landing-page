@@ -195,6 +195,88 @@ test(
 );
 
 test(
+  "verify: studentName uses masked phone when user has only a phone number (WA-only registration)",
+  { skip: SKIP },
+  async () => {
+    const uid = `test-np-phone-${RUN}`;
+    createdUserIds.push(uid);
+
+    // WA-only user: no email, blank names, no user_profiles row — but has a phone.
+    await queryDb(
+      `INSERT INTO users (id, first_name, last_name, phone, role, is_active)
+       VALUES ($1, '', '', '6281234567890', 'user', true)
+       ON CONFLICT (id) DO UPDATE SET first_name='', last_name='', phone='6281234567890', email=NULL`,
+      [uid]
+    );
+
+    const courseId = await seedCourse();
+    const code = await seedCert(uid, courseId);
+
+    const data = await verifyCert(code);
+
+    assert.equal(
+      data.studentName,
+      "6281****890",
+      `Expected masked phone fallback, got "${data.studentName}"`
+    );
+  }
+);
+
+test(
+  'verify: studentName still falls back to "Peserta" when the phone is too short to mask',
+  { skip: SKIP },
+  async () => {
+    const uid = `test-np-shortphone-${RUN}`;
+    createdUserIds.push(uid);
+
+    await queryDb(
+      `INSERT INTO users (id, first_name, last_name, phone, role, is_active)
+       VALUES ($1, '', '', '12345', 'user', true)
+       ON CONFLICT (id) DO UPDATE SET first_name='', last_name='', phone='12345', email=NULL`,
+      [uid]
+    );
+
+    const courseId = await seedCourse();
+    const code = await seedCert(uid, courseId);
+
+    const data = await verifyCert(code);
+
+    assert.equal(
+      data.studentName,
+      "Peserta",
+      `Expected "Peserta" for an unmaskable short phone, got "${data.studentName}"`
+    );
+  }
+);
+
+test(
+  "verify: email prefix wins over phone when both are present",
+  { skip: SKIP },
+  async () => {
+    const uid = `test-np-emailphone-${RUN}`;
+    createdUserIds.push(uid);
+
+    await queryDb(
+      `INSERT INTO users (id, email, first_name, last_name, phone, role, is_active)
+       VALUES ($1, $2, '', '', '6289876543210', 'user', true)
+       ON CONFLICT (id) DO UPDATE SET email=$2, first_name='', last_name='', phone='6289876543210'`,
+      [uid, `jane.roe.${RUN}@example.com`]
+    );
+
+    const courseId = await seedCourse();
+    const code = await seedCert(uid, courseId);
+
+    const data = await verifyCert(code);
+
+    assert.equal(
+      data.studentName,
+      `jane.roe.${RUN}`,
+      `Expected email prefix to win over phone, got "${data.studentName}"`
+    );
+  }
+);
+
+test(
   "verify: studentName uses display_name from user_profiles when first_name is blank",
   { skip: SKIP },
   async () => {
