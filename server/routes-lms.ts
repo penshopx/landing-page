@@ -1310,7 +1310,13 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
   });
 
   // POST /api/admin/lms/cert-repair — on-demand retry of the certificate backfill
+  // In-memory concurrency guard: only one repair run may be in flight at a time.
+  let certRepairInFlight = false;
   app.post("/api/admin/lms/cert-repair", isAuthenticated, requireAdminLms, async (_req, res) => {
+    if (certRepairInFlight) {
+      return res.status(409).json({ error: "Perbaikan sertifikat sedang berjalan. Coba lagi sebentar." });
+    }
+    certRepairInFlight = true;
     try {
       const pendingRows = await db.execute(sql.raw(`
         SELECT e.user_id, e.course_id
@@ -1360,6 +1366,8 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
     } catch (e) {
       console.error("[LMS-ADMIN] POST cert-repair:", e);
       res.status(500).json({ error: "Gagal menjalankan perbaikan sertifikat" });
+    } finally {
+      certRepairInFlight = false;
     }
   });
 
