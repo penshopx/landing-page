@@ -1,0 +1,534 @@
+# GUSTAFTA PRODUCT REGISTRY — SCHEMA & READINESS AUDIT
+
+## TARGET PROJECT
+
+🟢 REPLIT GUSTAFTA
+Project yang melakukan deployment ke:
+
+`https://gustafta.my.id`
+
+Project ini harus memiliki/terkait dengan:
+
+* Product Registry
+* Package Registry
+* Admin Registry
+* Catalog API
+* `/api/v1/catalog/products`
+* `/api/v1/catalog/packages`
+
+⚠️ JANGAN menjalankan audit ini di Replit GAIA Store.
+
+---
+
+# TUJUAN
+
+Kita sudah melakukan pre-creation audit dan menemukan:
+
+* 10 product valid secara komersial
+* 4 asset lainnya adalah feature/channel
+* Catalog API production saat ini mengembalikan `products = 0`
+
+Sebelum membuat 10 product tersebut, lakukan audit READ-ONLY terhadap **schema Product Registry yang sebenarnya digunakan oleh Gustafta**.
+
+Tujuannya menentukan:
+
+1. field apa saja yang wajib,
+2. field apa yang opsional,
+3. nilai enum yang valid,
+4. bagaimana product dipublish,
+5. bagaimana product menjadi eligible untuk GAIA,
+6. bagaimana product digunakan dalam Package Registry.
+
+---
+
+# ATURAN WAJIB
+
+JANGAN:
+
+* membuat product
+* mengedit product
+* menghapus product
+* membuat package
+* mengedit package
+* menghapus package
+* mengubah database
+* melakukan migration
+* mengubah source code
+* mengubah environment variable
+* melakukan deployment
+* melakukan publish
+* menjalankan sync yang mengubah data
+
+Audit harus 100% READ-ONLY.
+
+---
+
+# 1. AUDIT DATABASE SCHEMA
+
+Cari schema/tabel:
+
+`product_registry`
+
+Dan jika ada:
+
+* migrations
+* ORM model
+* schema definition
+* seed
+* repository/service
+* API DTO
+* validation schema
+
+Tampilkan struktur aktual:
+
+| Field | Type | Nullable | Default | Constraint | Enum |
+| ----- | ---- | -------- | ------- | ---------- | ---- |
+
+Khusus identifikasi:
+
+* primary key
+* unique constraint
+* foreign key
+* index
+* status constraint
+* price constraint
+* visibility constraint
+* Gaia eligibility fields
+
+---
+
+# 2. AUDIT PRODUCT API
+
+Periksa endpoint yang berkaitan dengan Product Registry.
+
+Cari:
+
+* GET products
+* POST products
+* PUT/PATCH products
+* publish endpoint
+* status endpoint
+* Gaia eligibility logic
+
+Jangan melakukan POST/PUT/PATCH.
+
+Untuk setiap endpoint tuliskan:
+
+| Endpoint | Method | Purpose | Auth | Request Fields | Response |
+| -------- | ------ | ------- | ---- | -------------- | -------- |
+
+Jika endpoint create/update ditemukan, hanya baca source code/validation-nya.
+
+---
+
+# 3. AUDIT PRODUCT ENUMS
+
+Temukan nilai enum aktual untuk:
+
+### product_type
+
+Tampilkan seluruh nilai valid.
+
+### status
+
+Tampilkan seluruh nilai valid.
+
+Contoh:
+
+`ACTIVE`
+
+`DRAFT`
+
+`PAUSED`
+
+`ARCHIVED`
+
+Tetapi JANGAN mengasumsikan.
+
+Gunakan enum aktual.
+
+### visibility
+
+Tampilkan seluruh nilai valid.
+
+### gaia_enabled
+
+Pastikan tipe aktual:
+
+boolean / integer / enum / lainnya.
+
+---
+
+# 4. AUDIT FIELD GAIA
+
+Cari seluruh field yang menentukan apakah product dapat tampil di GAIA.
+
+Identifikasi:
+
+* `gaia_enabled`
+* `visibility`
+* `status`
+* price
+* product_type
+* solution
+* sector
+* tier
+* standalone flag
+* subscription flag
+* DP flag
+* AI flag
+* usage profile
+* storage profile
+
+Jelaskan fungsi masing-masing.
+
+---
+
+# 5. AUDIT 7 KOLOM / FLAG YANG SUDAH DITAMBAHKAN
+
+Audit secara khusus field tambahan yang sebelumnya disebut:
+
+* visibility
+* standalone
+* subscription
+* dp
+* ai
+* usage profile
+* storage profile
+
+Untuk masing-masing jelaskan:
+
+1. nama field aktual
+2. type
+3. default
+4. arti bisnis
+5. apakah wajib
+6. apakah berpengaruh terhadap GAIA eligibility
+
+---
+
+# 6. AUDIT PRODUCT VALIDATION
+
+Cari validation/publish gate.
+
+Tentukan syarat agar product dapat:
+
+### disimpan sebagai DRAFT
+
+### dipublish
+
+### menjadi GAIA eligible
+
+Buat tabel:
+
+| Condition | DRAFT | ACTIVE | GAIA Eligible |
+| --------- | ----- | ------ | ------------- |
+
+Jangan mengubah validation.
+
+---
+
+# 7. AUDIT SOLUTION MAPPING
+
+Periksa apakah product_registry memiliki:
+
+* solution_id
+* solution
+* solution registry relation
+* atau tidak memiliki solution mapping langsung.
+
+Jika ada foreign key, tampilkan.
+
+Jika tidak ada, jelaskan bagaimana product dikaitkan dengan solution.
+
+---
+
+# 8. AUDIT PRICING
+
+Cari bagaimana price disimpan.
+
+Tentukan:
+
+* integer / decimal
+* currency
+* monthly price
+* one-time price
+* minimum price
+* apakah price = 0 diperbolehkan
+* apakah product free bisa GAIA eligible
+
+Penting:
+
+Jangan mengubah harga existing.
+
+---
+
+# 9. AUDIT PRODUCT TYPES
+
+Bandingkan product_type yang tersedia dengan 10 product yang akan kita register.
+
+10 kandidat:
+
+1. Klinik Konsultasi
+2. Bedah Dokumen
+3. Brain Project
+4. Toolkit
+5. Ruang Kelola
+6. Ruang Simpan
+7. Jasa Dokumen
+8. Jasa Keuangan
+9. Bimtek SKK
+10. Produk AI / AI Specialist
+
+Untuk masing-masing:
+
+| Product | Existing Product Type | Suitable? | Recommended Actual Enum |
+| ------- | --------------------- | --------- | ----------------------- |
+
+Jangan membuat enum baru.
+
+Jika tidak ada enum yang cocok, tulis:
+
+`NO SUITABLE ENUM`
+
+---
+
+# 10. AUDIT PRODUCT COMPOSITION COMPATIBILITY
+
+Periksa apakah product dengan type:
+
+* SERVICE
+* DIGITAL_WORKSPACE
+* AI_WORKSPACE
+* E_COURSE
+* AI_SPECIALIST
+* DOCUMENT_AI
+* DIGITAL_TOOL
+
+dapat menjadi member dalam:
+
+`package_products`
+
+Jangan membuat package.
+
+Cari constraint/schema saja.
+
+---
+
+# 11. AUDIT PACKAGE DEPENDENCY
+
+Periksa schema:
+
+`package_registry`
+
+`package_products`
+
+`package_version_snapshots`
+
+Tentukan:
+
+Apakah package dapat menggunakan semua 10 product candidate?
+
+Buat:
+
+| Product | Can be package member? | Constraint |
+| ------- | ---------------------- | ---------- |
+
+---
+
+# 12. AUDIT ACCESS LEVEL
+
+Periksa enum/schema untuk:
+
+* FULL
+* LIMITED
+* VIEW_ONLY
+
+Tentukan:
+
+* apakah access level benar-benar disimpan di database?
+* nama field aktual
+* tipe field
+* apakah usage_limit tersedia?
+* apakah usage_limit wajib atau optional?
+
+Ini penting karena Launch Package akan menggunakan access level.
+
+---
+
+# 13. AUDIT VERSIONING
+
+Periksa:
+
+`package_version_snapshots`
+
+Cari tahu:
+
+* kapan snapshot dibuat
+* version number
+* apakah otomatis saat publish
+* apakah product composition ikut disimpan
+* apakah harga ikut disimpan
+* apakah package dapat diedit setelah ACTIVE
+
+Jangan membuat snapshot.
+
+---
+
+# 14. AUDIT ADMIN REGISTRY UI
+
+Periksa source code halaman:
+
+`/admin-registry`
+
+Khusus tab:
+
+`Products`
+
+Cari:
+
+* create form
+* edit form
+* publish action
+* field names
+* default values
+* validation
+* Gaia toggle
+* visibility selector
+* price input
+* product type selector
+
+Jangan submit form.
+
+---
+
+# 15. PREPARE PRODUCT DATA BLUEPRINT
+
+Setelah audit selesai, buat blueprint untuk 10 product.
+
+JANGAN membuat record.
+
+Format:
+
+| # | Product | Type | Price | Visibility | Gaia | Standalone | Subscription | DP | AI | Usage Profile | Storage Profile |
+| - | ------- | ---- | ----: | ---------- | ---- | ---------- | ------------ | -- | -- | ------------- | --------------- |
+
+Gunakan harga EXISTING yang ditemukan.
+
+Jika harga tidak jelas, tulis:
+
+`NEEDS DECISION`
+
+Jangan mengarang.
+
+---
+
+# 16. SPECIAL CASES
+
+Periksa secara khusus:
+
+### Klinik Konsultasi
+
+Karena memiliki harga sesi dan paket.
+
+### Ruang Simpan
+
+Karena memiliki beberapa plan.
+
+### AI Specialist
+
+Karena merupakan family/177 Claw, bukan satu SKU sederhana.
+
+### Bimtek SKK
+
+Karena training/simulator dan bukan sertifikasi resmi.
+
+### Jasa Keuangan
+
+Karena price belum jelas.
+
+Berikan rekomendasi apakah masing-masing:
+
+`SINGLE PRODUCT`
+
+`PRODUCT FAMILY`
+
+atau
+
+`NOT YET READY`
+
+---
+
+# 17. CRITICAL QUESTION
+
+Jawab:
+
+### Apakah 10 product ini dapat langsung dibuat melalui Admin Registry tanpa coding?
+
+Jawab:
+
+`YES`
+
+`YES WITH CONFIGURATION`
+
+atau
+
+`NO — CODE CHANGE REQUIRED`
+
+Jika ada code change, jelaskan tepatnya.
+
+---
+
+# 18. FINAL REPORT
+
+Gunakan struktur:
+
+## A. DATABASE SCHEMA
+
+## B. PRODUCT API
+
+## C. ENUMS
+
+## D. GAIA ELIGIBILITY
+
+## E. PRICING
+
+## F. PACKAGE COMPATIBILITY
+
+## G. ACCESS LEVEL
+
+## H. VERSIONING
+
+## I. ADMIN REGISTRY
+
+## J. 10-PRODUCT BLUEPRINT
+
+## K. SPECIAL CASES
+
+## L. BLOCKERS
+
+## M. RECOMMENDED NEXT STEP
+
+---
+
+# FINAL SAFETY CHECK
+
+Sebelum selesai pastikan:
+
+Database changes: `0`
+
+Source changes: `0`
+
+Product created: `0`
+
+Package created: `0`
+
+Migration: `0`
+
+Deployment: `0`
+
+Publish: `0`
+
+Sync mutation: `0`
+
+Hanya laporan audit yang dihasilkan.
