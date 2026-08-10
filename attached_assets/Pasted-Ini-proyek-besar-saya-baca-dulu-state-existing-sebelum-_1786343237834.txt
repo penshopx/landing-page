@@ -1,0 +1,79 @@
+Ini proyek besar — saya baca dulu state existing sebelum coding, sesuai instruksi dokumen.
+
+
+4 actions
+Saya baca struktur existing lebih dalam sebelum memulai coding.
+
+
+4 actions
+Audit selesai. Existing state jelas — sekarang saya bangun semua komponen Phase 2B secara paralel.
+
+Rencana:
+
+Backend: gustafta-client.ts (cache layer) + route /catalog/* (proxy ke Gustafta API)
+Frontend: 4 halaman baru (/produk, /solusi, /paket/:id, /admin-katalog) + update Navbar + App.tsx
+Semua 42 produk existing tidak disentuh
+Graceful error state saat GUSTAFTA_CATALOG_BASE_URL belum dikonfigurasi
+
+4 actions
+Lanjutkan dengan semua halaman frontend dan update file routing — semua paralel.
+
+
+4 actions
+BASE_URL belum ada di config.ts — saya fix gustafta-api.ts agar ikuti pola existing (relative URL), lalu tulis semua file yang tersisa sekaligus.
+
+
+3 actions
+Lanjutkan menulis semua file yang tersisa secara paralel.
+
+
+4 actions
+Selesaikan update App.tsx dan Navbar.tsx, lalu restart backend — semua paralel.
+
+
+3 actions
+Now update the Navbar with the new links, then restart the backend.
+
+
+6 actions
+Both workflows running clean. Let me verify the UI and test the new catalog endpoint.
+
+
+6 actions
+Semua berjalan dengan benar. Screenshot /produk menampilkan graceful error state "Catalog API belum dikonfigurasi" — ini tepat karena GUSTAFTA_CATALOG_BASE_URL belum diset. Begitu URL diisi, halaman langsung aktif tanpa code change.
+
+✅ Final Report — Phase 2B
+1. Arsitektur Existing (tidak diubah)
+Komponen	Status
+42 produk di products.ts	✅ Tidak disentuh
+Halaman /, /konfirmasi-pembayaran, /admin-pesanan	✅ Tidak disentuh
+Supabase orders table	✅ Tidak disentuh
+Scalev payment links	✅ Tidak disentuh
+2. Yang Dibangun
+Backend (api-server):
+
+src/lib/gustafta-client.ts — HTTP client dengan in-memory cache 5 menit, fallback ke stale cache saat API down
+src/routes/catalog.ts — 10 proxy endpoint + GET /catalog/status + POST /catalog/sync (admin-protected)
+src/routes/index.ts — catalog router terdaftar
+Frontend (gaia-store):
+
+src/lib/gustafta-api.ts — typed client ke backend proxy
+src/pages/CatalogProduk.tsx → route /produk — grid produk Gustafta + filter by type + search
+src/pages/Solusi.tsx → route /solusi — 7-step discovery flow (Kebutuhan → Sektor → Tier → Durasi → Paket → Detail → Checkout)
+src/pages/PaketDetail.tsx → route /paket/:id — detail paket dengan included products
+src/pages/AdminKatalog.tsx → route /admin-katalog — sync dashboard, status API, manual sync button
+Navbar.tsx — 3 link baru: Produk Konstruksi / Produk Digital / Solusi
+3. Environment Variable
+Perlu diset satu env var:
+
+GUSTAFTA_CATALOG_BASE_URL=https://gustafta.my.id/api/v1/catalog
+
+Sebelum diset: halaman /produk dan /solusi menampilkan pesan "Catalog API belum dikonfigurasi" — tidak crash, tidak blank. Begitu diset, langsung aktif.
+
+4. Checkout Architecture
+package_id + package_version tersimpan dalam review summary di Step 7 Solusi Flow, sesuai spec. Provisioning belum diaktifkan — payment masih via WhatsApp / konfirmasi manual.
+
+5. Langkah Selanjutnya (Phase 3)
+Set GUSTAFTA_CATALOG_BASE_URL ke domain production Gustafta
+Test koneksi via /admin-katalog → tombol Sync Sekarang
+Phase 3: aktifkan payment Scalev untuk paket Gustafta + provisioning webhook ke Gustafta
