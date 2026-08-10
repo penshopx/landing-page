@@ -1,0 +1,218 @@
+Saya sedang melakukan audit arsitektur Gustafta.my.id untuk menyiapkan integrasi selektif dengan ekosistem DokumenProyek.com.
+
+PENTING:
+JANGAN mengubah kode, database, authentication, environment variables, routing, payment, deployment, atau konfigurasi apa pun.
+
+Jangan refactor.
+Jangan migration.
+Jangan menghapus data.
+Jangan membuat integrasi baru.
+
+Tugas Anda hanya AUDIT.
+
+Konteks bisnis:
+
+Gustafta.my.id tetap menjadi AI Platform / AI Marketplace yang lebih luas.
+
+Gustafta dapat memiliki ratusan chatbot/AI Specialist dari berbagai kategori.
+
+Tidak semua chatbot Gustafta akan ditampilkan di DokumenProyek.com.
+
+DokumenProyek.com adalah storefront sektor konstruksi.
+
+Di DokumenProyek terdapat:
+
+1. Gaia Store
+   → AI Specialist konstruksi
+
+2. Gaia SIAP
+   → digital workflow/work engine
+
+3. DP Store
+   → human execution
+
+Gaia Store hanya akan menampilkan AI Specialist konstruksi yang telah dikurasi.
+
+Sebagian AI Specialist Gaia Store akan menggunakan chatbot/engine yang sebenarnya berada di Gustafta.my.id.
+
+Untuk tahap awal, integrasi yang diinginkan kemungkinan cukup berupa deep link.
+
+API integration/SSO/shared identity akan dipertimbangkan setelah audit.
+
+AUDIT:
+
+A. Arsitektur aplikasi
+
+* framework
+* frontend
+* backend
+* API
+* services
+* folder structure
+
+B. AI architecture
+
+* chatbot architecture
+* agents
+* AI models
+* provider
+* prompt system
+* knowledge base
+* RAG
+* memory
+* tools
+* MultiClaw/agent architecture
+
+C. Product architecture
+Cari bagaimana chatbot/AI disimpan:
+
+* chatbot ID
+* product ID
+* name
+* category
+* price
+* status
+* owner
+* visibility
+* public/private
+* metadata
+
+D. Catalog
+Tentukan bagaimana ratusan chatbot saat ini dikelompokkan.
+
+Cari apakah memungkinkan memberikan metadata seperti:
+
+sector = construction
+store = gaia
+product_family = skk
+product_id = GAIA-SKK-001
+
+Tanpa mengubah apa pun.
+
+E. Deep Link
+Cari apakah setiap chatbot mempunyai URL/route yang stabil dan dapat digunakan dari external storefront.
+
+F. Authentication
+Audit:
+
+* user ID
+* email
+* session
+* authentication provider
+* access control
+* entitlement
+
+G. Payment
+Audit:
+
+* payment gateway
+* subscription
+* one-time payment
+* webhook
+* access control
+* product entitlement
+
+H. API
+Cari API yang sudah ada dan API yang mungkin digunakan untuk:
+
+* product catalog
+* chatbot
+* authentication
+* user
+* entitlement
+* usage
+* conversation
+
+Jangan membuat API baru.
+
+I. Database
+Audit:
+
+* users
+* chatbot
+* products
+* orders
+* payments
+* conversations
+* knowledge
+* memory
+* agents
+
+J. Environment
+Daftar nama environment variable yang berkaitan dengan:
+
+* domain
+* catalog
+* payment
+* authentication
+* API
+* external integration
+
+JANGAN tampilkan nilai secret/API key.
+
+K. Existing external integrations
+Cari apakah Gustafta sudah terhubung dengan:
+
+* payment
+* email
+* catalog
+* other applications.
+
+L. Risiko integrasi
+Identifikasi:
+
+* hardcoded URL
+* hardcoded product
+* duplicate identity
+* duplicate catalog
+* unstable chatbot URL
+* access control issue
+* database coupling
+
+TARGET ARSITEKTUR:
+
+Gustafta
+= AI Platform / AI Engine / General AI Marketplace
+
+Gaia Store
+= curated Construction AI storefront
+
+Target awal:
+
+Gaia Store
+→ selected Gaia Product
+→ stable Gustafta chatbot/deep link
+
+Bukan:
+
+Gaia Store
+→ seluruh Gustafta catalog
+
+Dan bukan:
+
+DokumenProyek
+→ mengambil alih Gustafta.
+
+PENTING:
+Audit ONLY.
+Jangan mengubah apa pun.
+
+FORMAT:
+
+1. Executive Summary
+2. Current Architecture
+3. AI Architecture
+4. Chatbot Architecture
+5. Product/Catalog Architecture
+6. Database
+7. Authentication
+8. Payment
+9. API
+10. Deep Link Capability
+11. External Integrations
+12. Environment Variables
+13. Security/Access Control
+14. Integration Risks
+15. Recommended Future Architecture
+16. Critical Issues
+17. Safe Next Steps
