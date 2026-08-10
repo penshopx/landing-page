@@ -32,6 +32,10 @@ const files = [
   // DB integration: confirms superadmin bootstrap guard survives server restarts.
   // Skipped automatically (process.exit 0) when DATABASE_URL is absent.
   resolve(__dirname, "bootstrap-superadmin-db.test.ts"),
+  // Concurrency regression: spawns two child processes of the test above at
+  // the same time; the global advisory run-lock must serialize them so
+  // neither clobbers the other's rows/recovery record. Skipped without DB.
+  resolve(__dirname, "bootstrap-superadmin-db-concurrent.test.ts"),
   // Unit: confirms normalizePhone + promoteSuperAdminIfMatch handle all phone
   // formats (leading 0, +62, bare 8x) so format mismatches never silently block
   // superadmin promotion. No DB or env required — pure logic test.
