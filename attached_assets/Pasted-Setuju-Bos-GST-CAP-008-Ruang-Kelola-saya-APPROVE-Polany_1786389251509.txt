@@ -1,0 +1,36 @@
+Setuju, Bos. **GST-CAP-008 — Ruang Kelola saya APPROVE.**
+
+Polanya memang tepat dibuat seperti Toolkit: **bukan SKU standalone**, melainkan kapabilitas yang meningkatkan nilai paket.
+
+### Keputusan final GST-CAP-008
+
+| Field                  | Nilai final                                                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `price`                | **0** — tetap                                                                                                                        |
+| `billing_type`         | **FREE** — tetap                                                                                                                     |
+| `visibility`           | **INCLUDED_ONLY** — tetap                                                                                                            |
+| `gaia_enabled`         | **false** — tetap                                                                                                                    |
+| `standalone_enabled`   | **false** — tetap                                                                                                                    |
+| `short_description`    | **Ruang kerja terpadu untuk mengelola dokumen, tim, dan progres kegiatan usaha Anda — tersedia sebagai bagian dari paket Gustafta.** |
+| `status`               | **ACTIVE** — tetap                                                                                                                   |
+| `subscription_enabled` | **true** — tetap                                                                                                                     |
+| `dp_enabled`           | **false** — tetap                                                                                                                    |
+| `ai_enabled`           | **false** — tetap                                                                                                                    |
+| `usage_profile`        | **STORAGE** — tetap                                                                                                                  |
+
+### Instruksi PATCH
+
+**Silakan PATCH GST-CAP-008 hanya pada `short_description`.**
+
+Kemudian lakukan:
+
+1. Read-back GST-CAP-008.
+2. Pastikan hanya `short_description` yang berubah.
+3. Cross-check GST-CAP-002, 003, 004, dan 006.
+4. Catalog tetap **3 standalone products**.
+5. Lock GST-CAP-008.
+6. Baru kita masuk ke **GST-CAP-009 — Ruang Simpan**.
+
+Dan saya setuju bahwa **Ruang Simpan perlu kita perlakukan lebih hati-hati**. Kalau memang kandidat pertama untuk `MONTHLY`, kita jangan sekadar mengikuti pola produk sebelumnya. Kita perlu memastikan dulu **unit billing-nya, harga existing, dan apakah benar layak menjadi SKU mandiri GAIA** sebelum PATCH.
+
+**GST-CAP-008: APPROVED → PATCH → read-back → LOCK.**
