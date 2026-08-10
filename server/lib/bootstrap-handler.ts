@@ -161,7 +161,18 @@ export function makeBootstrapHandler(db: BootstrapDb) {
         return;
       }
 
-      const result = await db.promoteToSuperadmin(email);
+      // If the DB drops between the guard read and the promotion, surface a
+      // clear 503 (service unavailable) instead of a confusing generic 500.
+      let result: Array<{ id: string | number; email: string; role: string }>;
+      try {
+        result = await db.promoteToSuperadmin(email);
+      } catch (dbErr: any) {
+        console.error("[bootstrap-superadmin] DB unavailable during promotion:", dbErr);
+        res.status(503).json({
+          error: "Database tidak dapat dijangkau saat proses promosi. Coba lagi dalam beberapa saat.",
+        });
+        return;
+      }
       if (result.length === 0) {
         res.status(404).json({
           error: `User dengan email ${email} tidak ditemukan. Pastikan sudah registrasi terlebih dahulu.`,

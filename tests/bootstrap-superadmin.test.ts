@@ -324,6 +324,56 @@ test("403 — second call with a DIFFERENT email is also blocked (guard is globa
 
 // ── DB-unavailable path ───────────────────────────────────────────────────────
 
+test("503 when promoteToSuperadmin() throws (DB drops mid-promotion after guard passes) — never a 500 or silent 200", async () => {
+  // Guard passes (no superadmin), but the DB dies before promotion completes.
+  const midFailDb: BootstrapDb = {
+    async findSuperadmin() {
+      return []; // guard passes
+    },
+    async promoteToSuperadmin(_email: string) {
+      throw new Error("connect ECONNREFUSED 127.0.0.1:5432");
+    },
+  };
+
+  const midFailApp = express();
+  midFailApp.use(express.json());
+  midFailApp.post("/api/admin/bootstrap-superadmin", makeBootstrapHandler(midFailDb));
+
+  const midFailServer = await new Promise<ReturnType<typeof createServer>>((resolve) => {
+    const s = createServer(midFailApp).listen(0, "127.0.0.1", () => resolve(s));
+  });
+  const midFailPort = (midFailServer.address() as any).port;
+
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:${midFailPort}/api/admin/bootstrap-superadmin`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-bootstrap-token": TOKEN,
+        },
+        body: JSON.stringify({ email: "founder@example.com" }),
+      }
+    );
+    const json = await res.json();
+
+    assert.equal(
+      res.status,
+      503,
+      `expected 503 when DB dies mid-promotion, got ${res.status}: ${JSON.stringify(json)}`
+    );
+    assert.notEqual(res.status, 200, "must never silently return 200 when promotion failed");
+    assert.ok(
+      typeof json.error === "string" && json.error.length > 0,
+      "response body must contain a clear error message"
+    );
+    assert.notEqual(json.success, true, "body must not claim success");
+  } finally {
+    await new Promise<void>((resolve) => midFailServer.close(() => resolve()));
+  }
+});
+
 test("503 when findSuperadmin() throws (DB unreachable) — user must NOT be promoted", async () => {
   // Build a fresh app with a db stub that always throws on findSuperadmin.
   const throwingDb: BootstrapDb = {
