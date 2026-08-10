@@ -1,0 +1,58 @@
+Saya ingin melakukan diagnostic READ-ONLY untuk persiapan integrasi Gaia Store.
+
+JANGAN mengubah kode, database, data produk, konfigurasi, environment variable, atau melakukan publish/deploy apa pun.
+
+Tolong audit dan laporkan kondisi aktual dari Catalog Registry / Product Registry yang digunakan oleh:
+
+/api/v1/catalog
+
+Fokus khusus pada:
+
+1. Apakah Product Registry sudah tersedia dan aktif?
+2. Berapa jumlah product_registry saat ini?
+   - total
+   - ACTIVE
+   - DRAFT
+   - PAUSED
+   - ARCHIVED
+3. Berapa produk yang:
+   - gaia_enabled = true
+   - visibility = PUBLIC
+   - product_type yang relevan untuk Gaia Store
+4. Apakah endpoint berikut tersedia dan berjalan di production:
+   - GET /api/v1/catalog/products
+   - GET /api/v1/catalog/solutions
+   - GET /api/v1/catalog/sectors
+   - GET /api/v1/catalog/tiers
+   - GET /api/v1/catalog/packages
+5. Berapa jumlah data yang dikembalikan masing-masing endpoint?
+6. Audit Package Registry:
+   - apakah package_registry sudah tersedia?
+   - berapa total package?
+   - berapa ACTIVE?
+   - apakah package_products dan package_version_snapshots sudah terisi?
+7. Audit Admin Registry:
+   - apakah ada UI untuk membuat/edit/publish product?
+   - apakah ada UI untuk membuat/edit/publish package?
+   - URL/path halaman admin tersebut?
+8. Audit GAIA Preview:
+   - apakah tersedia?
+   - bagaimana cara membuka preview?
+   - apakah preview membaca data yang sama dengan /api/v1/catalog?
+9. Tampilkan daftar produk yang saat ini eligible untuk Gaia Store dengan format:
+   productId | name | product_type | price | status | visibility | gaia_enabled
+10. Tampilkan daftar package yang saat ini eligible untuk Gaia Store dengan format:
+   packageId | name | status | visibility | jumlah produk
+11. Pastikan juga apakah 6 paket launch yang sebelumnya direncanakan SUDAH ADA atau BELUM ADA.
+12. Jika BELUM ADA, jangan membuatnya. Hanya jelaskan:
+   - menu/UI tempat membuatnya
+   - field yang wajib diisi
+   - field harga
+   - product yang harus dimasukkan
+   - cara publish menjadi ACTIVE
+13. Terakhir berikan kesimpulan dengan tiga status:
+   - READY
+   - PARTIALLY READY
+   - NOT READY
+
+Sekali lagi: READ-ONLY. Jangan melakukan perubahan apa pun.
