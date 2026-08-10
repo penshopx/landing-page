@@ -1,0 +1,894 @@
+Bisa. Untuk **Replit Gustafta**, saya sarankan mulai dari **Tahap 1** dulu: jangan ubah tampilan besar-besaran dan jangan integrasikan GAIA dulu. Kita bangun fondasi pemaketan di Gustafta terlebih dahulu.
+
+Berikut prompt yang bisa langsung Anda **copy-paste ke Replit Agent**:
+
+# GUSTAFTA — IMPLEMENTATION PHASE 1
+
+## PRODUCT REGISTRY + SOLUTION PACKAGE ENGINE
+
+Anda adalah senior full-stack engineer yang bekerja pada aplikasi Gustafta yang SUDAH BERJALAN.
+
+TUGAS UTAMA:
+Implementasikan fondasi Product Registry dan Solution Package Engine di aplikasi Gustafta tanpa merusak fitur, data, UI, authentication, billing, atau workflow yang sudah berjalan.
+
+==================================================
+
+## 0. ATURAN PALING PENTING
+
+==================================================
+
+JANGAN melakukan rewrite aplikasi.
+
+JANGAN mengganti framework existing.
+
+JANGAN mengganti database existing.
+
+JANGAN menghapus data existing.
+
+JANGAN menghapus fitur existing.
+
+JANGAN mengubah sistem authentication yang sudah berjalan.
+
+JANGAN mengubah payment gateway yang sudah berjalan.
+
+JANGAN mengintegrasikan GAIA pada tahap ini.
+
+JANGAN membuat fitur baru yang tidak diperlukan untuk Phase 1.
+
+Gunakan pendekatan incremental.
+
+Jika menemukan struktur existing yang sudah sesuai, gunakan kembali.
+
+Sebelum melakukan perubahan besar, audit terlebih dahulu.
+
+Jika ada konflik antara requirement ini dan implementasi existing, prioritaskan:
+
+1. menjaga aplikasi existing tetap berjalan;
+2. menjaga data existing;
+3. menambahkan architecture baru secara backward-compatible.
+
+==================================================
+
+## 1. TUJUAN PHASE 1
+
+==================================================
+
+Bangun fondasi internal agar Gustafta menjadi:
+
+> AI Production & Intelligence Engine
+
+yang memiliki:
+
+1. Product Registry
+2. Solution Registry
+3. Sector Registry
+4. Tier Registry
+5. Package Registry
+6. Access Matrix
+7. Package Versioning
+8. Publish Status
+9. Usage Profile dasar
+
+Pada tahap ini BELUM perlu membuat integrasi GAIA.
+
+==================================================
+
+## 2. AUDIT TERLEBIH DAHULU
+
+==================================================
+
+Sebelum coding:
+
+Audit aplikasi existing.
+
+Identifikasi:
+
+* framework
+* frontend architecture
+* backend architecture
+* database
+* ORM
+* authentication
+* user model
+* existing product model
+* existing store model
+* existing chatbot model
+* existing subscription/billing model
+* existing pricing
+* existing checkout
+* existing admin dashboard
+* existing API
+* existing route structure
+* existing environment variables
+* existing deployment structure
+
+Cari apakah sudah ada:
+
+* products table
+* plans table
+* subscriptions table
+* chatbot table
+* store/catalog table
+* pricing table
+* user access table
+
+Jangan membuat duplicate table jika struktur existing dapat diperluas secara aman.
+
+Setelah audit, buat ringkasan internal:
+
+CURRENT ARCHITECTURE
+CURRENT PRODUCT MODEL
+CURRENT BILLING MODEL
+CURRENT ADMIN MODEL
+PROPOSED CHANGES
+
+Kemudian implementasikan.
+
+==================================================
+
+## 3. PRODUCT REGISTRY
+
+==================================================
+
+Buat atau perluas Product Registry.
+
+Setiap product minimal memiliki:
+
+product_id
+product_name
+slug
+product_type
+category
+description
+status
+version
+visibility
+standalone_enabled
+subscription_enabled
+gaia_enabled
+dp_enabled
+ai_enabled
+usage_profile
+storage_profile
+created_at
+updated_at
+
+Jika existing product table sudah tersedia, EXTEND table tersebut daripada membuat duplicate.
+
+Product type harus mendukung:
+
+AI_SPECIALIST
+AI_WORKSPACE
+DIGITAL_WORKSPACE
+DOCUMENT_AI
+DIGITAL_TOOL
+MINI_APP
+GENERATOR
+ASSESSMENT
+KNOWLEDGE_PRODUCT
+EBOOK
+MODULE
+TEMPLATE
+CHECKLIST
+BUSINESS_KIT
+E_COURSE
+DIGITAL_CONSULTATION
+OTHER_DIGITAL_PRODUCT
+
+==================================================
+
+## 4. EXISTING GUSTAFTA PRODUCTS
+
+==================================================
+
+Jangan menghapus produk existing.
+
+Petakan produk existing ke Product Registry.
+
+Produk/capability yang harus dapat direpresentasikan:
+
+Peta Jalan Mulai
+Klinik Konsultasi
+Bedah Dokumen
+Brain Project
+Ekosistem Kompetensi
+Toolkit
+Mitra
+Ruang Kelola
+Ruang Simpan
+Jasa Dokumen
+Jasa Keuangan
+Bimtek SKK
+Executive Summary
+Produk AI / AI Specialist
+
+Tidak semua harus otomatis menjadi standalone product.
+
+Sistem harus memungkinkan status:
+
+INCLUDED_ONLY
+STANDALONE_ONLY
+INCLUDED_AND_STANDALONE
+INTERNAL_ONLY
+DP_ONLY
+
+==================================================
+
+## 5. SOLUTION REGISTRY
+
+==================================================
+
+Buat Solution Registry.
+
+Solution adalah kelompok kebutuhan bisnis.
+
+Contoh awal:
+
+LEGALITAS
+OSS
+SBU
+SKK
+TENDER
+PROYEK
+COMPLIANCE
+KOMPETENSI
+FINANCE
+
+Jangan mengunci sistem hanya pada daftar ini.
+
+Admin harus dapat menambahkan solution baru.
+
+Field minimal:
+
+solution_id
+name
+slug
+description
+status
+created_at
+updated_at
+
+==================================================
+
+## 6. SECTOR REGISTRY
+
+==================================================
+
+Buat Sector Registry.
+
+Contoh:
+
+KONSTRUKSI
+KONSULTAN
+PERDAGANGAN
+MANUFAKTUR
+TEKNOLOGI
+JASA
+LAINNYA
+
+Admin harus dapat menambahkan sector.
+
+Field:
+
+sector_id
+name
+slug
+description
+status
+
+==================================================
+
+## 7. TIER REGISTRY
+
+==================================================
+
+Buat Tier Registry.
+
+Default:
+
+BASIC
+PROFESSIONAL
+BUSINESS
+
+Jangan membuat terlalu banyak tier.
+
+Tier harus dapat digunakan ulang oleh berbagai solution.
+
+Field:
+
+tier_id
+name
+slug
+description
+level
+status
+
+==================================================
+
+## 8. PACKAGE REGISTRY
+
+==================================================
+
+Ini adalah bagian TERPENTING.
+
+Package adalah kombinasi:
+
+SOLUTION
++
+SECTOR
++
+TIER
++
+DURATION
+
+Contoh:
+
+Gustafta SBU
++
+Konstruksi
++
+Professional
++
+6 Bulan
+
+Package harus memiliki:
+
+package_id
+solution_id
+sector_id
+tier_id
+name
+slug
+description
+status
+duration_value
+duration_unit
+price
+currency
+version
+effective_from
+effective_until
+gaia_enabled
+created_at
+updated_at
+
+Duration unit minimal:
+
+MONTH
+YEAR
+
+Duration value:
+
+1
+3
+6
+12
+
+Tidak membuat generic unlimited monthly subscription.
+
+==================================================
+
+## 9. PACKAGE PRODUCT COMPOSITION
+
+==================================================
+
+Buat relasi:
+
+PACKAGE
+→ PRODUCTS
+
+Satu package dapat berisi banyak product.
+
+Satu product dapat digunakan pada banyak package.
+
+Gunakan many-to-many relation.
+
+Setiap package-product relation dapat memiliki:
+
+product_id
+package_id
+access_level
+usage_limit
+is_required
+sort_order
+
+Access level minimal:
+
+FULL
+LIMITED
+VIEW_ONLY
+
+==================================================
+
+## 10. ACCESS MATRIX
+
+==================================================
+
+Implementasikan Access Matrix.
+
+Tujuan:
+
+menentukan capability/product apa yang dapat digunakan customer berdasarkan:
+
+SOLUTION
+SECTOR
+TIER
+PACKAGE
+
+Contoh:
+
+SBU
+× Konstruksi
+× Professional
+
+mendapat:
+
+Ruang Kelola = FULL
+Kompetensi Hub = FULL
+Ruang Simpan = FULL
+Bedah Dokumen SBU = FULL
+SBU AI Specialist = FULL
+Toolkit SBU = LIMITED
+
+Sedangkan:
+
+Tender
+× Konstruksi
+× Professional
+
+dapat memiliki:
+
+Tender Workspace = FULL
+Tender Document Analyzer = FULL
+Tender AI Specialist = FULL
+Tender Toolkit = FULL
+Executive Summary = LIMITED
+
+Access Matrix harus menjadi source of truth untuk provisioning di masa depan.
+
+==================================================
+
+## 11. PACKAGE VERSIONING
+
+==================================================
+
+Package harus memiliki version.
+
+Contoh:
+
+SBU-KONSTRUKSI-PRO
+version 1
+
+Jika komposisi berubah:
+
+version 2
+
+Jangan mengubah package lama yang sudah dibeli customer secara retroaktif.
+
+Order/subscription yang sudah aktif harus dapat mengacu pada:
+
+package_id
++
+package_version
+
+Tujuannya agar perubahan package di masa depan tidak merusak customer existing.
+
+==================================================
+
+## 12. USAGE PROFILE
+
+==================================================
+
+Jangan menjual token kepada customer sebagai konsep utama.
+
+Buat struktur internal untuk usage profile.
+
+Contoh:
+
+usage_profile:
+
+AI_CHAT
+DOCUMENT_ANALYSIS
+DOCUMENT_GENERATION
+KNOWLEDGE_PROCESSING
+AGENT_EXECUTION
+STORAGE
+
+Pada Phase 1 cukup buat schema/configuration.
+
+BELUM perlu implementasi billing token secara penuh.
+
+Tujuan Phase 1 adalah menyediakan tempat untuk usage rules di masa depan.
+
+==================================================
+
+## 13. ADMIN DASHBOARD
+
+==================================================
+
+Tambahkan section admin baru:
+
+PRODUCTS
+SOLUTIONS
+SECTORS
+TIERS
+PACKAGES
+ACCESS MATRIX
+
+Jangan merusak admin dashboard existing.
+
+Gunakan UI style existing.
+
+==================================================
+
+## 14. PRODUCT ADMIN
+
+==================================================
+
+Admin dapat:
+
+create product
+edit product
+archive product
+change status
+set standalone_enabled
+set subscription_enabled
+set gaia_enabled
+set dp_enabled
+set ai_enabled
+
+Jangan menghapus existing product.
+
+==================================================
+
+## 15. SOLUTION ADMIN
+
+==================================================
+
+Admin dapat:
+
+create solution
+edit solution
+archive solution
+activate/deactivate solution
+
+==================================================
+
+## 16. SECTOR ADMIN
+
+==================================================
+
+Admin dapat:
+
+create sector
+edit sector
+archive sector
+activate/deactivate sector
+
+==================================================
+
+## 17. TIER ADMIN
+
+==================================================
+
+Admin dapat:
+
+create tier
+edit tier
+activate/deactivate tier
+
+==================================================
+
+## 18. PACKAGE BUILDER
+
+==================================================
+
+Buat admin interface untuk membuat package.
+
+Workflow:
+
+CREATE PACKAGE
+
+→ Select Solution
+→ Select Sector
+→ Select Tier
+→ Select Duration
+→ Set Price
+→ Select Products
+→ Configure Access Level
+→ Configure Usage Limit jika diperlukan
+→ Review
+→ Save Draft
+→ Publish
+
+Package dapat berstatus:
+
+DRAFT
+ACTIVE
+PAUSED
+ARCHIVED
+
+Jangan langsung publish ketika dibuat.
+
+==================================================
+
+## 19. PACKAGE BUILDER UX
+
+==================================================
+
+Buat tampilan sederhana dan mudah dipahami.
+
+Contoh:
+
+PACKAGE
+
+Gustafta Tender
+Konstruksi
+Professional
+6 Bulan
+
+PRODUCTS INCLUDED
+
+☑ Tender Workspace
+☑ Tender Document Analyzer
+☑ Tender AI Specialist
+☑ Tender Toolkit
+☑ Executive Summary
+
+ACCESS
+
+Tender Workspace → FULL
+Document Analyzer → FULL
+AI Specialist → FULL
+Toolkit → LIMITED
+
+PRICE
+
+Rp ______
+
+STATUS
+
+Draft
+
+[Save Draft]
+[Publish]
+
+==================================================
+
+## 20. PRODUCT STATUS
+
+==================================================
+
+Gunakan status:
+
+DRAFT
+ACTIVE
+PAUSED
+ARCHIVED
+
+Jangan menghapus data secara destructive.
+
+Gunakan soft delete/archive jika diperlukan.
+
+==================================================
+
+## 21. FUTURE GAIA COMPATIBILITY
+
+==================================================
+
+Walaupun GAIA BELUM diintegrasikan pada Phase 1, struktur data harus siap untuk future sync.
+
+Setiap product dan package yang akan dijual melalui GAIA memiliki:
+
+gaia_enabled
+
+Jangan membuat API GAIA dulu kecuali memang diperlukan oleh architecture existing.
+
+Jika memungkinkan, siapkan internal service/repository layer yang nantinya mudah diekspos sebagai API.
+
+==================================================
+
+## 22. FUTURE PROVISIONING COMPATIBILITY
+
+==================================================
+
+Package harus dapat digunakan nanti untuk:
+
+Customer
+→ Purchase
+→ Payment
+→ Package
+→ Package Version
+→ Access Matrix
+→ Provisioning
+→ Expiration
+
+Phase 1 belum perlu membuat provisioning lengkap.
+
+Namun schema harus tidak menghambat implementasi tersebut.
+
+==================================================
+
+## 23. IMPORTANT COMMERCIAL RULE
+
+==================================================
+
+Gustafta TIDAK menyediakan:
+
+Generic Gustafta Unlimited
+Generic Unlimited AI
+Generic subscription tanpa solution scope
+
+Model utama:
+
+SOLUTION
+×
+SECTOR
+×
+TIER
+×
+DURATION
+
+Contoh:
+
+Gustafta SBU
+Konstruksi
+Professional
+6 Bulan
+
+Gustafta Tender
+Konstruksi
+Business
+1 Tahun
+
+==================================================
+
+## 24. BACKWARD COMPATIBILITY
+
+==================================================
+
+Existing Gustafta subscription/product system harus tetap berjalan.
+
+Jika existing subscription architecture berbeda, JANGAN langsung menggantinya.
+
+Buat compatibility layer.
+
+Jangan memutus existing customer.
+
+Jangan mengubah existing active subscriptions secara otomatis.
+
+==================================================
+
+## 25. TESTING
+
+==================================================
+
+Setelah implementasi:
+
+Test:
+
+1. existing login
+2. existing chatbot
+3. existing product
+4. existing user
+5. existing subscription
+6. existing checkout jika ada
+7. admin dashboard
+8. create product
+9. create solution
+10. create sector
+11. create tier
+12. create package
+13. add products to package
+14. access matrix
+15. package version
+16. archive package
+17. existing application routes
+
+Pastikan tidak ada regression.
+
+==================================================
+
+## 26. DATABASE SAFETY
+
+==================================================
+
+Sebelum migration:
+
+backup / gunakan migration aman sesuai database existing.
+
+Jangan drop existing tables.
+
+Jangan rename existing columns tanpa alasan kuat.
+
+Jika perlu perubahan schema:
+
+gunakan additive migration.
+
+==================================================
+
+## 27. DOCUMENTATION
+
+==================================================
+
+Setelah selesai, buat dokumentasi internal:
+
+docs/product-registry.md
+docs/package-engine.md
+docs/access-matrix.md
+
+Dokumentasikan:
+
+* schema
+* relationship
+* API/service layer
+* package logic
+* access matrix
+* versioning
+* future GAIA integration
+
+==================================================
+
+## 28. FINAL REPORT
+
+==================================================
+
+Setelah selesai implementasi, berikan laporan:
+
+1. Existing architecture found
+2. Tables/models added
+3. Tables/models modified
+4. Routes added
+5. Components added
+6. Admin features added
+7. Migration performed
+8. Existing features preserved
+9. Tests performed
+10. Any risks/issues
+11. Recommended Phase 2
+
+JANGAN mengklaim selesai jika fitur belum benar-benar berjalan.
+
+==================================================
+
+## FINAL PRINCIPLE
+
+==================================================
+
+Gustafta adalah SOURCE OF TRUTH.
+
+Gustafta:
+
+CREATE
+CONFIGURE
+PACKAGE
+CONTROL
+PROVISION
+
+GAIA nantinya:
+
+DISPLAY
+DISCOVER
+SELL
+ORDER
+
+Scalev:
+
+PAYMENT
+
+DP Store:
+
+HUMAN SERVICE / PROJECT
+
+Phase 1 hanya fokus membangun fondasi Product Registry + Solution Package Engine di Gustafta.
+
+Jangan mengerjakan GAIA pada tahap ini.
+Jangan melakukan rewrite aplikasi.
+Pertahankan semua fitur existing.
+Implementasikan secara incremental dan backward-compatible.
+
+**Urutan kerjanya saya sarankan persis seperti ini:**
+
+**Sekarang:** paste prompt di atas ke **Replit Gustafta** → biarkan dia **audit dulu dan implementasi Phase 1**.
+
+Setelah Replit selesai, **jangan langsung kita suruh membuat GAIA**. Kirimkan kepada saya hasil/laporan Replit-nya (terutama schema/database yang dibuat dan apa yang berubah). Dari situ saya bisa buatkan **Prompt Phase 2: API Catalog Gustafta → GAIA**, yang disesuaikan dengan struktur nyata aplikasi Anda, bukan asumsi.
