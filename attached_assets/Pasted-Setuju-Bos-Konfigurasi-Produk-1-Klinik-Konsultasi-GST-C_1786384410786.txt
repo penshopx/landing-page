@@ -1,0 +1,44 @@
+Setuju, Bos. **Konfigurasi Produk #1 — Klinik Konsultasi (GST-CAP-002) saya approve.** Struktur ini masuk akal secara bisnis dan tetap menjaga Gustafta sebagai source of truth.
+
+### Keputusan final
+
+| Field                  | Nilai final                                                                                                                        |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `price`                | **150000**                                                                                                                         |
+| `billing_type`         | **ONE_TIME**                                                                                                                       |
+| `visibility`           | **INCLUDED_AND_STANDALONE**                                                                                                        |
+| `gaia_enabled`         | **true**                                                                                                                           |
+| `standalone_enabled`   | **true**                                                                                                                           |
+| `subscription_enabled` | **true** — tetap                                                                                                                   |
+| `dp_enabled`           | **false** — tetap                                                                                                                  |
+| `ai_enabled`           | **true** — tetap                                                                                                                   |
+| `usage_profile`        | **AI_CHAT** — tetap                                                                                                                |
+| `status`               | **ACTIVE** — tetap                                                                                                                 |
+| `short_description`    | **Sesi konsultasi AI + pendampingan ahli untuk masalah tender, SBU/SKK, legalitas, dan compliance konstruksi. Mulai dari 1 sesi.** |
+
+### Kenapa saya setuju
+
+**Klinik Konsultasi memang cocok menjadi "front door" GAIA.**
+
+Alurnya menjadi:
+
+**GAIA Store → Klinik Konsultasi Rp150.000 → pengalaman pertama → kebutuhan lebih kompleks → Paket / layanan Gustafta yang lebih tinggi.**
+
+Dan yang penting, kita **tidak membuat SKU berlebihan sekarang**. Rp150 ribu menjadi entry SKU, sementara Rp300 ribu/Rp500 ribu masih bisa ditangani sebagai variasi layanan sampai memang terbukti perlu menjadi SKU terpisah.
+
+Paket Klinik juga tetap berada di **Package Registry**, bukan dibuat sebagai product registry baru.
+
+### Instruksi PATCH
+
+**Boleh PATCH sekarang, tetapi hanya GST-CAP-002 dan hanya field yang disetujui di atas.**
+
+Jangan:
+
+* ❌ INSERT record baru
+* ❌ DELETE
+* ❌ mengubah 9 produk lainnya
+* ❌ mengubah package registry
+* ❌ melakukan sync/publish massal
+* ❌ mengubah `subscription_enabled`, `dp_enabled`, `ai_enabled`, atau `usage_profile` yang sudah benar
+
+Setelah PATCH, **jangan langsung lanjut ke Produk #2**. Lakukan dulu **read-back/GET GST-CAP-002** untuk memastikan nilai database benar-benar menjadi nilai final. Kalau cocok, baru kita kunci Produk #1 dan masuk **Bedah Dokumen (GST-CAP-003)**.
