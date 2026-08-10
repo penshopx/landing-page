@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { apiRequest } from "@/lib/queryClient";
@@ -416,6 +416,33 @@ export function AcademyStatCards({
   );
 }
 
+// ---- WA contact form state (named export so tests can exercise the real logic) ----
+// Pre-fills from the contact cache but never overwrites in-progress admin edits:
+// a dirty flag is set on the first edit, the pre-fill effect skips while dirty,
+// and markSaved() clears the flag after a successful save so the next cache
+// update re-syncs the form normally.
+export function useWaContactForm(contact: { primary: string; secondary: string }) {
+  const [form, setForm] = useState({ primary: "", secondary: "" });
+  const dirtyRef = useRef(false);
+
+  useEffect(() => {
+    if (dirtyRef.current) return;
+    setForm({ primary: contact.primary, secondary: contact.secondary });
+  }, [contact.primary, contact.secondary]);
+
+  function setField(field: "primary" | "secondary", value: string) {
+    dirtyRef.current = true;
+    setForm((f) => ({ ...f, [field]: value }));
+  }
+
+  function markSaved(saved: { primary: string; secondary: string }) {
+    dirtyRef.current = false;
+    setForm(saved);
+  }
+
+  return { form, setField, markSaved };
+}
+
 // ---- Main Component ----
 export default function AdminPage() {
   const { toast } = useToast();
@@ -466,15 +493,10 @@ export default function AdminPage() {
 
   // ── WA Contact Numbers (runtime, from /api/config/contact) ──
   const contact = useContactNumbers();
-  const [waContactForm, setWaContactForm] = useState({ primary: "", secondary: "" });
+  // Pre-fills from DB/fallback values when contact data resolves, but never
+  // overwrites in-progress admin edits (dirty flag); see useWaContactForm above.
+  const { form: waContactForm, setField: setWaContactField, markSaved: markWaContactSaved } = useWaContactForm(contact);
   const [waContactSaving, setWaContactSaving] = useState(false);
-
-  // Pre-fill form from DB/fallback values whenever contact data resolves or updates.
-  // This runs on mount (with static fallbacks) and again when the API response arrives
-  // so the admin always sees the effective numbers rather than blank inputs.
-  useEffect(() => {
-    setWaContactForm({ primary: contact.primary, secondary: contact.secondary });
-  }, [contact.primary, contact.secondary]);
 
   async function handleSaveWaContact() {
     const primary = waContactForm.primary.trim();
@@ -496,9 +518,9 @@ export default function AdminPage() {
       }
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan");
       queryClient.invalidateQueries({ queryKey: ["/api/config/contact"] });
-      // Keep the saved values in the form so admin can verify what was stored.
-      // The useEffect on contact.primary/secondary will sync when the query re-resolves.
-      setWaContactForm({ primary: data.primary ?? primary, secondary: data.secondary ?? secondary });
+      // Keep the saved values in the form so admin can verify what was stored,
+      // and clear the dirty flag so the next cache update re-syncs normally.
+      markWaContactSaved({ primary: data.primary ?? primary, secondary: data.secondary ?? secondary });
       toast({ title: "✅ Nomor WhatsApp diperbarui!", description: `${data.primary} / ${data.secondary}` });
     } catch (e: any) {
       handle401Error(e, "Error", e.message);
@@ -3175,7 +3197,7 @@ export default function AdminPage() {
                         <Input
                           placeholder={contact.primary}
                           value={waContactForm.primary}
-                          onChange={(e) => setWaContactForm((f) => ({ ...f, primary: e.target.value }))}
+                          onChange={(e) => setWaContactField("primary", e.target.value)}
                           className="text-sm font-mono"
                           data-testid="input-wa-primary"
                         />
@@ -3185,7 +3207,7 @@ export default function AdminPage() {
                         <Input
                           placeholder={contact.secondary}
                           value={waContactForm.secondary}
-                          onChange={(e) => setWaContactForm((f) => ({ ...f, secondary: e.target.value }))}
+                          onChange={(e) => setWaContactField("secondary", e.target.value)}
                           className="text-sm font-mono"
                           data-testid="input-wa-secondary"
                         />
