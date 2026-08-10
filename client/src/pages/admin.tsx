@@ -561,6 +561,8 @@ export default function AdminPage() {
     midtransOrderId: string;
     accessToken: string;
     createdAt: string;
+    downloadPath: string | null;
+    productName: string | null;
   }
 
   interface StoreProduct {
@@ -3965,20 +3967,15 @@ Selamat menggunakan! 🚀
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-green-500" />
-              {(() => {
-                const ord = storeWaDialog.order;
-                const prod = ord ? storeProducts.find(p => p.id === ord.productId) : null;
-                return prod?.downloadPath ? "Kirim Konfirmasi File Digital via WA" : "Kirim Link Akses Chatbot via WA";
-              })()}
+              {storeWaDialog.order?.downloadPath ? "Kirim Konfirmasi File Digital via WA" : "Kirim Link Akses Chatbot via WA"}
             </DialogTitle>
           </DialogHeader>
           {storeWaDialog.order && (() => {
             const order = storeWaDialog.order!;
-            const prod = storeProducts.find(p => p.id === order.productId);
-            const isDigital = !!(prod?.downloadPath);
+            const isDigital = !!(order.downloadPath);
             // Digital orders share the access PAGE (validates payment, resolves fresh 24h link) — never the raw storage path.
             const accessUrl = `${appUrl}/store/access/${order.accessToken}`;
-            const productLabel = prod?.name ?? order.midtransOrderId ?? "produk";
+            const productLabel = order.productName ?? order.midtransOrderId ?? "produk";
             const msg = isDigital
               ? `Halo ${order.customerName}! 👋
 

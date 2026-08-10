@@ -7886,8 +7886,28 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
   app.get("/api/store/admin/orders", isAuthenticated, async (_req, res) => {
     try {
-      const orders = await storage.getStoreOrders();
-      res.json(orders);
+      const { db: dbOrd } = await import("./db");
+      const { storeOrders: soTblOrd, storeProducts: spTblOrd } = await import("@shared/schema");
+      const { desc: descOrd, eq: eqOrd } = await import("drizzle-orm");
+      const rows = await dbOrd
+        .select({
+          id: soTblOrd.id,
+          productId: soTblOrd.productId,
+          customerName: soTblOrd.customerName,
+          customerEmail: soTblOrd.customerEmail,
+          customerPhone: soTblOrd.customerPhone,
+          amount: soTblOrd.amount,
+          status: soTblOrd.status,
+          midtransOrderId: soTblOrd.midtransOrderId,
+          accessToken: soTblOrd.accessToken,
+          createdAt: soTblOrd.createdAt,
+          downloadPath: spTblOrd.downloadPath,
+          productName: spTblOrd.name,
+        })
+        .from(soTblOrd)
+        .leftJoin(spTblOrd, eqOrd(soTblOrd.productId, spTblOrd.id))
+        .orderBy(descOrd(soTblOrd.createdAt));
+      res.json(rows);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch orders" });
     }
