@@ -46,6 +46,11 @@ const files = [
   // that actually changed state, not the full selection. Also confirms empty-ids
   // → 400 and auth gates. Skipped when DATABASE_URL is absent.
   resolve(__dirname, "lms-bulk-activate-deactivate-mixed.test.ts"),
+  // Static: confirms the certificate copy-link button (button-copy-verify-{id})
+  // calls navigator.clipboard.writeText with a full absolute URL
+  // (https://gustafta.my.id/lms/verify/<code>) — not a relative path — so
+  // students never paste a broken link into email or chat.
+  resolve(__dirname, "lms-certificate-copy-link.test.ts"),
 ];
 
 let hadFailure = false;
