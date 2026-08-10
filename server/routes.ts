@@ -18431,7 +18431,7 @@ Buat dokumen KB berkualitas tinggi untuk topik ini.`;
           const { sendPartnerTopupRequestNotification } = await import("./lib/email");
           const adminTo = (process.env.ADMIN_EMAILS || "").split(",").map((s) => s.trim()).filter(Boolean)[0]
             || process.env.BREVO_SENDER_EMAIL
-            || "support@gustafta.com";
+            || "support@gustafta.my.id";
           await sendPartnerTopupRequestNotification({
             to: adminTo,
             partnerName: partner.name,
@@ -21316,14 +21316,14 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
 
   // ── Admin: Check Brevo sender domain authentication status ───────────────────
   // Calls Brevo's /v3/senders/domains API to fetch SPF/DKIM/DMARC status for
-  // the configured sender domain (default: gustafta.com).
+  // the configured sender domain (default: gustafta.my.id).
   app.get("/api/admin/email/domain-status", isAuthenticated, requireAdmin, async (_req: any, res: any) => {
     const brevoApiKey = process.env.BREVO_API_KEY;
     if (!brevoApiKey) {
       return res.json({ configured: false, message: "BREVO_API_KEY is not set." });
     }
-    const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.com";
-    const domainName = senderEmail.split("@")[1] || "gustafta.com";
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.my.id";
+    const domainName = senderEmail.split("@")[1] || "gustafta.my.id";
     try {
       // Fetch all domains first, then get detail for our domain
       const listResp = await fetch("https://api.brevo.com/v3/senders/domains", {
@@ -21380,7 +21380,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       return res.status(400).json({ error: "Alamat email tujuan tidak valid." });
     }
     const { sendEmail } = await import("./lib/email");
-    const senderDomain = (process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.com").split("@")[1] || "gustafta.com";
+    const senderDomain = (process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.my.id").split("@")[1] || "gustafta.my.id";
     const result = await sendEmail({
       to: to.trim(),
       toName: "Gustafta Admin",

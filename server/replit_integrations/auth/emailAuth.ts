@@ -218,8 +218,8 @@ async function sendVerificationEmail(email: string, code: string, firstNameRaw: 
     return { sent: false, reason: "not_configured" };
   }
   // Use custom sender domain (must be verified in Brevo dashboard).
-  // Set BREVO_SENDER_EMAIL env var to override (e.g. noreply@gustafta.com).
-  const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.com";
+  // Set BREVO_SENDER_EMAIL env var to override (e.g. noreply@gustafta.my.id).
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || "noreply@gustafta.my.id";
   const firstName = escapeHtml(sanitizePlainText(firstNameRaw));
   const isReset = purpose === "reset";
   const subject = isReset ? "Kode Reset Password Gustafta Anda" : "Kode Verifikasi Akun Gustafta Anda";
@@ -279,7 +279,7 @@ ${footerNote}
       },
       body: JSON.stringify({
         sender: { name: "Gustafta", email: senderEmail },
-        replyTo: { name: "Gustafta Support", email: "support@gustafta.com" },
+        replyTo: { name: "Gustafta Support", email: "support@gustafta.my.id" },
         to: [{ email, name: sanitizePlainText(firstNameRaw) }],
         subject,
         htmlContent: html,

@@ -40,7 +40,7 @@ export async function sendEmail(opts: SendEmailOptions): Promise<SendEmailResult
       },
       body: JSON.stringify({
         sender: { name: "Gustafta", email: senderEmail },
-        replyTo: { name: "Gustafta Support", email: "support@gustafta.com" },
+        replyTo: { name: "Gustafta Support", email: "support@gustafta.my.id" },
         to: [{ email: opts.to, name: opts.toName || opts.to }],
         subject: opts.subject,
         htmlContent: opts.htmlContent,
