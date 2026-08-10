@@ -85,6 +85,7 @@ import { registerLmsRoutes } from "./routes-lms";
 import { registerDataMasterRoutes, buildDataMasterContext } from "./routes-data-master";
 import { registerGaiaRegistryRoutes } from "./gaia-registry";
 import { registerPackageEngineRoutes } from "./package-engine";
+import { registerCatalogApiRoutes, clearCatalogCache } from "./catalog-api";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 
 const _require = createRequire(import.meta.url);
@@ -22463,10 +22464,17 @@ Min 300 kata. Bahasa Indonesia profesional. Sitasi regulasi spesifik domain ini.
   registerLegalRoutes(app);
   registerLmsRoutes(app);
   registerDataMasterRoutes(app);
+  // Setiap mutasi admin registry meng-invalidate cache Catalog API publik (Phase 2A)
+  app.use("/api/admin/registry", (req, _res, next) => {
+    if (req.method !== "GET") clearCatalogCache();
+    next();
+  });
   // Product Registry + GAIA Publishing (Gustafta = MASTER, GAIA = commerce view)
   registerGaiaRegistryRoutes(app, { isAuthenticated, getDbRole });
   // Phase 1: Solution Package Engine (SOLUTION × SECTOR × TIER × DURATION)
   registerPackageEngineRoutes(app, { isAuthenticated, getDbRole });
+  // Phase 2A: public read-only Catalog API untuk GAIA (Gustafta = source of truth)
+  registerCatalogApiRoutes(app, { isAuthenticated, getDbRole });
 
   // ── Admin Agent System Endpoints ──────────────────────────────────────────
 

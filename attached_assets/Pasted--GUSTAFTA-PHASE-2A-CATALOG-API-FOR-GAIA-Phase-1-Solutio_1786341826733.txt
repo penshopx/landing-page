@@ -1,0 +1,584 @@
+# GUSTAFTA — PHASE 2A
+
+# CATALOG API FOR GAIA
+
+Phase 1 Solution Package Engine sudah selesai dan telah diuji.
+
+Gunakan implementasi Phase 1 yang SUDAH ADA.
+
+JANGAN melakukan rewrite.
+
+JANGAN membuat Product Registry baru.
+
+JANGAN membuat Package Registry baru.
+
+JANGAN mengubah struktur Phase 1 yang sudah berjalan kecuali benar-benar diperlukan.
+
+JANGAN mengintegrasikan payment pada tahap ini.
+
+JANGAN membuat provisioning customer pada tahap ini.
+
+JANGAN mengubah GAIA pada tahap ini.
+
+Fokus Phase 2A hanya:
+
+> membuat secure Catalog API agar GAIA nantinya dapat membaca katalog resmi Gustafta.
+
+==================================================
+
+## 1. SOURCE OF TRUTH
+
+==================================================
+
+Gustafta adalah satu-satunya SOURCE OF TRUTH.
+
+Data yang boleh menjadi sumber katalog:
+
+product_registry
+solution_registry
+sector_registry
+tier_registry
+package_registry
+package_products
+package_version_snapshots
+
+GAIA nantinya hanya menjadi consumer.
+
+Jangan membuat GAIA menjadi source of truth.
+
+==================================================
+
+## 2. API YANG DIBUTUHKAN
+
+==================================================
+
+Buat API read-only untuk katalog.
+
+Minimal endpoint:
+
+GET /api/catalog/products
+
+GET /api/catalog/products/:id
+
+GET /api/catalog/solutions
+
+GET /api/catalog/solutions/:id
+
+GET /api/catalog/sectors
+
+GET /api/catalog/tiers
+
+GET /api/catalog/packages
+
+GET /api/catalog/packages/:id
+
+GET /api/catalog/packages/:id/products
+
+GET /api/catalog/packages/:id/version
+
+==================================================
+
+## 3. HANYA DATA PUBLISHED
+
+==================================================
+
+API catalog publik TIDAK boleh mengembalikan:
+
+DRAFT
+ARCHIVED
+INTERNAL_ONLY
+unpublished
+
+Hanya data yang:
+
+ACTIVE
++
+gaia_enabled = true
+
+yang boleh masuk public catalog.
+
+==================================================
+
+## 4. PRODUCT VISIBILITY
+
+==================================================
+
+Hormati flag yang sudah dibuat pada Phase 1:
+
+visibility
+standalone_enabled
+subscription_enabled
+dp_enabled
+ai_enabled
+gaia_enabled
+
+Contoh:
+
+gaia_enabled = false
+
+→ jangan tampilkan ke GAIA.
+
+Jika:
+
+gaia_enabled = true
+
+→ dapat tampil di GAIA sesuai status dan visibility.
+
+==================================================
+
+## 5. PRODUCT TYPE
+
+==================================================
+
+API harus mengirim product_type.
+
+Contoh:
+
+AI_SPECIALIST
+AI_WORKSPACE
+DIGITAL_TOOL
+MINI_APP
+GENERATOR
+EBOOK
+MODULE
+TEMPLATE
+CHECKLIST
+BUSINESS_KIT
+E_COURSE
+DOCUMENT_AI
+OTHER_DIGITAL_PRODUCT
+
+==================================================
+
+## 6. SOLUTION PACKAGE API
+
+==================================================
+
+Package API harus mengembalikan:
+
+package_id
+package_name
+solution
+sector
+tier
+duration
+price
+currency
+status
+version
+effective_from
+effective_until
+description
+gaia_enabled
+
+Contoh:
+
+{
+package_id: "...",
+name: "Gustafta Tender — Konstruksi — Professional",
+solution: "Tender",
+sector: "Konstruksi",
+tier: "Professional",
+duration: 6,
+duration_unit: "MONTH",
+price: ...,
+currency: "IDR",
+version: 1,
+status: "ACTIVE",
+gaia_enabled: true
+}
+
+Sesuaikan format JSON dengan framework existing.
+
+==================================================
+
+## 7. PACKAGE PRODUCTS
+
+==================================================
+
+Package detail harus dapat mengembalikan produk yang termasuk dalam package.
+
+Untuk setiap product:
+
+product_id
+product_name
+product_type
+access_level
+usage_limit
+is_required
+sort_order
+
+Jangan mengembalikan data internal sensitif.
+
+==================================================
+
+## 8. PACKAGE VERSION
+
+==================================================
+
+PENTING:
+
+Jika package sudah memiliki version snapshot, Catalog API harus membaca versi ACTIVE yang berlaku.
+
+Jangan mengembalikan package composition yang tidak konsisten dengan version yang aktif.
+
+Jika package version berubah:
+
+GAIA harus nantinya dapat melihat version terbaru.
+
+Namun order lama tetap akan menggunakan package version yang dibeli.
+
+==================================================
+
+## 9. FILTER
+
+==================================================
+
+API packages harus mendukung filter:
+
+solution
+sector
+tier
+duration
+status
+gaia_enabled
+
+Contoh:
+
+GET /api/catalog/packages?solution=SBU
+
+GET /api/catalog/packages?sector=Konstruksi
+
+GET /api/catalog/packages?solution=Tender&sector=Konstruksi
+
+GET /api/catalog/packages?tier=Professional
+
+GET /api/catalog/packages?duration=6
+
+Gunakan query syntax yang sesuai dengan framework existing.
+
+==================================================
+
+## 10. SEARCH
+
+==================================================
+
+Jika architecture existing mendukung search, sediakan pencarian berdasarkan:
+
+product_name
+package_name
+solution
+sector
+description
+
+Jangan menambahkan search engine eksternal.
+
+Gunakan database query existing terlebih dahulu.
+
+==================================================
+
+## 11. SECURITY
+
+==================================================
+
+Pisahkan:
+
+PUBLIC CATALOG API
+
+dan
+
+ADMIN API.
+
+PUBLIC CATALOG:
+
+read-only
+tidak membutuhkan admin authentication
+
+ADMIN API:
+
+tetap membutuhkan authentication dan authorization existing.
+
+Jangan membuka:
+
+usage cost internal
+API keys
+AI provider credentials
+database credentials
+internal prompts
+private knowledge
+customer data
+internal margins
+internal AI cost
+internal provisioning data
+
+==================================================
+
+## 12. CORS / GAIA
+
+==================================================
+
+Siapkan API agar GAIA dapat mengaksesnya melalui domain resmi yang nantinya ditentukan.
+
+Jangan membuka CORS wildcard secara permanen jika tidak diperlukan.
+
+Gunakan environment variable untuk allowed origins.
+
+Contoh konsep:
+
+CATALOG_ALLOWED_ORIGINS
+
+Jangan hard-code domain jika belum diperlukan.
+
+==================================================
+
+## 13. API VERSIONING
+
+==================================================
+
+Gunakan versioning agar API dapat berkembang.
+
+Prefer:
+
+/api/v1/catalog/...
+
+Jika architecture existing memiliki convention API versioning, ikuti convention tersebut.
+
+==================================================
+
+## 14. RESPONSE FORMAT
+
+==================================================
+
+Gunakan response JSON yang konsisten.
+
+Contoh:
+
+{
+"success": true,
+"data": [...],
+"meta": {
+"page": 1,
+"limit": 20,
+"total": 100
+}
+}
+
+Untuk detail:
+
+{
+"success": true,
+"data": {...}
+}
+
+Gunakan pagination untuk list yang besar.
+
+==================================================
+
+## 15. CACHE / PERFORMANCE
+
+==================================================
+
+Catalog tidak boleh membebani database secara berlebihan.
+
+Jika architecture existing memiliki caching mechanism, gunakan kembali.
+
+Jika belum ada caching, buat implementation sederhana yang aman dan mudah dihapus/dikembangkan.
+
+Jangan menambahkan infrastructure kompleks.
+
+==================================================
+
+## 16. ADMIN PREVIEW
+
+==================================================
+
+Tambahkan kemampuan admin untuk melihat:
+
+"GAIA PREVIEW"
+
+pada product/package.
+
+Admin dapat mengetahui:
+
+* apakah product published
+* apakah gaia_enabled
+* apakah package published
+* package version
+* sector
+* tier
+* duration
+* price
+* included products
+
+Jangan membuat editor GAIA.
+
+Hanya preview.
+
+==================================================
+
+## 17. PRODUCT / PACKAGE FLAGS
+
+==================================================
+
+Pastikan logic berikut benar:
+
+PRODUCT:
+
+gaia_enabled = true
++
+ACTIVE
++
+visibility sesuai
+=================
+
+eligible untuk GAIA
+
+PACKAGE:
+
+gaia_enabled = true
++
+ACTIVE
++
+valid price
++
+has products
+============
+
+eligible untuk GAIA
+
+Jika salah satu syarat tidak terpenuhi:
+
+jangan expose sebagai public catalog.
+
+==================================================
+
+## 18. BACKWARD COMPATIBILITY
+
+==================================================
+
+Semua fitur existing harus tetap bekerja.
+
+Test:
+
+Store
+Landing pages
+Chatbot catalog
+Existing products
+Existing authentication
+Existing admin
+Existing subscription
+Existing APIs
+
+Jangan mengubah route existing kecuali diperlukan.
+
+==================================================
+
+## 19. TESTING
+
+==================================================
+
+Buat automated tests untuk:
+
+1. public products endpoint
+2. public package endpoint
+3. solution endpoint
+4. sector endpoint
+5. tier endpoint
+6. package product composition
+7. filtering
+8. pagination
+9. inactive product exclusion
+10. archived product exclusion
+11. gaia_enabled false exclusion
+12. package without price exclusion
+13. package without product exclusion
+14. admin API protection
+15. CORS behavior
+16. existing feature regression
+
+==================================================
+
+## 20. DO NOT IMPLEMENT YET
+
+==================================================
+
+Jangan implementasikan:
+
+GAIA frontend
+Scalev checkout
+customer order
+subscription purchase
+payment webhook
+customer provisioning
+access activation
+expiration
+renewal
+refund
+
+Semua itu adalah Phase 2B / Phase 3.
+
+==================================================
+
+## 21. DOCUMENTATION
+
+==================================================
+
+Buat:
+
+docs/catalog-api.md
+
+Dokumentasikan:
+
+* endpoint
+* parameters
+* response
+* authentication
+* public/private distinction
+* filtering
+* pagination
+* versioning
+* CORS
+* GAIA integration instructions
+
+==================================================
+
+## 22. FINAL REPORT
+
+==================================================
+
+Setelah selesai berikan:
+
+1. endpoint yang dibuat
+2. schema response
+3. authentication rules
+4. CORS configuration
+5. filtering
+6. pagination
+7. tests
+8. files changed
+9. migration if any
+10. known issues
+11. exact information GAIA developer perlu untuk Phase 2B
+
+PENTING:
+
+Jangan membuat asumsi tentang struktur GAIA.
+
+Phase 2A hanya membangun Gustafta Catalog API.
+
+FINAL PRINCIPLE:
+
+Gustafta = SOURCE OF TRUTH
+
+GAIA = CATALOG CONSUMER
+
+Gustafta creates and configures.
+
+GAIA displays and sells.
+
+Untuk Phase 2A:
+
+BUILD THE CATALOG API.
+DO NOT BUILD GAIA.
+DO NOT BUILD PAYMENT.
+DO NOT BUILD PROVISIONING.

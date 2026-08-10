@@ -13,5 +13,11 @@ Model komersial: PACKAGE = SOLUTION × SECTOR × TIER × DURATION (tidak ada gen
 - GAIA sengaja BELUM diintegrasikan di Phase 1 (hanya flag gaia_enabled).
 - Docs: docs/product-registry.md, docs/package-engine.md, docs/access-matrix.md.
 
+Phase 2A — Catalog API publik (server/catalog-api.ts, /api/v1/catalog/*, read-only tanpa auth):
+- Eligibility: product = ACTIVE + gaia_enabled + visibility≠INTERNAL_ONLY; package = ACTIVE + gaia_enabled + price>0 + ≥1 produk VISIBLE.
+- **Temuan review**: komposisi package publik WAJIB difilter per-produk (ACTIVE & bukan INTERNAL_ONLY) — kalau tidak, package eligible membocorkan produk DRAFT/internal. gaia_enabled TIDAK disyaratkan untuk anggota komposisi (flag itu hanya untuk listing standalone; capability INCLUDED_ONLY memang tampil via package). Snapshot historis juga difilter terhadap product_registry SAAT INI.
+- CORS via env CATALOG_ALLOWED_ORIGINS (tanpa env = tanpa header, bukan wildcard); cache in-memory 60s di-invalidate oleh middleware non-GET /api/admin/registry di routes.ts (didaftarkan SEBELUM route registry).
+- Admin GAIA Preview (/api/admin/registry/gaia-preview + tab UI) harus pakai keputusan eligibility yang SAMA dengan catalog publik.
+
 **Why:** spec ChatGPT Phase 1 + review architect (FAIL pertama karena versi tidak immutable).
 **How to apply:** setiap perubahan material package live → bump version + snapshot dalam satu tx; Phase 2 (provisioning/order) resolve entitlement dari snapshot.

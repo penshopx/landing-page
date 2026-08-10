@@ -58,6 +58,13 @@ type Pkg = {
   durationValue: number; durationUnit: string; price: number; currency: string; version: number;
   gaiaEnabled: boolean; products: PkgProduct[];
 };
+type GaiaPreviewData = {
+  success: boolean;
+  data: {
+    products: { productId: string; name: string; status: string; gaiaEnabled: boolean; visibility: string; eligible: boolean; reasons: string[] }[];
+    packages: { packageId: string; name: string; status: string; gaiaEnabled: boolean; version: number; solution: string; sector: string; tier: string; duration: string; price: number; eligible: boolean; reasons: string[]; includedProducts: { product_name: string; access_level: string; usage_limit: number | null }[] }[];
+  };
+};
 type MatrixRow = { packageId: string; version: number; status: string; solution: string; sector: string; tier: string; duration: string; price: number; access: { product: string; productId: string; level: string; usageLimit: number | null }[] };
 const gaiaColor: Record<string, string> = {
   NOT_READY: "bg-gray-200 text-gray-600", READY: "bg-blue-100 text-blue-800",
@@ -117,6 +124,7 @@ export default function AdminRegistry() {
   const { data: tiers = [] } = useQuery<SimpleReg[]>({ queryKey: ["/api/admin/registry/tiers"] });
   const { data: packages = [] } = useQuery<Pkg[]>({ queryKey: ["/api/admin/registry/packages"] });
   const { data: matrix = [] } = useQuery<MatrixRow[]>({ queryKey: ["/api/admin/registry/access-matrix"] });
+  const { data: gaiaPreview } = useQuery<GaiaPreviewData>({ queryKey: ["/api/admin/registry/gaia-preview"] });
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["/api/admin/registry/products"] });
@@ -233,7 +241,51 @@ export default function AdminRegistry() {
             <TabsTrigger value="packages" data-testid="tab-packages">Packages ({packages.length})</TabsTrigger>
             <TabsTrigger value="matrix" data-testid="tab-matrix">Access Matrix</TabsTrigger>
             <TabsTrigger value="gaia" data-testid="tab-gaia">GAIA Publishing</TabsTrigger>
+            <TabsTrigger value="gaia-preview" data-testid="tab-gaia-preview">GAIA Preview</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="gaia-preview">
+            <div className="space-y-4">
+              <Card>
+                <CardHeader><CardTitle className="text-base">GAIA Preview — Packages ({(gaiaPreview?.data?.packages || []).filter(p => p.eligible).length} eligible)</CardTitle></CardHeader>
+                <CardContent className="space-y-2">
+                  {(gaiaPreview?.data?.packages || []).map(p => (
+                    <div key={p.packageId} className="border rounded-md p-3 text-sm" data-testid={`gaia-pkg-${p.packageId}`}>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge className={p.eligible ? "bg-green-100 text-green-800" : "bg-red-100 text-red-700"}>{p.eligible ? "TAMPIL DI GAIA" : "TIDAK TAMPIL"}</Badge>
+                        <span className="font-mono text-xs">{p.packageId}</span>
+                        <Badge variant="outline">v{p.version}</Badge>
+                        <Badge className={statusColor[p.status] || ""}>{p.status}</Badge>
+                        <span className="font-medium">{p.name}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {p.solution} × {p.sector} × {p.tier} • {p.duration} • Rp {p.price.toLocaleString("id-ID")} • {p.includedProducts.length} produk
+                      </div>
+                      {!p.eligible && p.reasons.length > 0 && (
+                        <div className="text-xs text-red-600 mt-1">Alasan: {p.reasons.join(", ")}</div>
+                      )}
+                    </div>
+                  ))}
+                  {(gaiaPreview?.data?.packages || []).length === 0 && <p className="text-sm text-muted-foreground">Belum ada package.</p>}
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader><CardTitle className="text-base">GAIA Preview — Products ({(gaiaPreview?.data?.products || []).filter(p => p.eligible).length} eligible)</CardTitle></CardHeader>
+                <CardContent className="space-y-1">
+                  {(gaiaPreview?.data?.products || []).map(p => (
+                    <div key={p.productId} className="flex items-center justify-between border-b last:border-0 py-1.5 text-sm" data-testid={`gaia-prod-${p.productId}`}>
+                      <div className="min-w-0">
+                        <span className="font-medium">{p.name}</span>
+                        <span className="font-mono text-xs text-muted-foreground ml-2">{p.productId}</span>
+                        {!p.eligible && <span className="text-xs text-red-600 ml-2">({p.reasons.join(", ")})</span>}
+                      </div>
+                      <Badge className={p.eligible ? "bg-green-100 text-green-800" : "bg-gray-200 text-gray-600"}>{p.eligible ? "GAIA" : "—"}</Badge>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           <TabsContent value="solutions"><SimpleRegistryTab path="solutions" title="Solution Registry" items={solutions} onChanged={() => invalidateReg("solutions")} /></TabsContent>
           <TabsContent value="sectors"><SimpleRegistryTab path="sectors" title="Sector Registry" items={sectors} onChanged={() => invalidateReg("sectors")} /></TabsContent>
