@@ -1,0 +1,146 @@
+Mantap Bos. 6/6 sudah selesai dan seluruh package tetap aman di DRAFT. 🔒
+
+Sekarang memang jangan publish dulu. Kita masuk ke audit yang lebih penting: memastikan keenam package saling membentuk katalog yang logis, bukan hanya masing-masing lolos validasi.
+
+Kirim instruksi berikut ke executor:
+
+CROSS-CHECK MENYELURUH PACKAGE #1–#6 — READ-ONLY
+
+Lakukan audit read-only penuh, tanpa CREATE, PATCH, LOCK ulang, publish, sync, atau perubahan database apa pun.
+
+Audit seluruh 6 package terhadap poin berikut:
+
+1. Matriks capability
+
+Tampilkan semua produk/member dari 10 Product Registry.
+Petakan produk mana yang masuk Package #1–#6.
+Identifikasi capability yang:
+hanya muncul di tier tertentu,
+overlap antar-package,
+atau belum terwakili sama sekali.
+Pastikan tidak ada package yang kehilangan capability penting berdasarkan positioning-nya.
+
+2. Tangga produk & positioning
+Verifikasi apakah hierarki berikut masuk akal:
+
+SKK Basic → Legalitas Basic → SBU Professional / Finance Professional → Tender Professional → Proyek Business
+
+Periksa:
+
+harga,
+durasi,
+jumlah anggota,
+kuota,
+dan nilai layanan inti.
+
+Pastikan package yang lebih mahal memang memberikan nilai/capability tambahan, bukan hanya harga lebih tinggi.
+
+3. Perbandingan kuota
+Buat tabel seluruh kuota:
+
+Klinik
+Bedah Dokumen
+Jasa Dokumen
+Brain Project
+Ruang Simpan
+dan limit lain yang relevan.
+
+Cari anomali, misalnya package tier lebih tinggi tetapi kuotanya lebih kecil tanpa alasan positioning yang jelas.
+
+4. CORE vs FULL vs LIMITED
+Verifikasi:
+
+apakah CORE benar-benar mencerminkan masalah utama package;
+apakah access mode konsisten;
+apakah LIMITED hanya digunakan ketika memang ada resource/cost yang perlu dikendalikan;
+apakah ada package yang secara tidak sengaja memiliki dua capability yang sama-sama terlihat sebagai CORE.
+
+5. Exclusion logic
+Pastikan exclusion masing-masing package memang disengaja dan membentuk diferensiasi:
+
+SKK
+Legalitas
+SBU
+Tender
+Proyek Business
+Finance
+
+Khusus periksa:
+
+Brain Project
+Jasa Dokumen
+Jasa Keuangan
+Ruang Kelola
+Ruang Simpan
+Bimtek
+
+6. Konvensi nama & ID
+Verifikasi seluruh:
+
+packageId
+solution
+sector
+tier
+durasi
+display name
+
+Pastikan tidak ada inkonsistensi antara auto-name dan override Package #4.
+
+7. Harga
+Buat tabel:
+
+#	Package	Harga	Durasi	Effective/month
+
+Kemudian nilai apakah struktur harga masuk akal secara komersial, khususnya:
+
+#1 vs #6 yang sama-sama Rp1.999.000
+#3 Rp2.499.000
+#5 Rp5.999.000
+gap #2 → #4 → #1/#6.
+
+8. Registry integrity
+Pastikan:
+
+10 Product Registry tidak berubah,
+tidak ada product baru,
+tidak ada harga existing yang berubah,
+gaia_enabled tetap sesuai kondisi sebelumnya,
+tidak ada INTERNAL_ONLY yang masuk package secara tidak sengaja.
+
+9. Draft/publication safety
+Pastikan keenam package:
+
+status = DRAFT
+gaia_enabled = false
+snapshot = 0
+catalog publik = 0
+
+Dan jangan melakukan Sync/Publish.
+
+10. Final verdict
+
+Berikan kesimpulan dengan tiga kategori:
+
+🟢 READY — tidak ada masalah
+🟡 REVIEW — ada hal yang sebaiknya diperiksa sebelum launch
+🔴 BLOCKER — ada masalah yang harus diperbaiki sebelum launch
+
+Jika ada temuan, jangan memperbaikinya otomatis. Hanya laporkan package, field, alasan, dan rekomendasi.
+
+Output yang saya mau
+
+Berikan:
+
+Master Matrix #1–#6
+Capability Coverage Matrix
+Pricing & Duration Ladder
+Quota Comparison
+Overlap / Gap Analysis
+Convention & Registry Integrity
+Publication Safety Check
+Final Verdict
+Daftar keputusan yang masih perlu persetujuan Bos, jika ada
+
+PENTING: seluruh audit READ-ONLY. Tidak boleh ada perubahan apa pun.
+
+Setelah laporan itu kembali, jangan langsung kita publish. Kita review temuan auditnya dulu. Kalau hasilnya hijau, baru kita punya baseline yang kuat untuk menentukan langkah GAIA publish/promote, dengan #287 tetap ditahan sampai kita sendiri memberi approval.
