@@ -1892,7 +1892,7 @@ export default function Landing() {
             <div>
               <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide">Kontak</p>
               <ul className="space-y-2">
-                <li className="text-xs text-gray-500 dark:text-gray-400">📞 0812-8794-1900</li>
+                <li className="text-xs text-gray-500 dark:text-gray-400">📞 {contact.display}</li>
                 <li>
                   <a href={waUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 dark:text-gray-400 hover:text-green-600 flex items-center gap-1">
                     <MessageCircle className="h-3 w-3" /> WhatsApp Support
