@@ -7982,7 +7982,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           downloadUrl: signedUrl,
           expiryHours: 24,
         });
-        console.log(`[ManualOrder Digital] ${emailResult.sent ? "Email terkirim" : "Email gagal"} ke ${email} untuk "${sp.name}"`);
+        console.log(`[ManualOrder Digital] ${emailResult.sent ? "Email terkirim" : `Email gagal (${emailResult.reason}${emailResult.detail ? `: ${emailResult.detail}` : ""})`} ke ${email} untuk "${sp.name}"`);
 
         // Record order
         await db.insert(soTbl).values({
@@ -8003,6 +8003,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           agentName: sp.name,
           type: "digital",
           emailSent: emailResult.sent,
+          ...(emailResult.sent ? {} : { emailFailReason: emailResult.reason, emailFailDetail: emailResult.detail }),
         });
       }
 

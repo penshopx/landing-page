@@ -858,6 +858,16 @@ export default function AdminPage() {
     onError: (err: any) => handle401Error(err, "Gagal memperbarui langganan."),
   });
 
+  function formatEmailFailReason(reason?: string, detail?: string): string {
+    if (!reason) return "";
+    const label =
+      reason === "not_configured" ? "BREVO_API_KEY belum dikonfigurasi" :
+      reason === "api_error" ? "Brevo menolak permintaan" :
+      reason === "network_error" ? "gangguan jaringan ke Brevo" :
+      reason;
+    return `. Alasan: ${label}${detail ? ` — ${detail}` : ""}`;
+  }
+
   const createManualOrderMutation = useMutation({
     mutationFn: async (data: { agentId?: number; productId?: number; name: string; email: string; phone: string }) => {
       return apiRequest("POST", "/api/store/order/manual", data);
@@ -871,7 +881,7 @@ export default function AdminPage() {
           title: data.emailSent ? "📧 Email delivery terkirim!" : "✅ Order dibuat (email gagal)",
           description: data.emailSent
             ? `File "${data.agentName}" dikirim ke email pembeli. Link aktif 24 jam.`
-            : `Order tercatat tapi email gagal dikirim. Salin link di bawah dan kirim manual.`,
+            : `Order tercatat tapi email gagal dikirim${formatEmailFailReason(data.emailFailReason, data.emailFailDetail)}. Salin link di bawah dan kirim manual.`,
         });
       } else {
         toast({ title: "Link akses berhasil dibuat!", description: `Order manual untuk ${data.agentName} siap dikirim.` });
