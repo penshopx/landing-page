@@ -30,6 +30,7 @@ import { getQueryFn } from "../client/src/lib/queryClient";
 import {
   WA_CONTACT_DISPLAY,
   WA_CONTACT_DISPLAY_2,
+  WA_CONTACT_NUMBER_2,
 } from "../client/src/lib/contact";
 
 // ── Mocked rotated numbers (distinct from static fallbacks) ─────────────────
@@ -116,5 +117,19 @@ describe("Panduan Delivery live WA number (Task #195)", () => {
     expect(detail).toContain("Hubungi via WhatsApp");
     expect(detail).toContain(ROTATED_DISPLAY_2);
     expect(detail).not.toContain(WA_CONTACT_DISPLAY_2);
+  });
+
+  it("bottom CTA 'WA Tim Teknis' links to the rotated secondary number, not the static fallback", async () => {
+    mockFetch();
+    const qc = renderPage();
+
+    await waitFor(() => {
+      expect(qc.getQueryState(["/api/config/contact"])?.status).toBe("success");
+    });
+
+    const cta = screen.getByText("WA Tim Teknis").closest("a") as HTMLAnchorElement;
+    expect(cta).toBeTruthy();
+    expect(cta.href).toContain(`https://wa.me/${ROTATED.secondary}`);
+    expect(cta.href).not.toContain(WA_CONTACT_NUMBER_2);
   });
 });
