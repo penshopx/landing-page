@@ -459,7 +459,7 @@ test(
 );
 
 test(
-  "certificate email: fallback to 'Peserta' when student has no first_name or last_name",
+  "certificate email: falls back to email prefix (not 'Peserta') when student has no first_name or last_name",
   { skip: SKIP },
   async () => {
     const courseTitle = `Null Name Course ${RUN}`;
@@ -495,11 +495,13 @@ test(
       "Email must be sent to the null-name student's address"
     );
 
-    // htmlContent must use the "Peserta" fallback, not an empty string.
+    // The fallback must be the email prefix (everything before "@"), not "Peserta".
+    const expectedPrefix = NULL_USER_EMAIL.split("@")[0];
+
     assert.ok(
       typeof emailBody.htmlContent === "string" &&
-        emailBody.htmlContent.includes("Peserta"),
-      `htmlContent must contain the fallback greeting "Peserta" when name is NULL`
+        emailBody.htmlContent.includes(expectedPrefix),
+      `htmlContent must contain the email prefix "${expectedPrefix}" when name is NULL`
     );
 
     // to[0].name must be a non-empty fallback (not undefined, null, or "").
@@ -509,8 +511,13 @@ test(
     );
     assert.equal(
       emailBody.to[0].name,
+      expectedPrefix,
+      `to[0].name must equal the email prefix "${expectedPrefix}" when student has no name`
+    );
+    assert.notEqual(
+      emailBody.to[0].name,
       "Peserta",
-      "to[0].name must equal the 'Peserta' fallback when student has no name"
+      `to[0].name must NOT be "Peserta" when an email prefix is available`
     );
   }
 );

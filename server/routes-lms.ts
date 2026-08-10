@@ -766,7 +766,11 @@ export function registerLmsRoutes(
           (async () => {
             try {
               const uRows = await db.execute(sql.raw(
-                `SELECT email, first_name, last_name FROM users WHERE id = '${userId.replace(/'/g, "''")}'`
+                `SELECT u.email, u.first_name, u.last_name, up.display_name
+                 FROM users u
+                 LEFT JOIN user_profiles up ON up.user_id = u.id
+                 WHERE u.id = '${userId.replace(/'/g, "''")}'
+                 LIMIT 1`
               ));
               const uRow = (uRows as any).rows?.[0] ?? (uRows as any)[0];
               const email = uRow?.email as string | undefined;
@@ -775,7 +779,8 @@ export function registerLmsRoutes(
                 .from(lmsCourses).where(eq(lmsCourses.id, courseId));
               const courseTitle = course?.title ?? "Kursus";
               const rawName = [uRow?.first_name, uRow?.last_name].filter(Boolean).join(" ").trim();
-              const studentName = rawName || "Peserta";
+              const emailPrefix = email.split("@")[0] ?? "";
+              const studentName = rawName || (uRow?.display_name as string | undefined) || emailPrefix || "Peserta";
               const issueDate = now.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
               const appBase = (process.env.APP_URL || "https://gustafta.my.id").replace(/\/$/, "");
               const certsUrl = `${appBase}/lms/certificates`;
