@@ -57,6 +57,11 @@ const files = [
   // the real email helper and resolveDownloadUrl directly so signature
   // regressions are caught without booting a full server.
   resolve(__dirname, "store-manual-order-digital-email.test.ts"),
+  // DB integration: confirms POST /api/admin/lms/cert-repair backfills every
+  // completed enrollment without a certificate and GET /api/admin/lms/health
+  // returns pendingCertificates=0 afterwards (the UI condition that hides the
+  // red alert + Perbaiki button). Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "lms-cert-repair-clears-pending.test.ts"),
 ];
 
 let hadFailure = false;

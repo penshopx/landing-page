@@ -992,7 +992,7 @@ function SeedStatusBadge({ status, seeding, retryIn }: { status: string; seeding
   );
 }
 
-function LmsHealthCard({
+export function LmsHealthCard({
   health,
   isLoading,
   onRefresh,
@@ -1161,12 +1161,14 @@ function LmsHealthCard({
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">Total Sertifikat</p>
                 </div>
-                <div className={`rounded-lg px-4 py-3 text-center ${
+                <div
+                  data-testid="cell-lms-pending-certs"
+                  className={`rounded-lg px-4 py-3 text-center ${
                   (health.counts.pendingCertificates ?? 0) > 0
                     ? "bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800"
                     : "bg-muted/50"
                 }`}>
-                  <p className={`text-2xl font-bold ${
+                  <p data-testid="text-lms-pending-certs" className={`text-2xl font-bold ${
                     (health.counts.pendingCertificates ?? 0) > 0
                       ? "text-red-600 dark:text-red-400"
                       : "text-green-600 dark:text-green-400"
