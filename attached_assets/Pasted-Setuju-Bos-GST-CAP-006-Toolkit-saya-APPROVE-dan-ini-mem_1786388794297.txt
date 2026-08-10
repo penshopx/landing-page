@@ -1,0 +1,60 @@
+Setuju, Bos. **GST-CAP-006 — Toolkit saya APPROVE**, dan ini memang kasus yang tepat untuk **tidak dipaksa menjadi produk GAIA standalone**.
+
+### Keputusan final GST-CAP-006
+
+| Field                  | Nilai final                                                                                                     |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `price`                | **0** — tetap                                                                                                   |
+| `billing_type`         | **FREE** — tetap                                                                                                |
+| `visibility`           | **INCLUDED_ONLY** — tetap                                                                                       |
+| `gaia_enabled`         | **false** — tetap                                                                                               |
+| `standalone_enabled`   | **false** — tetap                                                                                               |
+| `short_description`    | **Kumpulan alat & template siap pakai untuk dokumen konstruksi — tersedia sebagai bagian dari paket Gustafta.** |
+| `status`               | **ACTIVE** — tetap                                                                                              |
+| `subscription_enabled` | **true** — tetap                                                                                                |
+| `dp_enabled`           | **false** — tetap                                                                                               |
+| `ai_enabled`           | **true** — tetap                                                                                                |
+| `usage_profile`        | **DOCUMENT_GENERATION** — tetap                                                                                 |
+
+### Ini penting
+
+Saya **setuju hanya PATCH `short_description`**.
+
+Jangan mengubah:
+
+* `price`
+* `billing_type`
+* `visibility`
+* `gaia_enabled`
+* `standalone_enabled`
+
+Toolkit justru bagus sebagai **value amplifier** paket.
+
+Jadi struktur katalog kita sekarang makin jelas:
+
+**Produk yang dijual langsung di GAIA**
+
+* Klinik Konsultasi — Rp150k
+* Bedah Dokumen — Rp149k
+* Brain Project — Rp499k
+
+**Kapabilitas yang memperkuat paket**
+
+* Toolkit — INCLUDED_ONLY
+
+Dengan begitu GAIA tidak terlihat seperti toko yang menjual setiap fitur kecil satu per satu.
+
+### Instruksi eksekusi
+
+**PATCH GST-CAP-006 hanya pada `short_description`.**
+
+Lalu:
+
+1. Read-back GST-CAP-006.
+2. Pastikan hanya `short_description` yang berubah.
+3. Pastikan GST-CAP-002, 003, 004 tetap sama.
+4. Catalog **harus tetap 3 produk** — Toolkit tidak boleh muncul sebagai standalone.
+5. Lock GST-CAP-006.
+6. Lanjut **GST-CAP-008 — Ruang Kelola**.
+
+Dan catatan dua task `lms/reseed` di bagian bawah **tidak perlu kita sentuh**; itu bukan bagian dari konfigurasi Product Registry yang sedang kita kerjakan.
