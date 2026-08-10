@@ -438,6 +438,22 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates DDL error:`, e);
   }
 
+  // ── Jamin unique index (user_id, course_id) ada — repair tabel lama ──────
+  // CREATE TABLE IF NOT EXISTS di atas TIDAK menambahkan constraint ke tabel
+  // yang sudah ada tanpa constraint; tanpa index unik, semua INSERT dengan
+  // ON CONFLICT (user_id, course_id) melempar error → 500.
+  try {
+    const { ensureCertificateUniqueIndex } = await import("./lms-cert-schema");
+    const r = await ensureCertificateUniqueIndex(pool);
+    if (r.created) {
+      console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates unique index CREATED (deduped ${r.deduped} row(s))`);
+    } else {
+      console.log(`${new Date().toLocaleTimeString()} [express] lms_certificates unique index verified`);
+    }
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates unique index repair error:`, e);
+  }
+
   // ── Backfill certificates for completions that pre-date the certificate feature ──
   try {
     // Find enrollments that are 100% complete but have no certificate yet
