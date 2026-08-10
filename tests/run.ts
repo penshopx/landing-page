@@ -83,6 +83,12 @@ const files = [
   // Real sendEmail (no BREVO_API_KEY) → not_configured; endpoint 502 contract;
   // static checks against server/routes.ts + admin-ai-health.tsx fallback chain.
   resolve(__dirname, "admin-email-test-brevo-not-configured.test.ts"),
+  // DB integration end-to-end: POST /api/webhooks/scalev (payment_status=paid,
+  // produk "Gustafta Paket 1 Bulan") → baris subscriptions_new berstatus
+  // 'active' dengan kolom order_id (hasil rename dari scalev_order_id) terisi
+  // scalev_plan_<orderId>. Juga cek getSubscriptionByOrderId + jalur non-paid.
+  // Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "scalev-webhook-subscription-activation.test.ts"),
 ];
 
 let hadFailure = false;
