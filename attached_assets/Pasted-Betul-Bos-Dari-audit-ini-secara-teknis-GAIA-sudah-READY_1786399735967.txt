@@ -1,0 +1,49 @@
+Betul Bos. Dari audit ini, **secara teknis GAIA sudah READY**, dan saya tidak melihat alasan untuk mengubah struktur package lagi.
+
+Ada **2 keputusan bisnis** yang perlu kita tutup sebelum `#287/#293` dijalankan.
+
+### Keputusan saya
+
+**1. CTA / alur beli → jangan pakai WA sebagai jalur utama.**
+
+Untuk launch pertama, saya sarankan CTA paket di GAIA diarahkan ke **checkout/order flow yang memang sudah dimiliki Gustafta/GAIA**, bukan membuat jalur manual baru.
+
+Namun **jangan mengarang payment URL**. Karena audit menyatakan package belum punya `scalev_payment_url`, developer perlu memastikan dulu apakah GAIA saat ini sudah punya mekanisme checkout paket berdasarkan `package_id`.
+
+Jika **belum ada**, jangan publish dengan tombol beli yang mati. Lebih baik CTA sementara **“Pesan Paket” → halaman/form order yang sudah tersedia**, atau tahan publish sampai checkout package jelas.
+
+**2. Benefits → untuk launch pertama, deskripsi + komposisi sudah cukup.**
+
+Saya **tidak menyetujui perubahan schema hanya untuk menambahkan `benefits` sekarang**.
+
+Alasannya:
+
+* keenam package sudah punya deskripsi;
+* komposisi terstruktur sudah bisa dirender menjadi benefit;
+* quota sudah eksplisit;
+* kita ingin menjaga launch pertama tetap sederhana;
+* `benefits` bisa menjadi **enhancement V2**, setelah kita melihat bagaimana katalog benar-benar tampil.
+
+### Jadi statusnya
+
+| Area                | Keputusan                    |
+| ------------------- | ---------------------------- |
+| 6 package           | 🟢 Final                     |
+| Catalog API         | 🟢 Ready                     |
+| Mapping composition | 🟢 Ready                     |
+| Description         | 🟢 Cukup untuk launch        |
+| Benefits field      | 🟡 Tunda V2                  |
+| CTA                 | 🔴 **Harus dipastikan dulu** |
+| Publish             | 🔒 **Belum**                 |
+| #287                | 🔒 Ditahan                   |
+| #293                | 🔒 Ditahan                   |
+
+**Satu hal yang saya minta sebelum publish:** lakukan **CTA/Checkout Readiness Check** read-only.
+
+Cari tahu secara konkret:
+
+> Kalau pembeli menekan **Beli/Pesan** pada package `PROYEK-KONSTRUKSI-BUSINESS-12M`, **URL/action sebenarnya apa dan bagaimana `package_id` diteruskan sampai order/payment?**
+
+Jangan membuat atau mengubah apa pun dulu.
+
+Kalau checkout package ternyata **sudah ada dan bisa menerima `package_id`**, maka menurut saya kita sudah sangat dekat dengan **GO untuk publish 6 package**. Kalau belum ada, kita selesaikan jalur checkout-nya dulu sebelum membuka katalog ke publik.
