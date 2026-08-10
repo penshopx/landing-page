@@ -663,8 +663,12 @@ interface DigitalProductDeliveryOptions {
   customerName?: string | null;
   productName: string;
   downloadUrl: string;
-  /** Hours until link expires (default 24) */
-  expiryHours?: number;
+  /**
+   * Hours until link expires (default 24). Pass `null` when the link is
+   * permanent (external URL like Google Drive) — the email then omits the
+   * expiry warning and says to save the email instead.
+   */
+  expiryHours?: number | null;
   /**
    * Opaque tag for Brevo → webhook correlation. When set, included in the
    * Brevo tags array so a bounce event can identify the exact order.
@@ -681,7 +685,21 @@ export async function sendDigitalProductDeliveryEmail(
   opts: DigitalProductDeliveryOptions,
 ): Promise<SendEmailResult> {
   const greetName = opts.customerName?.trim() || "Pembeli";
-  const expiry = opts.expiryHours ?? 24;
+  const expiry = opts.expiryHours === undefined ? 24 : opts.expiryHours;
+  const isPermanent = expiry === null;
+
+  const noticeHtml = isPermanent
+    ? `<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;margin:20px 0">
+            <p style="margin:0;font-size:13px;color:#1e40af;line-height:1.5">
+              💾 <strong>Simpan email ini — link download Anda</strong> dapat digunakan kapan saja.
+            </p>
+          </div>`
+    : `<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;margin:20px 0">
+            <p style="margin:0;font-size:13px;color:#92400e;line-height:1.5">
+              ⏰ <strong>Link aktif selama ${expiry} jam</strong> sejak email ini dikirim.<br>
+              Segera unduh dan simpan file ke perangkat Anda.
+            </p>
+          </div>`;
 
   const html = `<!DOCTYPE html>
 <html lang="id">
@@ -711,13 +729,8 @@ export async function sendDigitalProductDeliveryEmail(
               </a>
             </td></tr>
           </table>
-          <!-- Warning -->
-          <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;margin:20px 0">
-            <p style="margin:0;font-size:13px;color:#92400e;line-height:1.5">
-              ⏰ <strong>Link aktif selama ${expiry} jam</strong> sejak email ini dikirim.<br>
-              Segera unduh dan simpan file ke perangkat Anda.
-            </p>
-          </div>
+          <!-- Notice -->
+          ${noticeHtml}
           <!-- Alt Link -->
           <p style="margin:16px 0 0;font-size:12px;color:#6b7280;line-height:1.5">
             Jika tombol tidak berfungsi, salin link ini ke browser:<br>
@@ -741,7 +754,7 @@ Terima kasih atas pembelian ${opts.productName}. File Anda siap diunduh:
 
 ${opts.downloadUrl}
 
-Link aktif selama ${expiry} jam. Segera unduh dan simpan.
+${isPermanent ? "Simpan email ini — link download Anda dapat digunakan kapan saja." : `Link aktif selama ${expiry} jam. Segera unduh dan simpan.`}
 
 Butuh bantuan? Kunjungi gustafta.my.id
 

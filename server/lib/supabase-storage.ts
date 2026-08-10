@@ -10,11 +10,20 @@
  *   This supports Google Drive, Dropbox, or any external host as delivery.
  * - Otherwise treat it as a Supabase Storage bucket path and generate a signed URL.
  */
+/**
+ * True when the download_path is already a full external URL (Google Drive,
+ * Dropbox, etc.) that resolveDownloadUrl passes through unchanged. Such links
+ * are permanent — no expiry applies.
+ */
+export function isExternalDownloadUrl(downloadPath: string): boolean {
+  return downloadPath.startsWith("http://") || downloadPath.startsWith("https://");
+}
+
 export async function resolveDownloadUrl(
   downloadPath: string,
   expiresInSeconds = 86_400,
 ): Promise<string> {
-  if (downloadPath.startsWith("http://") || downloadPath.startsWith("https://")) {
+  if (isExternalDownloadUrl(downloadPath)) {
     return downloadPath;
   }
   return generateSignedDownloadUrl(downloadPath, expiresInSeconds);

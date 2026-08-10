@@ -7961,8 +7961,9 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         const { storeOrders: soTbl } = await import("@shared/schema");
 
         let signedUrl: string;
+        const { resolveDownloadUrl, isExternalDownloadUrl } = await import("./lib/supabase-storage");
+        const isPermanentLink = isExternalDownloadUrl(sp.downloadPath);
         try {
-          const { resolveDownloadUrl } = await import("./lib/supabase-storage");
           signedUrl = await resolveDownloadUrl(sp.downloadPath, 86_400);
         } catch (storageErr: any) {
           const msg: string = storageErr?.message ?? "";
@@ -7980,7 +7981,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           customerName: name,
           productName: sp.name,
           downloadUrl: signedUrl,
-          expiryHours: 24,
+          expiryHours: isPermanentLink ? null : 24,
         });
         console.log(`[ManualOrder Digital] ${emailResult.sent ? "Email terkirim" : `Email gagal (${emailResult.reason}${emailResult.detail ? `: ${emailResult.detail}` : ""})`} ke ${email} untuk "${sp.name}"`);
 
@@ -20360,7 +20361,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 `[Scalev] Digital product matched: "${matched.name}" → ${matched.downloadPath}`,
               );
               try {
-                const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+                const { resolveDownloadUrl, isExternalDownloadUrl } = await import("./lib/supabase-storage");
                 const { sendDigitalProductDeliveryEmail } = await import("./lib/email");
                 const { randomUUID: dpUUID } = await import("crypto");
                 const { db: dbOrd } = await import("./db");
@@ -20388,6 +20389,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 console.log(`[DigitalDelivery] Order recorded for "${matched.name}" — ${customerEmail}`);
 
                 // Resolve download URL — full URL (Google Drive etc.) or Supabase signed URL
+                const isPermanentLink = isExternalDownloadUrl(matched.downloadPath);
                 const signedUrl = await resolveDownloadUrl(matched.downloadPath, 86_400);
 
                 // Send delivery email — await so we can fall back to WA if it fails immediately
@@ -20398,7 +20400,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                     customerName: customerName || null,
                     productName: matched.name,
                     downloadUrl: signedUrl,
-                    expiryHours: 24,
+                    expiryHours: isPermanentLink ? null : 24,
                     orderCorrelationTag,
                   });
                   emailSent = emailResult.sent;
@@ -20421,7 +20423,9 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                     `📦 *${matched.name}*\n\n` +
                     `Halo ${greet},\n\n` +
                     `Link download produk Anda sudah siap:\n${signedUrl}\n\n` +
-                    `⚠️ Link berlaku 24 jam. Simpan segera sebelum kedaluwarsa.\n\n` +
+                    (isPermanentLink
+                      ? `💾 Simpan pesan ini — link download Anda dapat digunakan kapan saja.\n\n`
+                      : `⚠️ Link berlaku 24 jam. Simpan segera sebelum kedaluwarsa.\n\n`) +
                     `— Gustafta Digital`;
                   try {
                     const waRes = await fetch("https://api.fonnte.com/send", {
@@ -20985,7 +20989,8 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         return;
       }
 
-      const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+      const { resolveDownloadUrl, isExternalDownloadUrl } = await import("./lib/supabase-storage");
+      const isPermanentLink = isExternalDownloadUrl(downloadPath);
       const signedUrl = await resolveDownloadUrl(downloadPath, 86_400);
 
       const greet = (customerName || "").trim() || "Pembeli";
@@ -20994,7 +20999,9 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         `Halo ${greet},\n\n` +
         `Email pengiriman link download kami tidak sampai ke kotak masuk Anda.\n` +
         `Berikut link download langsung via WhatsApp:\n${signedUrl}\n\n` +
-        `⚠️ Link berlaku 24 jam. Simpan segera sebelum kedaluwarsa.\n\n` +
+        (isPermanentLink
+          ? `💾 Simpan pesan ini — link download Anda dapat digunakan kapan saja.\n\n`
+          : `⚠️ Link berlaku 24 jam. Simpan segera sebelum kedaluwarsa.\n\n`) +
         `— Gustafta Digital`;
 
       const waRes = await fetch("https://api.fonnte.com/send", {
