@@ -41,6 +41,11 @@ const files = [
   // Catches regressions where the field is dropped from the catalog response or
   // the handler falls back to the root payment domain instead of the checkout path.
   resolve(__dirname, "store-beli-scalev-checkout.test.ts"),
+  // DB integration: confirms POST /api/admin/lms/courses/bulk-activate and
+  // bulk-deactivate each return `activated`/`deactivated` = only the courses
+  // that actually changed state, not the full selection. Also confirms empty-ids
+  // → 400 and auth gates. Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "lms-bulk-activate-deactivate-mixed.test.ts"),
 ];
 
 let hadFailure = false;
