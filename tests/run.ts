@@ -62,6 +62,11 @@ const files = [
   // returns pendingCertificates=0 afterwards (the UI condition that hides the
   // red alert + Perbaiki button). Skipped when DATABASE_URL is absent.
   resolve(__dirname, "lms-cert-repair-clears-pending.test.ts"),
+  // DB integration: confirms POST /api/admin/lms/reseed reports accurate
+  // counts — a lesson row mutated directly in the DB yields updated > 0 with
+  // added = 0 and gets restored to seed content; an unchanged second pass
+  // yields added = 0 and updated = 0. Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "lms-reseed-updated-counts.test.ts"),
 ];
 
 let hadFailure = false;
