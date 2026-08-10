@@ -1,0 +1,224 @@
+# GUSTAFTA PRODUCT REGISTRY — PRE-CREATION AUDIT
+
+Lakukan audit READ-ONLY untuk menentukan 14 product yang benar-benar akan menjadi building blocks dalam Product Registry Gustafta.
+
+## ATURAN
+
+Jangan membuat product.
+
+Jangan mengedit product.
+
+Jangan menghapus product.
+
+Jangan mengubah database.
+
+Jangan publish.
+
+Jangan mengubah source code.
+
+Jangan mengubah environment variable.
+
+Jangan melakukan deployment.
+
+Hanya baca source code, konfigurasi, existing product definitions, landing pages, catalog references, dan data yang sudah tersedia.
+
+---
+
+## TUJUAN
+
+Kita menemukan produk Gustafta yang benar-benar EXISTING dan dapat dijadikan Product Registry.
+
+Jangan membuat nama produk hanya berdasarkan Launch Package Spec.
+
+Jika sebuah capability belum benar-benar ada, tandai:
+
+`NOT EXISTING`
+
+---
+
+## 1. CARI SEMUA PRODUK EXISTING
+
+Cari dari seluruh codebase/configuration:
+
+* products.ts
+* product registry
+* product definitions
+* pricing
+* landing pages
+* chatbot definitions
+* AI specialist
+* AI workspace
+* digital tools
+* document AI
+* generators
+* modules
+* ebooks
+* templates
+* checklists
+* business kits
+* consultation services
+
+Buat daftar seluruh kandidat product.
+
+---
+
+## 2. BEDAKAN PRODUCT VS FEATURE
+
+Untuk setiap kandidat tentukan:
+
+`PRODUCT`
+
+atau
+
+`FEATURE / CAPABILITY`
+
+atau
+
+`INTERNAL COMPONENT`
+
+Jangan memasukkan feature/internal component ke Product Registry kecuali memang dimaksudkan untuk dijual sebagai product.
+
+---
+
+## 3. PRODUCT REGISTRY PROPOSAL
+
+Buat tabel:
+
+| # | Actual Product Name | Existing? | Product Type | Existing Price | Related Solution | Evidence |
+| - | ------------------- | --------- | ------------ | -------------: | ---------------- | -------- |
+
+Gunakan nama aktual yang ditemukan di codebase/data.
+
+Jangan mengarang nama.
+
+---
+
+## 4. TARGET 14 PRODUCTS
+
+Launch architecture sebelumnya menyebut:
+
+`14 Products → building blocks`
+
+Periksa apakah benar ada tepat 14 kandidat yang valid.
+
+Jika:
+
+* kurang dari 14 → jelaskan yang kurang
+* lebih dari 14 → jelaskan kandidat tambahan
+* tepat 14 → tandai sebagai `14/14 VALID CANDIDATES`
+
+Jangan memaksakan jumlah 14.
+
+---
+
+## 5. MAP KE 6 LAUNCH PACKAGES
+
+Gunakan package berikut hanya sebagai mapping exercise:
+
+1. Gustafta SBU
+2. Gustafta Tender
+3. Gustafta Dokumen Proyek
+4. Gustafta Legalitas & OSS
+5. Gustafta ISO & Compliance
+6. Gustafta Business Memory
+
+Buat:
+
+| Product | SBU | Tender | Dokumen | Legalitas/OSS | ISO | Business Memory |
+| ------- | --- | ------ | ------- | ------------- | --- | --------------- |
+
+Gunakan:
+
+`CORE`
+
+`SUPPORTING`
+
+`NOT RELATED`
+
+---
+
+## 6. IDENTIFIKASI GAP
+
+Jika package membutuhkan capability yang belum tersedia sebagai actual product, tuliskan:
+
+`MISSING PRODUCT`
+
+Jangan membuat product untuk menutup gap.
+
+---
+
+## 7. SOLUTION MAPPING
+
+Gunakan solution production yang benar-benar ada:
+
+1. Legalitas
+2. OSS
+3. SBU
+4. SKK
+5. Tender
+6. Proyek
+7. Compliance
+8. Kompetensi
+9. Finance
+
+Untuk setiap product kandidat, tentukan solution yang paling sesuai.
+
+Jika tidak ada solution yang cocok:
+
+`NO EXISTING SOLUTION`
+
+Jangan memaksakan mapping.
+
+---
+
+## 8. FINAL RECOMMENDATION
+
+Berikan tiga kelompok:
+
+### A. READY TO REGISTER
+
+Produk yang benar-benar sudah ada dan aman dimasukkan ke Product Registry.
+
+### B. NEEDS PRODUCTIZATION
+
+Capability yang ada secara teknis tetapi belum layak dianggap product komersial.
+
+### C. NOT EXISTING
+
+Capability yang belum ada dan tidak boleh dimasukkan hanya demi memenuhi package.
+
+---
+
+## 9. CRITICAL CHECK
+
+Jawab secara eksplisit:
+
+### Apakah Gustafta benar-benar sudah memiliki 14 product yang siap dimasukkan ke Product Registry?
+
+Jawab:
+
+`YES`
+
+atau
+
+`NO`
+
+Jika NO, berikan jumlah aktual.
+
+---
+
+## 10. FINAL OUTPUT
+
+Jangan melakukan perubahan apa pun.
+
+Berikan hanya:
+
+1. Daftar seluruh product kandidat
+2. Status PRODUCT / FEATURE / INTERNAL
+3. Mapping ke solution
+4. Mapping ke 6 package
+5. Product yang missing
+6. Jumlah product valid
+7. Rekomendasi product registry final
+
+Tidak boleh ada perubahan data.
