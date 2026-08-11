@@ -1,0 +1,287 @@
+Nah, **ini audit yang sangat berguna**. Sekarang kita punya gambaran nyata, dan menurut saya keputusan arsitekturnya sudah cukup jelas.
+
+### Keputusan saya
+
+**Jangan langsung membangun API client registry atau outbound webhook.**
+
+Yang paling mendesak adalah **Fase B: Order API terpadu + dukungan `package_id` + payment link**.
+
+Karena saat ini bottleneck terbesar adalah:
+
+> **Produk sudah ada → katalog sudah ada → Scalev sudah live → webhook sudah live → fulfillment sudah live → tetapi paket belum punya jalur order/payment otomatis.**
+
+Itu celah yang menghambat ekosistem menghasilkan transaksi secara otomatis.
+
+---
+
+# 🎯 Target yang kita bangun
+
+Saya ingin satu alur kanonik:
+
+```text
+                    PRODUCT / PACKAGE
+                    Gustafta Registry
+                           │
+                           ↓
+              POST /api/v1/orders
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+          product_id                package_id
+              │                         │
+              └────────────┬────────────┘
+                           ↓
+                      STORE ORDER
+                           │
+                           ↓
+                    PAYMENT LINK
+                           │
+                           ↓
+                         SCALEV
+                           │
+                      customer pays
+                           ↓
+                    SCALEV WEBHOOK
+                           │
+                           ↓
+                         PAID
+                           │
+                           ↓
+                      FULFILLMENT
+```
+
+Lalu semua properti menjadi **consumer**, bukan pemilik sistem transaksi:
+
+```text
+Gustafta
+   ↑
+   │ Product / Order / Payment
+   │
+   ├── Gaia Store
+   ├── DP-Store
+   ├── dokumenproyek.com
+   └── Gaia SIAP
+```
+
+---
+
+# 🔴 Task berikutnya: Gustafta — Order API
+
+Saya akan kirim agent **implementasi Fase B saja**.
+
+Gunakan prompt ini:
+
+Berdasarkan audit arsitektur yang baru selesai, implementasikan Fase B — Unified Order API.
+
+PRIORITAS:
+Membuat satu kontrak order kanonik untuk seluruh ecosystem Gustafta tanpa membongkar flow checkout/Scalev yang sudah live.
+
+TARGET:
+
+POST /api/v1/orders
+
+Endpoint harus menggunakan Bearer API key dengan pola security yang sama seperti:
+
+POST /api/v1/ai/assist
+
+Ketentuan:
+
+1. Request menerima:
+
+   * product_id ATAU
+   * package_id
+   * buyer information minimum yang diperlukan untuk membuat transaksi/payment.
+     Jangan mengizinkan keduanya kosong.
+
+2. Order response harus mengembalikan minimal:
+
+   * order_ref
+   * product_id jika ada
+   * package_id jika ada
+   * amount
+   * currency
+   * status
+   * payment_url / checkout_url
+   * created_at
+
+3. Tambahkan dukungan package_id ke order model/database secara backward-compatible.
+   Jangan merusak order lama.
+
+4. Gunakan Product Registry / Package Registry sebagai source of truth.
+   Jangan membaca pricing.ts frontend sebagai sumber harga.
+
+5. Validasi:
+
+   * product/package harus ACTIVE dan purchasable.
+   * harga diambil server-side.
+   * client tidak boleh menentukan harga sendiri.
+   * package version yang dipakai harus dapat dilacak.
+   * order harus menyimpan snapshot/identitas produk yang diperlukan untuk audit.
+
+6. Payment:
+   Gunakan Scalev yang sudah LIVE.
+   Jangan membuat payment gateway baru.
+   Jangan menghidupkan Mayar.
+   Jangan mengubah webhook Scalev yang sudah berjalan kecuali benar-benar diperlukan untuk kompatibilitas.
+
+7. Payment URL:
+   Gunakan mekanisme checkout Scalev yang saat ini sudah terbukti live.
+   Jika payment link per-order belum bisa dibuat secara dinamis, jangan membuat workaround berbahaya.
+   Identifikasi keterbatasannya dan implementasikan solusi paling aman yang tetap dapat menghubungkan order ke transaksi Scalev.
+
+8. Security:
+
+   * Bearer API key.
+   * fail-closed jika key tidak dikonfigurasi.
+   * constant-time comparison jika masih menggunakan static key.
+   * jangan expose API key.
+   * rate limit endpoint order.
+   * jangan log credential atau data sensitif.
+   * jangan gunakan /api/store/notify sebagai external contract.
+
+9. Compatibility:
+
+   * Jangan merusak POST /api/store/order yang sudah live.
+   * Jangan merusak existing Scalev webhook.
+   * Jangan mengubah contract /api/v1/catalog/*.
+   * Jangan mengubah /api/v1/ai/assist.
+   * Jangan menyentuh Phase 1B/1C/1D Gaia SIAP.
+
+10. Jangan implementasi api_clients registry atau outbound webhook pada task ini.
+    Itu Phase berikutnya.
+
+11. Jangan melakukan cleanup besar seperti menghapus store_products, pricing.ts, agents, atau rename legacy columns.
+    Cleanup dilakukan terpisah setelah transaction flow stabil.
+
+TEST WAJIB:
+
+A. valid product_id → order berhasil
+B. valid package_id → order berhasil
+C. product_id + package_id kosong → 400
+D. product/package tidak valid → 4xx
+E. inactive product/package → ditolak
+F. client mencoba mengirim harga berbeda → harga server tetap digunakan
+G. tanpa API key → 401
+H. API key salah → 401
+I. existing /api/store/order tetap PASS
+J. existing Scalev webhook regression tetap PASS
+K. existing catalog API regression tetap PASS
+
+SEBELUM IMPLEMENTASI:
+
+Baca terlebih dahulu schema/database, existing order flow, Scalev integration, dan webhook.
+
+Jika ditemukan bahwa Scalev membutuhkan provisioning/variant tertentu agar package dapat dibayar, jangan membuat asumsi. Laporkan blocker teknis tersebut.
+
+Setelah selesai laporkan:
+
+* files changed
+* schema migration
+* endpoint contract
+* contoh request/response
+* bagaimana package_id diproses
+* bagaimana payment_url dihasilkan
+* security changes
+* seluruh hasil test
+* blocker yang tersisa
+
+SCOPE STRICT: hanya Unified Order API + package support + payment-link connection yang diperlukan.
+
+---
+
+## ⚠️ Ada satu hal yang sengaja saya tahan
+
+Audit menemukan:
+
+> **"Tidak ada pembuatan payment link per-order via API."**
+
+Ini **sangat penting**.
+
+Jangan sampai agent membuat sesuatu seperti:
+
+```text
+POST /orders
+→ generate URL Scalev secara asal
+→ customer bayar
+→ webhook tidak tahu order mana
+```
+
+Itu berbahaya.
+
+Kita harus memastikan:
+
+**`order_ref` Gustafta ↔ transaksi Scalev ↔ webhook ↔ PAID**
+
+punya correlation yang kuat.
+
+Kalau Scalev ternyata membutuhkan **variant/product provisioning terlebih dahulu**, agent harus berhenti di titik itu dan melaporkan blocker, bukan mengarang solusi.
+
+---
+
+# Setelah Fase B PASS
+
+Baru kita lakukan:
+
+### Fase C
+
+**API Client Registry**
+
+Membuat identitas resmi:
+
+```text
+GAIA_STORE
+DP_STORE
+DOKUMENPROYEK
+GAIA_SIAP
+```
+
+dengan:
+
+`client_id → hashed key → scope → status → rate limit`
+
+### Fase D
+
+**Outbound Payment Webhook**
+
+```text
+Gustafta
+   │
+   │ payment PAID
+   ↓
+signed webhook
+   ├── Gaia Store
+   ├── DP-Store
+   └── dokumenproyek
+```
+
+### Fase E
+
+**Konsolidasi katalog**
+
+Baru setelah transaksi stabil:
+
+`product_registry/package_registry`
+
+menjadi **satu-satunya sumber katalog eksternal**.
+
+---
+
+## Dan ini menurut saya titik balik penting
+
+Kita sudah bukan sekadar menghubungkan beberapa website.
+
+Kita sedang membangun:
+
+> **Gustafta sebagai Commerce + AI Backbone.**
+
+**Catalog → Order → Payment → Fulfillment** berada di Gustafta.
+
+Sedangkan:
+
+* **dokumenproyek.com** = acquisition/sales
+* **Gaia Store** = storefront
+* **DP-Store** = distribution
+* **Gaia SIAP** = AI application
+* **Gustafta** = core infrastructure
+
+Kalau Fase B berhasil, langkah berikutnya jauh lebih mudah karena keempat sistem tinggal menjadi **consumer dari satu transaction backbone**.

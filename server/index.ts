@@ -315,6 +315,15 @@ app.use("/api/v1/ai/assist", (req, res, next) => {
   next();
 });
 
+// Guard khusus /api/v1/orders (Unified Order API): payload order hanya beberapa KB.
+app.use("/api/v1/orders", (req, res, next) => {
+  const len = Number(req.headers["content-length"] || 0);
+  if (len > 64 * 1024) {
+    return res.status(413).json({ error: "payload_too_large", message: "Payload terlalu besar (maks 64KB)" });
+  }
+  next();
+});
+
 app.use(
   express.json({
     limit: "50mb",

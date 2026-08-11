@@ -87,6 +87,7 @@ import { registerGaiaRegistryRoutes } from "./gaia-registry";
 import { registerPackageEngineRoutes } from "./package-engine";
 import { registerCatalogApiRoutes, clearCatalogCache } from "./catalog-api";
 import { registerGaiaSiapAiRoutes } from "./gaia-siap-api";
+import { registerOrderApiRoutes } from "./order-api";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 
 const _require = createRequire(import.meta.url);
@@ -22588,6 +22589,9 @@ Min 300 kata. Bahasa Indonesia profesional. Sitasi regulasi spesifik domain ini.
 
   // Gaia SIAP External AI API (Task #306) — aditif, Bearer GAIA_SIAP_API_KEY, fail-closed.
   registerGaiaSiapAiRoutes(app);
+
+  // Unified Order API (Fase B) — aditif, Bearer ORDER_API_KEY, fail-closed.
+  registerOrderApiRoutes(app);
 
   // ── Admin Agent System Endpoints ──────────────────────────────────────────
 

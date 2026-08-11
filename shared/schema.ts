@@ -2189,6 +2189,13 @@ export const storeOrders = pgTable("store_orders", {
   accessToken: text("access_token").notNull().unique(),
   status: text("status").notNull().default("pending"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  // ── Unified Order API (Fase B) — kolom aditif, nullable, backward-compatible.
+  // Order paket dari POST /api/v1/orders: package_id + versi snapshot untuk audit;
+  // item_name = snapshot nama item saat order; source = asal order (mis. "api_v1").
+  packageId: varchar("package_id", { length: 60 }),
+  packageVersion: integer("package_version"),
+  itemName: text("item_name"),
+  source: text("source"),
 });
 
 export const insertStoreOrderSchema = createInsertSchema(storeOrders).omit({ id: true, createdAt: true });
