@@ -36,6 +36,11 @@ const files = [
   // the same time; the global advisory run-lock must serialize them so
   // neither clobbers the other's rows/recovery record. Skipped without DB.
   resolve(__dirname, "bootstrap-superadmin-db-concurrent.test.ts"),
+  // DB integration: 4 produk claw baru (desain/rencana/studi-kelayakan +
+  // persiapan-proyek-multiclaw) tetap Store-visible setelah seed dijalankan
+  // dua kali (fresh + rekonsiliasi) — flags sellability, wiring 3 anggota via
+  // slug lookup, dan kehadiran di katalog. Skipped tanpa DATABASE_URL.
+  resolve(__dirname, "claw-seed-store-visibility.test.ts"),
   // Unit: confirms normalizePhone + promoteSuperAdminIfMatch handle all phone
   // formats (leading 0, +62, bare 8x) so format mismatches never silently block
   // superadmin promotion. No DB or env required — pure logic test.
