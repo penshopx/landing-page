@@ -86,6 +86,7 @@ import { registerDataMasterRoutes, buildDataMasterContext } from "./routes-data-
 import { registerGaiaRegistryRoutes } from "./gaia-registry";
 import { registerPackageEngineRoutes } from "./package-engine";
 import { registerCatalogApiRoutes, clearCatalogCache } from "./catalog-api";
+import { registerGaiaSiapAiRoutes } from "./gaia-siap-api";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 
 const _require = createRequire(import.meta.url);
@@ -22503,6 +22504,9 @@ Min 300 kata. Bahasa Indonesia profesional. Sitasi regulasi spesifik domain ini.
   registerPackageEngineRoutes(app, { isAuthenticated, getDbRole });
   // Phase 2A: public read-only Catalog API untuk GAIA (Gustafta = source of truth)
   registerCatalogApiRoutes(app, { isAuthenticated, getDbRole });
+
+  // Gaia SIAP External AI API (Task #306) — aditif, Bearer GAIA_SIAP_API_KEY, fail-closed.
+  registerGaiaSiapAiRoutes(app);
 
   // ── Admin Agent System Endpoints ──────────────────────────────────────────
 

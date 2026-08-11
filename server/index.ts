@@ -304,6 +304,17 @@ app.use("/api/tender-ingest", (req, res, next) => {
   next();
 });
 
+// Guard khusus /api/v1/ai/assist (external API Gaia SIAP): payload wajar hanya
+// puluhan KB (prompt+context ≤ ~40k char). Tolak SEBELUM JSON di-parse agar
+// pemegang key tidak bisa mengirim body raksasa (limit global 50mb).
+app.use("/api/v1/ai/assist", (req, res, next) => {
+  const len = Number(req.headers["content-length"] || 0);
+  if (len > 256 * 1024) {
+    return res.status(413).json({ error: "payload_too_large", message: "Payload terlalu besar (maks 256KB)" });
+  }
+  next();
+});
+
 app.use(
   express.json({
     limit: "50mb",
@@ -782,7 +793,13 @@ for (const envVar of requiredEnvVars) {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
-    console.error("Internal Server Error:", err);
+    // Error body-parser (mis. JSON rusak) membawa RAW BODY di err.body —
+    // jangan pernah menulis isi body ke log (bisa berisi prompt/data sensitif).
+    if (err?.type === "entity.parse.failed" || err?.body !== undefined) {
+      console.error(`Request body error: ${err?.type || err?.name || "unknown"} status=${status}`);
+    } else {
+      console.error("Internal Server Error:", err);
+    }
 
     if (res.headersSent) {
       return next(err);

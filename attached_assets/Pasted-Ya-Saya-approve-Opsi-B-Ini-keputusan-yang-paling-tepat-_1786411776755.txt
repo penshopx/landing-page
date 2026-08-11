@@ -1,0 +1,373 @@
+Ya. **Saya approve Opsi B. 🟢**
+
+Ini keputusan yang paling tepat secara arsitektur. Jangan gunakan jalur publik `/api/messages` sebagai workaround, karena Gaia SIAP nantinya adalah aplikasi eksternal yang kita ingin perlakukan sebagai **client resmi Gustafta**, bukan sebagai user yang menyamar sebagai agen publik.
+
+### Keputusan resmi
+
+**Task #306 — APPROVED**
+
+Bangun **satu external AI API minimal** di Gustafta:
+
+```text
+POST /api/v1/ai/assist
+```
+
+Dengan prinsip:
+
+```text
+Gaia SIAP
+    ↓
+POST /api/v1/ai/assist
+    ↓
+API Key / shared secret
+    ↓
+Gustafta
+    ↓
+AI Router
+    ↓
+OpenAI / DeepSeek / Qwen / Gemini / OpenRouter
+    ↓
+JSON response
+    ↓
+Gaia SIAP
+```
+
+### Scope #306
+
+**WAJIB:**
+
+* API key/Bearer authentication
+* JSON request
+* JSON response
+* rate limiting dasar
+* validasi input
+* error handling
+* timeout
+* logging aman
+* endpoint terpisah dari `/api/messages`
+* tidak mengubah behavior chatbot existing
+* tidak mengubah Catalog API
+* tidak mengubah Gaia Store
+* tidak mengubah package/order system
+
+**JANGAN:**
+
+* ❌ memakai `/api/messages` sebagai workaround
+* ❌ membuat endpoint generik yang terlalu besar
+* ❌ mengubah chat engine existing
+* ❌ membuat SSO
+* ❌ membuat billing API
+* ❌ membuat streaming SSE dulu
+* ❌ expose provider API keys
+* ❌ memasukkan secret ke frontend
+
+### Kontrak awal yang saya sarankan
+
+Request:
+
+```json
+{
+  "prompt": "string",
+  "context": "string",
+  "case_id": "string",
+  "system_instruction": "string"
+}
+```
+
+Response:
+
+```json
+{
+  "response": "string",
+  "suggestions": []
+}
+```
+
+Kalau Gustafta membutuhkan parameter lain untuk routing model/agent, **jangan ditambahkan berdasarkan tebakan**. Gunakan abstraction yang memang sudah tersedia di Gustafta.
+
+### Satu keputusan keamanan penting
+
+API key **harus dibuat sebagai server-side secret**.
+
+```text
+Gustafta:
+GUSTAFTA_GAIA_SIAP_API_KEY
+
+Gaia SIAP:
+GUSTAFTA_API_KEY
+```
+
+Jangan pernah:
+
+```text
+React frontend → Gustafta API
+```
+
+Yang benar:
+
+```text
+React
+ ↓
+Gaia SIAP backend
+ ↓
+Gustafta /api/v1/ai/assist
+```
+
+Dengan begitu key tidak bocor ke browser.
+
+---
+
+## Prompt yang sekarang dikirim ke Replit Gustafta
+
+```text
+TASK #306 — APPROVED
+GAIA SIAP EXTERNAL AI API
+
+APPROVAL:
+Implementasikan Opsi B dari AI API Discovery.
+
+Tujuan:
+Membuka satu external AI-processing endpoint resmi untuk Gaia SIAP.
+
+Endpoint:
+
+POST /api/v1/ai/assist
+
+PENTING:
+Ini adalah endpoint tambahan.
+Jangan mengubah behavior endpoint AI/chat existing.
+
+==================================================
+SCOPE
+==================================================
+
+Implementasikan:
+
+POST /api/v1/ai/assist
+
+Authentication:
+- API key / shared secret
+- server-to-server only
+- jangan expose secret
+- gunakan environment variable
+- jangan hardcode secret
+
+Environment variable yang digunakan Gustafta:
+
+GAIA_SIAP_API_KEY
+
+Jika variable belum tersedia:
+jangan membuat secret palsu.
+Buat konfigurasi yang fail-closed dan laporkan bahwa
+secret harus dipasang melalui environment.
+
+Request JSON minimal:
+
+{
+  "prompt": "string",
+  "context": "string",
+  "case_id": "string",
+  "system_instruction": "string"
+}
+
+Response JSON minimal:
+
+{
+  "response": "string",
+  "suggestions": []
+}
+
+Gunakan AI/model routing yang SUDAH ADA di Gustafta.
+
+Jangan membuat provider AI baru.
+
+Jangan expose:
+OPENAI_API_KEY
+DEEPSEEK_API_KEY
+QWEN_API_KEY
+GEMINI_API_KEY
+OPENROUTER_API_KEY
+atau provider secret lainnya.
+
+==================================================
+SECURITY
+==================================================
+
+Implementasikan:
+
+1. API key authentication
+2. Fail closed jika key tidak tersedia
+3. Request validation
+4. Reasonable payload size limit
+5. Basic rate limiting per API client
+6. Timeout
+7. Safe error response
+8. Jangan log API key
+9. Jangan log provider secrets
+10. Jangan mengembalikan internal stack trace ke client
+
+Gunakan Bearer authentication jika sesuai dengan pattern API existing:
+
+Authorization: Bearer <GAIA_SIAP_API_KEY>
+
+Jika codebase memiliki pattern authentication API yang lebih baik,
+reuse pattern tersebut.
+
+==================================================
+AI PROCESSING
+==================================================
+
+Endpoint ini harus memanggil AI router/service existing.
+
+Jangan membuat chatbot/session baru.
+
+Jangan menggunakan:
+
+/api/messages
+/api/messages/stream
+/api/dialog-gustafta
+
+sebagai implementation shortcut.
+
+Endpoint ini harus menjadi abstraction server-to-server yang stabil.
+
+==================================================
+NO STREAMING
+==================================================
+
+Untuk V1:
+
+JSON request → JSON response.
+
+Jangan implementasikan SSE.
+
+==================================================
+CORS
+==================================================
+
+Karena endpoint dipanggil server-to-server,
+jangan membuat endpoint ini broadly accessible dari browser.
+
+Jangan membuka CORS ke *.
+
+==================================================
+OBSERVABILITY
+==================================================
+
+Tambahkan logging aman untuk:
+
+- request received
+- case_id
+- success/failure
+- latency
+
+Jangan log:
+
+- API key
+- provider API keys
+- full sensitive prompt jika tidak diperlukan
+
+==================================================
+COMPATIBILITY
+==================================================
+
+Jangan mengubah:
+
+- /api/v1/catalog/*
+- /api/admin/registry/*
+- /api/store/order
+- /api/messages
+- /api/messages/stream
+- /api/dialog-gustafta
+- existing chatbot behavior
+- Gaia Store
+- existing package/order system
+
+==================================================
+TEST
+==================================================
+
+Tambahkan/test secara lokal:
+
+1. No API key → 401
+2. Wrong API key → 401
+3. Valid API key + valid request → 200
+4. Invalid payload → 400
+5. Oversized payload → rejected
+6. AI provider failure → controlled 5xx
+7. Timeout → controlled error
+8. Secret tidak muncul di response/log
+9. Existing AI/chat endpoints tetap berfungsi
+
+==================================================
+DOCUMENTATION
+==================================================
+
+Buat kontrak singkat untuk endpoint:
+
+POST /api/v1/ai/assist
+
+Dokumentasikan:
+
+- URL
+- authentication
+- request schema
+- response schema
+- error codes
+- example request
+- example response
+
+Jika project memiliki OpenAPI infrastructure,
+tambahkan endpoint tersebut ke OpenAPI.
+
+==================================================
+QA / REPORT
+==================================================
+
+Setelah selesai:
+
+BUILD + TEST.
+
+Laporkan:
+
+A. Files changed
+B. Endpoint implemented
+C. Authentication mechanism
+D. Request schema
+E. Response schema
+F. Rate limit
+G. Error codes
+H. Environment variable name
+I. Tests performed
+J. Existing endpoint regression check
+K. Exact information yang dibutuhkan Gaia SIAP untuk integration
+
+IMPORTANT:
+
+Scope hanya TASK #306.
+
+Jangan mengerjakan #295 atau #296.
+
+Jangan mengubah Catalog/Store.
+
+Jangan melakukan deployment tambahan di luar kebutuhan task.
+
+Jangan membuat API key palsu.
+
+Jika ada keputusan teknis yang belum bisa diverifikasi dari codebase,
+STOP dan laporkan — jangan menebak.
+```
+
+### Setelah task #306 selesai
+
+**Jangan langsung memasang key ke Gaia SIAP.**
+
+Kirim hasil implementasi + test report-nya ke saya dulu.
+
+Kita akan cek kontraknya dari dua sisi:
+
+**Gustafta API contract ↔ Gaia SIAP `callAiService()`**
+
+Baru setelah cocok, kita lakukan **Phase 1B: real AI processing**.
+
+Ini adalah titik penting: setelah #306 berhasil, **Gaia SIAP untuk pertama kalinya akan memiliki jalur resmi ke AI engine Gustafta**, tanpa mengganggu Gaia Store maupun sistem chatbot Gustafta yang sudah live.

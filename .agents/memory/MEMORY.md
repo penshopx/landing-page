@@ -74,4 +74,5 @@
 - [Solution Package Engine](solution-package-engine.md) — komersial = SOLUTION×SECTOR×TIER×DURATION; package_products = access matrix; versi live IMMUTABLE via package_version_snapshots (snapshot dalam tx yang sama dengan perubahan).
 - [DB-test abort recovery](db-test-abort-recovery.md) — DB-mutating tests must write a durable recovery record before mutating + self-heal next run; after() never fires on SIGKILL/OOM.
 - [Landing page segmen](segment-landing-pages.md) — 4 halaman solusi per segmen: /kontraktor /biro-jasa /konsultan-iso /skk (portal ekosistem interaktif); nav header punya baris "Solusi untuk:" di shared-header navSolusi.
+- [Gaia SIAP external AI API](gaia-siap-external-ai-api.md) — POST /api/v1/ai/assist, Bearer GAIA_SIAP_API_KEY fail-closed; body cap harus PRA-PARSE; err.body jangan pernah masuk log.
 - [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.
