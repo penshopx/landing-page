@@ -97,6 +97,11 @@ const files = [
   // scalev_plan_<orderId>. Juga cek getSubscriptionByOrderId + jalur non-paid.
   // Skipped when DATABASE_URL is absent.
   resolve(__dirname, "scalev-webhook-subscription-activation.test.ts"),
+  // Integration (real handlers from server/lib/prod-url.ts): POST
+  // /api/admin/set-prod-url validation (https-only, no .replit.dev) and
+  // GET /api/config/app-url reflecting the saved URL — never a .replit.dev
+  // fallback — so delivery links can't break after an admin saves a valid URL.
+  resolve(__dirname, "prod-url-validation.test.ts"),
 ];
 
 let hadFailure = false;

@@ -773,8 +773,14 @@ function slugify(name: string): string {
     .slice(0, 60);
 }
 
-// In-memory cache for the production URL — loaded at startup from DB or env
-let _cachedProdUrl: string | null = null;
+// Production URL cache + resolution logic lives in server/lib/prod-url.ts so
+// the real handlers are testable (tests/prod-url-validation.test.ts).
+import {
+  getCachedProdUrl,
+  setCachedProdUrl,
+  makeAppUrlHandler,
+  makeSetProdUrlHandler,
+} from "./lib/prod-url";
 
 /** Load production URL from DB (system_config table) */
 async function loadProdUrlFromDb(): Promise<string | null> {
@@ -789,7 +795,7 @@ async function saveProdUrlToDb(url: string): Promise<void> {
   try {
     await db.insert(systemConfig).values({ key: "prod_url", value: url })
       .onConflictDoUpdate({ target: systemConfig.key, set: { value: url, updatedAt: new Date() } });
-    _cachedProdUrl = url;
+    setCachedProdUrl(url);
   } catch { /* non-critical */ }
 }
 
@@ -836,7 +842,8 @@ function getServerBaseUrl(req: { protocol: string; get(h: string): string | unde
   if (replitAppDomain) return `https://${replitAppDomain}`;
   // 3. Explicit overrides
   if (process.env.PROD_URL) return process.env.PROD_URL.replace(/\/$/, "");
-  if (_cachedProdUrl) return _cachedProdUrl;
+  const cachedProdUrl = getCachedProdUrl();
+  if (cachedProdUrl) return cachedProdUrl;
   return `${req.protocol}://${req.get("host")}`;
 }
 
@@ -891,16 +898,16 @@ export async function registerRoutes(
       const prodDomain = domains.find((d) => d.endsWith(".replit.app"));
       if (prodDomain) {
         const url = `https://${prodDomain}`;
-        _cachedProdUrl = url;
+        setCachedProdUrl(url);
         await saveProdUrlToDb(url); // persist so dev server can read it too
         console.log(`[startup] Production URL auto-saved: ${url}`);
       } else if (process.env.PROD_URL) {
-        _cachedProdUrl = process.env.PROD_URL.replace(/\/$/, "");
+        setCachedProdUrl(process.env.PROD_URL.replace(/\/$/, ""));
       } else {
         // 2. Try to load from DB (written by deployed server previously)
         const dbUrl = await loadProdUrlFromDb();
         if (dbUrl) {
-          _cachedProdUrl = dbUrl;
+          setCachedProdUrl(dbUrl);
           console.log(`[startup] Production URL loaded from DB: ${dbUrl}`);
         }
       }
@@ -11254,19 +11261,9 @@ Balas dengan JSON dengan struktur PERSIS ini:
     }
   });
 
-  // Returns the production base URL so embed codes / widget links are always correct
-  app.get("/api/config/app-url", (_req, res) => {
-    const domains = (process.env.REPLIT_DOMAINS || "").split(",").map((d) => d.trim()).filter(Boolean);
-    // Prefer CUSTOM domain (e.g. gustafta.my.id) over .replit.app
-    const customDomain = domains.find((d) => !d.endsWith(".replit.app") && !d.endsWith(".replit.dev") && !d.endsWith(".repl.co"));
-    if (customDomain) return res.json({ appUrl: `https://${customDomain}`, source: "replit_domains_custom" });
-    // PROD_URL (custom domain set by admin) beats the generic .replit.app domain
-    if (process.env.PROD_URL) return res.json({ appUrl: process.env.PROD_URL, source: "env" });
-    const prodDomain = domains.find((d) => d.endsWith(".replit.app"));
-    if (prodDomain) return res.json({ appUrl: `https://${prodDomain}`, source: "replit_domains" });
-    if (_cachedProdUrl) return res.json({ appUrl: _cachedProdUrl, source: "db" });
-    return res.json({ appUrl: null, source: "none" });
-  });
+  // Returns the production base URL so embed codes / widget links are always correct.
+  // Logic in server/lib/prod-url.ts (resolveAppUrl) — covered by tests/prod-url-validation.test.ts.
+  app.get("/api/config/app-url", makeAppUrlHandler());
 
   // Public: WA contact numbers — served from in-memory cache (loaded from DB at startup).
   // No HTTP cache: admin updates must be visible to the next request without waiting.
@@ -11548,33 +11545,9 @@ Balas dengan JSON dengan struktur PERSIS ini:
   // Admin: rotate WA contact numbers without redeploying
   app.post("/api/admin/contact", isAuthenticated, requireAdmin, makeAdminContactHandler());
 
-  // Admin: manually set the production URL (saved to DB + in-memory cache)
-  app.post("/api/admin/set-prod-url", isAuthenticated, requireAdmin, async (req: any, res: any) => {
-    const { url } = req.body as { url?: string };
-    if (!url || typeof url !== "string") return res.status(400).json({ error: "url required" });
-    const clean = url.trim().replace(/\/$/, "");
-
-    // Must be a valid URL
-    let parsed: URL;
-    try {
-      parsed = new URL(clean);
-    } catch {
-      return res.status(400).json({ error: "Format URL tidak valid. Contoh yang benar: https://nama-app.replit.app" });
-    }
-
-    // Must use https
-    if (parsed.protocol !== "https:") {
-      return res.status(400).json({ error: "URL harus menggunakan https:// (bukan http:// atau protokol lain)" });
-    }
-
-    // Must not be a .replit.dev URL (development/unstable)
-    if (parsed.hostname.endsWith(".replit.dev")) {
-      return res.status(400).json({ error: "URL .replit.dev adalah URL development yang tidak stabil dan akan berubah. Gunakan URL deployment yang stabil, misalnya https://nama-app.replit.app" });
-    }
-
-    await saveProdUrlToDb(clean);
-    return res.json({ ok: true, appUrl: clean });
-  });
+  // Admin: manually set the production URL (saved to DB + in-memory cache).
+  // Validation + handler in server/lib/prod-url.ts — covered by tests/prod-url-validation.test.ts.
+  app.post("/api/admin/set-prod-url", isAuthenticated, requireAdmin, makeSetProdUrlHandler(saveProdUrlToDb));
 
   // Short name → bigIdea ID mapping (add more as needed)
   const MODUL_SLUG_MAP: Record<string, string> = {
