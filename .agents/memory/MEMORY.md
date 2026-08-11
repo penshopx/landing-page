@@ -76,4 +76,5 @@
 - [Landing page segmen](segment-landing-pages.md) — 4 halaman solusi per segmen: /kontraktor /biro-jasa /konsultan-iso /skk (portal ekosistem interaktif); nav header punya baris "Solusi untuk:" di shared-header navSolusi.
 - [Gaia SIAP external AI API](gaia-siap-external-ai-api.md) — POST /api/v1/ai/assist, Bearer GAIA_SIAP_API_KEY fail-closed; body cap harus PRA-PARSE; err.body jangan pernah masuk log.
 - [Unified Order API](unified-order-api.md) — /api/v1/orders: SCALEV_ORDER via POST /v3/orders bila variant termapping (korelasi scalev_order_id, webhook lookup SEBELUM dedup legacy), else/gagal → MANUAL_WA; harga dari snapshot.
+- [Scalev /o/ page payment methods](scalev-order-page-payment.md) — hosted order page renders options ONLY from store-attached payment_accounts; empty at store level → page shows just Unpaid+WhatsApp, no VA.
 - [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.

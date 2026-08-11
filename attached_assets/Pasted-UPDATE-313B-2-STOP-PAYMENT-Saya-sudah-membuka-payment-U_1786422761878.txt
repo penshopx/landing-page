@@ -1,0 +1,65 @@
+UPDATE #313B-2 — STOP PAYMENT.
+
+Saya sudah membuka payment URL canary di browser. Screenshot menunjukkan:
+
+* Order: `260811NTYOONU`
+* Total: Rp10.000
+* Status pembayaran: `Unpaid`
+* Metode pembayaran: `-`
+* Tidak ada pilihan VA Mandiri
+* Tidak ada pilihan metode pembayaran lain
+* Yang tampil hanya tombol WhatsApp dan "Cek Status Pembayaran".
+
+Jadi **jangan lakukan pembayaran dan jangan membuat order baru**.
+
+Lakukan diagnostic READ-ONLY untuk mencari akar masalah:
+
+1. Trace URL:
+   `https://bayar.dokumenproyek.com/o/06FYY3JXW0DERJWGC9XTKE56YR8XE2EPSPSSD1PV`
+
+2. Pastikan halaman tersebut benar-benar merupakan payment/checkout flow Scalev dan bukan halaman status/order-detail custom Gustafta yang hanya membaca status order.
+
+3. Trace source code route `/o/:token` di `bayar.dokumenproyek.com`:
+
+   * dari mana halaman mendapatkan `scalev_order_id`,
+   * API apa yang dipanggil,
+   * apakah frontend pernah meminta/menampilkan payment methods,
+   * apakah ada redirect ke hosted checkout Scalev,
+   * apakah payment method selector sengaja tidak dirender.
+
+4. Cek order Scalev `260811NTYOONU` secara READ-ONLY:
+
+   * status,
+   * payment_status,
+   * payment_method,
+   * epayment_provider,
+   * payment_account_number,
+   * pg_payment_info,
+   * public_order_url,
+   * field lain yang relevan dengan payment.
+
+5. Bandingkan `public_order_url` Scalev dengan URL `bayar.dokumenproyek.com/o/...`.
+   Pastikan kita tidak salah menganggap wrapper Gustafta sebagai hosted checkout Scalev.
+
+6. Jika Scalev `public_order_url` memiliki payment-method selector tetapi wrapper Gustafta tidak, identifikasi bagian redirect/link yang hilang.
+
+7. Jika Scalev sendiri tidak memberikan selector/payment method untuk order ini, cari alasan/configuration state-nya secara READ-ONLY.
+
+8. Jangan melakukan:
+
+   * POST/PATCH yang memutasi order,
+   * pemilihan payment method melalui API,
+   * pembayaran,
+   * pembuatan order baru,
+   * perubahan kode/configuration.
+
+STOP setelah diagnosis.
+
+Laporan harus menjawab satu pertanyaan utama:
+
+**"Kenapa payment URL yang diberikan kepada pembeli hanya menampilkan Unpaid + WhatsApp, tetapi tidak menampilkan pilihan VA/payment method?"**
+
+Sertakan juga flow aktual:
+`Gustafta payment URL → endpoint/API → Scalev → payment method`
+
+dan tunjukkan di titik mana payment-method selector hilang.
