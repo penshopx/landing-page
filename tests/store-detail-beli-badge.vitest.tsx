@@ -209,6 +209,24 @@ describe("Store detail dialog — badge kurasi di kartu Beli", () => {
     expect(screen.queryByTestId("badge-beli-bersertifikat-prod-1")).not.toBeInTheDocument();
   });
 
+  it("prioritas: isGustafta menang atas isCertified & isCreatorMade saat semua true", async () => {
+    await openDetailDialog(
+      makeProduct({ isGustafta: true, isCertified: true, isCreatorMade: true })
+    );
+
+    expect(screen.getByTestId("badge-beli-gustafta-official-prod-1")).toBeInTheDocument();
+    expect(screen.queryByTestId("badge-beli-bersertifikat-prod-1")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("badge-beli-pra-sertifikasi-prod-1")).not.toBeInTheDocument();
+  });
+
+  it("prioritas: isCertified menang atas isCreatorMade saat isGustafta=false", async () => {
+    await openDetailDialog(makeProduct({ isCertified: true, isCreatorMade: true }));
+
+    expect(screen.getByTestId("badge-beli-bersertifikat-prod-1")).toBeInTheDocument();
+    expect(screen.queryByTestId("badge-beli-gustafta-official-prod-1")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("badge-beli-pra-sertifikasi-prod-1")).not.toBeInTheDocument();
+  });
+
   it("tidak menampilkan badge beli saat semua flag kurasi false", async () => {
     await openDetailDialog(makeProduct());
 
