@@ -20389,9 +20389,40 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 } as any).onConflictDoNothing();
                 console.log(`[DigitalDelivery] Order recorded for "${matched.name}" — ${customerEmail}`);
 
-                // Resolve download URL — full URL (Google Drive etc.) or Supabase signed URL
+                // Resolve download URL — full URL (Google Drive etc.) or Supabase signed URL.
+                // KRITIS: order sudah tersimpan di atas. Jika signing gagal (mis.
+                // SUPABASE_URL/SERVICE_ROLE_KEY belum dikonfigurasi), JANGAN biarkan
+                // error jatuh ke catch luar dan menghilangkan jejak — tandai order
+                // 'pending' agar bisa di-retry dan kirim alert WA ke superadmin.
                 const isPermanentLink = isExternalDownloadUrl(matched.downloadPath);
-                const signedUrl = await resolveDownloadUrl(matched.downloadPath, 86_400);
+                let signedUrl: string;
+                try {
+                  signedUrl = await resolveDownloadUrl(matched.downloadPath, 86_400);
+                } catch (urlErr: any) {
+                  console.error(`[DigitalDelivery] Gagal resolve download URL untuk "${matched.name}": ${urlErr?.message}`);
+                  // Order tetap tersimpan — turunkan status ke 'pending' supaya admin bisa retry.
+                  try {
+                    const { eq: dpEqOrd } = await import("drizzle-orm");
+                    await dbOrd.update(soTbl)
+                      .set({ status: "pending" } as any)
+                      .where(dpEqOrd(soTbl.accessToken, dpAccessToken));
+                  } catch (updErr: any) {
+                    console.error("[DigitalDelivery] Gagal menandai order pending:", updErr?.message);
+                  }
+                  // Alert superadmin via WA (fire-and-forget, tidak memblokir webhook).
+                  void _sendDigitalDeliveryFailureAlert({
+                    productName: matched.name,
+                    customerEmail,
+                    customerPhone,
+                    orderId: `scalev_${orderId}`,
+                    reason: urlErr?.message || "unknown",
+                  }).catch(() => {});
+                  return res.status(200).json({
+                    received: true,
+                    type: "digital_product_delivery",
+                    note: "delivery_failed_order_pending",
+                  });
+                }
 
                 // Send delivery email — await so we can fall back to WA if it fails immediately
                 let emailSent = false;
@@ -21055,6 +21086,56 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   }
   const BREVO_BOUNCE_ALERT_THRESHOLD = 0.2; // alert if >20% bounce rate over a window
   const BREVO_BOUNCE_ALERT_WINDOW = 60 * 60 * 1000; // 1-hour cooldown between alerts
+
+  // Alert admin ketika pengiriman produk digital GAGAL (mis. Supabase belum
+  // dikonfigurasi) — order sudah tersimpan status 'pending', tapi pembeli belum
+  // menerima apa-apa. Kirim WA ke SUPERADMIN_PHONE agar kegagalan tidak silent.
+  // Fire-and-forget: tidak pernah throw, tidak memblokir respons webhook.
+  async function _sendDigitalDeliveryFailureAlert(opts: {
+    productName: string;
+    customerEmail: string;
+    customerPhone?: string;
+    orderId: string;
+    reason: string;
+  }): Promise<void> {
+    const waMessage =
+      `*Gustafta Admin Alert* 🚨\n\n` +
+      `Pengiriman produk digital GAGAL:\n` +
+      `• Produk: ${opts.productName}\n` +
+      `• Pembeli: ${opts.customerEmail}${opts.customerPhone ? ` / ${opts.customerPhone}` : ""}\n` +
+      `• Order: ${opts.orderId}\n` +
+      `• Penyebab: ${opts.reason.slice(0, 200)}\n\n` +
+      `Order tersimpan dengan status *pending*. Perbaiki konfigurasi lalu kirim ulang link download secara manual.`;
+    // Jangan spam WA founder dari test run otomatis (email domain test khusus).
+    if (/@test\.gustafta\.id$/i.test(opts.customerEmail)) {
+      console.log(`[DigitalDelivery ALERT] (suppressed for test buyer) ${opts.orderId}: ${opts.reason.slice(0, 120)}`);
+      return;
+    }
+    const rawPhone = (process.env.SUPERADMIN_PHONE || "").split(",")[0].trim();
+    const fonnteApiKey = process.env.FONNTE_API_KEY || process.env.FONNTE_API_TOKEN;
+    if (rawPhone && fonnteApiKey) {
+      try {
+        let target = rawPhone.replace(/[^\d]/g, "");
+        if (target.startsWith("0")) target = "62" + target.slice(1);
+        else if (target.startsWith("8")) target = "62" + target;
+        const resp = await fetch("https://api.fonnte.com/send", {
+          method: "POST",
+          headers: { Authorization: fonnteApiKey },
+          body: new URLSearchParams({ target, message: waMessage }),
+        });
+        const body: any = await resp.json().catch(() => ({}));
+        if (resp.ok && body?.status !== false) {
+          console.log(`[DigitalDelivery ALERT] WA notification sent to ${target}`);
+          return;
+        }
+        console.error(`[DigitalDelivery ALERT] WA notification failed (HTTP ${resp.status}): ${JSON.stringify(body).slice(0, 200)}`);
+      } catch (waErr: any) {
+        console.error(`[DigitalDelivery ALERT] WA notification error: ${waErr?.message}`);
+      }
+    } else {
+      console.error(`[DigitalDelivery ALERT] Tidak bisa kirim WA alert (SUPERADMIN_PHONE/FONNTE key belum dikonfigurasi). Order ${opts.orderId} pending — cek manual.`);
+    }
+  }
 
   // Proactive bounce alert — sends WA (Fonnte) to SUPERADMIN_PHONE, falls back to email.
   // Fire-and-forget: never throws, never blocks the webhook response.

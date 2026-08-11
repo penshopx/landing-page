@@ -322,6 +322,49 @@ test("webhook paid duplikat order_id → 200 dengan note Duplicate, tidak membua
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
+// TEST 5b: Signed-URL gagal (path Supabase bucket, config hilang/path tidak ada)
+//          → order TETAP tersimpan dengan status 'pending' (bisa di-retry),
+//            webhook tetap 200 dengan note delivery_failed_order_pending.
+// ═════════════════════════════════════════════════════════════════════════════
+test("webhook paid + downloadPath bucket Supabase yang gagal di-sign → order tetap tersimpan status 'pending'", async () => {
+  const productName = `${RUN} Produk Bucket Gagal`;
+  const orderId = `test_${RUN}_sign_fail`;
+  const customerEmail = `signfail_${RUN}@test.gustafta.id`;
+
+  // downloadPath BUKAN URL eksternal → resolveDownloadUrl memanggil Supabase.
+  // Di lingkungan test: SUPABASE_URL hilang → throw "belum dikonfigurasi",
+  // atau bila terkonfigurasi, path fiktif ini → HTTP error → throw juga.
+  await createTestProduct({
+    name: productName,
+    downloadPath: `bucket-test-${RUN}/tidak-ada.pdf`,
+  });
+
+  const { status, body } = await postWebhook(
+    buildWebhookPayload({ orderId, productName, customerEmail }),
+  );
+
+  assert.equal(status, 200, `Webhook harus tetap 200. Body: ${JSON.stringify(body)}`);
+  assert.equal(body.received, true);
+  assert.equal(
+    body.type,
+    "digital_product_delivery",
+    `Kegagalan signing tidak boleh jatuh ke handler lain. Body: ${JSON.stringify(body)}`,
+  );
+  assert.equal(
+    body.note,
+    "delivery_failed_order_pending",
+    `Harus ada note kegagalan eksplisit. Body: ${JSON.stringify(body)}`,
+  );
+
+  // Order HARUS tersimpan meski signed URL gagal dibuat — status 'pending' agar bisa retry.
+  const order = await fetchOrder(orderId);
+  assert.ok(order, "Order harus tetap tersimpan di store_orders meski signing gagal");
+  assert.equal(order.customerEmail, customerEmail);
+  assert.equal(order.status, "pending", "Status order harus 'pending' setelah signing gagal");
+  assert.ok(order.accessToken && order.accessToken.length > 10, "accessToken tetap harus ada");
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
 // TEST 6: URL eksternal di resolveDownloadUrl dikembalikan apa adanya (unit check)
 // ═════════════════════════════════════════════════════════════════════════════
 test("resolveDownloadUrl: URL eksternal (https://) dikembalikan tanpa modifikasi", async () => {
