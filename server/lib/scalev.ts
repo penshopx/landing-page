@@ -1,4 +1,5 @@
 const SCALEV_API_URL = "https://api.scalev.id/v2";
+const SCALEV_V3_API_URL = "https://api.scalev.com/v3";
 
 // Base URL toko pembayaran (Scalev storefront). Ganti via env PAYMENT_BASE_URL
 // tanpa perlu sentuh kode saat migrasi domain berikutnya.
@@ -92,4 +93,61 @@ export async function createScalevProduct(params: {
     name: product.name,
     checkoutUrl: `${PAYMENT_BASE_URL}/p/${product.slug}`,
   };
+}
+
+// ── Scalev v3: create order server-side (Task #313A) ────────────────────────
+// Korelasi deterministik: kita membuat order DI Scalev dan menyimpan order_id
+// yang dikembalikan — webhook nanti mencocokkan data.order_id ke kolom
+// store_orders.scalev_order_id. TIDAK bergantung pada echo custom field.
+export interface ScalevOrderResult {
+  scalevOrderId: string;   // data.order_id (mis. "250130JQHFZG") — kunci korelasi webhook
+  scalevUuid: string | null; // data.id (UUID) — untuk lookup GET /v3/orders/{id}
+  checkoutUrl: string;     // URL yang diberikan ke pembeli untuk membayar
+}
+
+export async function createScalevOrder(params: {
+  storeUniqueId: string;
+  variantUniqueId: string;
+  quantity?: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  orderRef: string; // ORD-* Gustafta — dikirim sebagai metadata (defense-in-depth saja)
+}): Promise<ScalevOrderResult> {
+  const apiKey = process.env.SCALEV_API_KEY;
+  if (!apiKey) throw new Error("SCALEV_API_KEY tidak ditemukan di environment.");
+
+  const body: Record<string, unknown> = {
+    store_unique_id: params.storeUniqueId,
+    customer_name: params.customerName,
+    customer_email: params.customerEmail,
+    ...(params.customerPhone ? { customer_phone: params.customerPhone } : {}),
+    ordervariants: [
+      { variant_unique_id: params.variantUniqueId, quantity: params.quantity ?? 1 },
+    ],
+    // Defense-in-depth: BUKAN dependency korelasi (korelasi utama = order_id).
+    metadata: { order_ref: params.orderRef },
+    notes: `Gustafta order_ref: ${params.orderRef}`,
+  };
+
+  const res = await fetch(`${SCALEV_V3_API_URL}/orders`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const json = (await res.json().catch(() => null)) as any;
+  if (!res.ok || !json?.data) {
+    throw new Error(`Scalev v3 create order gagal: HTTP ${res.status} ${JSON.stringify(json?.error || json?.message || "").slice(0, 300)}`);
+  }
+  const d = json.data;
+  const scalevOrderId = String(d.order_id || "");
+  const checkoutUrl = String(d.public_order_url || d.payment_url || "");
+  if (!scalevOrderId || !checkoutUrl) {
+    throw new Error(`Scalev v3 create order: respons tanpa order_id/URL (order_id='${scalevOrderId}').`);
+  }
+  return { scalevOrderId, scalevUuid: d.id ? String(d.id) : null, checkoutUrl };
 }

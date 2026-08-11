@@ -2196,6 +2196,10 @@ export const storeOrders = pgTable("store_orders", {
   packageVersion: integer("package_version"),
   itemName: text("item_name"),
   source: text("source"),
+  // Korelasi deterministik ke Scalev v3: order_id Scalev yang dikembalikan saat
+  // POST /v3/orders (server-side create). Webhook mencocokkan data.order_id ke
+  // kolom ini — bukan via nama/email. Null untuk order lama/manual.
+  scalevOrderId: text("scalev_order_id"),
 });
 
 export const insertStoreOrderSchema = createInsertSchema(storeOrders).omit({ id: true, createdAt: true });
@@ -2825,6 +2829,9 @@ export const productRegistry = pgTable("product_registry", {
   aiEnabled:        boolean("ai_enabled").notNull().default(false),
   usageProfile:     jsonb("usage_profile").$type<string[]>().default([]), // AI_CHAT | DOCUMENT_ANALYSIS | DOCUMENT_GENERATION | KNOWLEDGE_PROCESSING | AGENT_EXECUTION | STORAGE
   storageProfile:   text("storage_profile"),
+  // Mapping eksplisit ke variant Scalev (v3 variant_unique_id) untuk checkout
+  // otomatis Order API. Null = belum diprovisikan → jalur MANUAL_WA.
+  scalevVariantUniqueId: varchar("scalev_variant_unique_id", { length: 80 }),
   createdAt:        timestamp("created_at").defaultNow().notNull(),
   updatedAt:        timestamp("updated_at").defaultNow().notNull(),
 });
@@ -2880,6 +2887,8 @@ export const packageRegistry = pgTable("package_registry", {
   effectiveFrom:  timestamp("effective_from"),
   effectiveUntil: timestamp("effective_until"),
   gaiaEnabled:    boolean("gaia_enabled").notNull().default(false),
+  // Mapping eksplisit ke variant Scalev (v3 variant_unique_id) — lihat productRegistry.
+  scalevVariantUniqueId: varchar("scalev_variant_unique_id", { length: 80 }),
   createdAt:      timestamp("created_at").defaultNow().notNull(),
   updatedAt:      timestamp("updated_at").defaultNow().notNull(),
 });

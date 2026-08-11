@@ -718,6 +718,22 @@ for (const envVar of requiredEnvVars) {
         created_at timestamp NOT NULL DEFAULT now())`);
     await pool.query(`CREATE UNIQUE INDEX IF NOT EXISTS uq_pkg_version_snapshot ON package_version_snapshots (package_db_id, version)`);
 
+    // ── Unified Order API + Scalev v3 correlation (Fase B + #313A) ─────────
+    // Kolom aditif nullable — order lama tidak terpengaruh. Diletakkan SETELAH
+    // CREATE product_registry/package_registry agar aman di DB yang baru dibuat.
+    await pool.query(`
+      ALTER TABLE store_orders
+        ADD COLUMN IF NOT EXISTS package_id varchar(60),
+        ADD COLUMN IF NOT EXISTS package_version integer,
+        ADD COLUMN IF NOT EXISTS item_name text,
+        ADD COLUMN IF NOT EXISTS source text,
+        ADD COLUMN IF NOT EXISTS scalev_order_id text;
+    `);
+    await pool.query(`ALTER TABLE product_registry ADD COLUMN IF NOT EXISTS scalev_variant_unique_id varchar(80)`);
+    await pool.query(`ALTER TABLE package_registry ADD COLUMN IF NOT EXISTS scalev_variant_unique_id varchar(80)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_store_orders_scalev_order_id ON store_orders (scalev_order_id) WHERE scalev_order_id IS NOT NULL`);
+    console.log(`${new Date().toLocaleTimeString()} [express] order-api correlation columns ready`);
+
     // Seed default (idempotent, ON CONFLICT DO NOTHING) — admin bisa menambah lagi
     await pool.query(`
       INSERT INTO tier_registry (name, slug, level) VALUES

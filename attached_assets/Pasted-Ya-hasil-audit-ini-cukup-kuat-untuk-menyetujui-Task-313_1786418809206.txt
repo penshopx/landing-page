@@ -1,0 +1,83 @@
+Ya, hasil audit ini cukup kuat untuk menyetujui Task #313, dengan satu catatan penting: jangan langsung melakukan transaksi uji sebelum provisioning variant dan alur create-order tervalidasi read-only terlebih dahulu.
+
+Keputusan saya: APPROVE #313 — dengan guardrail
+
+Arsitektur yang dipilih sudah tepat:
+
+Gustafta ORD-* → POST /v3/orders Scalev → simpan scalev_order_id → payment_url per-order → webhook data.order_id → cocokkan kembali ke store_orders.
+
+Ini jauh lebih deterministik daripada mencoba menyisipkan order_ref ke URL /c/checkout.
+
+Yang saya setujui
+Gunakan POST /v3/orders sebagai jalur checkout Scalev.
+Setelah ORD-* dibuat, buat order Scalev server-side.
+Simpan scalev_order_id di store_orders.
+Kembalikan payment_url dari response Scalev sebagai URL pembayaran order tersebut.
+Webhook tetap memverifikasi HMAC.
+Korelasi utama:
+ORD-xxxxx
+scalev_order_id
+webhook data.order_id
+metadata: { order_ref } boleh dikirim sebagai defense-in-depth, tetapi jangan pernah menjadikannya dependency utama.
+Jika create order Scalev gagal → MANUAL_WA, jangan membuat order lokal seolah-olah siap dibayar.
+Unified Order API dan Gaia SIAP tidak disentuh.
+Perubahan database cukup aditif, misalnya scalev_order_id, tanpa merusak order existing.
+Satu hal yang saya ubah dari rancangan awal
+
+Jangan langsung menjalankan:
+
+“verifikasi 1 transaksi uji nominal kecil”
+
+sebagai bagian otomatis Task #313.
+
+Pisahkan menjadi dua tahap:
+
+Task #313A — Implementasi + read-only verification
+
+tambah kolom scalev_order_id
+implementasi POST /v3/orders
+simpan ID Scalev
+return payment_url
+implement webhook correlation
+test failure/fallback
+test dengan mock/stub atau request yang tidak menghasilkan pembayaran nyata
+
+Task #313B — Live transaction test
+
+provisioning variant
+pilih nominal uji
+minta approval saya/Bos terlebih dahulu
+baru lakukan transaksi nyata end-to-end.
+
+Dengan begitu kita tidak accidentally melakukan charge/order nyata ketika masih menguji wiring.
+
+Instruksi ke developer
+
+Bisa langsung kirim:
+
+APPROVED — kerjakan Task #313A saja.
+
+Implementasikan jalur Scalev v3 server-side sesuai rancangan audit:
+POST /v3/orders → simpan scalev_order_id → return payment_url → webhook correlate melalui data.order_id.
+
+Tambahkan metadata.order_ref hanya sebagai defense-in-depth, bukan dependency correlation.
+
+Pertahankan fallback MANUAL_WA jika create order Scalev gagal.
+
+Perubahan database harus aditif dan backward-compatible. Jangan mengubah Unified Order API, Gaia SIAP, atau cabang webhook/order lama selain menambahkan lookup scalev_order_id sebelum cabang existing.
+
+DILARANG melakukan transaksi/payment nyata pada tahap ini.
+
+Sebelum implementasi provisioning variant atau live transaction, lakukan audit/read-only verification terlebih dahulu dan laporkan:
+
+mapping product registry → Scalev variant,
+payload final POST /v3/orders,
+response fields yang dipakai,
+migration/schema yang akan ditambahkan,
+fallback behavior,
+webhook correlation flow,
+seluruh test yang dijalankan.
+
+Setelah semua lolos, STOP dan tunggu approval untuk Task #313B (live transaction test).
+
+Kesimpulan: jalur /v3/orders adalah pilihan yang benar untuk checkout per-order. scalev_order_id menjadi foreign correlation key yang deterministik, sehingga kita tidak perlu memaksa order_ref masuk melalui URL checkout.

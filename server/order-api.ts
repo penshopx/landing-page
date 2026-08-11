@@ -127,6 +127,8 @@ type ResolvedItem = {
   name: string;
   amount: number;
   currency: string;
+  // Mapping variant Scalev v3 (bila item sudah diprovisikan) — untuk checkout otomatis.
+  scalevVariantUniqueId?: string | null;
 };
 
 async function resolveProduct(productId: string): Promise<{ item?: ResolvedItem; error?: { status: number; code: string; message: string } }> {
@@ -152,6 +154,7 @@ async function resolveProduct(productId: string): Promise<{ item?: ResolvedItem;
       name: p.name,
       amount: p.price,
       currency: p.currency || "IDR",
+      scalevVariantUniqueId: p.scalevVariantUniqueId ?? null,
     },
   };
 }
@@ -190,20 +193,39 @@ async function resolvePackage(packageId: string): Promise<{ item?: ResolvedItem;
       name: snap.name,
       amount: snap.price,
       currency: snap.currency || "IDR",
-      scalevVariantId: null, // paket belum diprovisikan di Scalev (blocker terlapor)
+      scalevVariantUniqueId: pkg.scalevVariantUniqueId ?? null,
     },
   };
 }
 
+// Jalur otomatis (Task #313A): buat order DI Scalev via POST /v3/orders.
+// Korelasi deterministik ORD-* ↔ scalev_order_id ↔ webhook data.order_id.
+// Syarat: item punya mapping scalev_variant_unique_id di registry + env
+// SCALEV_STORE_UNIQUE_ID + SCALEV_API_KEY. Gagal apa pun → fallback MANUAL_WA
+// (order lokal tetap pending, TIDAK berpura-pura siap dibayar).
+async function tryScalevOrder(item: ResolvedItem, buyer: ParsedBody["buyer"], orderRef: string) {
+  const storeUniqueId = (process.env.SCALEV_STORE_UNIQUE_ID || "").trim();
+  if (!item.scalevVariantUniqueId || !storeUniqueId || !process.env.SCALEV_API_KEY) return null;
+  try {
+    const { createScalevOrder } = await import("./lib/scalev");
+    const result = await createScalevOrder({
+      storeUniqueId,
+      variantUniqueId: item.scalevVariantUniqueId,
+      customerName: buyer.name,
+      customerEmail: buyer.email,
+      customerPhone: buyer.phone || undefined,
+      orderRef,
+    });
+    return result;
+  } catch (err) {
+    console.warn(`[order-api] scalev_create_failed ref=${logSafe(orderRef)} — fallback MANUAL_WA. ${logSafe((err as Error)?.message)}`);
+    return null;
+  }
+}
+
 function buildPayment(item: ResolvedItem, buyer: ParsedBody["buyer"], orderRef: string) {
-  // KEPUTUSAN V1 (hasil review): checkout Scalev otomatis DITAHAN dari API ini.
-  // URL /c/checkout?variant_ids= tidak membawa order_ref, sehingga webhook tidak
-  // bisa mengaitkan pembayaran ke order api_v1 secara pasti (korelasi nama
-  // produk+email tidak aman: nama tidak unik, order paralel bisa tertukar).
-  // Sampai Scalev mendukung custom order_ref yang tervalidasi webhook, SEMUA
-  // order API memakai jalur manual WA yang terbukti live — order_ref selalu
-  // terbawa eksplisit di pesan, admin mengaktivasi manual. Blocker terdokumentasi
-  // di docs/order-api.md.
+  // Jalur manual WA (terbukti live) — dipakai bila item belum diprovisikan di
+  // Scalev atau create order Scalev gagal. order_ref selalu terbawa di pesan.
   const wa = getWaContact().primary;
   const lines = [
     `Halo Gustafta, saya ingin memesan:`,
@@ -304,7 +326,24 @@ export function registerOrderApiRoutes(app: Express) {
         })
         .returning({ id: storeOrders.id, createdAt: storeOrders.createdAt });
 
-      const payment = buildPayment(item, buyer, orderRef);
+      // Coba jalur otomatis Scalev v3; gagal/tidak eligible → MANUAL_WA.
+      const scalev = await tryScalevOrder(item, buyer, orderRef);
+      let payment: { payment_url: string | null; payment_mode: string; wa_order_url: string | null; note: string };
+      if (scalev) {
+        const { eq } = await import("drizzle-orm");
+        await db
+          .update(storeOrders)
+          .set({ scalevOrderId: scalev.scalevOrderId })
+          .where(eq(storeOrders.id, inserted[0].id));
+        payment = {
+          payment_url: scalev.checkoutUrl,
+          payment_mode: "SCALEV_ORDER",
+          wa_order_url: null,
+          note: "Bayar melalui payment_url. Status order akan otomatis menjadi paid setelah pembayaran terkonfirmasi Scalev.",
+        };
+      } else {
+        payment = buildPayment(item, buyer, orderRef);
+      }
 
       return done(201, {
         order_ref: orderRef,

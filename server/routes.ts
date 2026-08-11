@@ -20176,6 +20176,52 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         return res.status(200).json({ received: true, note: `Payment status: ${paymentStatus}` });
       }
 
+      // ── Task #313A: korelasi deterministik order Unified Order API (api_v1) ──
+      // Order yang dibuat server-side via Scalev v3 menyimpan scalev_order_id
+      // saat create. Webhook mencocokkan data.order_id ke kolom itu — tanpa
+      // tebak-tebakan nama/email. Blok ini SENGAJA di atas dedup legacy:
+      // (a) race webhook-datang-sebelum-persist tidak permanen — retry webhook
+      //     berikutnya menemukan scalev_order_id yang sudah tersimpan, tidak
+      //     terhenti di dedup `scalev_<id>`;
+      // (b) fallback kedua: metadata.order_ref (defense-in-depth yang kita kirim
+      //     saat create) → cocokkan ke midtrans_order_id order api_v1 pending,
+      //     sekaligus backfill scalev_order_id. BUKAN dependency utama.
+      // Cabang legacy di bawah TIDAK disentuh; return di sini bila cocok.
+      try {
+        const { db: dbConn } = await import("./db");
+        const { storeOrders: storeOrdersTable } = await import("@shared/schema");
+        const { eq, and } = await import("drizzle-orm");
+        let apiOrderRows = await dbConn
+          .select({ id: storeOrdersTable.id, status: storeOrdersTable.status, midtransOrderId: storeOrdersTable.midtransOrderId, scalevOrderId: storeOrdersTable.scalevOrderId })
+          .from(storeOrdersTable)
+          .where(eq(storeOrdersTable.scalevOrderId, String(orderId)))
+          .limit(1);
+        if (!apiOrderRows[0]) {
+          const metaRef = String((data as any)?.metadata?.order_ref || "").trim();
+          if (metaRef.startsWith("ORD-")) {
+            apiOrderRows = await dbConn
+              .select({ id: storeOrdersTable.id, status: storeOrdersTable.status, midtransOrderId: storeOrdersTable.midtransOrderId, scalevOrderId: storeOrdersTable.scalevOrderId })
+              .from(storeOrdersTable)
+              .where(and(eq(storeOrdersTable.midtransOrderId, metaRef), eq(storeOrdersTable.source, "api_v1")))
+              .limit(1);
+          }
+        }
+        const apiOrder = apiOrderRows[0];
+        if (apiOrder) {
+          if (apiOrder.status !== "paid" || !apiOrder.scalevOrderId) {
+            await dbConn
+              .update(storeOrdersTable)
+              .set({ status: "paid", scalevOrderId: String(orderId) })
+              .where(eq(storeOrdersTable.id, apiOrder.id));
+            console.log(`✅ [Scalev webhook] Order API ${apiOrder.midtransOrderId} → paid (scalev_order_id=${orderId})`);
+          }
+          return res.status(200).json({ received: true, note: "api_v1 order marked paid", order_ref: apiOrder.midtransOrderId });
+        }
+      } catch (corrErr) {
+        // Jangan pernah menggagalkan webhook karena lookup korelasi; lanjut ke cabang legacy.
+        console.error("[Scalev webhook] api_v1 correlation lookup error:", (corrErr as Error)?.message);
+      }
+
       // Check duplicate (use midtransOrderId field to store scalev orderId)
       const existing = await storage.getStoreOrderByMidtransId(`scalev_${orderId}`);
       if (existing) {

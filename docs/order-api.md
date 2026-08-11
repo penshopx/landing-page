@@ -55,9 +55,13 @@ Fail-closed: tanpa env `ORDER_API_KEY` di Gustafta, endpoint membalas 503 `servi
 }
 ```
 
-`payment_mode` (V1): selalu `MANUAL_WA` — `payment_url` null; `wa_order_url` berisi pesan WA lengkap dengan `order_ref`, ID item, versi, dan harga. Order tercatat pending; admin memproses pembayaran lalu aktivasi manual.
+`payment_mode`:
+- `SCALEV_ORDER` (Task #313A) — order dibuat server-side di Scalev via `POST /v3/orders`; `payment_url` = URL order per-transaksi dari respons Scalev. Korelasi deterministik: `order_ref (ORD-*) ↔ store_orders.scalev_order_id (disimpan saat create) ↔ webhook data.order_id`. `metadata.order_ref` ikut dikirim hanya sebagai defense-in-depth, BUKAN dependency korelasi. Syarat: item punya `scalev_variant_unique_id` di registry + env `SCALEV_STORE_UNIQUE_ID` + `SCALEV_API_KEY`.
+- `MANUAL_WA` — dipakai bila item belum diprovisikan di Scalev ATAU create order Scalev gagal (fallback; order lokal tetap pending, tidak berpura-pura siap dibayar). `wa_order_url` memuat `order_ref`, ID item, versi, harga.
 
-**Keputusan V1 (hasil review keamanan):** checkout Scalev otomatis SENGAJA ditahan dari API ini. URL `/c/checkout?variant_ids=` tidak membawa `order_ref`, sehingga webhook tidak bisa mengaitkan pembayaran ke order `api_v1` secara pasti (korelasi nama produk + email tidak aman — nama tidak unik, order paralel bisa tertukar). `payment_mode: "SCALEV_CHECKOUT"` dicadangkan untuk V2 setelah korelasi kuat tersedia.
+**Catatan sejarah:** URL statis `/c/checkout?variant_ids=` TIDAK dipakai API ini — tidak bisa membawa `order_ref` sehingga korelasi webhook tidak aman (audit + review).
+
+**Webhook:** `POST /api/webhooks/scalev` kini mencocokkan `data.order_id` ke `store_orders.scalev_order_id` SEBELUM cabang legacy; bila cocok, order `api_v1` di-update menjadi `paid` (idempoten) dan cabang legacy tidak tereksekusi. Cabang lama tidak diubah.
 
 Order dicatat di `store_orders` dengan `source = "api_v1"`, `midtrans_order_id = order_ref`, plus kolom `package_id`/`package_version`/`item_name` (aditif, nullable — order lama tidak terpengaruh).
 
@@ -76,6 +80,5 @@ Order dicatat di `store_orders` dengan `source = "api_v1"`, `midtrans_order_id =
 
 ## Blocker yang tersisa (dilaporkan, bukan di-workaround)
 
-1. **Paket & produk registry belum diprovisikan di Scalev** — tidak ada variant Scalev milik registry, jadi semua order API = `MANUAL_WA`. Solusi aman berikutnya: provisikan produk/variant Scalev per item (API `createScalevProduct` sudah ada), simpan variant ID langsung di registry (bukan name-match ke store_products).
-2. **`/c/checkout?variant_ids=` tidak membawa `order_ref`** — korelasi kuat order_ref↔transaksi Scalev↔webhook butuh konfirmasi dukungan custom field/metadata checkout Scalev. Jangan diasumsikan; sampai terkonfirmasi, checkout otomatis dari API ini ditahan.
-3. Rate limit V1 masih satu bucket global untuk semua pemanggil (satu klien sibuk bisa menghabiskan kuota klien lain) — diselesaikan di Fase C (API client registry, kuota per client_id).
+1. **Provisioning variant (Task #313B, butuh approval)** — kolom `scalev_variant_unique_id` di `product_registry`/`package_registry` masih kosong untuk semua item, jadi jalur `SCALEV_ORDER` belum aktif di produksi (semua order = MANUAL_WA). #313B: provisikan variant per item di Scalev, isi mapping, lalu 1 transaksi uji nominal kecil end-to-end SETELAH approval.
+2. Rate limit V1 masih satu bucket global untuk semua pemanggil (satu klien sibuk bisa menghabiskan kuota klien lain) — diselesaikan di Fase C (API client registry, kuota per client_id).

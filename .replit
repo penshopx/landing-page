@@ -92,3 +92,4 @@ NOTIFICATION_WEBHOOK_URL = "https://gustafta.my.id/api/notify-fonnte?key=9876934
 PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
 VITE_PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
 NOTIFY_WEBHOOK_KEY = "98769346a8ad80072d68973c680d4db6"
+SCALEV_STORE_UNIQUE_ID = "store_Q6KHvqE8njFjGsS44N7wcP8d"
