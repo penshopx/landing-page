@@ -1,0 +1,140 @@
+Bagus. **Discovery ini justru berhasil mencegah kita membuat integrasi palsu.** 🟢
+
+Dan sekarang saya melihat satu hal penting: **jangan berikan API key atau URL secara manual dulu.** Kita perlu mencari tahu dari **Replit Gustafta yang sudah live** bagaimana API yang sebenarnya bekerja.
+
+Karena sebelumnya kita sudah membuktikan **Gustafta Catalog API live**, tetapi itu memang **belum berarti ada AI-processing API publik**.
+
+### Jadi status Gaia SIAP sekarang
+
+* 🟢 Phase 0 foundation
+* 🟢 `callAiService()` abstraction
+* 🟢 `/api/ai/assist`
+* 🟢 Case → Intake → Workflow → Result
+* 🟡 Gustafta AI integration — **blocked by API contract**
+* 🔴 Jangan implementasi fake API
+* 🔴 Jangan pasang payment/auth/mobile dulu
+
+### Langkah berikutnya: cari API Gustafta yang sebenarnya
+
+Kita punya **Replit Gustafta** yang sudah digunakan untuk Catalog API. Saya ingin agent di **Replit Gustafta**, bukan Gaia SIAP, melakukan **read-only API discovery**.
+
+Kirim prompt ini ke **Replit project Gustafta**:
+
+```text
+GUSTAFTA — READ-ONLY AI API DISCOVERY
+
+Kita sedang menyiapkan integrasi dengan aplikasi standalone Gaia SIAP.
+
+Gaia SIAP sudah memiliki:
+POST /api/ai/assist
+dan abstraction:
+callAiService()
+
+Namun Gaia SIAP belum mengetahui API AI-processing Gustafta yang sebenarnya.
+
+JANGAN mengubah apa pun.
+JANGAN membuat endpoint baru.
+JANGAN membuat credential baru.
+JANGAN mengubah database, deployment, environment, atau UI.
+
+Lakukan READ-ONLY audit pada workspace Gustafta ini untuk menentukan apakah Gustafta saat ini memiliki API yang dapat digunakan aplikasi eksternal untuk AI processing/inference.
+
+Audit:
+
+1. Cari seluruh backend/API route yang berhubungan dengan:
+   - AI
+   - chat
+   - inference
+   - agent
+   - chatbot
+   - completion
+   - message
+   - conversation
+   - orchestration
+   - OpenClaw/MultiClaw jika memang relevan
+
+2. Bedakan dengan tegas:
+   - Catalog API
+   - Product Registry API
+   - Order API
+   - AI processing/chat API
+
+3. Untuk setiap kandidat AI API, laporkan:
+   - endpoint/path
+   - HTTP method
+   - authentication
+   - required headers
+   - request body/schema
+   - response body/schema
+   - error response
+   - apakah endpoint public atau internal
+   - apakah endpoint aman untuk dipanggil aplikasi eksternal
+
+4. Trace satu request nyata jika memungkinkan secara READ-ONLY:
+   external request
+   → Gustafta API
+   → AI service/model
+   → response
+
+5. Cari environment variables yang terkait dengan:
+   - public API
+   - API base URL
+   - API key
+   - internal service authentication
+
+   Jangan menampilkan secret/API key aktual.
+   Cukup laporkan nama variable dan apakah variable tersebut tersedia.
+
+6. Cari dokumentasi OpenAPI/Swagger/API contract jika tersedia.
+
+7. Cari existing client/SDK yang digunakan oleh Gaia Store atau aplikasi lain.
+
+8. Verifikasi apakah Catalog API yang sudah digunakan Gaia Store memiliki kemampuan AI processing atau hanya catalog/product data.
+
+9. Jika TIDAK ADA external AI-processing API yang siap digunakan, katakan dengan tegas:
+   "Gustafta belum menyediakan external AI-processing API yang dapat diverifikasi."
+
+Jangan mengarang endpoint.
+
+Jangan menganggap endpoint internal sebagai public API tanpa bukti.
+
+OUTPUT:
+
+A. Catalog API
+B. Product Registry API
+C. Order API
+D. AI Processing API
+E. Authentication
+F. Relevant environment variables (nama saja, jangan secret)
+G. Existing API documentation
+H. Recommended integration endpoint untuk Gaia SIAP, jika benar-benar tersedia
+I. Jika belum tersedia, jelaskan GAP yang harus dibuat di Gustafta
+J. Exact next step
+
+READ-ONLY ONLY.
+NO CODE CHANGES.
+NO DEPLOYMENT.
+NO NEW API.
+```
+
+### Kenapa audit ini dilakukan di Gustafta?
+
+Karena **Gustafta adalah sumber kebenaran API**.
+
+Gaia SIAP tidak boleh menebak bagaimana Gustafta bekerja.
+
+Kalau hasilnya nanti:
+
+> **D. AI Processing API: tersedia**
+
+maka kita punya jalan → implementasi `callAiService()`.
+
+Kalau hasilnya:
+
+> **D. AI Processing API: belum tersedia**
+
+maka **jangan panik dan jangan membangun ulang Gaia SIAP**. Kita hanya perlu menentukan apakah Gustafta perlu membuka **satu API AI-processing yang minimal** untuk Gaia SIAP.
+
+Dan itu jauh lebih aman daripada sekarang menebak-nebak URL/API key.
+
+**Jadi sekarang: jalankan audit tersebut di Replit Gustafta. Jangan ubah Gaia SIAP dulu.**
