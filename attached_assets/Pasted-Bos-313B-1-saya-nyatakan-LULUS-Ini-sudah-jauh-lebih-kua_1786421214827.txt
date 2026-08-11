@@ -1,0 +1,97 @@
+Bos, **#313B-1 saya nyatakan LULUS. ✅**
+
+Ini sudah jauh lebih kuat daripada sekadar “mapping sudah ada”. Yang paling penting, **alur create-order → Scalev → payment URL → webhook → order lokal** sudah terbukti bekerja tanpa pembayaran nyata.
+
+### Status teknis
+
+| Area                                  | Status           |
+| ------------------------------------- | ---------------- |
+| 10/10 variant terprovisioning         | ✅                |
+| Harga Scalev ↔ registry               | ✅                |
+| Variant attached ke store             | ✅                |
+| Normalisasi nomor `+62`               | ✅                |
+| Create order live Scalev              | ✅                |
+| `scalev_order_id` tersimpan           | ✅                |
+| Per-order payment URL                 | ✅                |
+| Webhook `paid` → order tepat          | ✅                |
+| Duplicate-order handling              | ✅                |
+| Test Scalev                           | ✅ 7/7            |
+| Regression                            | ✅ 15/15          |
+| Data uji dibersihkan                  | ✅                |
+| Transaksi uang nyata                  | ❌ Belum          |
+| Production sudah mendapat fix terbaru | ⚠️ Belum Publish |
+
+### Saya APPROVE #313B-2
+
+**Boleh melakukan 1 transaksi nyata nominal kecil.**
+
+Saya setuju menggunakan:
+
+> **GST-CAP-009 — Ruang Simpan — Rp79.000**
+
+Alasannya bagus sebagai canary test: nominal relatif kecil dan variant-nya sudah terbukti valid.
+
+Namun ada **satu syarat penting sebelum uang benar-benar dibayarkan**:
+
+### ⚠️ Publish dulu, baru transaksi
+
+Laporan menyebut dua fix baru masih belum aktif production:
+
+* normalisasi nomor telepon `+62`
+* penyesuaian format response Scalev
+
+Jadi urutannya harus:
+
+**Publish → verifikasi production → buat 1 order nyata → bayar → verifikasi webhook → audit hasil.**
+
+Jangan bayar order yang dibuat sebelum Publish.
+
+### Instruksi #313B-2
+
+APPROVED — lanjut Task #313B-2 dengan 1 transaksi nyata nominal kecil.
+
+Target canary:
+GST-CAP-009 — Ruang Simpan — Rp79.000.
+
+Urutan WAJIB:
+
+1. Publish perubahan kode terbaru terlebih dahulu.
+2. Verifikasi production sudah menjalankan fix:
+
+   * normalisasi nomor telepon +62 → 628...
+   * parsing response Scalev terbaru.
+3. Buat SATU order baru dari flow production Gustafta.
+4. Pastikan payment_mode = SCALEV_ORDER.
+5. Pastikan scalev_order_id tersimpan di ORD-* yang baru.
+6. Pastikan payment_url adalah URL order tersebut.
+7. Lakukan pembayaran nyata Rp79.000.
+8. Tunggu webhook Scalev.
+9. Verifikasi hanya ORD-* tersebut yang berubah menjadi paid.
+10. Verifikasi scalev_order_id yang diterima webhook sama persis dengan order yang dibayar.
+11. Verifikasi tidak ada order lain yang ikut berubah.
+12. Verifikasi status pembayaran di Scalev dan status lokal konsisten.
+
+JANGAN membuat transaksi kedua sebagai percobaan tambahan.
+
+Jika terjadi error:
+
+* jangan retry pembayaran secara otomatis,
+* STOP,
+* simpan detail error/order_id untuk audit,
+* laporkan sebelum melakukan tindakan lanjutan.
+
+Setelah selesai, STOP dan kirim laporan:
+
+* ORD-* lokal,
+* Scalev order_id,
+* nominal,
+* timestamp,
+* status sebelum/sesudah,
+* hasil webhook,
+* hasil korelasi,
+* hasil verifikasi DB,
+* dan apakah ada anomali.
+
+Jika semuanya PASS, baru kita putuskan langkah Publish/final rollout berikutnya.
+
+**Catatan penting:** setelah transaksi berhasil, **jangan langsung menganggap seluruh 10 produk aman hanya karena satu canary berhasil**. Canary membuktikan jalur pembayaran end-to-end; mapping 10 variant sudah diverifikasi sebelumnya. Setelah itu kita bisa melakukan **final production readiness audit** sebelum mengaktifkan Scalev secara penuh.
