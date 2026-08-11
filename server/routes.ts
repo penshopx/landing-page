@@ -24832,7 +24832,9 @@ POLA KERJA: ELICIT (pahami tahap & niat) â†’ DISPATCH (agen sesuai kebutuhan) â†
     try {
       const hubId = parseInt(req.params.id);
       const { candidateIds } = req.body as { candidateIds: number[] };
-      if (!candidateIds?.length) return res.status(400).json({ error: "candidateIds wajib diisi" });
+      // Array kosong EKSPLISIT = reset hub ke solo (hapus semua sub-agen).
+      // Hanya tolak jika field hilang atau bukan array.
+      if (!Array.isArray(candidateIds)) return res.status(400).json({ error: "candidateIds wajib diisi" });
 
       // Fetch the candidate agents
       const { sql, inArray: inArr } = await import("drizzle-orm");

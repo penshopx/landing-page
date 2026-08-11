@@ -426,3 +426,61 @@ test(
     );
   }
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEST 9: auto-connect dengan candidateIds: [] → 200 + agenticSubAgents kosong
+//         (semua sub-agen dilepas — hub kembali solo)
+// ─────────────────────────────────────────────────────────────────────────────
+test(
+  "hub-audit HTTP: auto-connect candidateIds [] → 200 + agenticSubAgents kosong",
+  { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
+  async () => {
+    const { status, json } = await req(
+      "POST",
+      `/api/admin/hub-audit/${hubAgentId}/auto-connect`,
+      { user: adminId, body: { candidateIds: [] } }
+    );
+    assert.equal(
+      status, 200,
+      `auto-connect [] harus 200, dapat ${status}: ${JSON.stringify(json)}`
+    );
+    assert.ok(json.ok === true, "Response harus { ok: true }");
+    assert.ok(
+      Array.isArray(json.agenticSubAgents) && json.agenticSubAgents.length === 0,
+      `agenticSubAgents harus kosong setelah reset, dapat: ${JSON.stringify(json.agenticSubAgents)}`
+    );
+
+    // Verifikasi DB juga benar-benar kosong (bukan hanya response).
+    const [row] = await db
+      .select({ agenticSubAgents: agents.agenticSubAgents })
+      .from(agents)
+      .where(eq(agents.id, hubAgentId));
+    const stored = typeof row.agenticSubAgents === "string"
+      ? JSON.parse(row.agenticSubAgents)
+      : row.agenticSubAgents;
+    assert.ok(
+      Array.isArray(stored) && stored.length === 0,
+      `agentic_sub_agents di DB harus [] setelah reset, dapat: ${JSON.stringify(row.agenticSubAgents)}`
+    );
+  }
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEST 10: GET /api/store/catalog setelah reset penuh → harga tier solo 299.000
+// ─────────────────────────────────────────────────────────────────────────────
+test(
+  "hub-audit HTTP: harga katalog setelah reset penuh (0 sub) = tier solo (299.000)",
+  { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
+  async () => {
+    const item = await findCatalogItem(storeProductId);
+    assert.ok(
+      item !== undefined,
+      `Store product id=${storeProductId} tidak ditemukan di katalog setelah reset penuh`
+    );
+    assert.equal(
+      item.price,
+      299_000,
+      `Harga setelah reset penuh (0 sub, total=1) seharusnya 299.000, dapat: ${item.price}`
+    );
+  }
+);
