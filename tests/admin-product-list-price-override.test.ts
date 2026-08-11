@@ -28,10 +28,23 @@ import { db } from "../server/db";
 import { agents as agentsTable, storeProducts } from "../shared/schema";
 import { inArray } from "drizzle-orm";
 import { storage } from "../server/storage";
+import { parseSubAgentsValue } from "../server/db-storage";
+
+// ── Tier harga (salinan dari routes.ts) ──────────────────────────────────────
+const DEFAULT_LICENSE_PRICE = 299_000;
+function calcStorePrice(agenticSubAgents: unknown): number {
+  const subCount = Array.isArray(agenticSubAgents) ? agenticSubAgents.length : 0;
+  const total = subCount + 1; // orchestrator + sub-agents
+  if (total >= 7) return 1_299_000;
+  if (total >= 4) return 799_000;
+  if (total >= 2) return 499_000;
+  return DEFAULT_LICENSE_PRICE;
+}
 
 // ── Identifier unik per run ───────────────────────────────────────────────────
 const RUN = `aplo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 const createdProductIds: number[] = [];
+const createdAgentIds: number[] = [];
 
 // ── Server HTTP minimal ───────────────────────────────────────────────────────
 let server: Server;
@@ -62,16 +75,31 @@ before(async () => {
   const app = express();
   app.use(express.json());
 
-  // GET /api/store/admin/products — mirror produksi (tanpa kalkulasi agentik
-  // untuk kesederhanaan: agentId null → computedPrice = price)
+  // GET /api/store/admin/products — mirror produksi TERMASUK kalkulasi agentik:
+  // produk dengan agentId → computedPrice = calcStorePrice(agenticSubAgents dari
+  // agen tertaut); tanpa agentId → computedPrice = price.
   app.get("/api/store/admin/products", alwaysAuth, async (_req: any, res: any) => {
     try {
       const rows = await db.select().from(storeProducts).orderBy(storeProducts.sortOrder, storeProducts.id);
-      const enriched = rows.map((p: any) => ({
-        ...p,
-        computedPrice: p.price, // tanpa agentId, computedPrice = price
-        teamSize: null,
-      }));
+      const linkedAgentIds = rows.map((p: any) => p.agentId).filter(Boolean) as number[];
+      const agentSubInfoMap = new Map<number, { subAgents: any[]; teamSize: number }>();
+      if (linkedAgentIds.length > 0) {
+        const agentRows = await db
+          .select({ id: agentsTable.id, agenticSubAgents: agentsTable.agenticSubAgents })
+          .from(agentsTable)
+          .where(inArray(agentsTable.id, linkedAgentIds));
+        for (const r of agentRows) {
+          const subs = parseSubAgentsValue(r.agenticSubAgents);
+          agentSubInfoMap.set(r.id, { subAgents: subs, teamSize: subs.length + 1 });
+        }
+      }
+      const enriched = rows.map((p: any) => {
+        const info = p.agentId != null ? agentSubInfoMap.get(p.agentId) : undefined;
+        const computedPrice = info !== undefined ? calcStorePrice(info.subAgents) : p.price;
+        const teamSize = info?.teamSize ?? null;
+        const effectivePrice = p.priceOverride != null ? p.priceOverride : computedPrice;
+        return { ...p, computedPrice, teamSize, effectivePrice };
+      });
       res.json(enriched);
     } catch (err) {
       res.status(500).json({ error: String(err) });
@@ -103,6 +131,9 @@ after(async () => {
   );
   if (createdProductIds.length > 0) {
     await db.delete(storeProducts).where(inArray(storeProducts.id, createdProductIds));
+  }
+  if (createdAgentIds.length > 0) {
+    await db.delete(agentsTable).where(inArray(agentsTable.id, createdAgentIds));
   }
 });
 
@@ -208,6 +239,120 @@ test("siklus lengkap: set → hapus → set ulang override tercermin di admin li
   // Langkah 4: set override kedua
   await patchProduct(productId, { priceOverride: OVERRIDE_2 });
   assert.equal((await getAdminProducts(productId))?.priceOverride, OVERRIDE_2, "Langkah 4: override kedua aktif");
+});
+
+// ── Helper: buat agen orkestrator ringan dengan N sub-agen ───────────────────
+async function createOrchestrator(subCount: number): Promise<number> {
+  const subAgents = Array.from({ length: subCount }, (_, i) => ({
+    agentId: 9000 + i, // dummy IDs — hanya jumlah yang dihitung untuk pricing
+    role: `sub-${i}`,
+    description: `Sub-agen ${i}`,
+  }));
+  const agent = await storage.createAgent({
+    name: `${RUN} Orkestrator ${subCount}`,
+    isListed: false,
+    isActive: true,
+    agenticSubAgents: subAgents,
+  } as any);
+  const id = Number(agent.id);
+  createdAgentIds.push(id);
+  return id;
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BAGIAN 1B — Integrasi HTTP: PATCH agentId → computedPrice dihitung ulang dari
+// calcStorePrice(agenticSubAgents agen tertaut), bukan tetap di harga dasar.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test("PATCH agentId (tim 4 anggota) → computedPrice = tier 799.000, bukan price dasar", async () => {
+  const BASE_PRICE = 299_000;
+  const productId = await createProduct(BASE_PRICE);
+  const agentId = await createOrchestrator(3); // 3 sub + 1 orchestrator = 4 anggota
+
+  // Sebelum link: computedPrice = price dasar
+  const before = await getAdminProducts(productId);
+  assert.equal(before?.computedPrice, BASE_PRICE, "Sebelum link, computedPrice = price dasar");
+  assert.equal(before?.teamSize, null, "Sebelum link, teamSize harus null");
+
+  // PATCH agentId → link ke agen bertim
+  await patchProduct(productId, { agentId });
+
+  const after = await getAdminProducts(productId);
+  assert.ok(after, "Produk harus masih ada di daftar admin setelah link agen");
+  assert.equal(after.agentId, agentId, "agentId harus tersimpan setelah PATCH");
+  assert.equal(
+    after.computedPrice,
+    799_000,
+    "computedPrice harus dihitung ulang dari calcStorePrice tim 4 anggota (799.000), bukan tetap di harga dasar"
+  );
+  assert.equal(after.teamSize, 4, "teamSize harus 4 (3 sub + orchestrator)");
+  assert.notEqual(after.computedPrice, BASE_PRICE, "computedPrice tidak boleh tetap di harga dasar lama");
+});
+
+test("PATCH agentId dari agen kecil ke agen besar → computedPrice ikut tier baru", async () => {
+  const BASE_PRICE = 299_000;
+  const productId = await createProduct(BASE_PRICE);
+  const smallAgentId = await createOrchestrator(1); // 2 anggota → 499.000
+  const bigAgentId = await createOrchestrator(6);   // 7 anggota → 1.299.000
+
+  await patchProduct(productId, { agentId: smallAgentId });
+  const small = await getAdminProducts(productId);
+  assert.equal(small?.computedPrice, 499_000, "Tim 2 anggota → 499.000");
+  assert.equal(small?.teamSize, 2, "teamSize agen kecil harus 2");
+
+  // Re-link ke agen dengan tim besar
+  await patchProduct(productId, { agentId: bigAgentId });
+  const big = await getAdminProducts(productId);
+  assert.equal(
+    big?.computedPrice,
+    1_299_000,
+    "Setelah pindah ke agen tim 7 anggota, computedPrice harus 1.299.000 — bukan harga agen lama"
+  );
+  assert.equal(big?.teamSize, 7, "teamSize agen besar harus 7");
+});
+
+test("PATCH agentId agen solo → computedPrice = harga solo (299.000) meskipun price dasar beda", async () => {
+  const BASE_PRICE = 999_000; // sengaja beda agar terlihat bahwa computedPrice datang dari agen
+  const productId = await createProduct(BASE_PRICE);
+  const soloAgentId = await createOrchestrator(0); // solo → 299.000
+
+  await patchProduct(productId, { agentId: soloAgentId });
+  const row = await getAdminProducts(productId);
+  assert.equal(row?.computedPrice, 299_000, "Agen solo → computedPrice 299.000 dari calcStorePrice");
+  assert.equal(row?.price, BASE_PRICE, "price dasar tidak berubah oleh link agen");
+  assert.equal(row?.teamSize, 1, "teamSize agen solo harus 1");
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BAGIAN 1C — Statis: rute produksi GET /api/store/admin/products membaca
+// agenticSubAgents dari agen tertaut dan memanggil calcStorePrice.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test("routes.ts: enrichment GET /api/store/admin/products membaca agenticSubAgents dan memanggil calcStorePrice", () => {
+  const src = fs.readFileSync(path.join(process.cwd(), "server", "routes.ts"), "utf-8");
+
+  // Ambil blok handler GET admin products
+  const handlerStart = src.indexOf('app.get("/api/store/admin/products"');
+  assert.ok(handlerStart >= 0, "Handler GET /api/store/admin/products harus ada di routes.ts");
+  const block = src.slice(handlerStart, handlerStart + 2500);
+
+  assert.ok(
+    block.includes("agenticSubAgents: agentsTable.agenticSubAgents") ||
+      block.includes("agenticSubAgents"),
+    "Enrichment harus membaca kolom agenticSubAgents dari agen tertaut"
+  );
+  assert.ok(
+    block.includes("parseSubAgentsValue("),
+    "Enrichment harus menormalkan agenticSubAgents via parseSubAgentsValue (jsonb bisa berupa string)"
+  );
+  assert.ok(
+    block.includes("calcStorePrice("),
+    "Enrichment harus memanggil calcStorePrice(subAgents) untuk menghitung computedPrice produk ber-agen"
+  );
+  assert.ok(
+    /computedPrice\s*=\s*info\s*!==\s*undefined\s*\?\s*calcStorePrice\(info\.subAgents\)\s*:\s*p\.price/.test(block),
+    "computedPrice harus = calcStorePrice(subAgents agen tertaut) bila ada agen, fallback p.price bila tidak"
+  );
 });
 
 // ═════════════════════════════════════════════════════════════════════════════
