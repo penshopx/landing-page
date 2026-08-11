@@ -34,3 +34,19 @@ export function computeNextSortOrder(products: SortableProduct[]): number {
     : 0;
   return maxOrder + 10;
 }
+
+/**
+ * Compute the next `productForm.sortOrder` value when the "Tambah Produk"
+ * form is toggled.
+ *
+ * - Opening (`willOpen === true`): auto-fill with max existing sortOrder + 10.
+ * - Closing (`willOpen === false`): reset to "0" so a stale auto-filled value
+ *   never survives a close-without-save. The next open always recomputes from
+ *   the then-current product list.
+ */
+export function nextFormSortOrderOnToggle(
+  willOpen: boolean,
+  products: SortableProduct[],
+): string {
+  return willOpen ? String(computeNextSortOrder(products)) : "0";
+}

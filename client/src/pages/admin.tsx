@@ -17,7 +17,7 @@ import {
   Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical
 } from "lucide-react";
 import { useContactNumbers } from "@/lib/contact";
-import { syncOrderedProducts, computeNextSortOrder } from "@/lib/store-sort-order";
+import { syncOrderedProducts, nextFormSortOrderOnToggle } from "@/lib/store-sort-order";
 
 // ---- Types ----
 interface AdminMeData {
@@ -2119,10 +2119,10 @@ export default function AdminPage() {
                       </Button>
                       <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-white gap-1"
                         onClick={() => {
-                          if (!showProductForm) {
-                            // Auto-fill sort order: max existing + 10 (via production helper)
-                            setProductForm(f => ({ ...f, sortOrder: String(computeNextSortOrder(orderedProducts)) }));
-                          }
+                          // Opening: auto-fill sort order (max existing + 10).
+                          // Closing: reset to "0" so a stale value never lingers
+                          // in state after a close-without-save (via production helper).
+                          setProductForm(f => ({ ...f, sortOrder: nextFormSortOrderOnToggle(!showProductForm, orderedProducts) }));
                           setShowProductForm(!showProductForm);
                         }}
                         data-testid="button-toggle-product-form">

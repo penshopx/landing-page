@@ -25,6 +25,9 @@ const files = [
   // after a product is deleted, including when all products are deleted (→ 10).
   // Explicitly models the old guard bug vs the fix so regressions are caught.
   resolve(__dirname, "store-sort-order-autofill-after-delete.test.ts"),
+  // Unit: closing "Tambah Produk" without saving resets sortOrder to "0";
+  // second open recomputes fresh max+10 from the current list.
+  resolve(__dirname, "store-sort-order-form-close-reset.test.ts"),
   resolve(__dirname, "store-catalog-payment-link-clear.test.ts"),
   // Integration + cache: confirms clearing a product's paymentUrl falls back to
   // the agent URL (or null) immediately after invalidation — without a redeploy.
