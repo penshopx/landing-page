@@ -1,0 +1,73 @@
+Betul, Bos. **Akar masalahnya sekarang sudah jelas: bukan kode Gustafta dan bukan VA Xendit, melainkan `payment_accounts` di level DP-Gaia Store masih kosong.**
+
+Saya pilih **Opsi A**. ✅
+
+### Keputusan: APPROVE Opsi A
+
+**Attach payment account ke DP-Gaia Store melalui dashboard Scalev.**
+
+Ini lebih tepat daripada PATCH order karena:
+
+* menyelesaikan masalah di **level store**, bukan hanya order canary;
+* order API `/v3/orders` berikutnya akan memiliki payment method yang tersedia;
+* tidak perlu mengubah kode;
+* tidak perlu mengubah harga/variant;
+* tidak perlu membuat order baru;
+* order canary `260811NTYOONU` yang sekarang masih `draft/unpaid` bisa dipakai untuk verifikasi.
+
+### Tapi ada guardrail
+
+Jangan attach sembarang rekening/payment account. Gunakan **payment account yang memang sudah dimaksudkan untuk DP-Gaia Store**, khususnya:
+
+* **VA Xendit Mandiri**, jika memang account tersebut tersedia untuk di-attach;
+* rekening manual hanya jika memang ingin ditampilkan sebagai metode pembayaran kepada pembeli.
+
+Untuk **canary Rp10.000**, saya sarankan cukup aktifkan **VA Mandiri** dulu. Jangan mengubah terlalu banyak setting sekaligus. Dengan begitu kita tahu persis bahwa:
+
+**Store → VA Mandiri → order canary → pembayaran Rp10.000 → webhook `paid`**
+
+### Instruksi developer
+
+APPROVE OPSI A — attach payment account ke DP-Gaia Store.
+
+Lakukan melalui dashboard Scalev, bukan melalui PATCH/API order.
+
+TARGET:
+DP-Gaia Store harus memiliki payment account yang dapat digunakan untuk pembayaran VA, khususnya **Xendit VA Mandiri**.
+
+GUARDRAIL:
+
+1. Jangan membuat order baru.
+2. Jangan melakukan pembayaran.
+3. Jangan mengubah harga atau variant.
+4. Jangan mengubah kode.
+5. Jangan PATCH order `260811NTYOONU`.
+6. Jangan mengubah payment account bisnis/global yang tidak diperlukan.
+7. Hanya attach payment account yang memang sudah tersedia dan diperuntukkan bagi DP-Gaia Store.
+8. Untuk tahap ini prioritaskan VA Mandiri saja agar canary test tetap terisolasi.
+
+SETELAH ATTACH:
+Lakukan verification read-only:
+
+1. `GET /v2/stores/21104/payment-accounts`
+2. Pastikan `payment_accounts` DP-Gaia Store sekarang tidak kosong.
+3. Pastikan VA Mandiri/Xendit account yang dimaksud benar-benar ter-attach.
+4. Buka kembali payment URL order canary:
+   `https://bayar.dokumenproyek.com/o/06FYY3JXW0DERJWGC9XTKE56YR8XE2EPSPSSD1PV`
+5. Pastikan pilihan payment method sekarang muncul.
+6. Pastikan order `260811NTYOONU` tetap `draft/unpaid`.
+7. Jangan membayar dulu.
+
+STOP setelah payment method/VA berhasil muncul.
+
+Kirim laporan:
+
+* payment account yang di-attach,
+* hasil GET store payment accounts,
+* apakah VA Mandiri muncul di payment page,
+* status order canary,
+* dan konfirmasi bahwa belum ada pembayaran.
+
+Pembayaran Rp10.000 tetap menunggu approval tahap berikutnya.
+
+**Jadi sekarang kita tidak perlu membuat order baru.** Kalau attachment store berhasil, kita idealnya bisa memakai order canary yang sudah ada dan langsung melihat apakah pilihan VA muncul.

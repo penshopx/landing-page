@@ -8,4 +8,6 @@ The `/o/{secret_slug}` page on the store custom domain IS Scalev's hosted Nuxt S
 
 **Why:** v3 `POST /orders` creates a `draft` order with `payment_method: null`; the /o/ page is an order-status/invoice page. Payment method is normally chosen in the checkout FORM flow (`/p/...`) before order creation, or must come from store-attached payment accounts.
 
+**Nuance:** store-level `payment_methods` (e.g. `va_mandiri`) and `xendit_va_bank_codes` apply to the checkout FORM / payment-link flow only — they do NOT surface on the /o/ order page. Xendit VA is not a payment-account object (`/v2/payment-accounts` lists only manual bank_transfer accounts), so "attach VA to store" may only exist as a dashboard-side setting, if at all.
+
 **How to apply:** for API-created orders to be payable via their public URL, attach payment accounts (bank transfer / Xendit VA) to the STORE in the Scalev dashboard, or set payment fields on the order. Verify by checking `store.payment_accounts` in the public order payload.
