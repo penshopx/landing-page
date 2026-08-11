@@ -163,7 +163,7 @@ function validateProdUrl(url: string): string | null {
   return null;
 }
 
-function ProdUrlCard({ appUrl, isDevUrl, onSaved }: { appUrl: string; isDevUrl: boolean; onSaved: (u: string) => void }) {
+export function ProdUrlCard({ appUrl, isDevUrl, onSaved }: { appUrl: string; isDevUrl: boolean; onSaved: (u: string) => void }) {
   const { toast } = useToast();
   const [input, setInput] = useState("");
   const [saving, setSaving] = useState(false);
