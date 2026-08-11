@@ -7827,6 +7827,14 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
   app.patch("/api/store/admin/products/:id", isAuthenticated, async (req, res) => {
     try {
+      // Reject zero/negative price overrides so a typo can never publish a
+      // Rp 0 or negative-priced product to buyers. (null = clear override, OK)
+      if (req.body && req.body.priceOverride != null) {
+        const po = Number(req.body.priceOverride);
+        if (!Number.isFinite(po) || po <= 0) {
+          return res.status(400).json({ error: "Override harga harus lebih besar dari 0" });
+        }
+      }
       const product = await storage.updateStoreProduct(Number(req.params.id), req.body);
       if (!product) return res.status(404).json({ error: "Product not found" });
       invalidateStoreCatalog();

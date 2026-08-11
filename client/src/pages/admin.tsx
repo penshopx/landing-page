@@ -4242,7 +4242,11 @@ Selamat menggunakan! 🚀
                 placeholder="Kosongkan = harga dari tim"
                 data-testid="input-edit-product-price-override"
               />
-              <p className="text-xs text-muted-foreground mt-1">Isi untuk promo/harga khusus. Kosongkan agar harga otomatis dari jumlah agen.</p>
+              {editProductForm.priceOverride !== "" && Number(editProductForm.priceOverride) <= 0 ? (
+                <p className="text-xs text-red-600 mt-1" data-testid="error-edit-product-price-override">Override harga harus lebih besar dari 0.</p>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-1">Isi untuk promo/harga khusus. Kosongkan agar harga otomatis dari jumlah agen.</p>
+              )}
             </div>
             <div className="sm:col-span-2">
               <label className="text-xs font-medium mb-1 block text-muted-foreground">Link Pembayaran (opsional)</label>
@@ -4289,7 +4293,7 @@ Selamat menggunakan! 🚀
             <Button variant="outline" onClick={() => setEditProductDialog({ open: false, product: null })}>Batal</Button>
             <Button
               className="bg-blue-600 hover:bg-blue-700 text-white gap-2"
-              disabled={updateProductMutation.isPending || !editProductForm.name || !editProductForm.price}
+              disabled={updateProductMutation.isPending || !editProductForm.name || !editProductForm.price || (editProductForm.priceOverride !== "" && Number(editProductForm.priceOverride) <= 0)}
               onClick={() => {
                 if (!editProductDialog.product) return;
                 const featuresArr = editProductForm.features
