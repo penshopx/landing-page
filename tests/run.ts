@@ -102,6 +102,13 @@ const files = [
   // GET /api/config/app-url reflecting the saved URL — never a .replit.dev
   // fallback — so delivery links can't break after an admin saves a valid URL.
   resolve(__dirname, "prod-url-validation.test.ts"),
+  // Static/unit (no DB): validates server/claw-catalog.ts before seeding —
+  // global slug uniqueness (products + tools + generated evaluator slugs +
+  // legacy seed-file agents), pricing convention (K2/2.5jt/199rb OpenClaw,
+  // K3/5jt/299rb MultiClaw, documented exceptions), required fields non-empty
+  // and evaluatorCriteria of exactly 4. Catches duplicate or mispriced Claw
+  // batches at build time instead of after they reach the Store.
+  resolve(__dirname, "claw-catalog-validation.test.ts"),
 ];
 
 let hadFailure = false;
