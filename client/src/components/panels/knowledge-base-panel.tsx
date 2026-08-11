@@ -740,7 +740,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
         additionalContext: aiGenContext || undefined,
         notionParentId: aiGenPushNotion && aiGenNotionParentId ? aiGenNotionParentId : undefined,
       });
-      const data = await res.json();
+      const data = res;
       if (data.error) throw new Error(data.error);
       setAiGenResult(data);
       if (data.url) {
@@ -808,7 +808,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
         language: kbAiActionLanguage,
         customPrompt: kbAiAction === "custom" ? kbAiActionCustomPrompt : undefined,
       });
-      const data = await res.json();
+      const data = res;
       if (data.error) throw new Error(data.error);
       setKbAiActionResult(data.result);
     } catch (e: any) {
@@ -875,7 +875,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
         title: notionSyncItem.name,
         content: notionSyncItem.content || `Konten KB: ${notionSyncItem.name}\n\n${notionSyncItem.description || ""}`,
       });
-      const data = await res.json();
+      const data = res;
       if (data.error) throw new Error(data.error);
       setNotionSyncDone({ url: data.url, title: notionSyncItem.name });
       toast({ title: "Berhasil disinkronkan ke Notion", description: `"${notionSyncItem.name}" telah dibuat sebagai halaman Notion.` });
@@ -893,7 +893,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
         query: notionSearchQuery,
         type: "page",
       });
-      const data = await res.json();
+      const data = res;
       const pages = (data.results || []).map((p: any) => {
         const titleProp = Object.values(p.properties || {}).find((v: any) => v.type === "title") as any;
         const title = titleProp?.title?.map((t: any) => t.plain_text).join("") || p.id;
@@ -918,7 +918,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
     setNotionAllPages([]);
     try {
       const res = await apiRequest("GET", "/api/notion/pages");
-      const data = await res.json();
+      const data = res;
       const pages = (data.results || []).map((p: any) => {
         const titleProp = Object.values(p.properties || {}).find((v: any) => v.type === "title") as any;
         const title = titleProp?.title?.map((t: any) => t.plain_text).join("") || "(Tanpa Judul)";
@@ -941,7 +941,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
     setNotionImportingId(page.id);
     try {
       const contentRes = await apiRequest("GET", `/api/notion/page/${page.id}/content`);
-      const data = await contentRes.json();
+      const data = contentRes;
       if (data.error) throw new Error(data.error);
 
       let finalContent = data.content || "(konten kosong)";
@@ -956,7 +956,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
             action: notionImportAiAction,
             language: "Bahasa Indonesia",
           });
-          const aiData = await aiRes.json();
+          const aiData = aiRes;
           if (aiData.result) {
             finalContent = aiData.result;
             descSuffix = ` · AI-enhanced (${notionImportAiAction})`;
@@ -1344,7 +1344,7 @@ export function KnowledgeBasePanel({ agent }: KnowledgeBasePanelProps) {
                                   title: aiGenResult.title,
                                   content: aiGenResult.content,
                                 });
-                                const d = await r.json();
+                                const d = r;
                                 if (d.url) {
                                   setAiGenResult({ ...aiGenResult, url: d.url });
                                   toast({ title: "Berhasil push ke Notion", description: aiGenResult.title });

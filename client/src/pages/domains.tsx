@@ -56,7 +56,7 @@ export default function DomainsPage() {
         domain: newDomain,
         agentId: newAgentId === "none" ? null : newAgentId,
       });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/domains"] });
@@ -73,7 +73,7 @@ export default function DomainsPage() {
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await apiRequest("DELETE", `/api/domains/${id}`);
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/domains"] });
@@ -85,7 +85,7 @@ export default function DomainsPage() {
   const editMutation = useMutation({
     mutationFn: async ({ id, agentId }: { id: number; agentId: string | null }) => {
       const res = await apiRequest("PATCH", `/api/domains/${id}`, { agentId });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/domains"] });
@@ -101,7 +101,7 @@ export default function DomainsPage() {
     mutationFn: async (id: number) => {
       setVerifyingId(id);
       const res = await apiRequest("POST", `/api/domains/${id}/verify`, {});
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/domains"] });

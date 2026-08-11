@@ -104,7 +104,7 @@ export default function KlinikUjiKompetensiPage() {
   const asesmen = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/tools/klinik-ujikom/asesmen", journey.form);
-      return (await res.json()) as BlueprintKesiapan;
+      return res as BlueprintKesiapan;
     },
     onSuccess: (bp) => update({ blueprint: bp, step: 2 }),
     onError: (e: any) => toast({ title: "Gagal menyusun blueprint", description: e?.message || "Coba lagi.", variant: "destructive" }),
@@ -130,7 +130,7 @@ export default function KlinikUjiKompetensiPage() {
   const buatSoal = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/tools/simulator-uji-kompetensi/soal", { jabatan: journey.form.jabatan, jumlahSoal: 5 });
-      return (await res.json()) as { soalList: Soal[] };
+      return res as { soalList: Soal[] };
     },
     onSuccess: (d) => {
       if (!d.soalList?.length) { toast({ title: "Soal kosong", description: "Coba lagi.", variant: "destructive" }); return; }
@@ -146,7 +146,7 @@ export default function KlinikUjiKompetensiPage() {
         jawaban: (journey.soalList || []).map((s) => ({ nomor: s.nomor, jawaban: jawaban[s.nomor] || "" })),
       };
       const res = await apiRequest("POST", "/api/tools/simulator-uji-kompetensi/evaluasi", payload);
-      return (await res.json()) as Evaluasi;
+      return res as Evaluasi;
     },
     onSuccess: (ev) => update({ evaluasi: ev, step: 5 }),
     onError: (e: any) => toast({ title: "Gagal mengevaluasi", description: e?.message || "Coba lagi.", variant: "destructive" }),

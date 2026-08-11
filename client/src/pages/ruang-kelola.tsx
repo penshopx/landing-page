@@ -198,14 +198,14 @@ export default function RuangKelolaPage() {
 
   const { data: docs = [], isLoading: docsLoading, refetch } = useQuery<RKDocument[]>({
     queryKey: ["/api/ruang-kelola/documents", activeTab],
-    queryFn: () => apiRequest("GET", `/api/ruang-kelola/documents?category=${activeTab}`).then(r => r.json()),
+    queryFn: () => apiRequest("GET", `/api/ruang-kelola/documents?category=${activeTab}`),
     enabled: !!user,
   });
 
   // ── Mutations ──────────────────────────────────────────────────────────
   const saveProfile = useMutation({
     mutationFn: (data: Partial<RKProfile>) =>
-      apiRequest("POST", "/api/ruang-kelola/profile", data).then(r => r.json()),
+      apiRequest("POST", "/api/ruang-kelola/profile", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/profile"] });
       setShowProfileForm(false);
@@ -215,7 +215,7 @@ export default function RuangKelolaPage() {
   });
 
   const createDoc = useMutation({
-    mutationFn: (data: any) => apiRequest("POST", "/api/ruang-kelola/documents", data).then(r => r.json()),
+    mutationFn: (data: any) => apiRequest("POST", "/api/ruang-kelola/documents", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/documents"] });
       qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/summary"] });
@@ -227,7 +227,7 @@ export default function RuangKelolaPage() {
 
   const updateDoc = useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
-      apiRequest("PATCH", `/api/ruang-kelola/documents/${id}`, data).then(r => r.json()),
+      apiRequest("PATCH", `/api/ruang-kelola/documents/${id}`, data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/documents"] });
       qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/summary"] });
@@ -239,7 +239,7 @@ export default function RuangKelolaPage() {
   });
 
   const deleteDoc = useMutation({
-    mutationFn: (id: string) => apiRequest("DELETE", `/api/ruang-kelola/documents/${id}`).then(r => r.json()),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/ruang-kelola/documents/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/documents"] });
       qc.invalidateQueries({ queryKey: ["/api/ruang-kelola/summary"] });
@@ -1219,7 +1219,6 @@ function BiroJasaDialog({ open, onClose, doc, companyName }: {
         service_type: serviceType,
         notes,
       });
-      if (!res.ok) throw new Error("Gagal mengirim permintaan");
       setSubmitted(true);
     } catch (err: any) {
       toast({ title: "Gagal mengirim permintaan", description: err.message, variant: "destructive" });

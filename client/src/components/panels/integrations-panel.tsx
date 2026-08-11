@@ -103,7 +103,7 @@ export function IntegrationsPanel({ agent }: IntegrationsPanelProps) {
       const response = await apiRequest("PATCH", `/api/agents/${agent.id}`, {
         accessToken: newToken
       });
-      return response.json();
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
@@ -129,7 +129,7 @@ export function IntegrationsPanel({ agent }: IntegrationsPanelProps) {
     setIsConnecting(true);
     try {
       const response = await apiRequest("POST", `/api/telegram/setup-webhook/${agent.id}`);
-      const result = await response.json();
+      const result = response;
       
       if (result.success) {
         toast({
@@ -165,7 +165,7 @@ export function IntegrationsPanel({ agent }: IntegrationsPanelProps) {
       }
       
       const response = await apiRequest("POST", `/api/whatsapp/test-connection/${agent.id}`);
-      const result = await response.json();
+      const result = response;
       
       if (result.success) {
         toast({

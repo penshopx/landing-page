@@ -165,7 +165,7 @@ export default function MonitorMarketing() {
   const sweepMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/research/sweep");
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       toast({ title: "Tim marketing dijalankan", description: "Hasil baru sedang dibuat. Muat ulang sebentar lagi untuk melihatnya." });

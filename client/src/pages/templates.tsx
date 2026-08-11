@@ -120,7 +120,7 @@ export default function TemplatesPage() {
     mutationFn: (templateId: number) =>
       apiRequest("POST", `/api/chatbot-templates/${templateId}/use`, {
         customName: customName.trim() || undefined,
-      }).then((r) => r.json()),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
       queryClient.invalidateQueries({ queryKey: ["/api/chatbot-templates"] });

@@ -96,7 +96,7 @@ export function WidgetPanel({ agent, bigIdeaId }: WidgetPanelProps) {
   const updateMutation = useMutation({
     mutationFn: async (data: typeof settings) => {
       const response = await apiRequest("PATCH", `/api/agents/${agent.id}`, data);
-      return response.json();
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });

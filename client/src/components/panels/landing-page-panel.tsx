@@ -132,7 +132,7 @@ export function LandingPagePanel({ agent }: { agent: any }) {
         category: publishCategory,
         description: publishDescription,
         thumbnailColor: publishColor,
-      }).then((r) => r.json()),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chatbot-templates"] });
       setPublishSuccess(true);

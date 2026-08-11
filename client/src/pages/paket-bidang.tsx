@@ -61,7 +61,7 @@ export default function PaketBidangPage() {
   const saveMutation = useMutation({
     mutationFn: async (packages: string[]) => {
       const res = await apiRequest("POST", "/api/claw-packages/select", { packages });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/claw-packages/my"] });

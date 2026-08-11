@@ -43,7 +43,7 @@ export function EkosistemPanel({ agent }: EkosistemPanelProps) {
   const mcMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/ai/ekosistem-multiclaw", { agentId: agent?.id });
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       setMcResult(data);

@@ -145,14 +145,14 @@ export function ConversionPanel({ agent }: { agent: any }) {
     queryKey: ["/api/leads", agent.id],
     queryFn: async () => {
       const res = await apiRequest("GET", `/api/leads/${agent.id}`);
-      return res.json();
+      return res;
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof settings) => {
       const response = await apiRequest("PATCH", `/api/agents/${agent.id}`, data);
-      return response.json();
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
@@ -166,7 +166,7 @@ export function ConversionPanel({ agent }: { agent: any }) {
   const updateLeadMutation = useMutation({
     mutationFn: async ({ id, status }: { id: number; status: string }) => {
       const response = await apiRequest("PATCH", `/api/lead/${id}`, { status });
-      return response.json();
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/leads", agent.id] });

@@ -31,7 +31,7 @@ export function useImportAgent() {
         customName,
         toolboxId,
       });
-      return await response.json();
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/series"] });

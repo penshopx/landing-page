@@ -43,7 +43,7 @@ export function AffiliatePanel({ agent }: { agent: any }) {
         referralCode: data.referralCode,
         commissionRate: data.commissionRate,
       });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/affiliates"] });

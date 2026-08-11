@@ -55,7 +55,7 @@ function BujkTab() {
     setNibLookupLoading(true);
     try {
       const resp = await apiRequest("GET", `/api/data-master/cek-oss?nib=${encodeURIComponent(nib)}`);
-      const data = await resp.json();
+      const data = resp;
       if (!data.found) {
         toast({ title: "Data tidak ditemukan", description: "Coba cek manual di tab Cek OSS-RBA", variant: "destructive" });
         return;
@@ -78,13 +78,13 @@ function BujkTab() {
 
   const { data: rows = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/data-master/bujk", search],
-    queryFn: () => apiRequest("GET", `/api/data-master/bujk${search ? `?search=${encodeURIComponent(search)}` : ""}`).then(r => r.json()),
+    queryFn: () => apiRequest("GET", `/api/data-master/bujk${search ? `?search=${encodeURIComponent(search)}` : ""}`),
   });
 
   const saveMutation = useMutation({
     mutationFn: (data: any) => editItem
-      ? apiRequest("PUT", `/api/data-master/bujk/${editItem.id}`, data).then(r => r.json())
-      : apiRequest("POST", "/api/data-master/bujk", data).then(r => r.json()),
+      ? apiRequest("PUT", `/api/data-master/bujk/${editItem.id}`, data)
+      : apiRequest("POST", "/api/data-master/bujk", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/data-master/bujk"] });
       setDialogOpen(false);
@@ -94,7 +94,7 @@ function BujkTab() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiRequest("DELETE", `/api/data-master/bujk/${id}`).then(r => r.json()),
+    mutationFn: (id: number) => apiRequest("DELETE", `/api/data-master/bujk/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/data-master/bujk"] });
       toast({ title: "Data dihapus" });
@@ -308,14 +308,14 @@ function HargaTab() {
       let qs = "";
       if (search) qs = `?search=${encodeURIComponent(search)}`;
       else if (filterKategori !== "semua") qs = `?kategori=${encodeURIComponent(filterKategori)}`;
-      return apiRequest("GET", `/api/data-master/harga${qs}`).then(r => r.json());
+      return apiRequest("GET", `/api/data-master/harga${qs}`);
     },
   });
 
   const saveMutation = useMutation({
     mutationFn: (data: any) => editItem
-      ? apiRequest("PUT", `/api/data-master/harga/${editItem.id}`, data).then(r => r.json())
-      : apiRequest("POST", "/api/data-master/harga", data).then(r => r.json()),
+      ? apiRequest("PUT", `/api/data-master/harga/${editItem.id}`, data)
+      : apiRequest("POST", "/api/data-master/harga", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/data-master/harga"] });
       setDialogOpen(false);
@@ -325,7 +325,7 @@ function HargaTab() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiRequest("DELETE", `/api/data-master/harga/${id}`).then(r => r.json()),
+    mutationFn: (id: number) => apiRequest("DELETE", `/api/data-master/harga/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/data-master/harga"] });
       toast({ title: "Data dihapus" });
@@ -506,7 +506,7 @@ function OssTab() {
     setResult(null);
     try {
       const resp = await apiRequest("GET", `/api/data-master/cek-oss?nib=${encodeURIComponent(trimmed)}`);
-      const data = await resp.json();
+      const data = resp;
       setResult(data);
     } catch (e: any) {
       toast({ title: "Gagal cek OSS", description: e.message, variant: "destructive" });
@@ -542,7 +542,7 @@ function OssTab() {
   }
 
   const saveMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("POST", "/api/data-master/bujk", data).then(r => r.json()),
+    mutationFn: (data: any) => apiRequest("POST", "/api/data-master/bujk", data),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/data-master/bujk"] });
       setSaveOpen(false);
@@ -728,7 +728,7 @@ export default function DataMasterPage() {
 
   const { data: stats } = useQuery<{ bujkCount: number; materialCount: number }>({
     queryKey: ["/api/data-master/stats"],
-    queryFn: () => apiRequest("GET", "/api/data-master/stats").then(r => r.json()),
+    queryFn: () => apiRequest("GET", "/api/data-master/stats"),
     staleTime: 30_000,
   });
 

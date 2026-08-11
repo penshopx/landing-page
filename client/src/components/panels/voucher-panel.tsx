@@ -56,7 +56,7 @@ export function VoucherPanel({ agent }: { agent: any }) {
         agentId: data.agentId ? Number(data.agentId) : null,
         isActive: true,
       });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vouchers"] });

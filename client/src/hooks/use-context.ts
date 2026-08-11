@@ -36,7 +36,7 @@ export function useActivateContext() {
         toolboxId,
         agentId,
       });
-      return await response.json();
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/series"] });

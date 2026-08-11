@@ -66,7 +66,7 @@ export function TenderPanel({ agent }: { agent: any }) {
   const createSourceMutation = useMutation({
     mutationFn: async (data: typeof sourceForm) => {
       const res = await apiRequest("POST", "/api/tender-sources", data);
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tender-sources"] });
@@ -81,7 +81,7 @@ export function TenderPanel({ agent }: { agent: any }) {
   const scrapeMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await apiRequest("POST", `/api/tender-sources/${id}/scrape`);
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/tender-sources"] });
@@ -122,7 +122,7 @@ export function TenderPanel({ agent }: { agent: any }) {
         sourceId: data.sourceId || 0,
         tenderId: data.tenderId || `manual-${Date.now()}`,
       });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/tenders?limit=50"] });
@@ -157,7 +157,7 @@ export function TenderPanel({ agent }: { agent: any }) {
           type: tender.type, location: tender.location, status: tender.status, url: tender.url,
         },
       });
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       setMcResult(data);
@@ -230,7 +230,7 @@ export function TenderPanel({ agent }: { agent: any }) {
           }
 
           const res = await apiRequest("POST", "/api/tenders/bulk", { tenders: mapped });
-          const result = await res.json();
+          const result = res;
           queryClient.invalidateQueries({ queryKey: ["/api/tenders?limit=50"] });
           toast({ title: "Berhasil", description: `${result.imported} data tender berhasil diimpor` });
         } catch {

@@ -501,7 +501,7 @@ export default function Dashboard() {
   const updateSeriesMutation = useMutation({
     mutationFn: async ({ id, name, description }: { id: number; name: string; description?: string }) => {
       const res = await apiRequest("PATCH", `/api/series/${id}`, { name, description });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/series"] });
@@ -514,7 +514,7 @@ export default function Dashboard() {
   const deleteSeriesMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await apiRequest("DELETE", `/api/series/${id}`);
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/series"] });
@@ -528,7 +528,7 @@ export default function Dashboard() {
   const updateAgentMutation = useMutation({
     mutationFn: async ({ id, name, description }: { id: string; name: string; description?: string }) => {
       const res = await apiRequest("PATCH", `/api/agents/${id}`, { name, description });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
@@ -541,7 +541,7 @@ export default function Dashboard() {
   const toggleAgentEnabledMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await apiRequest("PATCH", `/api/agents/${id}/toggle-enabled`, {});
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
@@ -553,7 +553,7 @@ export default function Dashboard() {
   const setFolderMutation = useMutation({
     mutationFn: async ({ id, folderName }: { id: string; folderName: string | null }) => {
       const res = await apiRequest("PATCH", `/api/agents/${id}/folder`, { folderName });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
@@ -566,7 +566,7 @@ export default function Dashboard() {
   const archiveAgentMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await apiRequest("PATCH", `/api/agents/${id}/archive`, {});
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
@@ -604,7 +604,6 @@ export default function Dashboard() {
       const text = await importFile.text();
       const config = JSON.parse(text);
       const res = await apiRequest("POST", "/api/agents/import", { config, toolboxId: effectiveToolboxId });
-      if (!res.ok) throw new Error("Import gagal");
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });
       setImportDialogOpen(false);
       setImportFile(null);

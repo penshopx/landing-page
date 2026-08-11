@@ -87,7 +87,7 @@ export function ProductSettingsPanel({ agent }: { agent: any }) {
   const updateMutation = useMutation({
     mutationFn: async (data: typeof settings) => {
       const response = await apiRequest("PATCH", `/api/agents/${agent.id}`, data);
-      return response.json();
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/agents"] });

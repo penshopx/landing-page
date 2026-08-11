@@ -253,8 +253,7 @@ export function GenerateBigIdeasDialog({ open, onOpenChange, seriesId, onCreated
         urls: urls.filter(u => u.trim()),
         count,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gagal generate");
+      const data = res;
       setSuggestions(data.suggestions || []);
       setSelected(new Set(data.suggestions.map((_: any, i: number) => i)));
       setStep("results");

@@ -82,7 +82,7 @@ export function ShareAgentDialog({ agentId, agentName, open, onOpenChange }: Sha
   const addMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/agents/${agentId}/collaborators`, { email: email.trim(), role });
-      return res.json();
+      return res;
     },
     onSuccess: (data: any) => {
       setEmail("");
@@ -105,7 +105,7 @@ export function ShareAgentDialog({ agentId, agentName, open, onOpenChange }: Sha
   const removePendingMutation = useMutation({
     mutationFn: async (inviteEmail: string) => {
       const res = await apiRequest("DELETE", `/api/agents/${agentId}/pending-invites/${encodeURIComponent(inviteEmail)}`, {});
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       invalidate();
@@ -119,7 +119,7 @@ export function ShareAgentDialog({ agentId, agentName, open, onOpenChange }: Sha
   const updateMutation = useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: CollaboratorRole }) => {
       const res = await apiRequest("PATCH", `/api/agents/${agentId}/collaborators/${userId}`, { role: newRole });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       invalidate();
@@ -133,7 +133,7 @@ export function ShareAgentDialog({ agentId, agentName, open, onOpenChange }: Sha
   const removeMutation = useMutation({
     mutationFn: async (userId: string) => {
       const res = await apiRequest("DELETE", `/api/agents/${agentId}/collaborators/${userId}`, {});
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       invalidate();

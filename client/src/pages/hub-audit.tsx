@@ -72,7 +72,7 @@ function HubRow({ hub }: { hub: HubItem }) {
         subAgentNames: selectedNames.length > 0 ? selectedNames : nonOrcCandidates.map(c => c.agent_name),
         existingPrompt: hub.prompt_preview
       });
-      const data = await res.json();
+      const data = res;
       setGeneratedPrompt(data.prompt || "");
     } catch (e: any) {
       toast({ title: "Error generate", description: e.message, variant: "destructive" });

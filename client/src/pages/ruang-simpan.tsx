@@ -917,7 +917,6 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
         doc_status: docStatus,
         allow_biro_jasa: allowBiroJasa,
       });
-      if (!res.ok) throw new Error("Gagal menyimpan");
       toast({ title: "File diperbarui" });
       onUpdated();
     } catch {
@@ -932,7 +931,6 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
       const res = await apiRequest("PATCH", `/api/ruang-simpan/files/${file.id}`, {
         allow_biro_jasa: val,
       });
-      if (!res.ok) { setAllowBiroJasa(!val); throw new Error(); }
       toast({ title: val ? "Dokumen sekarang terlihat biro jasa" : "Dokumen disembunyikan dari biro jasa" });
       onUpdated();
     } catch {
@@ -948,7 +946,6 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
         `/api/ruang-simpan/files/${file.id}/access-requests/${reqId}/approve`,
         { expires_days: expiresDays }
       );
-      if (!res.ok) throw new Error();
       toast({ title: "Permintaan disetujui — Kuasa Digital otomatis dibuat" });
       refetchPassport();
     } catch {
@@ -962,7 +959,6 @@ function FileDetailDialog({ file, folders, onClose, onDelete, onUpdated }: {
       const res = await apiRequest("PATCH",
         `/api/ruang-simpan/files/${file.id}/access-requests/${reqId}/reject`, {}
       );
-      if (!res.ok) throw new Error();
       toast({ title: "Permintaan ditolak" });
       refetchPassport();
     } catch {
@@ -1442,8 +1438,7 @@ function GrantModal({ fileId, fileName, onClose, onGranted }: {
         purpose: purpose.trim(),
         expires_days: expiresDays ? parseInt(expiresDays) : null,
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Gagal");
+      const json = res;
       toast({ title: `Kuasa digital diberikan ke ${name}` });
       onGranted();
     } catch (e: any) {
@@ -1550,7 +1545,6 @@ function NewFolderDialog({ onClose, onCreated }: { onClose: () => void; onCreate
     setSaving(true);
     try {
       const res = await apiRequest("POST", "/api/ruang-simpan/folders", { name, color, icon });
-      if (!res.ok) throw new Error("Gagal");
       toast({ title: `Folder "${name}" dibuat` });
       onCreated();
     } catch { toast({ title: "Gagal membuat folder", variant: "destructive" }); }

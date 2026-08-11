@@ -54,7 +54,7 @@ export function CreateAgentDialog({ open, onOpenChange, forceOrchestrator, onCre
   const seedLexComMutation = useMutation({
     mutationFn: async (seriesId: string | number) => {
       const res = await apiRequest("POST", "/api/lexcom/seed", { seriesId });
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       setLexcomSeedDone(true);

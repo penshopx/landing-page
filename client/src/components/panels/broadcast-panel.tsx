@@ -57,7 +57,7 @@ export function BroadcastPanel({ agent }: { agent: any }) {
         contacts: (contacts as any[]).slice(0, 10).map((c: any) => ({ phone: c.phone, name: c.name })),
         agentContext: { name: agent.name },
       });
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       setPersonResult(data);
@@ -84,7 +84,7 @@ export function BroadcastPanel({ agent }: { agent: any }) {
         name: data.name,
         source: "manual",
       });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/wa-contacts/${agent.id}`] });
@@ -129,7 +129,7 @@ export function BroadcastPanel({ agent }: { agent: any }) {
         dataSource: data.dataSource || null,
         isEnabled: data.isEnabled,
       });
-      return res.json();
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/wa-broadcasts?agentId=${agent.id}`] });
@@ -173,7 +173,7 @@ export function BroadcastPanel({ agent }: { agent: any }) {
   const sendNowMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await apiRequest("POST", `/api/wa-broadcasts/${id}/send-now`);
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: [`/api/wa-broadcasts?agentId=${agent.id}`] });
@@ -193,7 +193,7 @@ export function BroadcastPanel({ agent }: { agent: any }) {
         template: broadcastForm.messageTemplate,
         agentContext: { name: agent?.name },
       });
-      return res.json();
+      return res;
     },
     onSuccess: (data) => { setAbResult(data); setAbOpen(true); },
     onError: () => toast({ title: "Gagal", description: "Gagal membuat A/B test variant", variant: "destructive" }),

@@ -110,7 +110,7 @@ export function StudioPanel({ agent }: { agent: any }) {
         knowledgeChunks: filteredKbs,
         mode: overwriteAll ? "overwrite_all" : "fill_empty_only",
       });
-      return await res.json();
+      return res;
     },
     onSuccess: (data) => {
       toast({
@@ -268,7 +268,7 @@ export function StudioPanel({ agent }: { agent: any }) {
         proposal: proposal.proposal,
         knowledgeChunks: proposal.knowledgeChunks,
       });
-      return res.json();
+      return res;
     },
     onSuccess: (data) => {
       setMcStudioResult(data);
