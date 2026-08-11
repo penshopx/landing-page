@@ -1,0 +1,45 @@
+Bos, revisi #313B-2: jangan gunakan variant production Rp79.000.
+
+Buat **1 variant khusus CANARY TEST Scalev senilai Rp10.000** untuk simulasi pembayaran end-to-end.
+
+TUJUAN:
+Menguji jalur nyata:
+Gustafta → Unified Order API → Scalev `/v3/orders` → payment URL → pembayaran Rp10.000 → webhook `paid` → ORD-* lokal menjadi `paid`.
+
+ATURAN WAJIB:
+
+1. Jangan mengubah harga atau variant 10 produk production yang sudah diprovisioning.
+2. Jangan menggunakan GST-CAP-009 atau variant production lainnya untuk transaksi test.
+3. Buat product/variant khusus dengan identitas yang sangat jelas, misalnya:
+   `GUSTAFTA-CANARY-TEST-10K`
+   atau nama yang setara dan mudah dibedakan dari produk production.
+4. Harga harus tepat **Rp10.000**.
+5. Variant harus di-attach ke Scalev store seperti provisioning sebelumnya.
+6. Jika registry membutuhkan mapping, gunakan mapping khusus yang tidak mengganggu product/package production.
+7. Jangan memasukkan variant test ke katalog GAIA/storefront production sebagai produk yang bisa dibeli publik.
+8. Pastikan variant test hanya dapat digunakan untuk test transaction yang disengaja.
+9. Verifikasi create-order menggunakan `/api/v1/orders` dan pastikan:
+
+   * `payment_mode = SCALEV_ORDER`
+   * `scalev_order_id` tersimpan
+   * `payment_url` valid
+   * order lokal tetap `pending` sebelum pembayaran.
+10. STOP setelah payment URL berhasil dibuat. Jangan melakukan pembayaran otomatis.
+
+SETELAH ITU:
+Kirim laporan read-only mengenai:
+
+* nama product/variant test,
+* Scalev variant ID,
+* harga,
+* store attachment status,
+* mapping registry jika ada,
+* hasil create-order,
+* `scalev_order_id`,
+* payment URL,
+* dan konfirmasi bahwa variant test tidak masuk katalog production.
+
+Jangan melakukan transaksi Rp10.000 sebelum approval terpisah untuk tahap pembayaran nyata.
+
+PENTING:
+Variant test ini hanya untuk **satu kali canary transaction**. Setelah pengujian selesai, variant harus dinonaktifkan/dihapus dari jalur pembelian publik agar tidak tertinggal sebagai produk aktif.
