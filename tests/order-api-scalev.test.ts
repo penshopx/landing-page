@@ -32,6 +32,9 @@ const SKIP = hasDb ? false : "DATABASE_URL tidak diset — lewati tes integrasi 
 const RUN = `oapi313_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 const TEST_EMAIL = `${RUN}@example.test`;
 const TEST_PRODUCT_ID = `GST-TST-${RUN.slice(-6).toUpperCase()}`;
+// Produk uji TANPA mapping variant — item registry nyata kini semua termapping
+// (provisioning #313B-1), jadi tes fallback butuh item uji sendiri.
+const TEST_PRODUCT_ID_UNMAPPED = `GST-TSU-${RUN.slice(-6).toUpperCase()}`;
 const API_KEY = "kunci-order-tes-313a";
 const SCALEV_ORDER_ID = `TST${RUN.slice(-8).toUpperCase()}`;
 
@@ -92,6 +95,17 @@ before(async () => {
     visibility: "STANDALONE_ONLY",
     scalevVariantUniqueId: `variant_TES_${RUN}`,
   } as any);
+  await db.insert(productRegistry).values({
+    productId: TEST_PRODUCT_ID_UNMAPPED,
+    name: `Produk Tes 313A tanpa mapping ${RUN}`,
+    slug: `produk-tes-313a-unmapped-${RUN}`,
+    productType: "DOCUMENT_TOOL",
+    category: "TEST",
+    price: 45000,
+    billingType: "ONE_TIME",
+    status: "ACTIVE",
+    visibility: "STANDALONE_ONLY",
+  } as any);
 
   // App 1: hanya Order API (ringan).
   {
@@ -121,6 +135,7 @@ after(async () => {
   try {
     await db.delete(storeOrders).where(eq(storeOrders.customerEmail, TEST_EMAIL));
     await db.delete(productRegistry).where(eq(productRegistry.productId, TEST_PRODUCT_ID));
+    await db.delete(productRegistry).where(eq(productRegistry.productId, TEST_PRODUCT_ID_UNMAPPED));
   } finally {
     orderServer?.close();
     routesServer?.close();
@@ -186,7 +201,7 @@ test("2. create Scalev gagal → fallback MANUAL_WA, order tetap pending tanpa s
 
 test("3. tanpa mapping variant → MANUAL_WA tanpa panggilan Scalev", { skip: SKIP }, async () => {
   scalevMode = "ok"; scalevCalls = [];
-  const r = await createOrder({ package_id: "SBU-KONSTRUKSI-PROFESSIONAL-6M", buyer });
+  const r = await createOrder({ product_id: TEST_PRODUCT_ID_UNMAPPED, buyer });
   assert.equal(r.status, 201);
   assert.equal(r.json.payment_mode, "MANUAL_WA");
   assert.equal(scalevCalls.length, 0);

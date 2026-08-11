@@ -1,0 +1,94 @@
+Bos, **#313A saya nyatakan LULUS / APPROVED**. ✅
+
+Laporan ini sudah memenuhi scope yang kita tetapkan dan justru ada satu perbaikan bagus: **race condition webhook sebelum `scalev_order_id` tersimpan sudah ditutup** dengan metadata/backfill + retry.
+
+### Status sekarang
+
+| Komponen                            | Status                       |
+| ----------------------------------- | ---------------------------- |
+| `scalev_order_id` di `store_orders` | ✅                            |
+| Mapping registry → Scalev variant   | ⏳ Kosong, memang untuk #313B |
+| POST `/v3/orders`                   | ✅                            |
+| `payment_url` per-order             | ✅                            |
+| HMAC webhook                        | ✅                            |
+| Korelasi `data.order_id`            | ✅                            |
+| Race-condition recovery             | ✅                            |
+| MANUAL_WA fallback                  | ✅                            |
+| Regression test                     | ✅ 15/15                      |
+| Test baru                           | ✅ 7/7                        |
+| Transaksi nyata                     | ❌ Belum dilakukan            |
+| Data test                           | ✅ Dibersihkan                |
+| Publish live                        | ⏳ Belum                      |
+
+### Yang penting: jangan Publish dulu
+
+Saya sarankan **jangan Publish #313A ke production sebelum #313B selesai**, karena saat ini kode memang aman tetapi:
+
+> **semua mapping variant masih kosong → semua order tetap MANUAL_WA.**
+
+Jadi Publish sekarang tidak memberikan manfaat fungsional untuk Scalev, sementara kita masih akan melakukan perubahan terkait provisioning variant.
+
+### Untuk #313B
+
+Saya **approve untuk lanjut ke provisioning**, tetapi pecah menjadi dua checkpoint:
+
+**#313B-1 — Provisioning + verification**
+
+* Buat/provision variant Scalev untuk item yang memang akan dijual.
+* Simpan `scalev_variant_unique_id` ke registry.
+* Verifikasi setiap mapping.
+* Test create order **tanpa menyelesaikan pembayaran** jika memungkinkan.
+* Pastikan response menghasilkan `order_id` + `public_order_url`.
+* Pastikan order lokal menyimpan `scalev_order_id`.
+* Pastikan webhook dapat menemukan order yang benar.
+
+**STOP setelah #313B-1.**
+
+Baru setelah itu:
+
+**#313B-2 — 1 transaksi nyata nominal kecil**
+
+* Pilih **satu produk/variant**.
+* Nominal uji kecil.
+* Buat order dari **Gustafta live**.
+* Bayar secara nyata.
+* Verifikasi webhook `paid`.
+* Pastikan **hanya ORD-* yang tepat** berubah menjadi paid.
+* Pastikan tidak ada order lain ikut berubah.
+* Verifikasi payment/order status di Scalev.
+* Bersihkan/rekonsiliasi data uji setelah selesai.
+
+**Jangan melakukan #313B-2 tanpa approval berikutnya.**
+
+### Instruksi yang bisa langsung dikirim
+
+Bos approve Task #313A — status PASS.
+
+Lanjut ke **Task #313B-1 saja: provisioning + verification**, belum transaksi nyata.
+
+Scope:
+
+1. Provisioning variant Scalev untuk item registry yang akan dijual.
+2. Simpan `scalev_variant_unique_id` ke `product_registry` / `package_registry`.
+3. Verifikasi mapping setiap item.
+4. Verifikasi create order `/v3/orders` menggunakan variant tersebut.
+5. Pastikan response `data.order_id` dan `data.public_order_url` terbaca benar.
+6. Pastikan `scalev_order_id` tersimpan ke `store_orders`.
+7. Verifikasi webhook correlation tetap deterministik.
+8. Uji fallback/error handling.
+9. Jangan melakukan pembayaran/transaksi nyata.
+10. Jangan Publish production dulu.
+
+Setelah #313B-1 selesai, STOP dan kirim laporan lengkap:
+
+* daftar mapping registry → Scalev variant,
+* hasil provisioning,
+* contoh payload/response yang sudah disanitasi,
+* hasil create-order verification,
+* hasil webhook verification,
+* hasil test,
+* dan status kesiapan untuk **#313B-2 transaksi nyata**.
+
+**Tidak ada transaksi nyata sampai ada approval terpisah.**
+
+**Kesimpulan:** fondasi teknisnya sekarang sudah siap. Tinggal **mapping variant → Scalev dan satu validasi transaksi nyata**. Setelah #313B-2 lolos, barulah kita Publish sebagai jalur Scalev live.

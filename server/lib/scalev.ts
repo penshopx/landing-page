@@ -117,11 +117,16 @@ export async function createScalevOrder(params: {
   const apiKey = process.env.SCALEV_API_KEY;
   if (!apiKey) throw new Error("SCALEV_API_KEY tidak ditemukan di environment.");
 
+  // Scalev menolak "+62..." ("has invalid format") — normalisasi ke digit saja
+  // (buang non-digit; "08xx" → "628xx").
+  const rawPhone = (params.customerPhone || "").replace(/\D/g, "");
+  const phone = rawPhone.startsWith("0") ? `62${rawPhone.slice(1)}` : rawPhone;
+
   const body: Record<string, unknown> = {
     store_unique_id: params.storeUniqueId,
     customer_name: params.customerName,
     customer_email: params.customerEmail,
-    ...(params.customerPhone ? { customer_phone: params.customerPhone } : {}),
+    ...(phone ? { customer_phone: phone } : {}),
     ordervariants: [
       { variant_unique_id: params.variantUniqueId, quantity: params.quantity ?? 1 },
     ],
@@ -140,10 +145,11 @@ export async function createScalevOrder(params: {
   });
 
   const json = (await res.json().catch(() => null)) as any;
-  if (!res.ok || !json?.data) {
-    throw new Error(`Scalev v3 create order gagal: HTTP ${res.status} ${JSON.stringify(json?.error || json?.message || "").slice(0, 300)}`);
+  // Respons v3 TIDAK dibungkus {data:...} (terverifikasi live) — tapi terima keduanya.
+  const d = json?.data ?? json;
+  if (!res.ok || !d) {
+    throw new Error(`Scalev v3 create order gagal: HTTP ${res.status} ${JSON.stringify(json?.errors || json?.error || json?.message || "").slice(0, 300)}`);
   }
-  const d = json.data;
   const scalevOrderId = String(d.order_id || "");
   const checkoutUrl = String(d.public_order_url || d.payment_url || "");
   if (!scalevOrderId || !checkoutUrl) {
