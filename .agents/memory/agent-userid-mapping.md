@@ -33,6 +33,14 @@ integration test that drives REAL HTTP requests through the auth middleware
 because static guard tests and pure-decision tests cannot see mapper/wiring gaps.
 See `tests/agent-collaboration-integration.test.ts`.
 
+**Repeat offender (Aug 2026):** `mapAgentRow` also dropped `isCertified`, so
+GET `/api/landing/:id` (which reads `agent.isCertified` off `storage.getAgent`)
+could never show the "Bersertifikat" badge even when the DB column was true —
+while catalog code (direct drizzle selects) worked fine, masking the gap. Fixed
+by mapping `isCertified: row.isCertified === true`. Caught by a real-HTTP + real-DB
+test (`tests/curation-badge-flag-removal.test.ts`). Any endpoint that reads an
+agent field via `storage.getAgent` must have such a test.
+
 **Test hygiene:** integration tests that boot the app must close the HTTP server
 AND `pool.end()`, and module-level cleanup `setInterval`s (in `server/routes.ts`,
 `server/routes-legal.ts`, `server/lib/rate-limiter.ts`) are `.unref()`'d so the

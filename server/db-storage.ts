@@ -1756,6 +1756,10 @@ export class DatabaseStorage implements IStorage {
       isEnabled: (row as any).isEnabled !== false,
       folderName: (row as any).folderName ?? null,
       agenticSubAgents: parseSubAgentsValue(row.agenticSubAgents),
+      // Status Bersertifikat (kurasi admin). WAJIB dipetakan: GET /api/landing/:id
+      // membaca agent.isCertified dari storage.getAgent — tanpa mapping ini badge
+      // "Bersertifikat" tidak pernah tampil meski kolom DB true.
+      isCertified: (row as any).isCertified === true,
       slug: (row as any).slug || null,
       createdAt: row.createdAt.toISOString(),
     } as unknown as Agent);
