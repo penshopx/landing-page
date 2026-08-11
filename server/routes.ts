@@ -24843,9 +24843,18 @@ POLA KERJA: ELICIT (pahami tahap & niat) → DISPATCH (agen sesuai kebutuhan) �
         .where(inArr(agentsLocalTable.id, candidateIds));
       const candidates = candidateRows as any[];
 
-      // Detect which requested IDs were not found in the DB
+      // Detect which requested IDs were not found in the DB.
+      // Reject the ENTIRE request — wiring a non-existent agent silently
+      // inflates the team count (and the store price) with a sub-agent
+      // that can never be called.
       const foundIds = new Set(candidates.map((c: any) => c.id));
-      const skippedIds = candidateIds.filter((id) => !foundIds.has(id));
+      const missingIds = candidateIds.filter((id) => !foundIds.has(id));
+      if (missingIds.length > 0) {
+        return res.status(400).json({
+          error: `candidateIds tidak valid — agen tidak ditemukan di database: [${missingIds.join(", ")}]`,
+          missing: missingIds,
+        });
+      }
 
       // Build agenticSubAgents JSON
       const agenticSubAgents = candidates.map((c: any) => {
@@ -24868,15 +24877,6 @@ POLA KERJA: ELICIT (pahami tahap & niat) → DISPATCH (agen sesuai kebutuhan) �
       // Wiring changes team size → store price changes → invalidate catalog cache.
       invalidateStoreCatalog();
 
-      if (skippedIds.length > 0) {
-        // 207 Multi-Status: some IDs were wired, some were not found
-        return res.status(207).json({
-          ok: true,
-          agenticSubAgents,
-          skipped: skippedIds,
-          warning: `${skippedIds.length} candidateId(s) tidak ditemukan di database dan dilewati: [${skippedIds.join(', ')}]`,
-        });
-      }
       res.json({ ok: true, agenticSubAgents, skipped: [] });
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
