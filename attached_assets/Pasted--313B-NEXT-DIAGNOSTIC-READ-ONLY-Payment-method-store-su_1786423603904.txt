@@ -1,0 +1,46 @@
+#313B — NEXT DIAGNOSTIC, READ-ONLY
+
+Payment method store sudah terbukti aktif:
+`Bank Mandiri Virtual Account` terlihat sebagai Selected Payment Method di DP-Gaia Store.
+
+Namun order canary `260811NTYOONU` tetap:
+
+* `draft`
+* `unpaid`
+* `payment_method = null`
+
+dan public order page `/o/...` tetap hanya menampilkan Unpaid + WhatsApp, tanpa payment-method selector.
+
+JANGAN melakukan mutasi, PATCH order, pembayaran, atau membuat order baru.
+
+Lakukan diagnosis khusus untuk membuktikan apakah ada perbedaan flow berikut:
+
+A. Hosted checkout:
+`/p/<product-slug>` → customer memilih payment method → order dibuat → e-payment dibuat → `/o/...`
+
+versus
+
+B. API order:
+`POST /v3/orders` → order langsung `draft` → `/o/...`
+
+Cari dan laporkan:
+
+1. Apakah `/p/<product-slug>` memang memiliki payment-method selector untuk Bank Mandiri VA.
+2. Apakah checkout `/p/...` menggunakan endpoint API berbeda untuk membuat order dibanding `POST /v3/orders`.
+3. Endpoint/request apa yang membuat e-payment setelah customer memilih VA.
+4. Apakah `POST /v3/orders` memiliki parameter/field resmi untuk langsung menentukan payment method atau membuat e-payment.
+5. Apakah `public_order_url` dari `POST /v3/orders` memang hanya public order/status page dan BUKAN payment checkout.
+6. Apakah ada endpoint resmi Scalev untuk:
+
+   * memilih payment method pada order draft, atau
+   * membuat e-payment dari order draft.
+7. Jika ada endpoint tersebut, cukup identifikasi method, endpoint, dan payload yang diperlukan. JANGAN memanggil endpoint mutasi.
+8. Jika tidak ada, jelaskan apakah satu-satunya flow resmi untuk menghasilkan VA adalah melalui `/p/...` checkout.
+
+Sangat penting:
+Bandingkan network/API flow dari satu checkout `/p/...` yang sudah ada secara READ-ONLY jika memungkinkan. Jangan menyelesaikan checkout dan jangan membuat transaksi baru.
+
+TUJUAN diagnosis:
+Menentukan apakah arsitektur `POST /v3/orders → public_order_url → bayar` memang cukup untuk menghasilkan VA, atau kita harus menambahkan tahap payment/e-payment creation setelah order dibuat.
+
+STOP setelah laporan.

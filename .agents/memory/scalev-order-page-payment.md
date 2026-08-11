@@ -10,4 +10,8 @@ The `/o/{secret_slug}` page on the store custom domain IS Scalev's hosted Nuxt S
 
 **Nuance:** store-level `payment_methods` (e.g. `va_mandiri`) and `xendit_va_bank_codes` apply to the checkout FORM / payment-link flow only — they do NOT surface on the /o/ order page. Xendit VA is not a payment-account object (`/v2/payment-accounts` lists only manual bank_transfer accounts), so "attach VA to store" may only exist as a dashboard-side setting, if at all.
 
-**How to apply:** for API-created orders to be payable via their public URL, attach payment accounts (bank transfer / Xendit VA) to the STORE in the Scalev dashboard, or set payment fields on the order. Verify by checking `store.payment_accounts` in the public order payload.
+**Deeper finding (frontend source traced):** the /o/ page has NO payment-method selector at all. Its VA display (`available-vas`) is computed solely from `order.pg_payment_info` — if no e-payment exists, it renders only Unpaid + WhatsApp. Store-attaching accounts does not add a selector to /o/.
+
+**E-payment creation paths:** (a) form checkout `/p/...` — buyer picks method BEFORE order creation (public v2 form-submit endpoint); (b) public retry endpoint `POST api.scalev.com/v2/order/public/{secret_slug}/payment` (no body) — "retryEPaymentCreationPublic", creates/retries e-payment for an existing order (likely needs payment_method already set); (c) docs: Order API has canonical `payment_method` with flat VA values (`va_bca`, `va_mandiri`, `payment_link`) — set it at `POST /v3/orders` so a VA/PayLink flow is provisioned.
+
+**How to apply:** API-created orders must specify `payment_method` at creation (or trigger e-payment creation afterward); `public_order_url` alone will never let the buyer pick a method.
