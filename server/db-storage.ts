@@ -3364,8 +3364,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3395,8 +3395,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3426,8 +3426,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3460,8 +3460,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3495,8 +3495,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3521,8 +3521,8 @@ export class DatabaseStorage implements IStorage {
       plan: insertSub.plan || "trial",
       status: insertSub.status || "active",
       accessToken: insertSub.accessToken,
-      scalevOrderId: insertSub.scalevOrderId || null,
-      scalevPaymentUrl: insertSub.scalevPaymentUrl || null,
+      orderId: insertSub.orderId || null,
+      paymentUrl: insertSub.paymentUrl || null,
       amount: insertSub.amount || 0,
       currency: insertSub.currency || "IDR",
       referralCode: insertSub.referralCode || null,
@@ -3540,8 +3540,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,
@@ -3564,8 +3564,8 @@ export class DatabaseStorage implements IStorage {
     if (data.plan !== undefined) updateData.plan = data.plan;
     if (data.status !== undefined) updateData.status = data.status;
     if (data.accessToken !== undefined) updateData.accessToken = data.accessToken;
-    if (data.scalevOrderId !== undefined) updateData.scalevOrderId = data.scalevOrderId;
-    if (data.scalevPaymentUrl !== undefined) updateData.scalevPaymentUrl = data.scalevPaymentUrl;
+    if (data.orderId !== undefined) updateData.orderId = data.orderId;
+    if (data.paymentUrl !== undefined) updateData.paymentUrl = data.paymentUrl;
     if (data.amount !== undefined) updateData.amount = data.amount;
     if (data.currency !== undefined) updateData.currency = data.currency;
     if (data.referralCode !== undefined) updateData.referralCode = data.referralCode;
@@ -3588,8 +3588,8 @@ export class DatabaseStorage implements IStorage {
       plan: row.plan as "trial" | "monthly" | "yearly" | "lifetime",
       status: (row.status || "active") as "active" | "expired" | "cancelled" | "pending",
       accessToken: row.accessToken,
-      scalevOrderId: row.scalevOrderId || undefined,
-      scalevPaymentUrl: row.scalevPaymentUrl || undefined,
+      orderId: row.orderId || undefined,
+      paymentUrl: row.paymentUrl || undefined,
       amount: row.amount || 0,
       currency: row.currency || "IDR",
       referralCode: row.referralCode || undefined,

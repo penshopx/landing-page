@@ -18,3 +18,5 @@ sync so Drizzle types match, but apply the actual DDL by hand.
 **Why:** push tries to reconcile the full schema and trips on the access_codes drift prompt
 before it ever creates your table. Direct, scoped DDL touches only what you intend and never
 prompts.
+
+**Column renames:** direct-DDL rename alone fails completion review — also commit an idempotent `migrations/NNNN_*.sql` (IF/ELSIF on information_schema handles mayar→scalev→renamed legacy states, see 0012/0013 pattern), append `meta/_journal.json` entry, and write a new snapshot (copy previous, rename columns, fresh id + prevId=old id).
