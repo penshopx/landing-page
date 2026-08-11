@@ -416,6 +416,15 @@ export default function StoreFeatured() {
       const res = await fetch("/api/store/featured");
       return res.json();
     },
+    // Beli links must never be stale: an admin clearing a paymentUrl has to be
+    // visible on the next visit/navigation, not after the default 5-minute
+    // staleTime. staleTime 0 + refetchOnMount "always" force a fresh request on
+    // every mount, and gcTime 0 evicts the payload when the page unmounts so a
+    // returning visitor can never see (or click) the previous response while
+    // the refetch is in flight — the page shows its loading state instead.
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
   });
 
   const createOrderMutation = useMutation({

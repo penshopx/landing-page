@@ -433,6 +433,132 @@ export async function getStoreCatalogItems(category: string, search: string): Pr
 
 // Pre-warm the default listing (no filters) so the very first burst of traffic
 // hits a warm cache instead of a cold, expensive query stampede.
+// HTTP handler for GET /api/store/featured. Exported so tests can mount it on a
+// real express app and verify end-to-end freshness: every request re-reads the
+// DB (no server cache) and the response is marked no-store so neither the
+// browser nor any intermediary can serve a stale Beli link after an admin
+// clears a payment URL.
+export async function featuredStoreHandler(_req: any, res: any) {
+  try {
+    // A cleared paymentUrl must reach buyers immediately — forbid HTTP caching.
+    res.set("Cache-Control", "no-store");
+    res.json(await getFeaturedStoreItems());
+  } catch (error) {
+    console.error("Store featured error:", error);
+    res.status(500).json({ error: "Failed to fetch featured products" });
+  }
+}
+
+// Builds the featured-page product list. Exported so tests can verify that a
+// cleared paymentUrl is reflected immediately (this reads fresh from the DB on
+// every call — there is no cache layer for featured, unlike the main catalog).
+export async function getFeaturedStoreItems() {
+      const { db } = await import("./db");
+      const { agents: agentsTable, storeProducts } = await import("@shared/schema");
+      const { and, eq, inArray } = await import("drizzle-orm");
+
+      const FEATURED_LIMIT = 8;
+
+      const calcPrice = 299000;
+      const calcOriginal = 450000;
+
+      // Pre-fetch paymentUrl for linked agents (two-pass: fetch rows first, then populate map)
+      const linkedPaymentUrlMap = new Map<number, string>();
+
+      const mapSP = (p: any) => ({
+        id: `sp-${p.id}`,
+        productId: p.id,
+        agentId: p.agentId ?? null,
+        name: p.name,
+        category: p.category || "Konstruksi",
+        tagline: (p.description ?? "").slice(0, 80),
+        description: p.description || "",
+        productSummary: p.description || "",
+        productFeatures: (p.features as string[]) || [],
+        emoji: p.emoji || "🤖",
+        color: p.color || "#6366f1",
+        price: p.price ?? calcPrice,
+        originalPrice: calcOriginal,
+        isGustafta: p.isGustafta ?? false,
+        paymentUrl: (p as any).paymentUrl || (p.agentId ? (linkedPaymentUrlMap.get(p.agentId) || null) : null),
+        scalevVariantId: (p as any).scalevVariantId ?? null,
+        type: "product",
+      });
+
+      // Gustafta official products
+      const gustaftaRows = await db.select().from(storeProducts)
+        .where(and(eq(storeProducts.isActive, true), eq(storeProducts.isGustafta, true)))
+        .orderBy(storeProducts.sortOrder, storeProducts.id)
+        .limit(FEATURED_LIMIT);
+
+      // Mitra products from store_products
+      const mitraSpRows = await db.select().from(storeProducts)
+        .where(and(eq(storeProducts.isActive, true), eq(storeProducts.isGustafta, false)))
+        .orderBy(storeProducts.sortOrder, storeProducts.id)
+        .limit(FEATURED_LIMIT);
+
+      // Pre-fetch paymentUrl for all linked agents (gustafta + mitra)
+      const allLinkedIds = [...gustaftaRows, ...mitraSpRows]
+        .map(p => p.agentId).filter(Boolean) as number[];
+      if (allLinkedIds.length > 0) {
+        const puRows = await db.select({ id: agentsTable.id, paymentUrl: agentsTable.paymentUrl })
+          .from(agentsTable).where(inArray(agentsTable.id, allLinkedIds));
+        for (const r of puRows) if (r.paymentUrl) linkedPaymentUrlMap.set(r.id, r.paymentUrl);
+      }
+
+      const mitraSpItems = mitraSpRows.map(mapSP);
+
+      // If mitra store_products < limit, supplement from agents
+      let agentMitraItems: any[] = [];
+      if (mitraSpItems.length < FEATURED_LIMIT) {
+        const spAgentIds = new Set(
+          [...gustaftaRows, ...mitraSpRows].map((p) => p.agentId).filter(Boolean)
+        );
+        const agentRows = await db.select({
+          id: agentsTable.id, name: agentsTable.name, category: agentsTable.category,
+          tagline: agentsTable.tagline, avatar: agentsTable.avatar,
+          widgetColor: agentsTable.widgetColor, agenticSubAgents: agentsTable.agenticSubAgents,
+          productSummary: agentsTable.productSummary, productFeatures: agentsTable.productFeatures,
+          parentAgentId: agentsTable.parentAgentId, paymentUrl: agentsTable.paymentUrl,
+        }).from(agentsTable).where(eq(agentsTable.isActive, true)).limit(FEATURED_LIMIT * 4);
+
+        agentMitraItems = agentRows
+          .filter((a) => {
+            if (spAgentIds.has(a.id)) return false;
+            if (a.parentAgentId != null) return false;
+            const sub = parseSubAgentsValue(a.agenticSubAgents).length;
+            return sub >= 1;
+          })
+          .slice(0, FEATURED_LIMIT - mitraSpItems.length)
+          .map((a) => {
+            const sub = parseSubAgentsValue(a.agenticSubAgents).length;
+            return {
+              id: `ag-${a.id}`,
+              agentId: a.id,
+              name: a.name,
+              category: a.category || "Konstruksi",
+              tagline: a.tagline || "",
+              description: "",
+              productSummary: a.productSummary || "",
+              productFeatures: (a.productFeatures as string[]) || [],
+              emoji: a.avatar && a.avatar.length <= 4 ? a.avatar : "🤖",
+              color: a.widgetColor || "#6366f1",
+              price: calcPrice,
+              originalPrice: calcOriginal,
+              agentCount: 1 + sub,
+              isGustafta: false,
+              paymentUrl: a.paymentUrl || null,
+              type: "agent",
+            };
+          });
+      }
+
+      return {
+        gustafta: gustaftaRows.map(mapSP),
+        mitra: [...mitraSpItems, ...agentMitraItems],
+      };
+  }
+
 function warmStoreCatalogCache(): void {
   void refreshStoreCatalog("||", "", "").catch((e) => {
     console.error("[StoreCatalog] warm failed:", e);
@@ -7366,117 +7492,8 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
   });
 
   // GET /api/store/featured — curated products grouped: isGustafta=true (Gustafta official) + isGustafta=false (mitra)
-  app.get("/api/store/featured", async (_req, res) => {
-    try {
-      const { db } = await import("./db");
-      const { agents: agentsTable, storeProducts } = await import("@shared/schema");
-      const { and, eq, inArray } = await import("drizzle-orm");
+  app.get("/api/store/featured", featuredStoreHandler);
 
-      const FEATURED_LIMIT = 8;
-
-      const calcPrice = 299000;
-      const calcOriginal = 450000;
-
-      // Pre-fetch paymentUrl for linked agents (two-pass: fetch rows first, then populate map)
-      const linkedPaymentUrlMap = new Map<number, string>();
-
-      const mapSP = (p: any) => ({
-        id: `sp-${p.id}`,
-        productId: p.id,
-        agentId: p.agentId ?? null,
-        name: p.name,
-        category: p.category || "Konstruksi",
-        tagline: (p.description ?? "").slice(0, 80),
-        description: p.description || "",
-        productSummary: p.description || "",
-        productFeatures: (p.features as string[]) || [],
-        emoji: p.emoji || "🤖",
-        color: p.color || "#6366f1",
-        price: p.price ?? calcPrice,
-        originalPrice: calcOriginal,
-        isGustafta: p.isGustafta ?? false,
-        paymentUrl: (p as any).paymentUrl || (p.agentId ? (linkedPaymentUrlMap.get(p.agentId) || null) : null),
-        scalevVariantId: (p as any).scalevVariantId ?? null,
-        type: "product",
-      });
-
-      // Gustafta official products
-      const gustaftaRows = await db.select().from(storeProducts)
-        .where(and(eq(storeProducts.isActive, true), eq(storeProducts.isGustafta, true)))
-        .orderBy(storeProducts.sortOrder, storeProducts.id)
-        .limit(FEATURED_LIMIT);
-
-      // Mitra products from store_products
-      const mitraSpRows = await db.select().from(storeProducts)
-        .where(and(eq(storeProducts.isActive, true), eq(storeProducts.isGustafta, false)))
-        .orderBy(storeProducts.sortOrder, storeProducts.id)
-        .limit(FEATURED_LIMIT);
-
-      // Pre-fetch paymentUrl for all linked agents (gustafta + mitra)
-      const allLinkedIds = [...gustaftaRows, ...mitraSpRows]
-        .map(p => p.agentId).filter(Boolean) as number[];
-      if (allLinkedIds.length > 0) {
-        const puRows = await db.select({ id: agentsTable.id, paymentUrl: agentsTable.paymentUrl })
-          .from(agentsTable).where(inArray(agentsTable.id, allLinkedIds));
-        for (const r of puRows) if (r.paymentUrl) linkedPaymentUrlMap.set(r.id, r.paymentUrl);
-      }
-
-      const mitraSpItems = mitraSpRows.map(mapSP);
-
-      // If mitra store_products < limit, supplement from agents
-      let agentMitraItems: any[] = [];
-      if (mitraSpItems.length < FEATURED_LIMIT) {
-        const spAgentIds = new Set(
-          [...gustaftaRows, ...mitraSpRows].map((p) => p.agentId).filter(Boolean)
-        );
-        const agentRows = await db.select({
-          id: agentsTable.id, name: agentsTable.name, category: agentsTable.category,
-          tagline: agentsTable.tagline, avatar: agentsTable.avatar,
-          widgetColor: agentsTable.widgetColor, agenticSubAgents: agentsTable.agenticSubAgents,
-          productSummary: agentsTable.productSummary, productFeatures: agentsTable.productFeatures,
-          parentAgentId: agentsTable.parentAgentId, paymentUrl: agentsTable.paymentUrl,
-        }).from(agentsTable).where(eq(agentsTable.isActive, true)).limit(FEATURED_LIMIT * 4);
-
-        agentMitraItems = agentRows
-          .filter((a) => {
-            if (spAgentIds.has(a.id)) return false;
-            if (a.parentAgentId != null) return false;
-            const sub = parseSubAgentsValue(a.agenticSubAgents).length;
-            return sub >= 1;
-          })
-          .slice(0, FEATURED_LIMIT - mitraSpItems.length)
-          .map((a) => {
-            const sub = parseSubAgentsValue(a.agenticSubAgents).length;
-            return {
-              id: `ag-${a.id}`,
-              agentId: a.id,
-              name: a.name,
-              category: a.category || "Konstruksi",
-              tagline: a.tagline || "",
-              description: "",
-              productSummary: a.productSummary || "",
-              productFeatures: (a.productFeatures as string[]) || [],
-              emoji: a.avatar && a.avatar.length <= 4 ? a.avatar : "🤖",
-              color: a.widgetColor || "#6366f1",
-              price: calcPrice,
-              originalPrice: calcOriginal,
-              agentCount: 1 + sub,
-              isGustafta: false,
-              paymentUrl: a.paymentUrl || null,
-              type: "agent",
-            };
-          });
-      }
-
-      res.json({
-        gustafta: gustaftaRows.map(mapSP),
-        mitra: [...mitraSpItems, ...agentMitraItems],
-      });
-    } catch (error) {
-      console.error("Store featured error:", error);
-      res.status(500).json({ error: "Failed to fetch featured products" });
-    }
-  });
 
   // GET /api/store/catalog/categories — distinct categories from store_products + all active agents
   app.get("/api/store/catalog/categories", async (_req, res) => {
