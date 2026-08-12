@@ -42,11 +42,31 @@ function HubRow({ hub }: { hub: HubItem }) {
   const nonOrcCandidates = hub.candidates.filter(c => !c.is_orchestrator);
 
   const autoConnect = useMutation({
-    mutationFn: () => apiRequest("POST", `/api/admin/hub-audit/${hub.hub_id}/auto-connect`, {
-      candidateIds: Array.from(selectedIds)
-    }),
-    onSuccess: () => {
-      toast({ title: "✅ Sub-agen terhubung!", description: `${selectedIds.size} agen berhasil dikonfigurasi.` });
+    mutationFn: async () => {
+      // Raw fetch (bukan apiRequest) agar status 207 vs 200 bisa diperiksa.
+      const res = await fetch(`/api/admin/hub-audit/${hub.hub_id}/auto-connect`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidateIds: Array.from(selectedIds) }),
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok && res.status !== 207) {
+        throw new Error(data.error || `${res.status}: gagal menghubungkan sub-agen`);
+      }
+      return { status: res.status, ...data };
+    },
+    onSuccess: (data: { status: number; agenticSubAgents?: any[]; skipped?: number[] }) => {
+      const wiredCount = data.agenticSubAgents?.length ?? 0;
+      if (data.status === 207 && (data.skipped?.length ?? 0) > 0) {
+        toast({
+          title: "⚠️ Sebagian kandidat dilewati",
+          description: `${wiredCount} agen terhubung. Dilewati (tidak ditemukan): #${data.skipped!.join(", #")}`,
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "✅ Sub-agen terhubung!", description: `${wiredCount} agen berhasil dikonfigurasi.` });
+      }
       qc.invalidateQueries({ queryKey: ["/api/admin/hub-audit"] });
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" })

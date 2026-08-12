@@ -331,20 +331,13 @@ test(
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TEST 7: auto-connect dengan ID campuran (valid + tidak ada) → 400 rejected
-//         Seluruh request ditolak; agenticSubAgents hub TIDAK boleh berubah.
+// TEST 7: auto-connect dengan ID campuran (valid + tidak ada) → 207 partial
+//         ID valid tetap diwire; ID palsu dilaporkan di `skipped` + `warning`.
 // ─────────────────────────────────────────────────────────────────────────────
 test(
-  "hub-audit HTTP: auto-connect ID campuran (valid + tidak ada) → 400 + wiring tidak berubah",
+  "hub-audit HTTP: auto-connect ID campuran (valid + tidak ada) → 207 + skipped dilaporkan",
   { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
   async () => {
-    // Snapshot wiring hub SEBELUM request (state dari TEST 5: 1 sub-agen).
-    const [beforeRow] = await db
-      .select({ agenticSubAgents: agents.agenticSubAgents })
-      .from(agents)
-      .where(eq(agents.id, hubAgentId));
-    const wiringBefore = JSON.stringify(beforeRow.agenticSubAgents);
-
     // Gunakan 1 ID valid (kandidat pertama) dan 2 ID palsu yang pasti tidak ada.
     const FAKE_ID_1 = 999_999_991;
     const FAKE_ID_2 = 999_999_992;
@@ -356,44 +349,48 @@ test(
       { user: adminId, body: { candidateIds: mixedIds } }
     );
 
-    // Harus 400 — ID tak dikenal tidak boleh diwire diam-diam.
+    // Harus 207 — partial success, bukan 200 penuh dan bukan 400 penolakan.
     assert.equal(
-      status, 400,
-      `auto-connect ID campuran harus 400, dapat ${status}: ${JSON.stringify(json)}`
+      status, 207,
+      `auto-connect ID campuran harus 207, dapat ${status}: ${JSON.stringify(json)}`
     );
 
-    // error harus menyebut kedua ID palsu.
+    // skipped harus berisi kedua ID palsu (dan BUKAN ID yang valid).
     assert.ok(
-      typeof json.error === "string" && json.error.length > 0,
-      `Response harus memiliki field 'error' non-kosong, dapat: ${JSON.stringify(json.error)}`
+      Array.isArray(json.skipped),
+      `Response harus memiliki field 'skipped' berupa array, dapat: ${JSON.stringify(json.skipped)}`
     );
-    assert.ok(
-      json.error.includes(String(FAKE_ID_1)) && json.error.includes(String(FAKE_ID_2)),
-      `error harus menyebut ID palsu [${FAKE_ID_1}, ${FAKE_ID_2}], dapat: ${json.error}`
-    );
-
-    // missing harus berisi kedua ID palsu (dan BUKAN ID yang valid).
-    assert.ok(
-      Array.isArray(json.missing),
-      `Response harus memiliki field 'missing' berupa array, dapat: ${JSON.stringify(json.missing)}`
-    );
-    const missingSorted = [...json.missing].sort((a: number, b: number) => a - b);
+    const skippedSorted = [...json.skipped].sort((a: number, b: number) => a - b);
     assert.deepEqual(
-      missingSorted,
+      skippedSorted,
       [FAKE_ID_1, FAKE_ID_2],
-      `missing harus berisi [${FAKE_ID_1}, ${FAKE_ID_2}], dapat: ${JSON.stringify(missingSorted)}`
+      `skipped harus berisi [${FAKE_ID_1}, ${FAKE_ID_2}], dapat: ${JSON.stringify(skippedSorted)}`
     );
 
-    // agenticSubAgents hub TIDAK boleh berubah setelah penolakan.
+    // warning harus menyebut kedua ID palsu.
+    assert.ok(
+      typeof json.warning === "string" &&
+        json.warning.includes(String(FAKE_ID_1)) &&
+        json.warning.includes(String(FAKE_ID_2)),
+      `warning harus menyebut ID palsu [${FAKE_ID_1}, ${FAKE_ID_2}], dapat: ${JSON.stringify(json.warning)}`
+    );
+
+    // agenticSubAgents di response = HANYA agen valid (1 entri), bukan panjang request.
+    assert.ok(Array.isArray(json.agenticSubAgents), "agenticSubAgents harus array");
+    assert.equal(
+      json.agenticSubAgents.length, 1,
+      `agenticSubAgents harus 1 (hanya ID valid), dapat ${json.agenticSubAgents.length}`
+    );
+    assert.equal(json.agenticSubAgents[0].agentId, candidateIds[0]);
+
+    // DB harus cocok dengan response — hanya ID valid yang terwire.
     const [afterRow] = await db
       .select({ agenticSubAgents: agents.agenticSubAgents })
       .from(agents)
       .where(eq(agents.id, hubAgentId));
-    assert.equal(
-      JSON.stringify(afterRow.agenticSubAgents),
-      wiringBefore,
-      "agenticSubAgents hub harus tidak berubah setelah request ditolak"
-    );
+    const wired = afterRow.agenticSubAgents as any[];
+    assert.equal(wired.length, 1, "DB hanya boleh berisi sub-agen valid");
+    assert.equal(wired[0].agentId, candidateIds[0]);
   }
 );
 
