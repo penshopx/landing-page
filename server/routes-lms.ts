@@ -507,6 +507,10 @@ async function seedLmsDataTracked() {
   }
 }
 
+// Promise yang selesai saat seed boot-time (fire-and-forget) sudah settle.
+// Dipakai tes integrasi agar tidak menutup pool DB saat seed masih berjalan.
+export let lmsSeedSettled: Promise<void> = Promise.resolve();
+
 // ─── Route registration ───────────────────────────────────────────────────────
 export function registerLmsRoutes(
   app: Express,
@@ -528,7 +532,7 @@ export function registerLmsRoutes(
     }
   };
 
-  trackedSeed();
+  lmsSeedSettled = trackedSeed();
 
   // POST /api/admin/lms/courses/bulk-deactivate — nonaktifkan beberapa kursus sekaligus
   app.post("/api/admin/lms/courses/bulk-deactivate", isAuthenticated, requireAdminLms, async (req: any, res) => {
