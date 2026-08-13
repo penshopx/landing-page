@@ -1,0 +1,83 @@
+CLAUDE CODE API BLUEPACK - AKSES AI CODING UNTUK DEVELOPER]
+
+
+
+Claude Code Bluepack adalah layanan API AI coding assistant untuk membantu coding, debugging, refactoring, pembuatan website/aplikasi, backend, frontend, dan arsitektur sistem. Cocok untuk developer, programmer, mahasiswa IT, freelancer, software engineer, dan tim software house yang ingin kerja coding lebih cepat dan efisien.
+
+
+
+---   FREE TRIAL 1 HARI ---
+
+Tersedia free trial 1 hari untuk pengguna yang ingin mencoba layanan terlebih dahulu sebelum berlangganan.
+
+Silakan chat admin untuk klaim trial Claude Code Bluepack.
+
+
+
+-- GARANSI REFUND 100% --
+
+Kami memberikan garansi refund 100% jika layanan tidak bisa digunakan setelah dibantu proses instalasi oleh admin.
+
+
+
+SISTEM RATE LIMIT CLAUDE CODE BLUEPACK
+
+Paket Basic:
+
+Maksimal: 100 request/5 jam
+
+Weekly limit: 1000 request/minggu
+
+
+
+Paket Pro:
+
+Maksimal: 250 request/5jam
+
+Weekly limit: 2500 request/minggu
+
+
+
+Jika kebutuhan penggunaan lebih besar, pengguna bisa custom rate limit melalui admin. Kami menyediakan custom ratelimit dari
+
+- 500 request
+
+- 750 request
+
+- 1000 request
+
+- 1500 request
+
+- 2000 request
+
+
+
+CARA KERJA CLAUDE CODE BLUEPACK
+
+- Claude Code Bluepack menggunakan sistem API, bukan login akun.
+
+- Pengguna akan mendapatkan akses berupa API key dan base URL yang bisa dipasang ke tools coding AI seperti VS Code,, Cursor, Windsurf, Antigravity, atau CLI/terminal.
+
+- Karena menggunakan sistem API, penggunaan menjadi lebih praktis, stabil, dan dapat dipantau langsung oleh admin. Jika ada kendala saat pemasangan, admin akan membantu sampai layanan siap digunakan.
+
+
+
+KEUNGGULAN CLAUDE CODE BLUEPACK
+
+1. Support multi-platform: Windows, Linux, dan Mac
+
+2. Bisa digunakan di VS Code, CLI, terminal, Windsurf, Antigravity
+
+3. Cocok untuk kebutuhan coding AI, debugging, refactoring, dan generate code
+
+4. Dibantu instalasi langsung oleh admin sampai siap digunakan
+
+5. Bisa custom rate limit sesuai kebutuhan (PC untuk info lebih lanjut)
+
+6. Bisa perpanjang masa aktif melalui admin
+
+
+
+KATA KUNCI PRODUK
+
+Claude Code, Claude Code API, API Claude Code, Claude AI Coding, AI Coding Assistant, AI Programming, AI Developer Tools, VS Code AI, Cline AI, Roo Code, Cursor AI, Windsurf AI, API Key AI, Coding Assistant, Web Developer, Programmer, Software Engineer, Mahasiswa IT, Next.js, React, TailwindCSS, Golang, Python, Laravel, Node.js, Backend Developer, Frontend Developer, Fullstack Developer, Bluepack.
