@@ -24951,6 +24951,72 @@ Maksimal 600 kata.`;
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
 
+  // ==================== BRAIN BUILDER (Claude/Anthropic — KHUSUS bangun otak, bukan chat) ====================
+  // POST /api/agents/generate-brain — draft system prompt untuk agen BARU (belum ada di DB).
+  app.post("/api/agents/generate-brain", isAuthenticated, async (req: any, res: any) => {
+    try {
+      const { callClaude } = await import("./lib/anthropic");
+      const { name, description, tagline, category } = (req.body || {}) as {
+        name?: string; description?: string; tagline?: string; category?: string;
+      };
+      if (!name || !String(name).trim()) return res.status(400).json({ error: "name wajib diisi" });
+
+      const systemMsg = `Kamu adalah perancang "otak" (system prompt) untuk asisten AI di platform Gustafta.
+Tulis dalam Bahasa Indonesia yang profesional. Keluarkan HANYA isi system prompt final — tanpa pembuka, tanpa penutup, tanpa blok kode.`;
+      const userMsg = `Rancang system prompt lengkap untuk asisten AI berikut:
+Nama: ${String(name).trim()}
+${tagline ? `Tagline: ${String(tagline).trim()}\n` : ""}${category ? `Kategori: ${String(category).trim()}\n` : ""}Deskripsi/fungsi: ${String(description || "").trim() || "(tidak ada deskripsi — simpulkan dari nama)"}
+
+System prompt harus mencakup:
+1. Identitas & persona (siapa asisten ini, gaya bicara)
+2. Keahlian inti dan batasan pengetahuan
+3. Aturan perilaku (jujur bila tidak tahu, jangan mengarang data/harga/regulasi)
+4. Format jawaban yang rapi untuk pengguna Indonesia
+Panjang ideal 300-600 kata.`;
+
+      const prompt = await callClaude({ system: systemMsg, user: userMsg, maxTokens: 2500 });
+      res.json({ ok: true, prompt });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || "Gagal generate otak" });
+    }
+  });
+
+  // POST /api/agents/:id/improve-brain — PREVIEW penyempurnaan otak agen lama (TIDAK menyimpan;
+  // penyimpanan tetap lewat PATCH /api/agents/:id setelah admin menyetujui pratinjau).
+  app.post("/api/agents/:id/improve-brain", isAuthenticated, async (req: any, res: any) => {
+    try {
+      const agent = await storage.getAgent(req.params.id as string);
+      if (!agent) return res.status(404).json({ error: "Agent not found" });
+      const authz = await assertCanMutateAgent(req, agent);
+      if (!authz.ok) return res.status(authz.status).json({ error: authz.error });
+
+      const currentPrompt = String((agent as any).systemPrompt || "").trim();
+      if (!currentPrompt) return res.status(400).json({ error: "Agen ini belum punya system prompt untuk disempurnakan. Gunakan generate-brain." });
+
+      const { callClaude } = await import("./lib/anthropic");
+      const instruction = String((req.body || {}).instruction || "").trim();
+
+      const systemMsg = `Kamu adalah editor senior "otak" (system prompt) asisten AI di platform Gustafta.
+Tugasmu MENYEMPURNAKAN system prompt yang sudah ada: lebih terstruktur, jelas, dan efektif — TANPA mengubah identitas, peran, bahasa, atau perilaku inti asisten.
+ATURAN KERAS:
+- Pertahankan APA ADANYA setiap blok marker teknis (contoh: "FEDERATION_MODE v2", "SYNTHESIS ORCHESTRATOR", "SCORECARD", blok ALL-CAPS, placeholder {{...}}, dan instruksi orkestrasi sub-agen). Jangan dihapus, jangan diparafrase.
+- Pertahankan bahasa asli prompt (jika Indonesia tetap Indonesia).
+- Keluarkan HANYA system prompt hasil akhir — tanpa komentar, tanpa penjelasan, tanpa blok kode.`;
+      const userMsg = `Nama asisten: ${(agent as any).name || "-"}
+${instruction ? `Permintaan khusus admin: ${instruction}\n` : ""}
+System prompt saat ini:
+---
+${currentPrompt.slice(0, 24000)}
+---
+Tulis versi yang disempurnakan.`;
+
+      const prompt = await callClaude({ system: systemMsg, user: userMsg, maxTokens: 4000, temperature: 0.4 });
+      res.json({ ok: true, prompt, previous_length: currentPrompt.length, new_length: prompt.length });
+    } catch (err: any) {
+      res.status(500).json({ error: err?.message || "Gagal menyempurnakan otak" });
+    }
+  });
+
   // ==================== WORKROOMS (Fase 1 — ruang kerja manusia + agen) ====================
   // Registry domain Workroom: stage machine + prompt analisis per bidang.
   // JSON output analisis SENGAJA seragam lintas domain (kelayakan/win_probability/

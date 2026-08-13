@@ -323,6 +323,21 @@ export default function MultiClawAdmin() {
     } catch { toast({ title: "Gagal reprocess", variant: "destructive" }); }
   }
 
+  const [improvingBrain, setImprovingBrain] = useState(false);
+  const [brainPreview, setBrainPreview] = useState<string | null>(null);
+  async function improveBrain() {
+    if (!agent) return;
+    setImprovingBrain(true); setBrainPreview(null);
+    try {
+      const r = await fetch(`/api/agents/${agent.id}/improve-brain`, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({}) });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Gagal");
+      setBrainPreview(data.prompt);
+      toast({ title: "Pratinjau otak baru siap", description: "Periksa hasilnya, lalu Terapkan bila setuju. Belum tersimpan." });
+    } catch (e: any) { toast({ title: "Gagal menyempurnakan otak", description: e?.message, variant: "destructive" }); }
+    finally { setImprovingBrain(false); }
+  }
+
   async function saveSettings() {
     if (!agent) return;
     setSavingSettings(true); setSavedOk(false);
@@ -618,6 +633,21 @@ export default function MultiClawAdmin() {
                           </div>
                         </div>
                         <textarea className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-3 text-xs text-slate-200 font-mono resize-none" rows={24} value={editPrompt} onChange={e => setEditPrompt(e.target.value)} />
+                        <Button onClick={improveBrain} disabled={improvingBrain} variant="outline" className="w-full border-purple-500/40 text-purple-300 hover:bg-purple-900/20" data-testid="btn-improve-brain">
+                          {improvingBrain ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Claude sedang menyempurnakan otak…</> : "✨ Sempurnakan Otak (Claude)"}
+                        </Button>
+                        {brainPreview && (
+                          <div className="space-y-2 border border-purple-500/30 rounded-lg p-3 bg-purple-950/10">
+                            <p className="text-xs text-purple-300 font-semibold">Pratinjau otak baru ({brainPreview.length} karakter) — belum tersimpan:</p>
+                            <div className="max-h-64 overflow-y-auto bg-slate-900 rounded p-2">
+                              <pre className="text-[11px] text-slate-300 whitespace-pre-wrap font-mono">{brainPreview}</pre>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white" data-testid="btn-apply-brain" onClick={() => { setEditPrompt(brainPreview); setBrainPreview(null); toast({ title: "Diterapkan ke editor", description: "Klik 'Simpan System Prompt' untuk menyimpan permanen." }); }}>Terapkan ke Editor</Button>
+                              <Button size="sm" variant="outline" className="flex-1" data-testid="btn-discard-brain" onClick={() => setBrainPreview(null)}>Buang</Button>
+                            </div>
+                          </div>
+                        )}
                         <Button onClick={saveSettings} disabled={savingSettings} className={`w-full ${savedOk ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"} text-white`}>
                           {savingSettings ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Menyimpan...</> : savedOk ? <><CheckCircle2 className="h-4 w-4 mr-2" />Tersimpan!</> : "Simpan System Prompt"}
                         </Button>

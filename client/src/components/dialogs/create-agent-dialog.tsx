@@ -111,6 +111,29 @@ export function CreateAgentDialog({ open, onOpenChange, forceOrchestrator, onCre
   };
   const [isOrchestrator, setIsOrchestrator] = useState(forceOrchestrator || false);
 
+  // "Buat Otak dengan AI" — Claude merancang system prompt untuk agen baru
+  const [generatingBrain, setGeneratingBrain] = useState(false);
+  const [claudeBrain, setClaudeBrain] = useState<string | null>(null);
+  const generateBrain = async () => {
+    if (!formData.name.trim()) return;
+    setGeneratingBrain(true);
+    try {
+      const data = await apiRequest("POST", "/api/agents/generate-brain", {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        tagline: formData.tagline.trim(),
+        category: formData.category || undefined,
+      });
+      setClaudeBrain(data.prompt);
+      setFormData((prev) => ({ ...prev, systemPrompt: data.prompt }));
+      toast({ title: "Otak dirancang oleh Claude", description: "Pratinjau di bawah. Otak tersimpan saat alat bantu dibuat." });
+    } catch (e: any) {
+      toast({ title: "Gagal merancang otak", description: e?.message || "Coba lagi", variant: "destructive" });
+    } finally {
+      setGeneratingBrain(false);
+    }
+  };
+
   useEffect(() => {
     if (open && forceOrchestrator) {
       setIsOrchestrator(true);
@@ -644,6 +667,38 @@ export function CreateAgentDialog({ open, onOpenChange, forceOrchestrator, onCre
                
               />
             </div>
+
+            {/* Buat otak dengan Claude — khusus perancangan otak, bukan chat */}
+            <div className="space-y-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full border-purple-300 dark:border-purple-800 text-purple-700 dark:text-purple-300"
+                disabled={generatingBrain || !formData.name.trim()}
+                data-testid="btn-generate-brain"
+                onClick={generateBrain}
+              >
+                {generatingBrain ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Claude sedang merancang otak…</>
+                ) : (
+                  <><Sparkles className="w-4 h-4 mr-2" />Buat Otak dengan AI (Claude)</>
+                )}
+              </Button>
+              {!formData.name.trim() && (
+                <p className="text-[10px] text-muted-foreground">Isi nama dulu agar AI bisa merancang otaknya.</p>
+              )}
+            </div>
+
+            {/* System Prompt preview — hasil Claude */}
+            {claudeBrain && (formData as any).systemPrompt === claudeBrain && (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-purple-700 dark:text-purple-400 font-semibold">System Prompt (dirancang Claude)</Label>
+                <div className="rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-950/20 p-3 max-h-28 overflow-y-auto">
+                  <p className="text-xs text-purple-800 dark:text-purple-300 leading-relaxed font-mono whitespace-pre-wrap">{claudeBrain}</p>
+                </div>
+                <p className="text-[10px] text-muted-foreground">Otak ini akan tersimpan saat alat bantu dibuat. Anda dapat mengubahnya nanti di pengaturan agen.</p>
+              </div>
+            )}
 
             {/* System Prompt preview — only shown when imported from Blueprint */}
             {savedBlueprint && formData.name === savedBlueprint.namaAI && (formData as any).systemPrompt && (
