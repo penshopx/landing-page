@@ -24836,13 +24836,17 @@ POLA KERJA: ELICIT (pahami tahap & niat) â†’ DISPATCH (agen sesuai kebutuhan) â†
       // Hanya tolak jika field hilang atau bukan array.
       if (!Array.isArray(candidateIds)) return res.status(400).json({ error: "candidateIds wajib diisi" });
 
+      // Deduplicate: ID yang sama dikirim dua kali tidak boleh menghasilkan
+      // dua slot sub-agen "hantu" di agenticSubAgents.
+      const uniqueCandidateIds = [...new Set(candidateIds)];
+
       // Fetch the candidate agents
       const { sql, inArray: inArr } = await import("drizzle-orm");
       const { agents: agentsLocalTable } = await import("@shared/schema");
       const candidateRows = await db
         .select({ id: agentsLocalTable.id, name: agentsLocalTable.name })
         .from(agentsLocalTable)
-        .where(inArr(agentsLocalTable.id, candidateIds));
+        .where(inArr(agentsLocalTable.id, uniqueCandidateIds));
       const candidates = candidateRows as any[];
 
       // Detect which requested IDs were not found in the DB.
@@ -24850,8 +24854,8 @@ POLA KERJA: ELICIT (pahami tahap & niat) â†’ DISPATCH (agen sesuai kebutuhan) â†
       // back so the caller (and the admin UI) can surface a warning instead
       // of silently showing an inflated wiring count.
       const foundIds = new Set(candidates.map((c: any) => c.id));
-      const missingIds = candidateIds.filter((id) => !foundIds.has(id));
-      if (candidateIds.length > 0 && candidates.length === 0) {
+      const missingIds = uniqueCandidateIds.filter((id) => !foundIds.has(id));
+      if (uniqueCandidateIds.length > 0 && candidates.length === 0) {
         return res.status(400).json({
           error: `candidateIds tidak valid â€” tidak ada agen yang ditemukan di database: [${missingIds.join(", ")}]`,
           missing: missingIds,

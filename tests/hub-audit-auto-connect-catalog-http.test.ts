@@ -481,3 +481,45 @@ test(
     );
   }
 );
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEST 11: auto-connect dengan ID duplikat [id1, id1, id2] → tepat 2 agen
+//          terwire (bukan 3) — duplikat harus dide-dup sebelum query DB.
+// ─────────────────────────────────────────────────────────────────────────────
+test(
+  "hub-audit HTTP: auto-connect ID duplikat [id1, id1, id2] → tepat 2 agen terwire",
+  { skip: !HAS_DB ? "DATABASE_URL tidak tersedia" : false },
+  async () => {
+    const dupIds = [candidateIds[0], candidateIds[0], candidateIds[1]];
+    const { status, json } = await req(
+      "POST",
+      `/api/admin/hub-audit/${hubAgentId}/auto-connect`,
+      { user: adminId, body: { candidateIds: dupIds } }
+    );
+    assert.equal(
+      status, 200,
+      `auto-connect ID duplikat harus 200, dapat ${status}: ${JSON.stringify(json)}`
+    );
+    assert.ok(json.ok === true, "Response harus { ok: true }");
+    assert.deepEqual(json.skipped, [], "skipped harus kosong — semua ID valid");
+    assert.ok(Array.isArray(json.agenticSubAgents), "agenticSubAgents harus array");
+    assert.equal(
+      json.agenticSubAgents.length, 2,
+      `agenticSubAgents harus tepat 2 entri (duplikat dide-dup), dapat: ${JSON.stringify(json.agenticSubAgents)}`
+    );
+    const wiredIds = json.agenticSubAgents.map((s: any) => s.agentId).sort((a: number, b: number) => a - b);
+    assert.deepEqual(wiredIds, [candidateIds[0], candidateIds[1]].sort((a, b) => a - b));
+
+    // DB juga harus berisi tepat 2 entri unik.
+    const [row] = await db
+      .select({ agenticSubAgents: agents.agenticSubAgents })
+      .from(agents)
+      .where(eq(agents.id, hubAgentId));
+    const stored = typeof row.agenticSubAgents === "string"
+      ? JSON.parse(row.agenticSubAgents)
+      : row.agenticSubAgents;
+    assert.equal(stored.length, 2, "DB harus berisi tepat 2 sub-agen unik");
+    const storedIds = stored.map((s: any) => s.agentId).sort((a: number, b: number) => a - b);
+    assert.deepEqual(storedIds, [candidateIds[0], candidateIds[1]].sort((a, b) => a - b));
+  }
+);
