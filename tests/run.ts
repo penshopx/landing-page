@@ -53,6 +53,15 @@ const files = [
   // Catches regressions where the field is dropped from the catalog response or
   // the handler falls back to the root payment domain instead of the checkout path.
   resolve(__dirname, "store-beli-scalev-checkout.test.ts"),
+  // DB integration + static: when a product with a scalev_variant_id is later
+  // given a payment_url, the catalog serves BOTH fields together (transition is
+  // clean), every Beli handler takes exactly one checkout path (no double
+  // charge), and featured handleBuy uses paymentUrl exclusively over the variant.
+  resolve(__dirname, "checkout-payment-url-transition.test.ts"),
+  // Static guard: Brain Builder endpoints (paid Anthropic completions) must be
+  // rate-limited per user via the shared store, cap all text inputs, and keep
+  // improve-brain behind assertCanMutateAgent — prevents API-credit exhaustion.
+  resolve(__dirname, "brain-builder-guard.test.ts"),
   // DB integration: confirms POST /api/admin/lms/courses/bulk-activate and
   // bulk-deactivate each return `activated`/`deactivated` = only the courses
   // that actually changed state, not the full selection. Also confirms empty-ids

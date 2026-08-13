@@ -63,7 +63,7 @@ import { sendAgentShareNotification, sendAgentInviteToSignup, sendAgentCertifica
 import { getDefaultPoliciesForSeries, type AgentPolicySet } from "./lib/agent-policies";
 import { importDocumentToProposal, mergeProposalIntoAgent, type ApplyMode } from "./lib/document-importer";
 import { buildEbookMarkdown, buildEbookHtml, stripMarkdownToPlainText, buildEbookTables } from "./lib/ebook-generator";
-import { chatIpRateLimiter, chatAgentIdRateLimiter } from "./lib/rate-limiter";
+import { chatIpRateLimiter, chatAgentIdRateLimiter, brainBuilderRateLimiter } from "./lib/rate-limiter";
 import { runGuardedDialog, dialogChatCompletion, DialogBusyError, DIALOG_MODEL, dialogLoadStats } from "./lib/dialog-load-guard";
 import { callWithRouter, callWithRouterStream } from "./lib/model-router";
 import { isSchedulerLeader, schedulerInstanceId } from "./lib/scheduler-leader";
@@ -21782,7 +21782,7 @@ Use case konkret: ${(domainAnalysis.useCaseExamples || []).join("; ")}
 Metrik sukses: ${(domainAnalysis.successMetrics || []).join(", ")}
 Kompleksitas: ${domainAnalysis.domainComplexity || "medium"}
 Multi-domain: ${domainAnalysis.isMultiDomain ? "Ya — " + (domainAnalysis.crossDomainLinks || []).join(", ") : "Tidak"}
-==============================`;
+=== AKHIR HASIL ANALISIS ===`;
 
       let multiclawPrompt = "";
 
@@ -24984,11 +24984,15 @@ Maksimal 600 kata.`;
   };
 
   // POST /api/agents/generate-brain — draft system prompt untuk agen BARU (belum ada di DB).
-  app.post("/api/agents/generate-brain", isAuthenticated, async (req: any, res: any) => {
+  // Rate-limited per pengguna (store bersama): setiap panggilan memicu completion
+  // Anthropic BERBAYAR, jadi request berulang tanpa batas = risiko penguras kredit.
+  app.post("/api/agents/generate-brain", isAuthenticated, brainBuilderRateLimiter, async (req: any, res: any) => {
     try {
       const ent = await assertBrainEntitlement(req);
       if (!ent.ok) return res.status(ent.status).json({ error: ent.error });
       const { callClaude } = await import("./lib/anthropic");
+      // Batasi ukuran setiap field input — mencegah prompt raksasa membengkakkan
+      // token count (biaya) atau menyelundupkan payload besar ke LLM.
       const b = (req.body || {}) as Record<string, unknown>;
       const bounded = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max).trim() : "");
       const name = bounded(b.name, 120);
@@ -25000,8 +25004,8 @@ Maksimal 600 kata.`;
       const systemMsg = `Kamu adalah perancang "otak" (system prompt) untuk asisten AI di platform Gustafta.
 Tulis dalam Bahasa Indonesia yang profesional. Keluarkan HANYA isi system prompt final — tanpa pembuka, tanpa penutup, tanpa blok kode.`;
       const userMsg = `Rancang system prompt lengkap untuk asisten AI berikut:
-Nama: ${String(name).trim()}
-${tagline ? `Tagline: ${String(tagline).trim()}\n` : ""}${category ? `Kategori: ${String(category).trim()}\n` : ""}Deskripsi/fungsi: ${String(description || "").trim() || "(tidak ada deskripsi — simpulkan dari nama)"}
+Nama: ${name}
+${tagline ? `Tagline: ${tagline}\n` : ""}${category ? `Kategori: ${category}\n` : ""}Deskripsi/fungsi: ${description || "(tidak ada deskripsi — simpulkan dari nama)"}
 
 System prompt harus mencakup:
 1. Identitas & persona (siapa asisten ini, gaya bicara)
@@ -25019,7 +25023,7 @@ Panjang ideal 300-600 kata.`;
 
   // POST /api/agents/:id/improve-brain — PREVIEW penyempurnaan otak agen lama (TIDAK menyimpan;
   // penyimpanan tetap lewat PATCH /api/agents/:id setelah admin menyetujui pratinjau).
-  app.post("/api/agents/:id/improve-brain", isAuthenticated, async (req: any, res: any) => {
+  app.post("/api/agents/:id/improve-brain", isAuthenticated, brainBuilderRateLimiter, async (req: any, res: any) => {
     try {
       const agent = await storage.getAgent(req.params.id as string);
       if (!agent) return res.status(404).json({ error: "Agent not found" });
@@ -25035,6 +25039,7 @@ Panjang ideal 300-600 kata.`;
       if (currentPrompt.length > 24000) return res.status(400).json({ error: "System prompt terlalu panjang (>24.000 karakter) untuk disempurnakan otomatis. Edit manual saja." });
 
       const { callClaude } = await import("./lib/anthropic");
+      // Cap ukuran instruksi admin — mencegah payload raksasa masuk ke LLM berbayar.
       const rawInstr = (req.body || {}).instruction;
       const instruction = typeof rawInstr === "string" ? rawInstr.slice(0, 1000).trim() : "";
 

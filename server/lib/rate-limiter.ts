@@ -372,6 +372,31 @@ const chatMinuteStore = new SharedRateLimitStoreAdapter(
   memoryFallbackStore,
 );
 
+// Limiter khusus endpoint Brain Builder (Claude/Anthropic). Setiap panggilan
+// memicu completion BERBAYAR, jadi walau endpoint sudah login-gated tetap wajib
+// dibatasi per-pengguna agar satu akun tidak bisa menguras kredit API dengan
+// request berulang. Store BERSAMA (Postgres) — konsisten lintas instance
+// autoscale. Admin di-skip (alat internal mereka).
+const brainMinuteStore = new SharedRateLimitStoreAdapter(
+  defaultSharedStore,
+  "brain:",
+  memoryFallbackStore,
+);
+
+export const BRAIN_BUILDER_LIMIT_PER_MINUTE = 5;
+
+export const brainBuilderRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: BRAIN_BUILDER_LIMIT_PER_MINUTE,
+  keyGenerator: (req: Request) => chatRateLimitKey(req),
+  skip: (req: Request) => isAdminUser(req),
+  store: brainMinuteStore,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  handler: retryAfterHandler as any,
+  message: "Terlalu banyak permintaan generate otak. Coba lagi sebentar lagi.",
+});
+
 export const chatIpRateLimiter = rateLimit({
   windowMs: 60 * 1000,
   limit: (req: Request) => chatRateLimitValue(req),

@@ -7,8 +7,8 @@
 // "Done looks like":
 //   - handler reads scalevVariantId and constructs the correct URL when paymentUrl is null
 //   - the checkout URL format (?variant_ids=<id>&qty=1) is asserted explicitly
-//   - paymentUrl takes priority over scalevVariantId (tested via source inspection)
-//   - both store.tsx and store-featured.tsx follow the same pattern
+//   - priority rules (source inspection): store.tsx = variant-first (webhook
+//     fulfillment), store-featured.tsx = paymentUrl-first (admin override)
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -24,21 +24,24 @@ function readSrc(relPath: string): string {
 // BAGIAN 1 — store.tsx: handleBuyNow
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test("store.tsx: handleBuyNow — paymentUrl diperiksa LEBIH DULU sebelum scalevVariantId", () => {
+test("store.tsx: handleBuyNow — scalevVariantId diperiksa LEBIH DULU sebelum paymentUrl (variant menang, webhook fulfillment terjaga)", () => {
   const src = readSrc("client/src/pages/store.tsx");
 
   // Extract the handleBuyNow function body
   const fnStart = src.indexOf("const handleBuyNow = (agent: AgentProduct)");
   assert.ok(fnStart !== -1, "handleBuyNow harus ada di store.tsx");
 
-  // paymentUrl branch must appear before scalevVariantId branch
+  // Aturan yang disengaja di katalog utama: scalevVariantId menang atas
+  // paymentUrl agar order Scalev terbentuk dan webhook fulfillment tetap
+  // berjalan (lihat komentar di handleBuyNow). Selaras dengan
+  // tests/store-catalog-scalev-variant.test.ts.
   const paymentUrlIdx = src.indexOf("agent.paymentUrl", fnStart);
   const scalevVariantIdx = src.indexOf("agent.scalevVariantId", fnStart);
   assert.ok(paymentUrlIdx !== -1, "handleBuyNow harus menggunakan agent.paymentUrl");
   assert.ok(scalevVariantIdx !== -1, "handleBuyNow harus menggunakan agent.scalevVariantId");
   assert.ok(
-    paymentUrlIdx < scalevVariantIdx,
-    "agent.paymentUrl harus diperiksa SEBELUM agent.scalevVariantId (prioritas)"
+    scalevVariantIdx < paymentUrlIdx,
+    "agent.scalevVariantId harus diperiksa SEBELUM agent.paymentUrl di store.tsx (prioritas variant)"
   );
 });
 
