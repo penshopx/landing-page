@@ -78,4 +78,5 @@
 - [Unified Order API](unified-order-api.md) — /api/v1/orders: SCALEV_ORDER via POST /v3/orders bila variant termapping (korelasi scalev_order_id, webhook lookup SEBELUM dedup legacy), else/gagal → MANUAL_WA; harga dari snapshot.
 - [Scalev /o/ page payment methods](scalev-order-page-payment.md) — hosted order page renders options ONLY from store-attached payment_accounts; empty at store level → page shows just Unpaid+WhatsApp, no VA.
 - [apiRequest returns parsed JSON](apirequest-parsed-json.md) — never call .json()/.ok on apiRequest results (crashes "(intermediate value).json is not a function"); raw fetch sites still need .json().
+- [Claude brain builder scope](claude-brain-builder.md) — Anthropic key ONLY for generating/improving system prompts (generate-brain / improve-brain preview), never daily chat; improve must preserve marker blocks.
 - [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.

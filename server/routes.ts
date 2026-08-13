@@ -24952,14 +24952,50 @@ Maksimal 600 kata.`;
   });
 
   // ==================== BRAIN BUILDER (Claude/Anthropic — KHUSUS bangun otak, bukan chat) ====================
+  // Rate limit sederhana per-user (endpoint berbayar). Catatan: in-memory per proses —
+  // cukup untuk fitur admin/kreator bervolume rendah; JANGAN tiru pola ini untuk endpoint publik.
+  const brainCallLog = new Map<string, number[]>();
+  function brainRateLimited(userId: string): boolean {
+    const now = Date.now();
+    const windowMs = 60 * 60 * 1000;
+    const arr = (brainCallLog.get(userId) || []).filter(t => now - t < windowMs);
+    if (arr.length >= 15) { brainCallLog.set(userId, arr); return true; }
+    arr.push(now); brainCallLog.set(userId, arr); return false;
+  }
+  // Gate: sama dengan hak membuat agen (admin ATAU langganan aktif) — cegah akun gratis
+  // membakar kredit Anthropic tanpa batas.
+  async function assertBrainEntitlement(req: any): Promise<{ ok: true; userId: string } | { ok: false; status: number; error: string }> {
+    const userId = (req.user as any)?.claims?.sub || (req.user as any)?.id || "";
+    if (!userId) return { ok: false, status: 401, error: "User ID not found" };
+    const adminIds = (process.env.ADMIN_USER_IDS || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+    const dbRole = await getDbRole(req);
+    const isAdmin = dbRole === "admin" || dbRole === "superadmin" || adminIds.includes(userId);
+    if (!isAdmin) {
+      const sub = await storage.getActiveSubscription(userId);
+      if (!sub || sub.status !== "active") return { ok: false, status: 403, error: "Fitur ini butuh langganan aktif." };
+    }
+    if (brainRateLimited(userId)) return { ok: false, status: 429, error: "Terlalu sering. Coba lagi dalam 1 jam." };
+    return { ok: true, userId };
+  }
+  const brainSafeError = (res: any, err: any, fallback: string) => {
+    console.error("[brain-builder]", err?.message || err);
+    const msg = String(err?.message || "");
+    res.status(502).json({ error: msg.startsWith("ANTHROPIC_API_KEY") ? msg : fallback });
+  };
+
   // POST /api/agents/generate-brain — draft system prompt untuk agen BARU (belum ada di DB).
   app.post("/api/agents/generate-brain", isAuthenticated, async (req: any, res: any) => {
     try {
+      const ent = await assertBrainEntitlement(req);
+      if (!ent.ok) return res.status(ent.status).json({ error: ent.error });
       const { callClaude } = await import("./lib/anthropic");
-      const { name, description, tagline, category } = (req.body || {}) as {
-        name?: string; description?: string; tagline?: string; category?: string;
-      };
-      if (!name || !String(name).trim()) return res.status(400).json({ error: "name wajib diisi" });
+      const b = (req.body || {}) as Record<string, unknown>;
+      const bounded = (v: unknown, max: number) => (typeof v === "string" ? v.slice(0, max).trim() : "");
+      const name = bounded(b.name, 120);
+      const description = bounded(b.description, 2000);
+      const tagline = bounded(b.tagline, 200);
+      const category = bounded(b.category, 100);
+      if (!name) return res.status(400).json({ error: "name wajib diisi" });
 
       const systemMsg = `Kamu adalah perancang "otak" (system prompt) untuk asisten AI di platform Gustafta.
 Tulis dalam Bahasa Indonesia yang profesional. Keluarkan HANYA isi system prompt final — tanpa pembuka, tanpa penutup, tanpa blok kode.`;
@@ -24977,7 +25013,7 @@ Panjang ideal 300-600 kata.`;
       const prompt = await callClaude({ system: systemMsg, user: userMsg, maxTokens: 2500 });
       res.json({ ok: true, prompt });
     } catch (err: any) {
-      res.status(500).json({ error: err?.message || "Gagal generate otak" });
+      brainSafeError(res, err, "Gagal merancang otak. Coba lagi sebentar.");
     }
   });
 
@@ -24990,11 +25026,17 @@ Panjang ideal 300-600 kata.`;
       const authz = await assertCanMutateAgent(req, agent);
       if (!authz.ok) return res.status(authz.status).json({ error: authz.error });
 
+      const userIdIb = (req.user as any)?.claims?.sub || (req.user as any)?.id || "";
+      if (brainRateLimited(userIdIb)) return res.status(429).json({ error: "Terlalu sering. Coba lagi dalam 1 jam." });
+
       const currentPrompt = String((agent as any).systemPrompt || "").trim();
       if (!currentPrompt) return res.status(400).json({ error: "Agen ini belum punya system prompt untuk disempurnakan. Gunakan generate-brain." });
+      // Jangan truncate diam-diam — marker di bagian akhir bisa hilang tanpa terdeteksi.
+      if (currentPrompt.length > 24000) return res.status(400).json({ error: "System prompt terlalu panjang (>24.000 karakter) untuk disempurnakan otomatis. Edit manual saja." });
 
       const { callClaude } = await import("./lib/anthropic");
-      const instruction = String((req.body || {}).instruction || "").trim();
+      const rawInstr = (req.body || {}).instruction;
+      const instruction = typeof rawInstr === "string" ? rawInstr.slice(0, 1000).trim() : "";
 
       const systemMsg = `Kamu adalah editor senior "otak" (system prompt) asisten AI di platform Gustafta.
 Tugasmu MENYEMPURNAKAN system prompt yang sudah ada: lebih terstruktur, jelas, dan efektif — TANPA mengubah identitas, peran, bahasa, atau perilaku inti asisten.
@@ -25006,14 +25048,21 @@ ATURAN KERAS:
 ${instruction ? `Permintaan khusus admin: ${instruction}\n` : ""}
 System prompt saat ini:
 ---
-${currentPrompt.slice(0, 24000)}
+${currentPrompt}
 ---
 Tulis versi yang disempurnakan.`;
 
-      const prompt = await callClaude({ system: systemMsg, user: userMsg, maxTokens: 4000, temperature: 0.4 });
+      const prompt = await callClaude({ system: systemMsg, user: userMsg, maxTokens: 8000, temperature: 0.4 });
+
+      // Validasi deterministik: marker teknis yang ada di prompt lama WAJIB tetap ada.
+      const PROTECTED_MARKERS = ["FEDERATION_MODE v2", "SYNTHESIS ORCHESTRATOR", "SCORECARD"];
+      const lost = PROTECTED_MARKERS.filter(m => currentPrompt.includes(m) && !prompt.includes(m));
+      if (lost.length > 0) {
+        return res.status(422).json({ error: `Hasil AI menghilangkan marker penting (${lost.join(", ")}). Tidak diterapkan — coba lagi.` });
+      }
       res.json({ ok: true, prompt, previous_length: currentPrompt.length, new_length: prompt.length });
     } catch (err: any) {
-      res.status(500).json({ error: err?.message || "Gagal menyempurnakan otak" });
+      brainSafeError(res, err, "Gagal menyempurnakan otak. Coba lagi sebentar.");
     }
   });
 
