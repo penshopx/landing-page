@@ -19,6 +19,7 @@ import path from "node:path";
 import { db } from "../server/db";
 import { storeProducts } from "../shared/schema";
 import { eq, inArray } from "drizzle-orm";
+import { getStoreCatalogItems, invalidateStoreCatalog } from "../server/routes";
 
 // ── Identifier unik per run ───────────────────────────────────────────────────
 const RUN = `scv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -280,5 +281,95 @@ test("store.tsx: handleBuyNow memeriksa scalevVariantId SEBELUM paymentUrl (prio
     `scalevVariantId harus diperiksa SEBELUM paymentUrl di handleBuyNow ` +
     `(posisi variant=${variantPos}, posisi payment=${paymentPos}) — ` +
     `aturan prioritas: scalevVariantId selalu menang atas paymentUrl`
+  );
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BAGIAN 6 — Invalidasi cache katalog saat scalev_variant_id / paymentUrl berubah
+//
+// Skenario nyata: admin menghapus scalevVariantId dari produk yang sudah live.
+// Tanpa invalidasi, cache katalog (TTL 30 dtk) tetap menyajikan variant ID lama
+// → pembeli yang klik Beli mendapat URL checkout Scalev untuk varian yang sudah
+// tidak ada. PATCH admin memanggil invalidateStoreCatalog() setelah SETIAP
+// update — tes ini membuktikan mekanisme itu benar-benar menyegarkan katalog.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test("cache katalog: hapus scalevVariantId + invalidateStoreCatalog() → katalog segar tanpa variant ID lama", async () => {
+  const pid = await createProduct({ scalevVariantId: SAMPLE_VARIANT_ID, paymentUrl: SAMPLE_PAYMENT_URL });
+
+  // Warm cache — search dengan RUN unik supaya hanya produk tes yang ter-cache
+  const warm = await getStoreCatalogItems("Semua", RUN);
+  const warmItem = warm.find((i: any) => i.productId === pid);
+  assert.ok(warmItem, "produk tes harus muncul di katalog setelah warm build");
+  assert.equal(warmItem.scalevVariantId, SAMPLE_VARIANT_ID, "cache warm harus memuat variant ID awal");
+
+  // Admin menghapus scalev_variant_id (mutasi DB langsung — setara updateStoreProduct)
+  await db.update(storeProducts)
+    .set({ scalevVariantId: null } as any)
+    .where(eq(storeProducts.id, pid));
+
+  // TANPA invalidasi: cache (masih fresh, < TTL) tetap menyajikan variant ID lama —
+  // membuktikan bahwa invalidasi memang DIBUTUHKAN, bukan kebetulan TTL.
+  const stale = await getStoreCatalogItems("Semua", RUN);
+  const staleItem = stale.find((i: any) => i.productId === pid);
+  assert.equal(
+    staleItem?.scalevVariantId, SAMPLE_VARIANT_ID,
+    "tanpa invalidasi, cache fresh masih menyajikan variant ID lama (bukti cache aktif)"
+  );
+
+  // DENGAN invalidasi (yang dipanggil handler PATCH admin): katalog dibangun ulang
+  invalidateStoreCatalog();
+  const fresh = await getStoreCatalogItems("Semua", RUN);
+  const freshItem = fresh.find((i: any) => i.productId === pid);
+  assert.ok(freshItem, "produk tetap ada di katalog setelah rebuild");
+  assert.equal(
+    freshItem.scalevVariantId, null,
+    "setelah invalidateStoreCatalog(), katalog TIDAK boleh lagi memuat variant ID yang dihapus"
+  );
+});
+
+test("cache katalog: hapus paymentUrl pada produk yang sama + invalidasi → paymentUrl hilang dari katalog", async () => {
+  const pid = await createProduct({ scalevVariantId: SAMPLE_VARIANT_ID, paymentUrl: SAMPLE_PAYMENT_URL });
+
+  invalidateStoreCatalog(); // mulai dari cache kosong untuk kunci ini
+  const warm = await getStoreCatalogItems("Semua", RUN);
+  const warmItem = warm.find((i: any) => i.productId === pid);
+  assert.equal(warmItem?.paymentUrl, SAMPLE_PAYMENT_URL, "cache warm harus memuat paymentUrl awal");
+
+  // Admin mengosongkan paymentUrl DAN scalevVariantId sekaligus
+  await db.update(storeProducts)
+    .set({ paymentUrl: null, scalevVariantId: null } as any)
+    .where(eq(storeProducts.id, pid));
+
+  invalidateStoreCatalog();
+  const fresh = await getStoreCatalogItems("Semua", RUN);
+  const freshItem = fresh.find((i: any) => i.productId === pid);
+  assert.ok(freshItem, "produk tetap ada di katalog setelah rebuild");
+  assert.equal(freshItem.paymentUrl, null, "paymentUrl yang dikosongkan tidak boleh tersaji dari cache");
+  assert.equal(freshItem.scalevVariantId, null, "scalevVariantId yang dikosongkan tidak boleh tersaji dari cache");
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// BAGIAN 7 — Penjagaan statis: handler PATCH admin memanggil invalidateStoreCatalog()
+// ═════════════════════════════════════════════════════════════════════════════
+
+test("routes.ts: PATCH /api/store/admin/products/:id memanggil invalidateStoreCatalog() setelah updateStoreProduct", () => {
+  const src = fs.readFileSync(path.join(process.cwd(), "server", "routes.ts"), "utf-8");
+
+  const start = src.indexOf('app.patch("/api/store/admin/products/:id"');
+  assert.ok(start !== -1, "handler PATCH /api/store/admin/products/:id harus ada di routes.ts");
+
+  // Blok handler sampai handler route berikutnya
+  const rest = src.slice(start);
+  const nextRoute = rest.slice(10).search(/app\.(get|post|patch|put|delete)\(/);
+  const block = nextRoute === -1 ? rest : rest.slice(0, nextRoute + 10);
+
+  const updatePos = block.indexOf("updateStoreProduct");
+  const invalidatePos = block.indexOf("invalidateStoreCatalog()");
+  assert.ok(updatePos !== -1, "handler PATCH harus memanggil storage.updateStoreProduct");
+  assert.ok(
+    invalidatePos !== -1 && invalidatePos > updatePos,
+    "handler PATCH harus memanggil invalidateStoreCatalog() SETELAH updateStoreProduct — " +
+    "tanpa itu cache katalog (TTL 30 dtk) menyajikan scalev_variant_id / paymentUrl lama ke pembeli"
   );
 });
