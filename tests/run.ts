@@ -118,6 +118,12 @@ const files = [
   // and evaluatorCriteria of exactly 4. Catches duplicate or mispriced Claw
   // batches at build time instead of after they reach the Store.
   resolve(__dirname, "claw-catalog-validation.test.ts"),
+  // DB integration + static: scalevVariantId dipetakan di catalog builder,
+  // dan alur cart (cart-drawer + use-cart buildCheckoutUrl) memakai
+  // keberadaan scalevVariantId sebagai kondisi penentu — item dengan
+  // variant ID DAN paymentUrl dirutekan lewat /c/checkout?variant_ids=.
+  // Hook test produksi ada di tests/cart-scalev-checkout.vitest.tsx.
+  resolve(__dirname, "store-catalog-scalev-variant.test.ts"),
 ];
 
 let hadFailure = false;

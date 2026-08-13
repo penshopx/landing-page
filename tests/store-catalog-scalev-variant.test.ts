@@ -206,6 +206,55 @@ test("use-cart.tsx: buildCheckoutUrl membangun URL dengan variant_ids dan qty", 
 // BAGIAN 4 — Penjagaan statis: aturan prioritas scalevVariantId > paymentUrl
 // ═════════════════════════════════════════════════════════════════════════════
 
+// ═════════════════════════════════════════════════════════════════════════════
+// BAGIAN 5 — Cart checkout: item dengan scalevVariantId DAN paymentUrl
+//            harus dirutekan lewat URL variant Scalev (/c/checkout?variant_ids=)
+// ═════════════════════════════════════════════════════════════════════════════
+
+// Perilaku runtime hook produksi (CartProvider/useCart) diuji di
+// tests/cart-scalev-checkout.vitest.tsx — item dengan scalevVariantId DAN
+// paymentUrl produk → buildCheckoutUrl() = /c/checkout?variant_ids=…
+// Di sini: static guards yang mengunci kondisi penentu di kode sumber.
+
+test("use-cart.tsx: filter buildCheckoutUrl memakai scalevVariantId sebagai kondisi penentu (static guard sinkronisasi replika)", () => {
+  const src = fs.readFileSync(
+    path.join(process.cwd(), "client", "src", "hooks", "use-cart.tsx"),
+    "utf-8"
+  );
+
+  // Kondisi filter persis: selected && scalevVariantId
+  assert.ok(
+    /filter\(\s*i\s*=>\s*i\.selected\s*&&\s*i\.scalevVariantId\s*\)/.test(src),
+    "buildCheckoutUrl harus memfilter item dengan `i.selected && i.scalevVariantId` — scalevVariantId adalah kondisi penentu"
+  );
+
+  // paymentUrl tidak boleh dipakai di dalam use-cart untuk membangun URL checkout
+  assert.ok(
+    !src.includes("paymentUrl"),
+    "use-cart.tsx tidak boleh menggunakan paymentUrl dalam pembentukan URL checkout"
+  );
+});
+
+test("cart-drawer.tsx: pemisahan item Scalev vs WA memakai keberadaan scalevVariantId", () => {
+  const src = fs.readFileSync(
+    path.join(process.cwd(), "client", "src", "components", "cart-drawer.tsx"),
+    "utf-8"
+  );
+
+  assert.ok(
+    /filter\(\s*i\s*=>\s*i\.scalevVariantId\s*\)/.test(src),
+    "cart-drawer harus memfilter item Scalev dengan keberadaan scalevVariantId"
+  );
+  assert.ok(
+    /filter\(\s*i\s*=>\s*!i\.scalevVariantId\s*\)/.test(src),
+    "cart-drawer harus merutekan item TANPA scalevVariantId ke jalur WA"
+  );
+  assert.ok(
+    !src.includes("paymentUrl"),
+    "cart-drawer tidak boleh membuka paymentUrl — jalur Scalev harus lewat buildCheckoutUrl()"
+  );
+});
+
 test("store.tsx: handleBuyNow memeriksa scalevVariantId SEBELUM paymentUrl (prioritas Scalev variant)", () => {
   const src = fs.readFileSync(
     path.join(process.cwd(), "client", "src", "pages", "store.tsx"),
