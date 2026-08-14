@@ -17,7 +17,7 @@ import {
   MessageCircle, ShieldCheck, Store, Bot, FileText, CreditCard,
   GraduationCap, Smartphone, Users, Building2, Briefcase, User,
   Send, Loader2, Sparkles, X, ChevronDown, Lock, ShoppingBag, FileDown,
-  Mic, MicOff, Paperclip, Bell, Clock, Target, Mail, Stethoscope,
+  Mic, MicOff, Paperclip, Bell, Clock, Target, Mail, Stethoscope, FolderOpen,
 } from "lucide-react";
 
 const GUSTAFTA_AGENT_ID = "1";
