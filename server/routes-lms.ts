@@ -1394,7 +1394,7 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
     }
     certRepairInFlight = true;
     try {
-      const pendingRows = await db.execute(sql.raw(`
+      const pendingRows = await db.execute(sql`
         SELECT e.user_id, e.course_id
         FROM lms_enrollments e
         WHERE e.progress = 100
@@ -1403,7 +1403,7 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
             SELECT 1 FROM lms_certificates c
             WHERE c.user_id = e.user_id AND c.course_id = e.course_id
           )
-      `));
+      `);
       const rows = pendingRows.rows ?? [];
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
       let backfilled = 0;
