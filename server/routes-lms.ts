@@ -17,10 +17,34 @@ function generateCertCode(): string {
  * keep the first 4 and last 3 digits, mask the middle.
  * Returns "" when the phone is missing or too short to mask meaningfully.
  */
-function maskPhone(phone: unknown): string {
+export function maskPhone(phone: unknown): string {
   const digits = String(phone ?? "").replace(/\D/g, "");
   if (digits.length < 8) return "";
   return `${digits.slice(0, 4)}****${digits.slice(-3)}`;
+}
+
+/**
+ * Resolve the student's display name used on the certificate verify page AND
+ * the congratulations email, with the fallback chain:
+ *   first_name+last_name → display_name → email prefix → masked phone → "Peserta"
+ * Exported so tests can assert the ordering without hitting the DB/email path.
+ */
+export function resolveStudentName(row: {
+  first_name?: unknown;
+  last_name?: unknown;
+  display_name?: unknown;
+  email?: unknown;
+  phone?: unknown;
+} | undefined | null): string {
+  const fullName = [row?.first_name, row?.last_name].filter(Boolean).join(" ").trim();
+  const emailPrefix = String(row?.email ?? "").split("@")[0] ?? "";
+  return (
+    fullName ||
+    (row?.display_name ? String(row.display_name) : "") ||
+    emailPrefix ||
+    maskPhone(row?.phone) ||
+    "Peserta"
+  );
 }
 
 function isAuthenticated(req: any, res: any, next: any) {
@@ -809,9 +833,7 @@ export function registerLmsRoutes(
               const [course] = await db.select({ title: lmsCourses.title })
                 .from(lmsCourses).where(eq(lmsCourses.id, courseId));
               const courseTitle = course?.title ?? "Kursus";
-              const rawName = [uRow?.first_name, uRow?.last_name].filter(Boolean).join(" ").trim();
-              const emailPrefix = email.split("@")[0] ?? "";
-              const studentName = rawName || (uRow?.display_name as string | undefined) || emailPrefix || maskPhone(uRow?.phone) || "Peserta";
+              const studentName = resolveStudentName(uRow);
               const issueDate = now.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
               const appBase = (process.env.APP_URL || "https://gustafta.my.id").replace(/\/$/, "");
               const certsUrl = `${appBase}/lms/certificates`;
@@ -959,9 +981,7 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
       ));
       const nameArr = (nameRows.rows ?? nameRows) as any[];
       const nr = nameArr[0] as any;
-      const fullName = [nr?.first_name, nr?.last_name].filter(Boolean).join(" ").trim();
-      const emailPrefix = (nr?.email as string | undefined)?.split("@")[0] ?? "";
-      const studentName = fullName || nr?.display_name || emailPrefix || maskPhone(nr?.phone) || "Peserta";
+      const studentName = resolveStudentName(nr);
       res.json({ ...cert, course, studentName });
     } catch (e) {
       res.status(500).json({ error: "Gagal verifikasi sertifikat" });
