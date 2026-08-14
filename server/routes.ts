@@ -8020,17 +8020,8 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           throw storageErr; // re-throw untuk catch umum di bawah
         }
 
-        // Send delivery email
-        const emailResult = await sendDigitalProductDeliveryEmail({
-          to: email,
-          customerName: name,
-          productName: sp.name,
-          downloadUrl: signedUrl,
-          expiryHours: isPermanentLink ? null : 24,
-        });
-        console.log(`[ManualOrder Digital] ${emailResult.sent ? "Email terkirim" : `Email gagal (${emailResult.reason}${emailResult.detail ? `: ${emailResult.detail}` : ""})`} ke ${email} untuk "${sp.name}"`);
-
-        // Record order
+        // Record order FIRST — persistensi order tidak boleh bergantung pada
+        // keberhasilan pengiriman email (email gagal ≠ order hilang).
         await db.insert(soTbl).values({
           productId: sp.id,
           customerName: name,
@@ -8041,6 +8032,22 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           accessToken: randomUUID(),
           status: "paid",
         } as any).onConflictDoNothing();
+
+        // Send delivery email (non-blocking terhadap pencatatan order —
+        // helper mengembalikan { sent:false }, dan try/catch menjaga bila throw)
+        let emailResult: { sent: boolean; reason?: string; detail?: string };
+        try {
+          emailResult = await sendDigitalProductDeliveryEmail({
+            to: email,
+            customerName: name,
+            productName: sp.name,
+            downloadUrl: signedUrl,
+            expiryHours: isPermanentLink ? null : 24,
+          });
+        } catch (emailErr: any) {
+          emailResult = { sent: false, reason: "exception", detail: emailErr?.message || String(emailErr) };
+        }
+        console.log(`[ManualOrder Digital] ${emailResult.sent ? "Email terkirim" : `Email gagal (${emailResult.reason}${emailResult.detail ? `: ${emailResult.detail}` : ""})`} ke ${email} untuk "${sp.name}"`);
 
         return res.json({
           success: true,

@@ -376,6 +376,90 @@ test(
 );
 
 // ══════════════════════════════════════════════════════════════════════════════
+// Task 265: Order HARUS tercatat di store_orders meski email gagal
+// ══════════════════════════════════════════════════════════════════════════════
+
+test(
+  "routes.ts — insert store_orders terjadi SEBELUM sendDigitalProductDeliveryEmail (insert tidak digated hasil email)",
+  () => {
+    const insertIdx = BLOCK.indexOf("db.insert(soTbl)");
+    const sendIdx = BLOCK.indexOf("sendDigitalProductDeliveryEmail({");
+    assert.ok(insertIdx !== -1, "Handler harus meng-insert order ke store_orders (db.insert(soTbl)).");
+    assert.ok(sendIdx !== -1, "Pemanggilan sendDigitalProductDeliveryEmail harus ada.");
+    assert.ok(
+      insertIdx < sendIdx,
+      "Insert store_orders HARUS terjadi SEBELUM pengiriman email — " +
+        "order tidak boleh hilang hanya karena email delivery gagal.",
+    );
+  },
+);
+
+test(
+  "routes.ts — insert store_orders tidak dibungkus kondisi emailResult.sent",
+  () => {
+    // Tidak boleh ada pola `if (emailResult.sent) { ... db.insert(soTbl)` —
+    // insert harus tanpa syarat terhadap hasil email.
+    const insertIdx = BLOCK.indexOf("db.insert(soTbl)");
+    const emailResultIdx = BLOCK.indexOf("emailResult");
+    assert.ok(insertIdx !== -1 && emailResultIdx !== -1);
+    assert.ok(
+      insertIdx < emailResultIdx,
+      "Insert order harus terjadi sebelum emailResult ada — " +
+        "sehingga mustahil digated pada keberhasilan email.",
+    );
+  },
+);
+
+test(
+  "routes.ts — pemanggilan email dibungkus try/catch agar throw tidak menggagalkan respons order",
+  () => {
+    assert.match(
+      BLOCK,
+      /try\s*\{[\s\S]*?sendDigitalProductDeliveryEmail\s*\(\s*\{[\s\S]*?\}\s*catch/,
+      "sendDigitalProductDeliveryEmail harus dibungkus try/catch — bila helper throw, " +
+        "order sudah tercatat dan respons tetap sukses dengan emailSent:false.",
+    );
+  },
+);
+
+test(
+  "sendDigitalProductDeliveryEmail: fetch THROW (network mati) → { sent:false }, tidak melempar",
+  async () => {
+    const realKey = process.env.BREVO_API_KEY;
+    process.env.BREVO_API_KEY = "test-brevo-key-stub";
+
+    const realFetch = globalThis.fetch;
+    (globalThis as any).fetch = async () => {
+      throw new Error("ECONNREFUSED simulated network failure");
+    };
+
+    try {
+      const { sendDigitalProductDeliveryEmail } = await import(
+        "../server/lib/email"
+      );
+      const result = await sendDigitalProductDeliveryEmail({
+        to: "offline@test.gustafta.id",
+        customerName: "Offline",
+        productName: "Test Product",
+        downloadUrl: "https://drive.google.com/test",
+        expiryHours: 24,
+      });
+      assert.equal(
+        result.sent,
+        false,
+        "Helper harus mengembalikan sent:false (bukan throw) saat network mati — " +
+          "kondisi yang membuat handler tetap merespons sukses dengan order tercatat.",
+      );
+      assert.equal((result as any).reason, "network_error");
+    } finally {
+      (globalThis as any).fetch = realFetch;
+      if (realKey === undefined) delete process.env.BREVO_API_KEY;
+      else process.env.BREVO_API_KEY = realKey;
+    }
+  },
+);
+
+// ══════════════════════════════════════════════════════════════════════════════
 // SUPABASE_URL hilang → 503 deskriptif, email TIDAK dikirim (Task: no silent skip)
 // ══════════════════════════════════════════════════════════════════════════════
 
