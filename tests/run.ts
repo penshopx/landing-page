@@ -139,6 +139,11 @@ const files = [
   // variant ID DAN paymentUrl dirutekan lewat /c/checkout?variant_ids=.
   // Hook test produksi ada di tests/cart-scalev-checkout.vitest.tsx.
   resolve(__dirname, "store-catalog-scalev-variant.test.ts"),
+  // HTTP + DB integration: Product Registry + GAIA Publishing admin-only —
+  // anonim 401, non-admin 403, admin create→validate→publish (zip response),
+  // product_id permanen lintas edit/versi, 422 + missing untuk produk DRAFT.
+  // Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "gaia-registry-admin-http.test.ts"),
 ];
 
 let hadFailure = false;
