@@ -2641,6 +2641,10 @@ export default function AdminPage() {
                           <div className="min-w-0">
                             <p className="font-medium text-sm truncate">{order.customerName}</p>
                             <p className="text-xs text-muted-foreground truncate">{order.customerEmail} · {order.customerPhone || "—"}</p>
+                            <p className="text-xs truncate" data-testid={`text-order-product-${order.id}`}>
+                              <span aria-hidden="true">{order.downloadPath ? "📄" : "🤖"}</span>{" "}
+                              <span className="font-medium">{order.productName ?? "—"}</span>
+                            </p>
                             <p className="text-xs text-muted-foreground">{order.midtransOrderId}</p>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
