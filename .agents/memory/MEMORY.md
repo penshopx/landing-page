@@ -80,4 +80,5 @@
 - [apiRequest returns parsed JSON](apirequest-parsed-json.md) — never call .json()/.ok on apiRequest results (crashes "(intermediate value).json is not a function"); raw fetch sites still need .json().
 - [Claude brain builder scope](claude-brain-builder.md) — Anthropic key ONLY for generating/improving system prompts (generate-brain / improve-brain preview), never daily chat; improve must preserve marker blocks.
 - [CASHFLOW-PBJ product line](cashflow-pbj-line.md) — Pak Arga + 7 spesialis (claw-catalog), toolkit /toolkit-cashflow, harga simulasi CASHFLOW_TIERS; aturan konten & topik terlarang terkunci.
+- [Happy-dom full-page render livelock](full-page-vitest-preseed-cache.md) — page-mount tests hang with zero output when loading-phase `data = []` sync effects loop; pre-seed the query cache.
 - [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.
