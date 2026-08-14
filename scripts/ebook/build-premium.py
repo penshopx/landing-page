@@ -5,7 +5,15 @@ import re, html
 SRC = "scripts/ebook/kas-merah-full.txt"
 OUT = "scripts/ebook/premium-ebook.html"
 
-lines = open(SRC, encoding="utf-8", errors="replace").read().split("\n")[:2622]  # book only; duplicates start after
+raw = open(SRC, "rb").read()
+import re as _re
+def _cesu(m):
+    s = m.group(0)
+    hi = ((s[0]&0x0f)<<12)|((s[1]&0x3f)<<6)|(s[2]&0x3f)
+    lo = ((s[3]&0x0f)<<12)|((s[4]&0x3f)<<6)|(s[5]&0x3f)
+    return chr(0x10000 + ((hi-0xD800)<<10) + (lo-0xDC00)).encode("utf-8")
+raw = _re.sub(rb"\xed[\xa0-\xaf][\x80-\xbf]\xed[\xb0-\xbf][\x80-\xbf]", _cesu, raw)
+lines = raw.decode("utf-8", errors="replace").split("\n")[:2622]  # book only; duplicates start after
 
 # strip embedded chat notes
 clean = []
@@ -31,6 +39,9 @@ def esc(s):
     s = s.replace("✅", '<span class="ok">✓</span>').replace("🔴", '<span class="bad">●</span>')
     s = s.replace("❌", '<span class="bad">✕</span>').replace("🔒", '<b>[TERKUNCI]</b>')
     s = s.replace("⬛", "■")
+    for ch, css in (("🟥", "#C8102E"), ("🔴", "#C8102E"), ("🟨", "#e0a800"), ("🟡", "#e0a800"), ("🟩", "#1a7f4e"), ("🟢", "#1a7f4e")):
+        s = s.replace(ch, f'<span style="color:{css}">■</span>')
+    s = "".join(c for c in s if ord(c) < 0x1F000)
     return s
 
 # group into blocks
