@@ -835,6 +835,7 @@ export default function Landing() {
               { icon: "📄", label: "Bedah Dokumen", href: "/bedah-dokumen" },
               { icon: "🧠", label: "Brain Project", href: "/brain-project" },
               { icon: "🛠️", label: "Toolkit", href: "/toolkit" },
+              { icon: "🏗️", label: "Ruang Proyek", href: "/ruang-proyek" },
               { icon: "📋", label: "Ruang Kelola", href: "/ruang-kelola" },
               { icon: "🎓", label: "Ekosistem Kompetensi", href: "/kompetensi-hub" },
               { icon: "🤖", label: "Produk AI", href: "/store" },
@@ -926,6 +927,39 @@ export default function Landing() {
                   Kenali Ruang Simpan <ArrowRight className="h-4 w-4" />
                 </button>
               </Link>
+            </div>
+          </div>
+
+          {/* Ruang Proyek — full width */}
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-100 dark:border-emerald-900/50 rounded-3xl p-8 mb-6" data-testid="card-landing-ruang-proyek">
+            <div className="md:flex md:items-start md:gap-8">
+              <div className="md:flex-1">
+                <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-emerald-200 dark:shadow-emerald-900/40">
+                  <FolderOpen className="h-6 w-6 text-white" />
+                </div>
+                <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2">Ruang Proyek</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white mb-3 leading-snug">
+                  Satu proyek, satu ruang.<br />Berkasnya tidak berserakan lagi.
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
+                  Kontrak di email, addendum di WA, foto progres di HP mandor, laporan di laptop admin —
+                  saat PPK minta satu dokumen, satu kantor sibuk mencarinya. Ruang Proyek memberi setiap
+                  proyek "dapur" sendiri: administrasi, teknis, keuangan, foto, semua di satu tempat.
+                </p>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
+                  Dan saat proyek selesai, satu klik menjadikannya <em>etalase portfolio</em> —
+                  bukti pengalaman yang rapi untuk tender berikutnya. Anda yang atur apa yang boleh dilihat publik.
+                </p>
+                <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 mb-5">
+                  <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                  <span>Administrasi · Teknis · Keuangan · Dokumentasi · Portfolio publik</span>
+                </div>
+                <Link href="/ruang-proyek">
+                  <button className="flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors" data-testid="link-landing-ruang-proyek">
+                    Kenali Ruang Proyek <ArrowRight className="h-4 w-4" />
+                  </button>
+                </Link>
+              </div>
             </div>
           </div>
 
