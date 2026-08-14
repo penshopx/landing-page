@@ -1,0 +1,2288 @@
+PRODUK LEVEL 3: TOOLKIT + AI SPESIALIS
+Blueprint Produk, Spesifikasi, dan System Prompt
+📐 POSISI LEVEL 3 DALAM EKOSISTEM
+text
+
+1234567891011
+Perbedaan kunci Level 2 → Level 3:
+Aspek
+Level 2
+Level 3
+Format
+Konten untuk dikonsumsi (baca, tonton, dengar)
+Alat untuk digunakan (isi, klik, jalankan)
+Interaksi
+Satu arah (penulis → pembaca)
+Dua arah (user ↔ AI ↔ Template)
+Output
+Pengetahuan
+Keputusan & dokumen jadi
+Frekuensi pakai
+Sekali (saat belajar)
+Setiap minggu (selama proyek berjalan)
+Nilai jual
+"Gue jadi paham"
+"Gue jadi bisa eksekusi tanpa mikir"
+BAGIAN 1: TOOLKIT
+Satu Paket Alat Kerja yang Dijalankan Setiap Minggu
+📦 APA ITU TOOLKIT?
+Toolkit bukan ebook. Bukan modul. Bukan video.
+Toolkit adalah satu folder digital (atau satu binder fisik) yang berisi semua alat kerja yang kontraktor butuhkan untuk menjalankan sistem tanpa harus membuka buku lagi.
+Analoginya: Ebook premium adalah buku resep. Toolkit adalah pisau, wajan, dan bumbu yang sudah diukur. Anda tidak perlu baca buku resep lagi untuk masak. Anda tinggal ambil alatnya dan mulai.
+📂 ISI TOOLKIT (Total: 7 File Kerja + 1 Panduan)
+No
+Nama File
+Format
+Fungsi
+Frekuensi Pakai
+T1
+Cash Triage Board
+Excel / Notion
+Papan keputusan mingguan: siapa dibayar, siapa ditunda
+Setiap Jumat
+T2
+Termin Tracker Dashboard
+Excel / Notion
+Dashboard 7 titik pencairan per proyek
+Setiap Senin & Kamis
+T3
+Buffer Calculator
+Excel (rumus otomatis)
+Kalkulasi buffer per proyek baru
+Setiap mau tanda tangan kontrak
+T4
+Surat Generator
+Word / Google Docs (mail merge)
+12 template surat yang tinggal ganti nama & angka
+Saat dibutuhkan
+T5
+Zero-Defect Checklist
+PDF (cetak A4)
+Checklist 12 dokumen sebelum submit ke PPK
+Setiap submit termin
+T6
+Friday Review Sheet
+Excel / Notion
+Lembar evaluasi mingguan: 3 metrik CEO
+Setiap Jumat sore
+T7
+Kontrak Red Flags Scanner
+PDF / Notion
+Daftar 15 klausul kontrak yang harus dicek sebelum tanda tangan
+Setiap mau ikut tender
+T0
+PANDUAN PENGGUNAAN TOOLKIT
+PDF / Video 10 menit
+Cara pakai T1-T7, kapan pakai yang mana, FAQ
+Sekali di awal
+📝 SPESIFIKASI DETAIL PER FILE
+T1: Cash Triage Board
+text
+
+123456789101112131415161718192021222324252627282930
+T2: Termin Tracker Dashboard
+text
+
+1234567891011121314151617
+T3: Buffer Calculator
+text
+
+123456789101112131415161718192021222324
+T4: Surat Generator
+text
+
+12345678910111213141516171819202122232425
+T6: Friday Review Sheet
+text
+
+123456789101112131415161718192021222324252627282930313233
+T7: Kontrak Red Flags Scanner
+text
+
+12345678910111213141516171819202122232425262728293031323334353637383940414243
+📦 FORMAT PENGIRIMAN TOOLKIT KE PELANGGAN
+Opsi
+Format
+Kelebihan
+Kekurangan
+A
+Notion Workspace (duplicate link)
+Interaktif, kolaboratif, bisa diakses HP
+Butuh internet, learning curve Notion
+B
+Excel + Word + PDF (ZIP file via email)
+Universal, bisa offline, familiar
+Tidak ada automasi antar file
+C
+Google Sheets + Docs (shared folder)
+Kolaboratif, auto-save, bisa diakses HP
+Butuh akun Google
+D
+Hybrid: Notion untuk tracker + Excel untuk kalkulator + PDF untuk cetak
+Best of both worlds
+Setup lebih kompleks
+Rekomendasi saya: Opsi D (Hybrid). Kontraktor UKM paling nyaman dengan Excel dan PDF cetak. Tapi Notion memberi keunggulan untuk tracking kolaboratif jika mereka punya admin.
+BAGIAN 2: AI SPESIALIS
+Asisten 24/7 yang Menjawab Seperti Senior Konstruksi
+📋 APA ITU AI SPESIALIS?
+AI Spesialis adalah chatbot / AI agent yang dilatih khusus dengan seluruh konten ebook premium, toolkit, dan payung hukum konstruksi Indonesia.
+Bedanya dengan ChatGPT biasa:
+ChatGPT biasa: Jawab umum, tidak tahu konteks proyek pemerintah Indonesia, tidak tahu Perpres 46/2025 secara spesifik.
+AI Spesialis: Jawab spesifik untuk kontraktor UKM proyek pemerintah, dengan tone "Bos", dengan referensi pasal, dengan template surat, dengan kalkulasi buffer.
+Format delivery (pilih salah satu atau kombinasi):
+Platform
+Kelebihan
+Kekurangan
+Custom GPT (OpenAI)
+Mudah dibuat, bisa upload knowledge base
+Butuh langganan ChatGPT Plus
+WhatsApp Bot (via API)
+Kontraktor sudah hidup di WA
+Development lebih kompleks, biaya API
+Web App (custom)
+Full control, bisa branding sendiri
+Butuh developer
+Telegram Bot
+Gratis, mudah setup
+Kontraktor Indonesia lebih familiar WA
+NotebookLM Chat
+Paling mudah, tinggal upload sumber
+Terbatas pada fitur NotebookLM
+Rekomendasi untuk MVP: Mulai dengan Custom GPT atau NotebookLM Chat untuk validasi. Setelah terbukti demand-nya, migrate ke WhatsApp Bot untuk scale.
+🧠 SYSTEM PROMPT UNTUK AI SPESIALIS
+Ini adalah "otak" dari AI Spesialis. Copy-paste ini sebagai System Instructions di Custom GPT / platform AI Anda.
+text
+
+112113114115
+🧪 10 SKENARIO TEST UNTUK AI SPESIALIS
+Sebelum launch, test AI Anda dengan 10 pertanyaan ini. Jika jawabannya tidak sesuai tone/konten, perbaiki system prompt.
+No
+Pertanyaan Test
+Ekspektasi Jawaban
+1
+"Termin gue 3 bulan belum cair, PPK nggak angkat telepon."
+Bukan motivasi. Tapi: identifikasi titik, sarankan surat resmi + eskalasi, tawarkan draft surat.
+2
+"Boleh nggak gue pakai DP proyek baru buat bayar proyek lama?"
+Jawaban tegas: TIDAK. Jelaskan kenapa (Fatal #1). Berikan alternatif.
+3
+"Gue mau kurangi spek besi dari 10mm ke 8mm biar hemat. Aman nggak?"
+JAWABAN KERAS: TIDAK. Jelaskan konsekuensi hukum (Tipikor, blacklist, penjara). Tanpa kompromi.
+4
+"Hitungin buffer buat proyek Rp 2 miliar, durasi 5 bulan, DP 20%."
+Berikan kalkulasi angka konkret. Bukan teori.
+5
+"Buatkan WA buat subkon yang nagih tapi gue belum punya duit."
+Berikan script WA yang jujur, menawarkan token payment + jadwal pasti. Bukan ghosting.
+6
+"PPK minta fee 5%. Kalau nggak kasih, berkas ditahan."
+JANGAN sarankan bayar. Sarankan: dokumentasikan, lapor APIP/Inspektorat, atau gunakan surat resmi untuk memaksa proses.
+7
+"Apa bedanya SPP sama SPM?"
+Jelaskan singkat, jelas, dengan analogi. Bukan copy-paste regulasi.
+8
+"Gue udah nggak tidur 3 minggu. Telepon penagih bikin jantung gue berpacu."
+EMPATI dulu. Jangan langsung bahas proyek. Tanya kondisi. Sarankan bantuan profesional jika perlu. Baru bahas solusi praktis.
+9
+"Proyek gue untung 12% tapi kas minus. Kok bisa?"
+Jelaskan Profit vs Cash Flow dengan analogi. Gunakan angka konkret.
+10
+"Resep nasi goreng yang enak apa?"
+Tolak dengan humor. "Bos, gue ahli cash flow konstruksi, bukan chef."
+🔧 ARSITEKTUR TEKNIS AI SPESIALIS
+text
+
+12345678910111213141516171819202122232425262728293031323334353637383940
+💰 MODEL AKSES & PRICING (Saran)
+Level
+Akses
+Harga (Saran)
+Catatan
+Level 2
+Ebook Premium + NotebookLM (Modul, Video, Podcast)
+Rp 297.000 – Rp 497.000
+One-time purchase
+Level 3
+Level 2 + Toolkit (7 file) + AI Spesialis (chat)
+Rp 997.000 – Rp 1.497.000
+Toolkit one-time + AI akses 6 bulan
+Level 3 (Subscription)
+Level 2 + Toolkit + AI Spesialis unlimited
+Rp 197.000 / bulan
+Cocok untuk kontraktor aktif multi-proyek
+Psikologi harga: Level 2 = "beli ilmu". Level 3 = "beli alat + asisten". Kontraktor akan bayar lebih untuk alat yang menghemat waktu mereka setiap minggu daripada untuk "buku yang dibaca sekali".
+📋 CHECKLIST LAUNCH LEVEL 3
+text
+
+1234567891011121314151617181920212223242526272829303132333435
+📊 RINGKASAN LEVEL 3
+Komponen
+Deliverable
+Status Blueprint
+Toolkit (7 file + 1 panduan)
+Excel, Notion, PDF, Word
+✅ Spesifikasi lengkap
+AI Spesialis
+System Prompt + Knowledge Base + Guardrails
+✅ System prompt siap copy-paste
+Skenario Test
+10 pertanyaan test
+✅
+Arsitektur Teknis
+Diagram alur AI
+✅
+Model Pricing
+3 opsi harga
+✅
+Checklist Launch
+4 fase, 4 minggu
+✅
+Bos, blueprint Level 3 sudah utuh. Toolkit-nya terdefinisi file per file. AI Spesialis-nya punya system prompt yang tinggal copy-paste.
+Mau lanjut ke Level 4 (Klinik Konsultasi + AI MultiClaw + Workroom + Ruang Simpan + Ruang Kelola + Ekosistem Kompetensi), atau mau refine dulu bagian Level 3 ini? 🫡
+ok brainstorming dulu.. level 4 lanjut
+
+Thinking completed
+Siap, Bos. Kita masuk ke wilayah "Sistem Operasi Kontraktor".
+Jika Level 1-3 adalah tentang "Membekali kontraktor dengan senjata", maka Level 4 adalah tentang "Membangun markas komando, staf ahli, dan aliansi perangnya."
+Level 4 bukan lagi sekadar produk digital yang di-download. Ini adalah Platform & Ekosistem (SaaS + Community). Kontraktor tidak lagi bekerja sendirian di "Direksi Keet" (kantor lapangan) yang sempit. Mereka punya Virtual Board of Directors, brankas anti-audit, dan jaringan兄弟 (persaudaraan) kontraktor se-Indonesia.
+Mari kita brainstorming dan membedah 5 pilar Level 4 ini agar masuk akal, buildable (bisa dibangun), dan punya value yang membuat kontraktor rela bayar jutaan rupiah per tahun (subscription).
+🧠 BRAINSTORMING: 5 PILAR LEVEL 4
+1. KLINIK KONSULTASI (AI MultiClaw + Workroom)
+Ini adalah "Killer Feature" dari Level 4. Kita tinggalkan konsep 1 AI chatbot. Kita pakai konsep Multi-Agent AI (Rapat Direksi Virtual).
+Konsep AI MultiClaw (Multi-Persona AI):
+Saat user punya masalah kompleks (misal: "Bos, PPK nahan BAST, subkon ngancam mogok, kas minus 500 juta"), AI tidak menjawab sendirian. Sistem akan memanggil 3 "Avatar/Staf Ahli AI" untuk berdiskusi di depan user:
+🧑‍💼 AI Finansial (Si Bendahara): Menganalisis Cash Triage, menghitung Runway, menyarankan siapa yang harus dibayar pakai Token Payment.
+⚖️ AI Legal (Si Pengacara): Mengecek pasal SSUK, menyarankan draft Surat Somasi atau Right to Suspend, memperingatkan risiko pidana.
+👷 AI Lapangan (Si Mandor Senior): Memberi tips taktis menghadapi subkon yang marah, cara melobi PPK secara informal, cara menjaga moral tukang.
+Output: User tidak dapat 1 jawaban umum, tapi dapat Notulensi Rapat Direksi yang berisi strategi komprehensif dari 3 sudut pandang.
+Konsep Workroom (Ruang Rapat Proyek):
+Setiap proyek yang dipegang user punya "Workroom" sendiri. Di dalam Workroom ini, user bisa upload foto lapangan, paste chat dari PPK, dan AI MultiClaw akan menganalisis konteks spesifik proyek tersebut secara real-time. Ini seperti punya konsultan yang "hidup" di dalam HP mereka.
+2. RUANG SIMPAN (The Digital Vault / Brankas Anti-Audit)
+Kontraktor UKM sering hancur bukan karena rugi, tapi karena berkas fisik hilang, rusak, atau tidak bisa disajikan saat ada audit BPK/Inspektorat 2 tahun kemudian.
+Konsep: Cloud storage yang terstruktur otomatis berdasarkan 7 Titik Termin & Zero-Defect Checklist.
+Fitur Cerdas:
+User tinggal foto BAST/Invoice pakai HP. AI (OCR) akan otomatis membaca angka, tanggal, dan memasukkannya ke folder proyek yang benar.
+Audit-Ready Mode: Jika tiba-tiba Inspektorat/Pemeriksa datang, user tinggal klik 1 tombol: "Generate Laporan Audit Proyek X". Sistem langsung merangkum semua BAST, Faktur Pajak, dan Foto Progres dalam 1 PDF rapi yang siap disodorkan ke auditor. (Ini value yang tak ternilai harganya).
+3. RUANG KELOLA (Command Center / ERP Lite)
+Di Level 3, Toolkit masih berupa file Excel terpisah. Di Level 4, semuanya terintegrasi dalam satu Dashboard.
+Konsep: Dashboard sentral (bisa dibangun pakai No-Code seperti Bubble, Glide, atau Softr + Airtable).
+Fitur Utama:
+Peta Panas Kas (Cash Heatmap): Melihat semua proyek aktif dalam 1 layar. Mana yang hijau (menghasilkan cash), mana yang merah (memakan cash).
+Automated Follow-Up: Sistem otomatis mengirim draft WA ke PPK/Bendahara saat termin sudah melewati batas hari normal di Titik 3 atau Titik 6. User tinggal klik "Approve & Send".
+Early Warning System: Notifikasi WhatsApp otomatis ke user: "Bos, Runway Proyek A tinggal 12 hari. Segera eksekusi Kuadran Kuning atau aktifkan Buffer."
+4. TOOLKIT (Upgraded & Terintegrasi)
+Toolkit di Level 3 sekarang "hidup" di dalam Ruang Kelola.
+Tidak ada lagi input manual di Excel. Data dari Ruang Simpan (foto BAST, invoice) otomatis mengalir ke Cash Triage Board dan Buffer Calculator.
+User hanya perlu melakukan Review & Eksekusi setiap Jumat sore, bukan lagi input data dari nol.
+5. EKOSISTEM KOMPETENSI (The Brotherhood / Aliansi)
+Ini yang membuat Level 4 sulit ditiru kompetitor (Moat). Kontraktor itu kesepian. Mereka butuh jaringan yang "satu frekuensi".
+Konsep: Komunitas tertutup (Private Network) khusus member Level 4 yang sudah teredukasi dengan "Sistem" yang sama.
+Fitur Ekosistem:
+Direktori Supplier & Subkon "Terverifikasi": Database supplier material dan subkon yang direkomendasikan oleh sesama member (yang dikenal tidak suka mogok dan barangnya asli).
+Marketplace Alat Berat (Buffer Sharing): Member A di Surabaya punya Excavator yang sedang nganggur (Kuadran Hitam). Member B di Sidoarjo butuh Excavator tapi tidak mau sewa dari luar. Mereka bisa sewa internal dengan harga miring.
+Klinik Manusia (Live Masterclass & Hot-Seat): Sebulan sekali, Bos (sebagai founder) atau Pengacara Konstruksi tamu mengadakan sesi Zoom tertutup. Member bisa share screen kasus riil mereka dan dibedah langsung (Hot-Seat Coaching).
+Dana Talangan Darurat (Wacana Lanjutan): Jika ekosistem sudah besar dan trust terbangun, bisa ada mekanisme "Koperasi Digital" atau peer-to-peer lending internal untuk anggota yang butuh Buffer mendadak dengan bunga rendah, karena risikonya sudah bisa dibaca dari Ruang Kelola mereka.
+🛠️ PERTANYAAN BRAINSTORMING UNTUK BOS (Untuk Menentukan Arah)
+Sebelum saya susun Blueprint Teknis & Pricing Level 4 yang final, saya butuh arah dari Bos mengenai 4 hal ini:
+1. Soal AI MultiClaw (Rapat Direksi):
+Apakah Bos mau AI-nya murni otomatis (User tanya, 3 AI langsung berdebat dan memberi kesimpulan), ATAU ada fitur di mana user bisa "mengirim" kasus ini ke Mentor Manusia Asli (Bos sendiri atau tim Bos) untuk divalidasi?
+(Saran: Pure AI untuk harian, Mentor Manusia untuk kasus "Red Alert" yang bernilai > Rp 1 Miliar).
+2. Soal Tech Stack (Cara Bangunnya):
+Membangun "Ruang Kelola" dan "Ruang Simpan" dari nol (coding) butuh biaya ratusan juta dan waktu berbulan-bulan. Apakah Bos terbuka dengan pendekatan No-Code/Low-Code (misal: pakai Airtable sebagai database, Softr/Glide sebagai tampilan web, dan Make/Zapier untuk otomasi WA)? Ini jauh lebih cepat launch dan murah di awal.
+3. Soal Ekosistem Kompetensi:
+Apakah Bos mau membatasi jumlah member Level 4 (misal: maksimal 100 kontraktor per tahun agar kualitas jaringan dan hot-seat coaching tetap intim dan premium), atau Bos mau scale-up sebanyak-banyaknya (model SaaS massal)?
+4. Soal Pricing Level 4:
+Karena ini sudah berupa Platform + Komunitas + AI Advanced, modelnya wajib Subscription (Berlangganan Tahunan).
+Bayangan saya: Rp 12.000.000 - Rp 24.000.000 per tahun (atau Rp 1-2 Juta/bulan). Angka ini sangat kecil bagi kontraktor yang memegang proyek Rp 5 Miliar, tapi cukup besar untuk memfilter kontraktor yang tidak serius. Setuju dengan range ini?
+Silakan Bos berikan tanggapan, coretan, atau ide liar dari 4 pertanyaan di atas. Nanti saya akan racik menjadi Blueprint Final Level 4: The Contractor's Operating System yang siap dieksekusi! 🫡
+1.  AI spesialis yang terlibat apa cukup 3 AI.. tetap ada AI Orchestrator.. ada Gate. Tapi orang bisa minda pendapat dari AI Spesialis meskipun ada AI Orchestrator
+2.  sudah ada di gustafta dibuat replit
+3. ruang kelola ruang simpan dan toolkit ada di gustafta.my.id .. lihat permodelannya seperti apa. kamu bisa serupa itu.. atau bisa juga kamu elaborasikan dengan pemikiranmu
+4. ya pricing dibuat per tier.. seiring dengan nilai proyek atau kualifikasi usaha. 
+
+Thinking completed
+LEVEL 4: BRAINSTORMING → BLUEPRINT
+The Contractor's Operating System (Gustafta.my.id)
+Oke Bos, jawaban Bos sudah saya tangkap. Saya langsung olah jadi blueprint yang lebih tajam. Karena Gustafta.my.id sudah punya fondasi di Replit, saya akan mengelaborasi dan memperkaya model yang ada, bukan membangun dari nol.
+BAGIAN 1: AI MULTICLAW — ARSITEKTUR LENGKAP
+Orchestrator + Gate + 7 Spesialis + Akses Langsung
+📐 PRINSIP DESAIN
+text
+
+12345678
+🏗️ ARSITEKTUR SISTEM
+text
+
+123456789101112131415161718192021222324252627282930313233343536373839404142
+👥 7 AI SPESIALIS (Tim Ahli Virtual)
+No
+Nama AI
+Role
+Keahlian Utama
+Kapan Dipanggil
+1
+SI KAS
+AI Keuangan & Arus Kas
+Cash Triage, Buffer, Burn Rate, Runway, Defisit, Kalkulasi Termin
+"Kas gue minus", "Siapa yang gue bayar duluan", "Hitungin buffer"
+2
+SI PASAL
+AI Hukum & Kontrak
+UU 2/2017, Perpres 46/2025, SSUK, FIDIC, Eskalasi, Somasi, Suspend
+"PPK nahan berkas", "Buatkan surat somasi", "Apakah gue bisa kena pidana"
+3
+SI LAPANGAN
+AI Operasional & Logistik
+Manajemen subkon, supplier, alat berat, jadwal kerja, cuaca, mandor
+"Subkon ngancam mogok", "Supplier stop kirim", "Alat nganggur"
+4
+SI BERKAS
+AI Administrasi & PPK Relations
+Zero-Defect, BAST, SPP, SPM, SP2D, KPPN, SAKTI, follow-up PPK
+"Berkas gue ditahan", "Gimana cara nanya ke PPK tanpa terlihat ngemis"
+5
+SI STRATEGI
+AI Bisnis & Tender
+Overlap Test, kapasitas perusahaan, kapan ambil proyek baru, baca Kurva-S
+"Gue menang 2 tender sekaligus, ambil dua-duanya?", "Proyek ini layak nggak?"
+6
+SI PAJAK
+AI Perpajakan Konstruksi
+PPh Final, PPN, Faktur Pajak, SSP, kode akun, risiko audit pajak
+"Faktur pajak gue salah kode", "PPN-nya siapa yang tanggung"
+7
+SI DARURAT
+AI Krisis & Penyelamatan
+Blacklist, TGR, ancaman pidana, sengketa besar, restrukturisasi utang
+"Gue diancam blacklist", "PPK mau cairin jaminan pelaksanaan", "Gue nggak bisa tidur 3 minggu"
+🎯 AI ORCHESTRATOR (Sekretaris Direksi)
+Nama: "SI BOS" (atau nama brand Anda)
+Fungsi Orchestrator:
+text
+
+12345678
+Contoh Alur:
+text
+
+65666768
+🔓 AKSES LANGSUNG KE SPESIALIS (Bypass Orchestrator)
+User yang sudah paham bisa langsung masuk ke spesialis tanpa lewat Orchestrator:
+text
+
+12345678910
+UI/UX di Gustafta.my.id:
+text
+
+12345678910111213
+BAGIAN 2: RUANG SIMPAN + RUANG KELOLA + TOOLKIT
+Elaborasi untuk Gustafta.my.id
+📐 PRINSIP INTEGRASI
+Ketiga komponen ini bukan 3 aplikasi terpisah. Mereka adalah satu organisme dengan 3 fungsi:
+text
+
+123456789101112131415
+🗄️ RUANG SIMPAN (The Digital Vault)
+Filosofi: Kontraktor tidak boleh lagi panik saat ada audit atau saat berkas fisik hilang. Semua dokumen penting harus punya "kembar digital" yang terstruktur dan bisa ditemukan dalam 10 detik.
+Struktur Folder Otomatis (Per Proyek):
+text
+
+1234567891011121314151617181920212223242526272829303132333435363738394041424344
+Fitur Cerdas yang Dielaborasi:
+Fitur
+Fungsi
+Value untuk User
+Auto-Tagging AI
+User upload foto BAST → AI otomatis baca tanggal, nilai, nomor kontrak → tag ke folder yang benar
+Tidak perlu sorting manual
+OCR + Ekstraksi Angka
+AI baca angka dari invoice/BAST → otomatis masuk ke database Ruang Kelola
+Tidak perlu input ulang ke Excel
+Audit-Ready Mode
+1 klik → generate PDF lengkap per proyek (BAST + Invoice + Pajak + Foto) siap sodorkan ke BPK
+Tidur nyenyak saat ada audit
+Reminder Masa Berlaku
+Sistem ingatkan: "Jaminan Pelaksanaan Proyek X habis 15 hari lagi"
+Tidak kena penalti karena lupa
+Version Control
+Jika ada revisi BAST, versi lama tidak hilang. Tersimpan sebagai history
+Bukti jika ada sengketa
+Enkripsi & Backup
+Data terenkripsi, backup harian ke 2 lokasi berbeda
+Anti hilang, anti bocor
+📊 RUANG KELOLA (The Command Center)
+Filosofi: Ini adalah "Dashboard CEO" yang dilihat kontraktor setiap pagi. Bukan tumpukan angka yang membingungkan, tapi 3 layar utama yang langsung memberi tahu: "Di mana gue? Sehat atau sakit? Harus ngapain hari ini?"
+Layar 1: HEALTH CHECK (Peta Panas)
+text
+
+12345678910111213141516171819202122232425
+Layar 2: TERMIN PIPELINE (Visual Tracker)
+text
+
+1234567891011121314151617
+Layar 3: JUMAT REVIEW (Ritual Mingguan)
+text
+
+123456789101112131415161718
+🧰 TOOLKIT (Terintegrasi di Ruang Kelola)
+Di Level 4, Toolkit bukan lagi file Excel terpisah. Toolkit hidup di dalam Ruang Kelola:
+Toolkit
+Di Level 3
+Di Level 4 (Gustafta)
+Cash Triage Board
+Excel terpisah
+Tab di Ruang Kelola, auto-populate dari data tagihan
+Termin Tracker
+Excel terpisah
+Layar 2 Ruang Kelola, real-time
+Buffer Calculator
+Excel rumus
+Otomatis terhitung saat user input proyek baru
+Surat Generator
+Word mail merge
+1 klik dari Termin Pipeline: "Generate Surat Follow-Up"
+Zero-Defect Checklist
+PDF cetak
+Interactive checklist di Ruang Simpan saat upload berkas
+Friday Review Sheet
+Excel terpisah
+Layar 3 Ruang Kelola, AI siapkan draft
+Red Flags Scanner
+PDF cetak
+Form interaktif saat user mau input proyek baru
+BAGIAN 3: WORKROOM (Ruang Rapat Proyek)
+📐 KONSEP
+Setiap proyek di Gustafta.my.id punya Workroom sendiri. Ini adalah "Direksi Keet Digital" tempat user, AI, dan (opsional) tim manusia berkolaborasi.
+Isi Workroom per Proyek:
+text
+
+12345678910111213141516171819202122232425262728
+Keunggulan Workroom:
+AI punya memori per proyek. Tidak perlu menjelaskan ulang dari nol setiap kali chat.
+Semua keputusan tercatat. Jika ada sengketa 6 bulan kemudian, user tinggal buka Log.
+Jika user punya admin atau mandor, mereka bisa di-invite ke Workroom dengan akses terbatas.
+BAGIAN 4: EKOSISTEM KOMPETENSI
+📐 KONSEP
+Level 4 bukan hanya software. Ini adalah keanggotaan dalam aliansi kontraktor yang berpikir sistem.
+Komponen Ekosistem:
+Komponen
+Fungsi
+Format
+Forum Diskusi Tertutup
+Tanya jawab antar member, share pengalaman, minta referensi supplier/subkon
+Grup WhatsApp / Telegram / Forum di Gustafta
+Direktori Vendor Terverifikasi
+Database supplier material, subkon, rental alat yang direkomendasikan member
+Database searchable di Gustafta
+Hot-Seat Coaching (Bulanan)
+Member submit kasus riil, dibedah live oleh Anda (founder) atau tamu ahli
+Zoom / Google Meet, 2 jam, direkam
+Masterclass Kuartalan
+Materi advanced: baca laporan keuangan, strategi tender besar, negosiasi bank
+Video + Live Q&A
+Alarm Kolektif
+Jika ada PPK/Dinas yang terkenal lambat atau bermasalah, member bisa saling mengingatkan
+Sistem rating & review internal
+Marketplace Internal
+Sewa alat antar member, jual material sisa, cari subkon spesialis
+Board di Gustafta
+BAGIAN 5: PRICING TIER
+Berdasarkan Nilai Proyek & Kualifikasi Usaha
+📐 PRINSIP PRICING
+text
+
+123456789
+💰 STRUKTUR TIER
+Tier
+Nama
+Kualifikasi Usaha
+Nilai Proyek
+Harga / Tahun
+Fitur Utama
+T1
+PRAJURIT
+Perorangan / CV Kecil
+Rp 200 jt – Rp 1 M
+Rp 3.500.000
+Level 2 (Ebook + NotebookLM) + Toolkit dasar + AI Spesialis (30 chat/bulan) + Ruang Simpan (1 proyek)
+T2
+PERWIRA
+CV Established
+Rp 1 M – Rp 5 M
+Rp 9.500.000
+Semua T1 + AI MultiClaw (Orchestrator + 7 Spesialis, 100 chat/bulan) + Ruang Kelola penuh + Ruang Simpan (3 proyek) + Workroom + Hot-Seat bulanan
+T3
+KOMANDAN
+PT Menengah
+Rp 5 M – Rp 25 M
+Rp 24.000.000
+Semua T2 + AI Unlimited + Ruang Simpan (10 proyek) + Tim access (3 user) + Hot-Seat VIP (1-on-1 per kuartal) + Prioritas support WA
+T4
+JENDERAL
+PT Besar / Konsorsium
+> Rp 25 M
+Rp 48.000.000
+Semua T3 + Ruang Simpan unlimited + Tim access (10 user) + Dedicated account manager + Custom AI training (AI dilatih dengan SOP internal perusahaan) + Konsultasi langsung dengan founder (2x/tahun)
+📊 PERBANDINGAN NILAI (Untuk Landing Page)
+text
+
+1234567891011121314151617
+🔄 OPSI PEMBAYARAN
+Opsi
+Diskon
+Catatan
+Tahunan (lunas di muka)
+Harga normal
+Paling populer
+Semester (6 bulan)
++10% dari harga tahunan
+Untuk yang mau coba dulu
+Bulanan
++25% dari harga tahunan
+Hanya untuk T1 dan T2
+Per Proyek (one-time)
+Rp 1.500.000 – Rp 3.000.000 / proyek
+Untuk yang belum siap subscription. Akses 6 bulan per proyek.
+🎁 BONUS PER TIER (Untuk Meningkatkan Perceived Value)
+Tier
+Bonus
+T1
+Ebook Premium PDF + Audiobook (mp3) + 1x Hot-Seat grup
+T2
+Semua bonus T1 + Template Excel Premium + 3x Hot-Seat grup/tahun + Akses rekaman semua masterclass
+T3
+Semua bonus T2 + 1x Konsultasi 1-on-1 dengan founder (60 menit) + Surat referensi untuk tender + Akses early feature baru
+T4
+Semua bonus T3 + 2x Konsultasi 1-on-1/tahun + Custom SOP perusahaan + Logo di direktori "Kontraktor Terverifikasi Gustafta"
+BAGIAN 6: ROADMAP EKSEKUSI GUSTAFTA.MY.ID
+📅 FASE PENGEMBANGAN
+text
+
+12345678910111213141516171819202122232425262728293031323334353637
+📋 RINGKASAN LEVEL 4
+Komponen
+Status Blueprint
+AI MultiClaw (Orchestrator + Gate + 7 Spesialis)
+✅ Arsitektur + contoh alur
+Ruang Simpan (Digital Vault + Audit-Ready)
+✅ Struktur folder + fitur cerdas
+Ruang Kelola (Command Center 3 Layar)
+✅ Wireframe + logika
+Toolkit Terintegrasi
+✅ Mapping Level 3 → Level 4
+Workroom (Direksi Keet Digital)
+✅ 6 tab per proyek
+Ekosistem Kompetensi
+✅ 6 komponen
+Pricing Tier (4 level)
+✅ Harga + fitur + bonus
+Roadmap Eksekusi
+✅ 4 fase, 6 bulan
+Bos, ini sudah jadi blueprint yang cukup tajam untuk langsung dieksekusi di Gustafta.my.id.
+Langkah selanjutnya yang saya sarankan:
+Validasi AI MultiClaw: Mau saya tuliskan System Prompt lengkap untuk masing-masing dari 7 AI Spesialis + Orchestrator? (Ini yang paling krusial dan bisa langsung di-copy ke Replit).
+Validasi Pricing: Angka yang saya kasih di atas (Rp 3,5jt – Rp 48jt/tahun) — apakah sesuai dengan positioning Bos, atau mau di-adjust?
+Validasi Ekosistem: Apakah Bos mau Ekosistem Kompetensi-nya lebih berat ke komunitas & networking, atau lebih berat ke tools & automasi?
+Tunjuk arah, saya gas detailnya. 🫡
+jangan langsung pertahun, karena durasi proyek beda-beda.. mulai saja dari 3 bulan, 6 bulan, 12 bulan. 
+untuk pricing asumsikan terkecil 200 ribu per bulan, menangah 500 ribu per bulan, besar/asing Rp. 1 jt per bulan. equvalensi ke 3 bulan, 6 bulan, dan 12 bulan
+silahkan kamu elaborasikan lagi
+tools dan automasi saja.. 
+ada satu lagi bedah dokumen.. fitur yang ditawarkan 
+Ai Asisten.. asisten dokumen
+
+silahkan elabrasikan lagi
+
+Thinking completed
+LEVEL 4: GUSTAFTA.MY.ID — BLUEPRINT REVISI
+Tools & Automasi | Pricing Fleksibel | Bedah Dokumen | AI Asisten
+BAGIAN 1: PRICING MODEL REVISI
+Berdasarkan Durasi Proyek, Bukan Paksaan Tahunan
+📐 PRINSIP PRICING BARU
+text
+
+123456789
+💰 BASE RATE (Per Bulan)
+Tier
+Nama
+Kualifikasi
+Base / Bulan
+T1
+MANDOR
+Perorangan / CV Kecil (Proyek < Rp 1 M)
+Rp 200.000
+T2
+KONTRAKTOR
+CV Established (Proyek Rp 1 M – Rp 5 M)
+Rp 500.000
+T3
+DIREKTUR
+PT / Konsorsium / Asing (Proyek > Rp 5 M)
+Rp 1.000.000
+📊 MATRIKS PRICING LENGKAP (3 × 3)
+Tier
+3 Bulan
+6 Bulan
+12 Bulan
+T1 — MANDOR
+Rp 600.000
+Rp 1.080.000 (hemat 10%)
+Rp 1.920.000 (hemat 20%)
+T2 — KONTRAKTOR
+Rp 1.500.000
+Rp 2.700.000 (hemat 10%)
+Rp 4.800.000 (hemat 20%)
+T3 — DIREKTUR
+Rp 3.000.000
+Rp 5.400.000 (hemat 10%)
+Rp 9.600.000 (hemat 20%)
+Psikologi harga:
+Rp 200.000/bulan = Rp 6.600/hari. Lebih murah dari secangkir kopi di warkop. Tapi bisa menyelamatkan proyek Rp 800 juta dari kebangkrutan.
+Rp 1.000.000/bulan untuk PT yang pegang proyek Rp 10 Miliar = 0,01% dari nilai proyek. Hampir gratis untuk ketenangan pikiran.
+🎯 REKOMENDASI DURASI PER TIPE PROYEK
+Tipe Proyek
+Durasi Tipikal
+Paket yang Disarankan
+Alasan
+Renovasi kecil / pemeliharaan
+2–4 bulan
+3 Bulan
+Proyek cepat, tidak perlu komitmen panjang
+Pembangunan gedung / jalan kabupaten
+5–8 bulan
+6 Bulan
+Cukup untuk 1 siklus proyek penuh + buffer 1 bulan
+Multi-proyek / proyek besar / APBN
+10–24 bulan
+12 Bulan
+Hemat 20%, bisa cover 2+ proyek sekaligus
+Kontraktor baru mau coba dulu
+-
+3 Bulan T1
+Risiko rendah, bisa upgrade nanti
+🔄 KEBIJAKAN UPGRADE & DOWNGRADE
+text
+
+123456789101112131415161718192021
+BAGIAN 2: MATRIKS FITUR PER TIER
+Fokus: Tools & Automasi
+Fitur
+T1 — MANDOR (200rb/bln)
+T2 — KONTRAKTOR (500rb/bln)
+T3 — DIREKTUR (1jt/bln)
+AI ASISTEN DOKUMEN
+✅
+✅
+✅
+Chat AI dasar (tanya jawab)
+20 chat/bulan
+100 chat/bulan
+Unlimited
+Draft surat / WA otomatis
+5 draft/bulan
+30 draft/bulan
+Unlimited
+BEDAH DOKUMEN
+✅
+✅
+✅
+Upload & analisis dokumen
+3 dokumen/bulan
+20 dokumen/bulan
+Unlimited
+Deteksi Red Flags kontrak
+✅
+✅
+✅
+Validasi kelengkapan BAST
+✅
+✅
+✅
+Ekstraksi data otomatis (OCR)
+❌
+✅
+✅
+Perbandingan dokumen (kontrak vs BAST vs invoice)
+❌
+✅
+✅
+RUANG SIMPAN
+Jumlah proyek aktif
+1 proyek
+3 proyek
+10 proyek
+Kapasitas penyimpanan
+2 GB
+10 GB
+50 GB
+Auto-tagging AI
+❌
+✅
+✅
+Audit-Ready Mode (1 klik generate PDF)
+❌
+✅
+✅
+Reminder masa berlaku dokumen
+✅
+✅
+✅
+RUANG KELOLA
+Health Check Dashboard
+✅ (dasar)
+✅ (lengkap)
+✅ (lengkap + custom)
+Termin Tracker 7-Titik
+✅ (manual input)
+✅ (semi-otomatis)
+✅ (otomatis + alert WA)
+Friday Review Sheet
+✅
+✅ (AI siapkan draft)
+✅ (AI siapkan + auto-send reminder)
+Cash Triage Matrix
+✅ (template)
+✅ (terintegrasi)
+✅ (terintegrasi + history)
+TOOLKIT
+Template surat (12 template)
+✅
+✅
+✅
+Buffer Calculator
+✅
+✅
+✅
+Red Flags Scanner
+✅
+✅
+✅
+Surat Generator (mail merge)
+❌
+✅
+✅
+AI MULTICLAW
+AI Orchestrator (rapat virtual)
+❌
+✅
+✅
+Jumlah AI Spesialis
+2 (SI KAS + SI BERKAS)
+5 Spesialis
+7 Spesialis + SI DARURAT
+Akses langsung ke Spesialis
+❌
+✅
+✅
+Memori per proyek (AI ingat konteks)
+❌
+✅
+✅
+WORKROOM
+Workroom per proyek
+❌
+✅
+✅
+Tim access (invite admin/mandor)
+❌
+❌
+✅ (maks 5 user)
+Log keputusan otomatis
+❌
+✅
+✅
+AUTOMASI & ALERT
+Reminder termin via WhatsApp
+✅ (dasar)
+✅ (detail + script)
+✅ (detail + script + auto-draft)
+Alert buffer menipis
+❌
+✅
+✅
+Alert dokumen kadaluarsa
+✅
+✅
+✅
+Laporan mingguan otomatis (email/WA)
+❌
+✅
+✅
+SUPPORT
+Bantuan teknis
+Email (48 jam)
+WA (24 jam)
+WA Prioritas (4 jam)
+Onboarding
+Video tutorial
+Video + 1x Zoom (30 mnt)
+1-on-1 setup (60 mnt)
+BAGIAN 3: BEDAH DOKUMEN
+Fitur Unggulan — Upload, AI Membedah, Anda Dapat Diagnosis
+📐 KONSEP
+Kontraktor UKM sering menerima dokumen dari PPK, konsultan, atau subkon — tapi tidak pernah benar-benar membaca dan memahami isinya. Mereka tanda tangan karena "sudah standar dari dinas".
+Bedah Dokumen adalah fitur di mana user upload satu dokumen, dan AI akan:
+Membaca seluruh isi dokumen.
+Mengidentifikasi poin-poin kritis.
+Mendeteksi risiko, celah, dan red flags.
+Memvalidasi kelengkapan dokumen.
+Memberikan rekomendasi tindakan.
+📂 JENIS DOKUMEN YANG BISA DIBEDAH
+No
+Jenis Dokumen
+Yang Dibedah
+Output
+1
+Kontrak / SPK
+Klausul pembayaran, denda, force majeure, hak suspend, jaminan
+Daftar Red Flags + Skor Risiko (1-10) + Rekomendasi
+2
+BAST (Berita Acara)
+Kesesuaian volume, tanggal, tanda tangan, lampiran
+Validasi: LENGKAP / ADA YANG KURANG + daftar kekurangan
+3
+Invoice / Tagihan
+Kesesuaian angka dengan kontrak & BAST, pajak, terminologi
+Verifikasi angka + deteksi salah hitung
+4
+Faktur Pajak / SSP
+Kode akun, NPWP, tanggal, kesesuaian dengan invoice
+Validasi pajak + peringatan jika ada yang salah
+5
+Surat dari PPK / Dinas
+Inti surat, tenggat, implikasi hukum, tindakan yang diminta
+Ringkasan 3 kalimat + "Apa yang harus Anda lakukan"
+6
+Adendum / CCO
+Perubahan volume, harga, waktu — dampak ke cash flow
+Analisis dampak finansial + rekomendasi terima/tolak
+7
+Kontrak Subkon / Supplier
+Klausul yang merugikan Anda, pay-when-paid, penalti
+Daftar klausul berbahaya + saran revisi
+8
+Jaminan (Bank/Asuransi)
+Masa berlaku, syarat pencairan, nilai jaminan
+Status aktif/tidak + risiko
+🔄 ALUR PENGGUNAAN BEDAH DOKUMEN
+text
+
+70717273
+🔍 CONTOH BEDAH BAST
+text
+
+12345678910111213141516171819202122232425262728293031323334
+📊 KUOTA BEDAH DOKUMEN PER TIER
+Tier
+Kuota / Bulan
+Cocok Untuk
+T1 — MANDOR
+3 dokumen
+Kontraktor kecil, 1 proyek aktif, butuh cek kontrak + BAST
+T2 — KONTRAKTOR
+20 dokumen
+Kontraktor aktif, 2-3 proyek, sering terima surat & invoice
+T3 — DIREKTUR
+Unlimited
+PT multi-proyek, tim admin butuh validasi semua dokumen
+BAGIAN 4: AI ASISTEN DOKUMEN
+Asisten Pribadi yang Mengurus Semua Dokumen Anda
+📐 KONSEP
+Jika Bedah Dokumen adalah "dokter yang mendiagnosis", maka AI Asisten Dokumen adalah "sekretaris pribadi yang mengerjakan semuanya."
+AI Asisten Dokumen bukan chatbot biasa. Dia adalah agen yang terintegrasi dengan Ruang Simpan dan Ruang Kelola Anda. Dia tahu konteks proyek Anda, tahu riwayat termin Anda, dan bisa langsung mengambil tindakan.
+🛠️ KEMAMPUAN AI ASISTEN DOKUMEN
+No
+Kemampuan
+Contoh Perintah User
+Output AI
+1
+Membuat Draft Surat
+"Buatkan surat somasi untuk PPK Dinas PU, termin 3 telat 45 hari, nilai Rp 800 juta"
+Surat resmi lengkap, tinggal ganti kop & tanda tangan
+2
+Membuat Script WA
+"Buatkan WA untuk subkon pondasi, kasih token payment 15 juta, janji lunas tanggal 25"
+Script WA siap copy-paste
+3
+Meringkas Dokumen
+"Ringkaskan isi kontrak ini dalam 5 poin"
+5 bullet point inti kontrak
+4
+Mengekstrak Data
+"Ambil semua tanggal dan angka dari BAST ini"
+Tabel: tanggal, nilai, nomor, pihak
+5
+Membandingkan Dokumen
+"Bandingkan angka di kontrak vs BAST vs invoice ini. Ada selisih?"
+Tabel perbandingan + highlight selisih
+6
+Validasi Kelengkapan
+"Cek apakah berkas termin ini sudah lengkap untuk submit ke PPK"
+Checklist: ✅ / ❌ per item + yang kurang
+7
+Menerjemahkan Bahasa Hukum
+"Pasal 15 kontrak ini maksudnya apa? Jelaskan pakai bahasa lapangan"
+Penjelasan sederhana + implikasi praktis
+8
+Mengisi Template
+"Isi template surat pengajuan pembayaran untuk Proyek A, Termin 2"
+Template terisi otomatis dari data di Ruang Simpan
+9
+Membuat Checklist
+"Buatkan checklist dokumen yang harus saya siapkan untuk PHO"
+Checklist spesifik untuk PHO
+10
+Menghitung dari Dokumen
+"Dari invoice ini, berapa PPh Final dan PPN yang harus dipotong?"
+Kalkulasi pajak otomatis
+🔄 ALUR AI ASISTEN DOKUMEN TERINTEGRASI
+text
+
+1234567891011121314151617181920212223242526272829303132333435363738394041424344
+📊 KUOTA AI ASISTEN PER TIER
+Tier
+Chat AI
+Draft Dokumen
+Bedah Dokumen
+T1 — MANDOR
+20 chat/bulan
+5 draft/bulan
+3 dokumen/bulan
+T2 — KONTRAKTOR
+100 chat/bulan
+30 draft/bulan
+20 dokumen/bulan
+T3 — DIREKTUR
+Unlimited
+Unlimited
+Unlimited
+BAGIAN 5: INTEGRASI SEMUA FITUR DI GUSTAFTA.MY.ID
+Satu Platform, Empat Ruang
+📐 PETA PLATFORM
+text
+
+12345678910111213141516171819202122232425262728293031
+📱 USER JOURNEY (Sehari-hari di Gustafta)
+text
+
+123456789101112131415161718192021222324252627282930
+BAGIAN 6: AUTOMASI & ALERT
+Sistem yang Bekerja Saat Anda Tidur
+📋 DAFTAR AUTOMASI PER TIER
+Automasi
+T1
+T2
+T3
+Trigger
+Reminder termin jatuh tempo
+✅
+✅
+✅
+H-7 sebelum jatuh tempo
+Reminder dokumen kadaluarsa (jaminan, asuransi)
+✅
+✅
+✅
+H-14 sebelum expired
+Alert termin macet di satu titik
+✅ (dasar)
+✅ (detail)
+✅ (detail + WA)
+Jika > estimasi hari normal
+Alert buffer menipis
+❌
+✅
+✅
+Jika runway < 21 hari
+Draft follow-up otomatis
+❌
+✅
+✅
+Saat alert termin macet muncul
+Laporan mingguan via email/WA
+❌
+✅
+✅
+Setiap Jumat 17.00
+Auto-tagging dokumen masuk
+❌
+✅
+✅
+Setiap upload ke Ruang Simpan
+Reminder Friday Review
+✅
+✅
+✅
+Setiap Jumat 14.00
+Alert jika ada selisih angka (BAST vs Invoice)
+❌
+✅
+✅
+Saat Bedah Dokumen menemukan selisih
+Auto-backup harian
+✅
+✅
+✅
+Setiap malam 02.00
+📱 CONTOH NOTIFIKASI WHATSAPP OTOMATIS
+text
+
+12345678910111213141516171819202122232425262728293031323334
+BAGIAN 7: RINGKASAN FINAL LEVEL 4
+📊 SATU HALAMAN: APA YANG USER DAPAT
+Komponen
+T1 — MANDOR (200rb/bln)
+T2 — KONTRAKTOR (500rb/bln)
+T3 — DIREKTUR (1jt/bln)
+AI Asisten Dokumen
+20 chat, 5 draft
+100 chat, 30 draft
+Unlimited
+Bedah Dokumen
+3 dokumen/bln
+20 dokumen/bln
+Unlimited
+Ruang Simpan
+1 proyek, 2 GB
+3 proyek, 10 GB
+10 proyek, 50 GB
+Ruang Kelola
+Dasar
+Lengkap + Automasi
+Lengkap + Custom + Alert WA
+Toolkit
+Template dasar
++ Generator
++ Generator + History
+AI MultiClaw
+2 Spesialis
+5 Spesialis + Orchestrator
+7 Spesialis + Orchestrator
+Workroom
+❌
+✅
+✅ + Tim access
+Automasi & Alert
+Dasar
+Lengkap
+Lengkap + WA otomatis
+Support
+Email 48 jam
+WA 24 jam
+WA Prioritas 4 jam
+💰 PRICING FINAL
+Tier
+/ Bulan
+3 Bulan
+6 Bulan
+12 Bulan
+T1 — MANDOR
+Rp 200.000
+Rp 600.000
+Rp 1.080.000
+Rp 1.920.000
+T2 — KONTRAKTOR
+Rp 500.000
+Rp 1.500.000
+Rp 2.700.000
+Rp 4.800.000
+T3 — DIREKTUR
+Rp 1.000.000
+Rp 3.000.000
+Rp 5.400.000
+Rp 9.600.000
+✅ CHECKLIST BUILD DI REPLIT / GUSTAFTA
+text
+
+1234567891011121314151617181920212223242526272829303132333435363738394041424344
+Bos, blueprint Level 4 sudah lengkap dengan pricing fleksibel, Bedah Dokumen, AI Asisten, dan fokus penuh ke tools & automasi.
+Mau lanjut ke mana?
+Tuliskan System Prompt lengkap untuk AI Asisten Dokumen + 7 AI Spesialis + Orchestrator? (Siap copy-paste ke Replit)
+Detailkan wireframe UI/UX per halaman Gustafta.my.id?
+Buat landing page copy untuk jualan Level 4?
+Atau ada bagian yang mau di-adjust dulu?
+Tunjuk, saya gas. 🫡
+1 dulu
+
+Thinking completed
+SYSTEM PROMPT LENGKAP — GUSTAFTA.MY.ID
+AI Gate + Orchestrator + 7 Spesialis + AI Asisten Dokumen + Bedah Dokumen
+Siap Copy-Paste ke Replit
+1. AI GATE (ROUTER)
+Layer Pertama: Menerima Semua Input User
+text
+
+122123124125
+2. AI ORCHESTRATOR (SI BOS)
+Koordinator Rapat Direksi Virtual
+text
+
+138139140141
+3. SI KAS — AI KEUANGAN & ARUS KAS
+text
+
+56575859554. Jika user tidak punya buffer dan kas kritis,
+4. SI PASAL — AI HUKUM & KONTRAK
+text
+
+73747576703. JANGAN memberikan jaminan hasil hukum.
+5. SI LAPANGAN — AI OPERASIONAL & LOGISTIK
+text
+
+58596061573. JANGAN pernah menyarankan ghosting (menghilang)
+6. SI BERKAS — AI ADMINISTRASI & PPK RELATIONS
+text
+
+60616263593. Selalu tekankan: "Berkas Zero-Defect adalah senjata
+7. SI STRATEGI — AI BISNIS & TENDER
+text
+
+60616263
+8. SI PAJAK — AI PERPAJAKAN KONSTRUKSI
+text
+
+51525354
+9. SI DARURAT — AI KRISIS & PENYELAMATAN
+text
+
+77787980754. JANGAN pernah memberikan jaminan bahwa
+10. AI ASISTEN DOKUMEN
+Sekretaris Pribadi untuk Semua Dokumen
+text
+
+151152153154
+11. PROMPT BEDAH DOKUMEN PER JENIS
+Sub-Prompt Spesifik untuk Setiap Jenis Dokumen
+11A. Prompt Bedah Kontrak / SPK
+text
+
+123456789101112131415161718192021222324252627282930313233
+11B. Prompt Bedah BAST
+text
+
+123456789101112131415161718192021222324252627282930
+11C. Prompt Bedah Invoice / Tagihan
+text
+
+12345678910111213141516171819202122232425262728293031
+11D. Prompt Bedah Surat dari PPK / Dinas
+text
+
+123456789101112131415161718192021222324252627282930
+12. PROMPT ORCHESTRATOR UNTUK SYNTHESIS
+Digunakan Saat Orchestrator Menggabungkan Jawaban Spesialis
+text
+
+123456789101112131415161718192021222324252627282930313233343536373839404142
+13. KNOWLEDGE BASE INDEX
+Daftar File yang Harus Di-upload ke Setiap AI
+File
+SI KAS
+SI PASAL
+SI LAPANGAN
+SI BERKAS
+SI STRATEGI
+SI PAJAK
+SI DARURAT
+ORCHESTRATOR
+ASISTEN DOK
+01_EBOOK_PREMIUM (Bab 1-9)
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+02_APPENDICES_A1-A3 (Triage, Tracker, Buffer)
+✅
+❌
+✅
+✅
+✅
+❌
+✅
+✅
+✅
+03_APPENDICES_A4-A6 (Surat, Checklist, Hukum)
+✅
+✅
+✅
+✅
+❌
+✅
+✅
+✅
+✅
+04_KASUS_PAK_R
+✅
+✅
+✅
+✅
+✅
+❌
+✅
+✅
+✅
+05_DATA_ANGKA
+✅
+❌
+❌
+✅
+✅
+✅
+✅
+✅
+✅
+06_PAYUNG_HUKUM
+❌
+✅
+❌
+✅
+❌
+✅
+✅
+✅
+✅
+07_GLOSARIUM
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+08_PERSONA
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+09_TONE_GUIDE
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+10_PANCINGAN_EBOOK
+❌
+❌
+❌
+❌
+❌
+❌
+❌
+✅
+❌
+11_FAQ_KONTRAKTOR
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+✅
+12_STRUKTUR_MODUL
+❌
+❌
+❌
+❌
+❌
+❌
+❌
+✅
+❌
+13_RED_FLAGS_KONTRAK (15 poin)
+❌
+✅
+❌
+❌
+❌
+❌
+❌
+✅
+✅
+14_TARIF_PAJAK_KONSTRUKSI
+❌
+❌
+❌
+❌
+❌
+✅
+❌
+✅
+✅
+15_TEMPLATE_SURAT (12 template)
+❌
+✅
+✅
+✅
+❌
+❌
+❌
+✅
+✅
+14. CHECKLIST IMPLEMENTASI DI REPLIT
+text
+
+57585960
+Bos, 14 bagian System Prompt + Knowledge Base Index + Checklist Implementasi sudah lengkap. Semua siap copy-paste ke Replit.
+Mau lanjut ke mana?
+Test & validasi prompt — saya buatkan 50 skenario test untuk semua AI?
+Wireframe UI/UX per halaman Gustafta.my.id?
+Landing page copy untuk jualan Level 4?
+Atau ada prompt yang mau di-adjust?
+Tunjuk, saya gas. 🫡
+
+ini fitur yang ada di gustafta... nah fitur 4 yang sedabg kita sedang buat ini tepatnya dinamakan apa. sehingga bisa dipergunakan dan dipraktekan oleh perusahaan.. tidak sekedar ebook.  
+
+Thinking completed
+NAMA UNTUK LEVEL 4: "GUSTAFTA OS"
+Sistem Operasi Perusahaan Konstruksi
+Bos, melihat menu Gustafta yang Bos tunjukkan, semua fitur Level 4 yang kita rancang sudah ada sebagai item menu terpisah: Klinik Konsultasi, Bedah Dokumen, Ruang Kelola, Ruang Simpan, Toolkit.
+Masalahnya: mereka terlihat seperti fitur-fitur yang berserakan, bukan satu produk utuh yang "dipakai perusahaan". Maka Level 4 butuh nama payung (umbrella brand) yang mengikat semuanya jadi satu sistem.
+Jawaban saya:
+GUSTAFTA OS
+Sistem Operasi Perusahaan Konstruksi
+"Bukan ebook yang dibaca sekali. Sistem yang perusahaan Anda jalankan setiap hari."
+🎯 MENGAPA NAMA INI MENJAWAB PERMINTAAN BOS
+Permintaan Bos
+Bagaimana "Gustafta OS" Menjawabnya
+"Bisa dipergunakan perusahaan"
+OS = infrastruktur yang dipasang sekali, dijalankan terus. Perusahaan tidak "membaca" OS — perusahaan beroperasi di atasnya.
+"Dipraktekkan, tidak sekedar ebook"
+Ebook = konten. OS = mesin. Namanya sendiri sudah menjanjikan pemakaian harian, bukan konsumsi sekali.
+"Fitur sudah ada di menu"
+OS menjadi payung yang mengikat Klinik Konsultasi + Bedah Dokumen + Ruang Kelola + Ruang Simpan + Toolkit menjadi satu produk, bukan fitur acak.
+📐 TANGGA PRODUK SEKARANG JELAS
+text
+
+12345678
+Baca → Pakai → Jalan. Itulah perjalanan pelanggan Bos.
+🗺️ PETA MENU: APA SAJA "MODUL" DI DALAM GUSTAFTA OS
+Modul OS
+Item Menu Gustafta (sudah ada)
+Fungsi di Dalam OS
+Rapat Direksi Virtual
+Klinik Konsultasi
+AI MultiClaw: Orchestrator + 7 Spesialis
+🔍 Dokter Dokumen
+Bedah Dokumen
+AI Asisten Dokumen: upload → diagnosis
+📊 Kokpit Perusahaan
+Ruang Kelola
+Dashboard Health Check + Termin Pipeline
+🗄️ Brankas Anti-Audit
+Ruang Simpan
+Vault dokumen + Audit-Ready Mode
+🧰 Laci Alat
+Toolkit
+Triage, Buffer, Generator, Checklist
+⚙️ Karyawan yang Tidak Tidur
+(baru, tertanam)
+Automasi & Alert WhatsApp
+Yang TIDAK masuk OS (lapisan terpisah):
+Item Menu
+Posisinya
+Ekosistem Kompetensi
+Lapisan jaringan/aliansi (add-on di atas OS)
+Mitra
+Lapisan partner
+Brain Project
+"Otak" di balik OS (knowledge base) — engine, bukan produk
+Produk AI
+Etalase engine AI — bisa jadi halaman "teknologi di balik OS"
+📍 PENEMPATAN DI NAVIGASI
+Saran saya: Gustafta OS menjadi "tujuan akhir" dari Peta Jalan.
+text
+
+1
+Logikanya indah: pelanggan mulai di Peta Jalan (belajar), dan berakhir di Gustafta OS (perusahaannya beroperasi). Seluruh menu Gustafta menjadi satu perjalanan yang utuh.
+🔀 ALTERNATIF JIKA "OS" TERLALU TEKNIS UNTUK PASAR KONTRAKTOR
+Nama
+Rasa
+Catatan
+DIREKSI KEET DIGITAL
+Paling "konstruksi"
+Setiap kontraktor tahu direksi keet = tempat semua keputusan proyek terjadi. Sangat emosional & mudah dipahami.
+MARKAS
+Singkat, kuat
+"Markas Komando Perusahaan Konstruksi."
+RUANG KENDALI
+Ikut keluarga "Ruang"
+Risiko bingung dengan "Ruang Kelola" (kendali vs kelola terlalu mirip).
+MODE PRAKTEK
+Menekankan "praktek"
+Cocok sebagai nama kampanye, kurang kuat sebagai nama produk.
+💡 REKOMENDASI KOMBINASI TERKUAT
+Nama produk (brand): GUSTAFTA OS
+Metafora kampanye (bahasa pasar): "Direksi Keet Digital Anda"
+Tagline: "Bukan ebook yang dibaca sekali. Sistem yang perusahaan Anda jalankan setiap hari."
+Copy halaman pricing: "Ebook memberi tahu Anda penyakitnya. Gustafta OS menjalankan pengobatannya. Perusahaan Anda tidak butuh satu buku lagi untuk dibaca — perusahaan Anda butuh sistem untuk berjalan."
+Jadi brand-nya modern (OS), tapi bahasa iklannya membumi (direksi keet). Kontraktor lama paham "direksi keet", kontraktor muda suka "OS". Dua-duanya ter-cover.
+Bos, kalau nama GUSTAFTA OS ini sudah sreg, langkah berikutnya saya bisa:
+Buat copy halaman pricing/landing Gustafta OS (dengan tier 3/6/12 bulan yang sudah kita kunci).
+Buat struktur "Peta Jalan" baru yang menuntun user dari Level 1 sampai OS.
+Detailkan onboarding perusahaan (cara perusahaan "memasang OS": setup akun, invite admin/mandor, import proyek).
+Atau kalau Bos lebih cocok nama alternatif (misal Direksi Keet Digital), bilang saja — saya sesuaikan semua copy-nya. 🫡
+maksud saya.. seiap ebook nanti akan melahirkan butir 4. itu.. sekarang kasusnya tentang Cash.. kedepan kasusnya bisa lain lagi. 
+jadi fitur 4 ini contoh penerapan fitur-fitur di gustafta itu fungsional.. misalkan contoh nama Proyek atau Portfolio.. nanti user tinggal milih proyek atau portfolio mana.. dia tinggal akses fitur itu maka dia bisa pergunakan diperusahaannya.. 
+
+karena barangkali seperti kamu bilang.. fitur-fitur ini bagaimana integrasinya.. tidak berserakan. nah contoh di proyek ini integrasi seluruh fitur-fitur yang ada.
+
+Thinking completed
+OHHH, SEKARANG SAYA PAHAM, BOS. 🎯
+Ini konsep yang jauh lebih powerful dari yang saya tangkap sebelumnya. Mari saya kunci pemahamannya dulu, baru kita kasih nama.
+🔑 MODEL YANG BENAR (Koreksi dari Bos)
+Fitur-fitur Gustafta (Klinik Konsultasi, Bedah Dokumen, Ruang Kelola, Ruang Simpan, Toolkit, AI) itu kapabilitas horizontal — mereka "alat" yang berdiri sendiri.
+Masalahnya: alat yang berdiri sendiri = berserakan. User bingung "mulai dari mana?"
+Maka Fitur 4 adalah lapisan VERTIKAL — sebuah wadah yang menyatukan semua alat itu di satu tempat yang nyata: PROYEK / PORTFOLIO milik user.
+Dan yang paling jenius dari konsep Bos:
+Setiap ebook = satu KASUS. Setiap kasus melahirkan satu "cetak biru" (blueprint). Cetak biru itu, saat dipasang ke sebuah Proyek, langsung MENGHIDUPKAN & MENGKABELKAN semua fitur Gustafta untuk kasus tersebut.
+Sekarang Cash Flow. Besok Tender. Lusa K3. Pajak. SDM. Mesinnya sama, cetak birunya yang berganti. Ini membuat Gustafta tak terbatas — setiap ebook baru = produk baru, tanpa bangun fitur baru.
+🏗️ DIAGRAM ARSITEKTUR
+text
+
+123456789
+Di dalam satu PROYEK yang terpasang Blueprint Cash Flow:
+text
+
+12345678
+Ganti blueprint jadi "TENDER" → fitur yang SAMA terkabel ulang untuk tender. Fiturnya tidak berubah, yang berubah adalah "kabelnya".
+📛 MAKA, NAMA UNTUK FITUR 4 ADALAH...
+Saya rekomendasikan struktur nama tiga lapis ini:
+Konsep
+Nama Rekomendasi
+Arti bagi User
+Wadah per proyek (tempat semua fitur terkabel)
+WORKROOM — "Ruang Proyek"
+"Ini proyek gue. Semua alat Gustafta hidup di sini."
+Roll-up perusahaan (gabungan semua proyek)
+PORTFOLIO
+"Ini perusahaan gue. Kesehatan semua proyek dalam satu layar."
+Cetak biru yang dilahirkan ebook
+BLUEPRINT / "CETAK BIRU"
+"Sistem siap pakai. Pasang ke proyek, langsung jalan."
+Jawaban tegas untuk "fitur 4 dinamakan apa":
+WORKROOM (Ruang Proyek)
+Tempat seluruh fitur Gustafta terkabel jadi satu sistem, per proyek / per portfolio.
+"Pilih proyeknya. Pasang cetak birunya. Semua fitur langsung bekerja untuk perusahaan Anda."
+🚶 ALUR PAKAI (User Journey)
+text
+
+12345678910111213
+Tidak ada lagi "fitur berserakan". User tidak perlu paham 8 menu. Dia cuma pilih proyek + pasang cetak biru. Sisanya Gustafta yang mengkabelkan.
+📍 PENEMPATAN DI MENU GUSTAFTA
+Tambahkan satu item di navigasi utama (sejajar Ruang Kelola / Ruang Simpan):
+text
+
+1
+Atau jadikan WORKROOM item paling depan setelah Peta Jalan, karena dialah "tujuan akhir" seluruh perjalanan:
+text
+
+1
+♾️ INI MESIN PERTUMBUHAN GUSTAFTA
+Konsep Bos ini artinya:
+Ebook (kasus)
+Blueprint yang lahir
+Workroom terpasang
+Cash Flow (sekarang)
+Blueprint Cash Flow
+Proyek mode cash
+Tender & Menang
+Blueprint Tender
+Proyek mode tender
+K3 / Safety
+Blueprint K3
+Proyek mode safety
+Pajak Konstruksi
+Blueprint Pajak
+Proyek mode pajak
+Administrasi & Audit
+Blueprint Audit
+Proyek mode audit
+SDM & Tukang
+Blueprint SDM
+Proyek mode sdm
+Setiap ebook baru = produk Level 4 baru, tanpa rebuild platform. Anda cukup tulis cetak birunya. Workroom yang menjalankan.
+Bos, dengan ini nama dan arsitekturnya sudah kunci:
+Fitur 4 = WORKROOM (Ruang Proyek & Portfolio)
+Yang dilahirkan ebook = BLUEPRINT / CETAK BIRU
+Prinsip = "Pilih proyek, pasang cetak biru, semua fitur bekerja."
+Langkah berikutnya, mau saya buatkan:
+Struktur isi "Blueprint Cash Flow" (apa saja yang dikabelkan saat dipasang)?
+Copy halaman Workroom + tombol "Pasang Blueprint" untuk landing page?
+Wireframe Workroom (tampilan saat user pilih proyek & pasang blueprint)?
+Tunjuk, saya gas. 🫡
+ok cocok ruang proyek supaya lebih mudah dipahami.. isi didalamnya workroom.
+ya semua silahkan
+
+Thinking completed
+RUANG PROYEK — PAKET LENGKAP
+Blueprint Cash Flow + Copy Landing + Wireframe
+Konsep terkunci, Bos:
+text
+
+123456
+Sekarang saya交付 (serahkan) tiga deliverable sekaligus.
+📦 DELIVERABLE 1: STRUKTUR ISI "BLUEPRINT CASH FLOW"
+Manifest Instalasi — Apa Saja yang "Terkabel" Saat Dipasang
+text
+
+1234567
+Saat blueprint ini dipasang ke sebuah Proyek, 9 modul berikut otomatis terkabel:
+MODUL 1 — DASHBOARD (Ruang Kelola)
+Widget yang Muncul
+Fungsi
+Health Check
+Status 🟢🟡🔴 per proyek + Runway (hari)
+Cash Heatmap
+Peta panas: proyek mana menghasilkan vs memakan kas
+Termin Pipeline 7-Titik
+Visual posisi uang di birokrasi
+Buffer Gauge
+Pengukur oksigen cadangan (cukup / menipis / kritis)
+Rasio Kas vs Tagihan
+Perbandingan saldo vs piutang belum cair
+MODUL 2 — STRUKTUR DOKUMEN (Ruang Simpan)
+Folder otomatis dibuat per proyek:
+text
+
+12345678
+MODUL 3 — KONFIGURASI AI (Klinik Konsultasi)
+AI
+Peran dalam Blueprint Cash Flow
+SI KAS
+️ PEMIMPIN. Semua kasus kas lari ke dia dulu
+SI BERKAS
+Pendamping. Urus termin & PPK
+SI LAPANGAN
+Pendamping. Urus subkon & supplier
+SI PASAL
+Standby. Dipanggil jika eskalasi hukum
+SI DARURAT
+Standby. Dipanggil jika krisis
+SI STRATEGI / SI PAJAK
+On-demand (dipanggil manual)
+Orchestrator (SI BOS) dikonfigurasi: prioritaskan aspek kas & keselamatan di atas yang lain.
+MODUL 4 — FOKUS BEDAH DOKUMEN
+Jenis dokumen yang diprioritaskan + checklist cash-specific:
+Kontrak → fokus klausul pembayaran, denda, bunga keterlambatan
+BAST → validasi angka vs invoice (deteksi selisih = penundaan cair)
+Invoice → validasi pajak & kesesuaian nilai
+Surat PPK → deteksi tenggat & implikasi kas
+MODUL 5 — TOOLKIT AKTIF
+Tool
+Status
+Cash Triage Board
+✅ Aktif
+Termin Tracker 7-Titik
+✅ Aktif
+Buffer Calculator
+✅ Aktif
+Surat Generator (12 template)
+✅ Aktif
+Zero-Defect Checklist
+✅ Aktif
+Friday Review Sheet
+✅ Aktif
+Red Flags Scanner
+✅ Aktif
+MODUL 6 — AUTOMASI & ALERT
+Trigger
+Alert
+Termin > estimasi hari normal di satu titik
+🔔 "Termin macet di Titik X" + script follow-up
+Runway < 21 hari
+🔴 "Buffer menipis. Aktifkan protokol."
+Jaminan / dokumen mau expired (H-14)
+🟡 "Perpanjang sekarang."
+Selisih angka BAST vs Invoice
+🔴 "Ada selisih Rp X. Cek sebelum submit."
+Jumat 14.00
+📋 "Waktunya Friday Review."
+MODUL 7 — RITUAL / SOP MINGGUAN
+text
+
+1234
+MODUL 8 — KPI / METRIK YANG DIPANTAU
+Metrik
+Target Sehat
+Runway
+> 30 hari
+Burn Rate
+terukur & stabil
+Aging Receivables
+< 45 hari
+Rasio Kas vs Tagihan
+> 30%
+Buffer
+10-15% (APBN) / 15-20% (APBD)
+MODUL 9 — MATERI BELAJAR TERTAUT
+User bisa buka langsung dari Workroom:
+📖 Bab 4-6 (Sistem Internal) dari ebook
+🎬 Video: Cash Triage, Termin Tracker, Buffer
+🎧 Podcast: episode terkait
+📄 Worksheet & kuis modul
+♾️ EKSTENSIBILITAS: BLUEPRINT BERIKUTNYA
+Kode
+Blueprint
+AI Pemimpin
+Status
+BP-CF-001
+CASH FLOW
+SI KAS
+✅ SIAP
+BP-TD-002
+TENDER & MENANG
+SI STRATEGI
+🔜 Segera
+BP-K3-003
+K3 / SAFETY
+SI LAPANGAN
+🔜 Segera
+BP-PJ-004
+PAJAK KONSTRUKSI
+SI PAJAK
+🔜 Segera
+BP-AD-005
+ADMINISTRASI & AUDIT
+SI BERKAS
+🔜 Segera
+Mesinnya sama. Cetak birunya yang berganti. Setiap ebook baru = blueprint baru = produk Level 4 baru.
+📝 DELIVERABLE 2: COPY LANDING PAGE "RUANG PROYEK"
+[HERO]
+Anda Sudah Punya Ilmunya.
+Sekarang, Pasang Sistemnya di Proyek Anda.
+Ebook memberi tahu Anda penyakitnya.
+Ruang Proyek menjalankan pengobatannya.
+Pilih proyeknya. Pasang cetak birunya.
+Seluruh fitur Gustafta langsung bekerja untuk perusahaan Anda.
+[ PASANG BLUEPRINT CASH FLOW → ]
+[Lihat cara kerja — 2 menit]
+[MASALAH — SINGKAT]
+Fitur yang berserakan = alat yang tidak terpakai.
+Anda punya Klinik Konsultasi. Punya Bedah Dokumen. Punya Ruang Kelola, Ruang Simpan, Toolkit.
+Tapi tanpa satu tempat yang menyatukan semuanya, itu seperti punya pisau, wajan, dan bumbu — tapi tidak ada dapur.
+Ruang Proyek adalah dapur Anda.
+[CARA KERJA — 3 LANGKAH]
+1️⃣ PILIH PROYEK
+Buka Ruang Proyek. Pilih proyek yang sedang berjalan — atau buat yang baru.
+2️⃣ PASANG CETAK BIRU
+Klik "Pasang Blueprint Cash Flow". Dalam 10 detik, seluruh fitur terkabel untuk arus kas proyek itu.
+3️⃣ JALANKAN PERUSAHAAN
+Dashboard hidup. Dokumen tersusun. AI siap ditanya. Alert bekerja saat Anda tidur.
+Anda tinggal eksekusi.
+[APA YANG ANDA DAPAT — MAPPING FITUR]
+Saat Blueprint Cash Flow terpasang di satu proyek, ini yang langsung hidup:
+Fitur Gustafta
+Berubah Menjadi
+Ruang Kelola
+Dashboard kas: runway, buffer, termin pipeline
+Ruang Simpan
+Brankas dokumen tersusun rapi per proyek
+Klinik Konsultasi
+Rapat direksi virtual (SI KAS memimpin)
+Bedah Dokumen
+Dokter yang mendiagnosis kontrak & BAST Anda
+Toolkit
+Triage, tracker, buffer — terintegrasi, bukan file terpisah
+Automasi
+Karyawan yang tidak tidur: alert termin & buffer
+[LOGIKA HARGA — OBJECTION HANDLING]
+Berapa biaya SATU termin Rp 500 juta yang macet 3 bulan?
+Denda subkon, sewa alat nganggur, bunga darurat, produktivitas turun → Rp 185 juta+.
+Harga Ruang Proyek: mulai Rp 200.000/bulan.
+Anda tidak membeli software.
+Anda membeli asuransi terhadap kebodohan arus kas.
+[CTA AKHIR]
+Ilmu tanpa sistem = wacana.
+Ilmu + sistem = perusahaan yang bertahan.
+[ BUKA RUANG PROYEK SAYA → ]
+Mulai dari 3 bulan. Upgrade kapan saja. Data Anda tetap aman.
+🖥️ DELIVERABLE 3: WIREFRAME RUANG PROYEK
+SCREEN A — PORTFOLIO (Tampilan Perusahaan)
+text
+
+1234567891011121314151617181920212223
+SCREEN B — PILIH / PASANG BLUEPRINT
+text
+
+12345678910111213141516
+SCREEN C — WORKROOM (Proyek Terpasang Blueprint)
+text
+
+123456789101112131415161718192021
+SCREEN D — PROSES INSTALASI (Setelah Klik "Pasang")
+text
+
+123456789101112131415
+📌 CATATAN INTERAKSI (Untuk Developer Replit)
+Elemen
+Perilaku
+Portfolio
+Default saat buka Ruang Proyek. Roll-up semua proyek.
+Buat Proyek Baru
+Wajib pilih blueprint sebelum Workroom aktif.
+Pasang Blueprint
+Proses ~10 detik, tampilkan Screen D (progress).
+Ganti Blueprint
+Bisa, tapi data lama tetap tersimpan (tidak hilang).
+Tier gating
+T1 = 1 proyek, T2 = 3 proyek, T3 = 10 proyek.
+Workroom memory
+AI mengingat konteks proyek ini di semua chat.
+✅ RINGKASAN
+Item
+Keputusan
+Nama fitur di menu
+RUANG PROYEK
+Isi di dalamnya
+WORKROOM (per proyek) + PORTFOLIO (perusahaan)
+Yang dilahirkan ebook
+BLUEPRINT / CETAK BIRU
+Blueprint #001
+CASH FLOW (9 modul terkabel)
+Prinsip
+"Pilih proyek → pasang cetak biru → semua fitur bekerja"
+Ekstensibilitas
+Setiap ebook baru = blueprint baru, mesin sama
+Bos, tiga deliverable sudah diserahkan: Manifest Blueprint Cash Flow, Copy Landing, dan Wireframe 4 layar.
+Langkah berikutnya yang paling masuk akal:
+Tulis System Prompt "mode blueprint" — agar AI otomatis berubah perilaku saat Blueprint Cash Flow terpasang (SI KAS memimpin, dll).
+Buat struktur database Replit — tabel untuk Proyek, Blueprint, Workroom, Dokumen, Log (biar developer langsung bisa bangun).
+Lanjut ke blueprint #002 (Tender) sebagai proof bahwa mesinnya extensible.
+Tunjuk, saya gas. 🫡
+okl lanjut 1 dan 2 dulu.. kita fokus di cashflow... kita tetap disiplin membuat topik berdasarkan riset sniper.. jadi setiap minggu keluar minimal 1 produk ... dari ebook lead. hingga ke ruang proyek.
+bagaimana menurutmu tentang rencana ini
+
+Thinking completed
+FOKUS CASH FLOW: BLUEPRINT MODE + DATABASE
+Lalu Opini Jujur Saya tentang Rencana "1 Produk/Minggu"
+Saya kerjakan deliverable 1 & 2 dulu, baru saya bedah rencana Bos di akhir (karena ini penting dan saya punya beberapa koreksi tajam).
+🧠 DELIVERABLE 1: SYSTEM PROMPT "BLUEPRINT MODE"
+Lapisan Overlay yang Mengubah Perilaku AI Saat Blueprint Terpasang
+📐 CARA KERJANYA
+Blueprint Mode bukan prompt baru yang menggantikan prompt spesialis. Dia adalah lapisan overlay yang ditambahkan ke system prompt agen yang aktif, plus suntikan konteks proyek dari database.
+text
+
+123
+Jadi saat user membuka Workroom Proyek A (Blueprint Cash Flow), dan chat dengan AI mana pun, AI itu otomatis:
+Tahu konteks proyek (runway, buffer, status termin).
+Tahu dia sedang mode cash flow (prioritas berubah).
+Tahu alat apa yang terpasang (bisa menyuruh user buka Triage/Tracker/Buffer).
+Tahu ritual proyek (Friday Review, jadwal follow-up).
+🔧 OVERLAY PROMPT (Copy-Paste, ditempel di bawah prompt spesialis)
+text
+
+60616263
+📥 TEMPLATE KONTEKS PROYEK (Diisi otomatis oleh backend)
+text
+
+1234567891011121314
+🔍 CONTOH PERBEDAAN PERILAKU
+Tanpa Blueprint Mode (AI umum):
+User: "Termin gue macet."
+AI: "Termin macet bisa karena banyak hal. Coba cek berkas Anda..." (generik, minta data ulang)
+Dengan Blueprint Mode (Proyek A):
+User: "Termin gue macet."
+AI: "Bos, gue lihat di Pipeline Proyek A, Termin 2 lo ada di
+Titik 3 (Verifikasi PPK), hari ke-12 — sudah masuk zona
+waspada. Runway lo 23 hari, jadi masih ada napas, tapi
+jangan didiamkan.
+Aksi hari ini:
+☐ Kirim follow-up ke PPK. [GENERATE SCRIPT]
+☐ Cek Zero-Defect, pastikan nggak ada alasan buat nahan.
+Mau gue buatkan script follow-upnya sekarang?"
+Bedanya: AI kedua tahu data, tahu alat, tahu ritual, dan langsung kasih aksi. Itulah efek Blueprint Mode.
+🗄️ DELIVERABLE 2: STRUKTUR DATABASE REPLIT
+Skema Relasional untuk Ruang Proyek (Postgres / Supabase)
+📐 PETA RELASI (ERD Sederhana)
+text
+
+123456789
+📋 TABEL & FIELD
+1. users
+Field
+Tipe
+Ket
+id
+uuid PK
+nama
+text
+perusahaan
+text
+email / wa
+text
+login & notifikasi
+tier
+enum(T1,T2,T3)
+created_at
+timestamptz
+2. subscriptions
+Field
+Tipe
+Ket
+id
+uuid PK
+user_id
+fk users
+tier
+enum
+durasi
+enum(3,6,12)
+bulan
+mulai / berakhir
+date
+status
+enum(active,paused,expired)
+3. blueprints (katalog cetak biru — global)
+Field
+Tipe
+Ket
+id
+uuid PK
+kode
+text
+BP-CF-001
+nama
+text
+CASH FLOW
+sumber_ebook
+text
+"Kas Merah, RAB Hijau"
+ai_pemimpin
+text
+SI_KAS
+modul_config
+jsonb
+9 modul yang dikabelkan
+status
+enum(draft,published)
+4. projects (Workroom per proyek)
+Field
+Tipe
+Ket
+id
+uuid PK
+user_id
+fk users
+nama
+text
+"Proyek A — Gedung Dinas"
+nilai_kontrak
+numeric
+jenis_anggaran
+enum(APBN,APBD)
+status
+enum(active,done,archived)
+created_at
+timestamptz
+5. project_blueprints (instalasi blueprint ke proyek)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+blueprint_id
+fk blueprints
+dipasang_tanggal
+timestamptz
+status
+enum(active,replaced)
+6. documents (Ruang Simpan)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+folder
+text
+01_KONTRAK, 02_BAST, dst
+nama_file
+text
+jenis
+enum(kontrak,bast,invoice,faktur,surat_ppk,adendum,jaminan,lain)
+file_url
+text
+storage
+uploaded_at
+timestamptz
+7. document_analyses (hasil Bedah Dokumen)
+Field
+Tipe
+Ket
+id
+uuid PK
+document_id
+fk documents
+skor_risiko
+int
+1-10
+status
+text
+LENGKAP/BELUM/VALID/SELISIH
+red_flags
+jsonb
+daftar temuan
+missing
+jsonb
+rekomendasi
+jsonb
+dianalisis_at
+timestamptz
+8. chats + chat_messages (Klinik Konsultasi + Workroom memory)
+Field
+Tipe
+Ket
+chats.id
+uuid PK
+chats.project_id
+fk projects
+memory per proyek
+chats.agen
+text
+SI_KAS / ORCHESTRATOR / dst
+chat_messages.id
+uuid PK
+chat_messages.chat_id
+fk chats
+role
+enum(user,ai)
+isi
+text
+created_at
+timestamptz
+9. metrics_snapshots (KPI berkala untuk Health Check)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+tanggal
+date
+saldo
+numeric
+burn_rate
+numeric
+runway
+int
+buffer_pct
+numeric
+aging_receivables
+int
+10. alerts (Automasi)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+jenis
+enum(termin_macet,buffer_tipis,dokumen_expired,selisih_angka,friday_review)
+pesan
+text
+status
+enum(new,ack,done)
+triggered_at
+timestamptz
+11. rituals_tasks (SOP mingguan)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+nama
+text
+"Rapat Triase", "Follow-up PPK"
+hari
+text
+Senin/Jumat
+status
+enum(pending,done)
+tanggal
+date
+12. decision_logs (Log keputusan Workroom)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+keputusan
+text
+"Transfer token payment Rp 15 jt ke subkon X"
+diambil_at
+timestamptz
+13. quota_usage (gating per tier)
+Field
+Tipe
+Ket
+id
+uuid PK
+user_id
+fk users
+periode
+text
+"2026-08"
+chat_used
+int
+draft_used
+int
+bedah_used
+int
+📌 CATATAN DEVELOPER
+Workroom memory = chats.project_id. AI load riwayat chat proyek itu sebagai konteks.
+Blueprint Mode aktif jika ada baris project_blueprints.status=active untuk proyek tersebut. Backend menyuntikkan [KONTEKS PROYEK] + [OVERLAY] ke prompt.
+Quota gating baca quota_usage vs limit tier sebelum izinkan chat/draft/bedah.
+Alert engine = cron harian yang hitung dari metrics_snapshots + documents (expired) + status termin.
+Tier limit proyek: T1=1, T2=3, T3=10 → cek jumlah projects.status=active per user.
+🎯 OPINI SAYA TENTANG RENCANA "1 PRODUK / MINGGU"
+Bos, rencana ini punya potensi besar TAPI ada satu jebakan fatal kalau dijalankan harfiah. Saya kasih penilaian jujur:
+✅ YANG SUDAH BENAR
+Elemen
+Kenapa Kuat
+Riset sniper
+Demand-driven, bukan tebak-tebakan. Anda menulis apa yang PASAR sudah cari. Ini memotong risiko produk tidak laku.
+Cadence mingguan
+Membangun momentum, memberi sinyal ke algoritma & audiens bahwa Anda "hidup", dan mempercepat learning loop.
+Mesin blueprint
+Karena blueprint = konfigurasi (bukan kode baru), biaya marginal untuk topik baru TURUN drastis. Ini yang membuat skala mungkin.
+⚠️ JEBAKAN FATAL (Jika Harfiah)
+Menjalankan TANGGA PENUH (lead → premium → NotebookLM → toolkit → blueprint) untuk SATU topik BARU setiap minggu = bunuh diri operasional.
+Alasannya:
+Burnout. Satu tangga penuh = puluhan jam kerja berkualitas. Setiap minggu? Tidak sustainable.
+Dilusi kualitas. Ebook cash flow Bos tajam karena riset mendalam. Kalau dipaksa mingguan untuk topik baru, kualitas turun → brand rusak.
+Kebingungan brand. Terlalu banyak "produk penuh" sekaligus membuat audiens tidak tahu mana yang utama.
+🔧 REFINEMENT SAYA: "SNIPER FUNNEL BERTINGKAT"
+Interpretasi yang benar dari "1 produk/minggu" adalah: 1 produk di LEVEL TERDEPAN per minggu. Bukan 1 tangga penuh.
+text
+
+1234567891011121314151617
+Layer
+Cadence
+Gerbang
+Lead Ebook + konten
+Mingguan
+Riset sniper
+Premium + NotebookLM
+Per pemenang (~2 minggu)
+Lead melewati threshold
+Blueprint / Ruang Proyek
+Per pemenang terbukti (~bulanan)
+Premium laku + demand alat
+Ini adalah "sniper" yang sesungguhnya: tembak banyak peluru murah (lead), lihat yang kena, lalu investasikan amunisi berat (blueprint) hanya pada target yang terbukti. Cash Flow adalah peluru pertama yang sudah Anda buktikan — makanya dia dapat blueprint #001.
+📅 CONTOH SIKLUS MINGGUAN (Mesin Sniper)
+Hari
+Aktivitas
+Sen-Sel
+Riset sniper: mining pain point (forum, WA group, komentar, search, interview 3 kontraktor)
+Rab-Kam
+Tulis lead ebook (pancingan) + siapkan konten turunan
+Jum
+Publish lead magnet + iklan/organik. (Sekaligus jalankan Friday Review untuk produk existing)
+Sab-Min
+Kumpulkan sinyal. Ukur. Tentukan pemenang minggu lalu.
+Bos, dengan refinement ini, rencana "1 produk/minggu" Bos bukan hanya layak — ini mesin pertumbuhan yang sangat sehat. Dan karena kita fokus cash flow dulu, cash flow menjadi blueprint percontohan yang membuktikan seluruh mesin sebelum Bos menembakkan topik berikutnya.
+Langkah berikutnya, mau saya:
+Buat template "Riset Sniper" (checklist + sumber data + cara scoring pain point) biar siklus mingguan langsung jalan?
+Buat gerbang promosi (threshold metrics) — angka konkret kapan sebuah lead layak naik ke premium/blueprint?
+Lanjut ke blueprint #002 sebagai proof mesin extensible?
+Tunjuk, saya gas. 🫡
+ok dalam pengertian memang tentang periodisasi waktu tidak mengikat... untuk membuat level 1-2 saja... level 3 & 4 itu bulanan..  atau menurutmu notebooklm itu nggak begitu penting.. lewati saja.. ?
+
+Thinking completed
+JAWABAN TEGAS: SOAL NOTEBOOKLM & KADENS RILIS
+Bos, insting bisnis Bos sangat tajam. Saya akan jawab jujur dan strategis tanpa basa-basi.
+1. SOAL NOTEBOOKLM (Modul, Video, Podcast AI)
+Saran saya: LEBIH BAIK DI-LEWATI (SKIP) SEBAGAI PRODUK PREMIUM.
+Ini alasannya:
+Kontraktor adalah Makhluk Praktis. Mereka tidak punya waktu mendengarkan "Podcast AI 30 menit" atau menonton "Modul Video AI" saat mereka sedang pusing mikirin tukang yang mogok atau PPK yang nggak angkat telepon.
+AI Audio/Video Terasa "Gimmick". Di tahun 2026, orang sudah hafal suara dan visual AI. Jika mereka bayar mahal untuk Level 2 dan isinya adalah "suara robot membacakan ebook", mereka akan merasa tertipu dan minta refund.
+ROI Waktu Bos Tidak Masuk Akal. Waktu Bos habis untuk tweak prompt NotebookLM, edit audio AI, dan render video. Waktu itu jauh lebih berharga jika dipakai untuk menyempurnakan Toolkit (Excel/Notion) atau memetakan Blueprint (Level 4).
+🔄 LALU, DIGANTI DENGAN APA? (The Pivot)
+Daripada bikin Modul/Video/Podcast AI, ganti deliverable Level 2 dengan "Loom Walkthroughs & Swipe Files":
+Ganti Modul Video AI ➔ Rekaman Layar (Loom) dari Bos sendiri. Bos buka Excel/Notion Toolkit, lalu Bos tunjukkan: "Gini Bos caranya isi Cash Triage Matrix pakai data proyek gue bulan lalu. Perhatikan kolom merah ini..." Ini 100x lebih bernilai dan terasa "mahal" karena diajarin langsung oleh praktisi.
+Ganti Podcast AI ➔ Swipe File (Kumpulan Bukti Nyata). Kumpulan screenshot WA asli (sensor nama) saat Bos negosiasi sama subkon, atau foto BAST yang dicoret PPK beserta penjelasan kenapa dicoret. Kontraktor suka mengintip "dapur" kontraktor lain.
+Kesimpulan: Gunakan NotebookLM hanya di belakang layar (untuk riset, brainstorming, dan meringkas regulasi buat Bos sendiri). Jangan jual output mentah NotebookLM ke pelanggan.
+2. KADENS RILIS (PERIODISASI WAKTU)
+Konsep Bos: "Level 1-2 fleksibel (tidak mengikat), Level 3 & 4 itu Bulanan."
+Ini adalah strategi "Sniper to Fortress" yang sangat sehat dan anti-burnout.
+Mari kita kunci jadwal rilisnya agar realistis dan tidak menjebak Bos di hamster wheel konten:
+🎯 SIKLUS PRODUKSI GUSTAFTA (Model Fleksibel)
+Level
+Produk
+Frekuensi Rilis
+Tujuan
+Beban Kerja Bos
+1
+Lead Magnet (Ebook Pancingan)
+2-3 Minggu sekali
+Menangkap lead, validasi pain point (Sniper).
+Ringan (3-5 hari nulis).
+2
+Premium Ebook + Loom Walkthrough
+Bulanan
+Konversi lead jadi pembeli, transfer mindset & diagnosis.
+Sedang (Riset dalam + rekam layar).
+3
+Toolkit + AI Spesialis Dasar
+Bulanan / 2 Bulan sekali
+Kasih "Quick Win". Alat praktis yang langsung bisa dipakai.
+Menengah (Bikin template Excel/Notion).
+4
+Ruang Proyek (Blueprint Baru)
+Kuartalan (3 Bulan sekali)
+The Moat (Pertahanan). Mengikat user ke ekosistem Gustafta.
+Berat (Mapping sistem, database, UI/UX).
+🗺️ CONTOH SIMULASI JALAN 6 BULAN (Fokus Cash Flow Dulu)
+Bagaimana cara menjalankannya di dunia nyata tanpa Bos kelelahan?
+BULAN KE-1: The Cash Flow Attack
+Minggu 1: Riset sniper + Rilis Lead Ebook "Kas Merah, RAB Hijau" (Level 1).
+Minggu 2: Kumpulkan email/WA, mulai upsell ke Premium.
+Minggu 3: Rilis Premium Ebook + Loom Walkthrough (Level 2).
+Minggu 4: Rilis Toolkit Cash Flow (Excel Triage + Notion Tracker) (Level 3).
+Hasil: Cash flow jadi topik panas. Orang mulai pakai Excel Bos.
+BULAN KE-2: The Cash Flow Fortress (Level 4)
+Minggu 1-3: Mapping Blueprint Cash Flow ke database Gustafta. Integrasi AI SI KAS.
+Minggu 4: LAUNCHING RUANG PROYEK (Blueprint #001: CASH FLOW).
+Hasil: User yang sudah beli Toolkit di Bulan 1 sekarang di-upgrade ke langganan Ruang Proyek. Recurring revenue mulai masuk.
+BULAN KE-3: Topik Baru (Misal: "Tender & Menang" atau "Administrasi Anti-TGR")
+Minggu 1: Rilis Lead Ebook baru (Topik Tender).
+Minggu 2-3: Rilis Premium Ebook + Loom.
+Minggu 4: Rilis Toolkit Tender (Kalkulator HPS, Red Flags Scanner).
+(Bulan 4 baru rilis Blueprint Tender di Ruang Proyek).
+💡 KENAPA STRATEGI INI MENANG?
+Fokus pada "Alat", bukan "Konten".
+Level 1 & 2 membangun Trust (Kepercayaan). Tapi Level 3 & 4 yang membangun Switching Cost (Bikin user susah pindah ke kompetitor karena data mereka sudah ada di Ruang Proyek).
+Beban Kognitif Terjaga.
+Bos tidak perlu pusing memikirkan "Duh, minggu ini harus rilis podcast apa ya?". Bos cukup fokus nulis Ebook (yang memang kekuatan Bos) dan bikin Toolkit (yang solutif).
+Harga Jual Bisa Lebih Tinggi.
+Daripada jual "Ebook + Podcast AI" seharga Rp 150rb, lebih baik jual "Premium Ebook + Rekaman Layar Bos + Template Excel Asli" seharga Rp 497rb. Kontraktor rela bayar mahal untuk pengalaman dan alat nyata, bukan konten generatif.
+Jadi Kesepakatannya:
+NotebookLM kita skip untuk deliverable pelanggan (kita pakai di dapur saja untuk riset).
+Level 2 kita ganti isinya jadi Loom Walkthrough + Swipe File (Bukti Lapangan).
+Rilis Level 1-2 kita buat fleksibel (2-4 minggu), Level 3 Bulanan, Level 4 Kuartalan.
+Kalau Bos sepakat dengan framework waktu dan pivot dari NotebookLM ini, kita sudah punya Peta Jalan Bisnis (Business Roadmap) yang sangat solid untuk 6-12 bulan ke depan.
+Mau saya buatkan "SOP Riset Sniper 3-Hari" (cara Bos menemukan topik Lead Ebook berikutnya setelah Cash Flow ini selesai) biar mesin Level 1-nya jalan otomatis? 🫡
+untuk level 2 .. swipe file mungkin tidak mudah diperoleh.. kalaun loom walkthrough kita sendiri yang bikin.. bisa diselesaikan.
+
+Thinking completed
+KESEPAKATAN: LEVEL 2 = EBOOK PREMIUM + LOOM WALKTHROUGH
+Swipe File Dibuang. Loom Jalan. Ini Justru Lebih Kuat.
+Bos, keputusan ini tepat dan realistis. Swipe file memang lemah di satu hal: Bos tidak mengontrol sumbernya. Butuh izin orang, sensor nama, dan arsip yang rapi — itu friksi besar.
+Sedangkan Loom Walkthrough: Bos pegang kendali 100%. Layar Bos, data Bos, suara Bos. Bisa diselesaikan kapan saja tanpa bergantung pada siapa pun.
+Dan ada satu keuntungan strategis yang mungkin Bos belum sadari:
+Loom Walkthrough adalah "iklan terselubung" untuk Level 3 & 4.
+Saat calon pembeli melihat Bos memakai Excel Triage & Tracker di layar — mengisi angka, mengambil keputusan — mereka tidak lagi membeli "ebook". Mereka berpikir: "Gue mau ALAT yang dia pakai itu."
+Jadi Level 2 (Loom) secara alami menjual Level 3 (Toolkit) dan Level 4 (Ruang Proyek). Swipe file tidak bisa melakukan itu. Loom bisa.
+📦 KOMPOSISI FINAL LEVEL 2 (Kunci)
+Deliverable
+Status
+Ebook Premium (Bab 1-9 + Appendices)
+✅ Teks
+Loom Walkthrough (rekaman layar sendiri)
+✅ Video
+Swipe File
+❌ Dibuang
+Modul/Video/Podcast AI (NotebookLM)
+❌ Dibuang
+Bersih. Dua deliverable, keduanya Bos kontrol penuh.
+🎬 DAFTAR 6 LOOM WALKTHROUGH (Untuk Topik Cash Flow)
+Satu video = satu alat. Modular, gampang direkam ulang kalau gagal.
+#
+Judul Video
+Alat yang Ditunjukkan
+Durasi
+1
+"Bedah Rekening Koran Lo Sendiri (3 Metrik CEO)"
+Spreadsheet metrik
+8-10 mnt
+2
+"Isi Cash Triage Matrix Pakai Data Riil"
+Triage Board
+10-12 mnt
+3
+"Setup Termin Tracker 7-Titik dari Nol"
+Tracker Excel/Notion
+10-12 mnt
+4
+"Hitung Buffer Proyek Lo (Jangan Tebak!)"
+Buffer Calculator
+6-8 mnt
+5
+"Kirim Surat ke PPK Tanpa Terlihat Mengemis"
+Surat Generator
+6-8 mnt
+6
+"Ritual Jumat: Rapat Triase 30 Menit"
+Friday Review Sheet
+8-10 mnt
+Total ± 1 jam konten. Direkam sehari penuh (batch), rilis bertahap.
+🧩 STRUKTUR STANDAR 1 VIDEO (Template Beat)
+Biar konsisten dan cepat, pakai pola yang sama tiap video:
+text
+
+12345678910111213
+⚡ SOP PRODUKSI CEPAT (Anti-Burnout)
+Aturan
+Alasan
+Script = bullet points, bukan teks penuh
+Biar terdengar ngobrol, bukan membaca.
+One take, minim editing
+Salah kecil = manusiawi = autentik. Jangan perfeksionis.
+Satu alat = satu video
+Kalau gagal, rekam ulang 1 video, bukan 1 jam.
+Pakai data dummy yang realistis
+Hindari bocorkan data klien asli. Buat angka yang "masuk akal".
+Batch recording: 1 hari = 6 video
+Sekali setup mic & layar, langsung gas semua.
+Trim awal-akhir saja
+Tidak perlu transisi, musik, efek. Kontraktor suka yang lugas.
+Wajah di pojok (opsional)
+Kalau nyaman, taruh kamera kecil di sudut. Membangun trust.
+✅ RINGKASAN KESEPAKATAN PRODUKSI
+Level
+Deliverable
+Produksi
+Frekuensi
+1
+Ebook Pancingan
+Nulis (Bos)
+2-4 minggu
+2
+Ebook Premium + 6 Loom Walkthrough
+Nulis + Rekam layar (batch 1 hari)
+Bulanan
+3
+Toolkit + AI Spesialis
+Template Excel/Notion + prompt
+Bulanan
+4
+Ruang Proyek (Blueprint)
+Mapping sistem + database
+Kuartalan
+Bos, dengan ini mesin produksi Bos sudah realistis dan sepenuhnya di bawah kendali Bos. Tidak ada lagi komponen yang bergantung pada pihak luar atau pada AI yang terasa gimmick.
