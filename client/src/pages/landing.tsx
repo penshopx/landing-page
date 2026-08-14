@@ -834,7 +834,7 @@ export default function Landing() {
               { icon: "🏥", label: "Klinik Konsultasi", href: "/klinik-konsultasi" },
               { icon: "📄", label: "Bedah Dokumen", href: "/bedah-dokumen" },
               { icon: "🧠", label: "Brain Project", href: "/brain-project" },
-              { icon: "🛠️", label: "Toolkit", href: "/toolkit" },
+              { icon: "🛠️", label: "Ebook & Toolkit", href: "/ebook-toolkit" },
               { icon: "🏗️", label: "Ruang Proyek", href: "/ruang-proyek" },
               { icon: "📋", label: "Ruang Kelola", href: "/ruang-kelola" },
               { icon: "🎓", label: "Ekosistem Kompetensi", href: "/kompetensi-hub" },

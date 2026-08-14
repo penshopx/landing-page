@@ -98,6 +98,7 @@ import ToolkitPage from "@/pages/toolkit";
 import ToolkitCashflowPage from "@/pages/toolkit-cashflow";
 import CashflowPbjPage from "@/pages/cashflow-pbj";
 import EbookKasMerahPage from "@/pages/ebook-kas-merah";
+import EbookToolkitPage from "@/pages/ebook-toolkit";
 import EtalaseProyekPage from "@/pages/etalase-proyek";
 import BiroJasaSbuPage from "@/pages/biro-jasa-sbu";
 import JasaDokumenPage from "@/pages/jasa-dokumen";
@@ -599,6 +600,7 @@ function Router() {
       <Route path="/toolkit-cashflow" component={ToolkitCashflowPage} />
       <Route path="/cashflow-pbj" component={CashflowPbjPage} />
       <Route path="/ebook-kas-merah" component={EbookKasMerahPage} />
+      <Route path="/ebook-toolkit" component={EbookToolkitPage} />
       <Route path="/etalase/:userId" component={EtalaseProyekPage} />
       <Route path="/biro-jasa-sbu" component={BiroJasaSbuPage} />
       <Route path="/jasa-dokumen" component={JasaDokumenPage} />

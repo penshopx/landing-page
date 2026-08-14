@@ -252,7 +252,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
     { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
-    { href: "/toolkit",           label: "Toolkit",             icon: Hammer },
+    { href: "/ebook-toolkit",     label: "Ebook & Toolkit",     icon: Hammer },
     { href: "/mitra-biro-jasa",   label: "Mitra",               icon: HandshakeIcon },
   ];
 
