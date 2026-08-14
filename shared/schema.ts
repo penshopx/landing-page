@@ -2286,7 +2286,12 @@ export const lmsLessons = pgTable("lms_lessons", {
   isPreview: boolean("is_preview").default(false),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+  // Seed reconciliation keys off slug; without this, onConflictDoNothing has no
+  // conflict target and duplicate slugs create double lessons in a course.
+  // Created in DB via direct DDL (drizzle-kit push is blocked in this project).
+  uniqueIndex("lms_lessons_course_slug_unique").on(table.courseId, table.slug),
+]);
 
 export const insertLmsLessonSchema = createInsertSchema(lmsLessons).omit({ id: true, createdAt: true });
 export type InsertLmsLesson = z.infer<typeof insertLmsLessonSchema>;

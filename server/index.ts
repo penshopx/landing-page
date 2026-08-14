@@ -474,6 +474,22 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] lms_certificates unique index repair error:`, e);
   }
 
+  // ── Jamin unique index (course_id, slug) ada di lms_lessons ─────────────
+  // Rekonsiliasi seed mengunci identitas lesson pada slug per course; tanpa
+  // index unik, slug ganda membuat lesson dobel & update rekonsiliasi ambigu.
+  // Dedupe dulu (pertahankan baris aktif terbaru), lalu CREATE UNIQUE INDEX.
+  try {
+    const { ensureLessonUniqueIndex } = await import("./lms-lesson-schema");
+    const r = await ensureLessonUniqueIndex(pool);
+    if (r.created) {
+      console.log(`${new Date().toLocaleTimeString()} [express] lms_lessons (course_id, slug) unique index CREATED (deduped ${r.deduped} row(s))`);
+    } else {
+      console.log(`${new Date().toLocaleTimeString()} [express] lms_lessons (course_id, slug) unique index verified`);
+    }
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] lms_lessons unique index repair error:`, e);
+  }
+
   // ── Backfill certificates for completions that pre-date the certificate feature ──
   try {
     // Find enrollments that are 100% complete but have no certificate yet
