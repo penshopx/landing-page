@@ -67,6 +67,23 @@ export default function EbookKasMerahPage() {
         <p className="text-[11px] text-slate-500 mt-3">Harga simulasi — dikirim sebagai file digital setelah pembayaran dikonfirmasi via WhatsApp.</p>
       </section>
 
+      {/* Mini ebook gratis (PDF) */}
+      <section className="max-w-3xl mx-auto px-4 pb-10">
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 text-center" data-testid="card-mini-ebook">
+          <Badge className="mb-2 bg-emerald-600/20 text-emerald-300 border border-emerald-500/30">GRATIS · PDF 14 HALAMAN</Badge>
+          <p className="text-sm font-semibold text-white mb-1">Mini Ebook Pancingan — "Diagnosis 15 Menit"</p>
+          <p className="text-xs text-slate-400 mb-3">
+            Versi ringkas dengan cover &amp; ilustrasi: tamparan angka Pak R, 5 akar masalah, 3 kesalahan fatal,
+            dan kenapa PPK bukan musuh Anda. Bisa diunduh langsung, bebas disebar ke sesama kontraktor.
+          </p>
+          <Button asChild variant="outline" size="sm" className="border-emerald-500/40">
+            <a href="/ebooks/kas-merah-mini-ebook.pdf" download="KAS-MERAH-RAB-HIJAU-Mini-Ebook.pdf" data-testid="link-download-mini-ebook">
+              Unduh Mini Ebook (PDF Gratis)
+            </a>
+          </Button>
+        </div>
+      </section>
+
       {/* Untuk siapa */}
       <section className="max-w-3xl mx-auto px-4 pb-10 grid sm:grid-cols-2 gap-4">
         <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
