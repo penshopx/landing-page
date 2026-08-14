@@ -228,6 +228,42 @@ test("delete lesson: enrollment progress deflates and completed_at clears when o
   assert.equal(Number(lessons[0].id), lessonB, "remaining lesson must be lesson B");
 });
 
+test("delete lesson: certificate survives as an immutable historical record when completion is undone", { skip: SKIP }, async () => {
+  // PRODUCT DECISION (see DELETE route comment in server/routes-lms.ts):
+  // a certificate already issued for a completion is NOT revoked or flagged
+  // when a later lesson deletion drops the student below 100%.
+  const courseId = await seedCourse();
+  const lessonA = await seedLesson(courseId, 1);
+  await seedLesson(courseId, 2); // surviving lesson the student never completed
+  const studentId = `student-${RUN}-cert`;
+  await seedEnrollment(studentId, courseId, 100, true);
+  await seedProgress(studentId, courseId, lessonA);
+
+  // Certificate issued for the (then-valid) completion.
+  const certCode = `GUSTAFTA-TEST-${RUN.slice(-6).toUpperCase()}`;
+  await queryDb(
+    `INSERT INTO lms_certificates (user_id, course_id, certificate_code)
+     VALUES ($1, $2, $3)`,
+    [studentId, courseId, certCode]
+  );
+
+  const res = await deleteLesson(lessonA);
+  assert.equal(res.status, 200, `Expected 200, got ${res.status}`);
+
+  // Completion is undone…
+  const enr = await getEnrollment(studentId, courseId);
+  assert.equal(Number(enr.progress), 0, `progress must drop to 0, got ${enr.progress}`);
+  assert.equal(enr.completed_at, null, "completed_at must be cleared below 100%");
+
+  // …but the certificate row remains, byte-for-byte identical.
+  const certs = await queryDb(
+    `SELECT certificate_code FROM lms_certificates WHERE user_id = $1 AND course_id = $2`,
+    [studentId, courseId]
+  );
+  assert.equal(certs.length, 1, "issued certificate must NOT be deleted by lesson deletion");
+  assert.equal(certs[0].certificate_code, certCode, "certificate code must be unchanged");
+});
+
 test("delete lesson: unauthenticated → 401", { skip: SKIP }, async () => {
   const courseId = await seedCourse();
   const lessonA = await seedLesson(courseId, 1);

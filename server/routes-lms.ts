@@ -1296,6 +1296,16 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
   // ?force=true is NOT set, the route returns 409 with { error, enrolledStudents }
   // so the frontend can show a confirmation dialog before destructively removing
   // the lesson and wiping affected student progress.
+  //
+  // PRODUCT DECISION — certificates are IMMUTABLE HISTORICAL RECORDS.
+  // When the recalculation drops a student below 100% and clears completed_at,
+  // any lms_certificates row already issued for that completion is deliberately
+  // left untouched (NOT revoked or flagged).  The certificate attests that the
+  // student completed the course *as it existed at the time of completion*; a
+  // later curriculum edit by an admin must not retroactively invalidate it.
+  // This mirrors the manual enrollment-removal route above, which also
+  // preserves certificates by default.  Covered by
+  // tests/lms-lesson-delete-progress.test.ts ("certificate survives …").
   app.delete("/api/admin/lms/lessons/:id", isAuthenticated, requireAdminLms, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
