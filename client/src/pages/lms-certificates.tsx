@@ -202,7 +202,14 @@ function CertificateCard({ cert }: { cert: Certificate }) {
             variant="outline"
             size="sm"
             className="gap-1 text-xs px-2.5"
-            onClick={() => navigator.clipboard.writeText(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`)}
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`);
+                toast({ title: "URL disalin!" });
+              } catch {
+                toast({ title: "Gagal menyalin URL", description: "Browser memblokir akses clipboard. Salin manual dari kode sertifikat.", variant: "destructive" });
+              }
+            }}
             title="Salin link verifikasi"
             data-testid={`button-copy-verify-${cert.id}`}
           >
