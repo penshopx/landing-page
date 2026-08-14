@@ -1125,11 +1125,17 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
         });
       }
 
-      await db.delete(lmsLessonProgress).where(eq(lmsLessonProgress.courseId, id));
-      await db.delete(lmsCertificates).where(eq(lmsCertificates.courseId, id));
-      await db.delete(lmsLessons).where(eq(lmsLessons.courseId, id));
-      await db.delete(lmsEnrollments).where(eq(lmsEnrollments.courseId, id));
-      const [deleted] = await db.delete(lmsCourses).where(eq(lmsCourses.id, id)).returning();
+      // Delete all dependent rows AND the course in ONE transaction so a
+      // mid-way failure can never leave orphaned enrollment/progress rows
+      // pointing at a deleted course (or a half-deleted course).
+      const deleted = await db.transaction(async (tx) => {
+        await tx.delete(lmsLessonProgress).where(eq(lmsLessonProgress.courseId, id));
+        await tx.delete(lmsCertificates).where(eq(lmsCertificates.courseId, id));
+        await tx.delete(lmsLessons).where(eq(lmsLessons.courseId, id));
+        await tx.delete(lmsEnrollments).where(eq(lmsEnrollments.courseId, id));
+        const [row] = await tx.delete(lmsCourses).where(eq(lmsCourses.id, id)).returning();
+        return row;
+      });
       if (!deleted) return res.status(404).json({ error: "Kursus tidak ditemukan" });
       res.json({ ok: true });
     } catch (e: any) {
