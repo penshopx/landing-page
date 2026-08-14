@@ -222,3 +222,10 @@ uri = "file://attached_assets/ebook/kas-merah-mini-ebook.pdf"
 type = "pdf"
 title = "Mini Ebook Pancingan — KAS MERAH, RAB HIJAU (14 halaman, A5)"
 description = "PDF pancingan gratis: cover ilustrasi, tabel Pak R, 5 akar masalah, 3 kesalahan fatal, halaman CTA oranye, sesuai catatan desain naskah (navy/merah/oranye)."
+
+[[outputs]]
+id = "F-cIz2ch8EC0VFWBgdNrk"
+uri = "file://attached_assets/ebook/kas-merah-premium.pdf"
+type = "pdf"
+title = "EBOOK PREMIUM — KAS MERAH, RAB HIJAU (98 hal., terkunci password)"
+description = "Versi lengkap: cover, daftar isi, 9 bab + 6 lampiran, halaman pembuka per bagian, tabel berwarna. Password contoh: GUSTAFTA2026"
