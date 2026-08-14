@@ -838,7 +838,7 @@ export default function Landing() {
               { icon: "🏗️", label: "Ruang Proyek", href: "/ruang-proyek" },
               { icon: "📋", label: "Ruang Kelola", href: "/ruang-kelola" },
               { icon: "🎓", label: "Ekosistem Kompetensi", href: "/kompetensi-hub" },
-              { icon: "🤖", label: "Produk AI", href: "/store" },
+              { icon: "🤖", label: "Produk", href: "/produk" },
             ].map((item) => (
               <Link key={item.label} href={item.href}>
                 <div className="bg-white/15 hover:bg-white/25 border border-white/30 rounded-xl px-4 py-3 cursor-pointer transition-colors flex items-center gap-2 text-sm font-semibold">

@@ -272,7 +272,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/jasa-keuangan",          label: "Jasa Keuangan",          icon: TrendingUp },
     { href: "/klinik-uji-kompetensi",  label: "Bimtek SKK",       icon: GraduationCap },
     { href: "/executive-summary",      label: "Exec. Summary",    icon: FileText },
-    { href: "/store",                  label: "Produk AI",         icon: Zap },
+    { href: "/produk",                 label: "Produk",           icon: Zap },
   ];
 
   // Untuk mobile: semua item gabungan

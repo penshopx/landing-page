@@ -16,6 +16,13 @@ description: Pembagian peran gustafta.my.id vs dokumenproyek.com yang sudah dise
 - Halaman jasa manusia di Gustafta (/jasa-dokumen, /jasa-keuangan) menaut ke dokumenproyek.com (ada task antrean untuk ini).
 - Ganti nama domain = keputusan merek, ditunda; JANGAN pasang 2 domain untuk 1 app yang sama (SEO kembar + cookie).
 
+# Katalog pusat "Produk" (/produk)
+
+- KEPUTUSAN BOS: satu katalog untuk SEMUA produk BERBAYAR; produk gratis TIDAK tampil di katalog (tetap di halaman fiturnya).
+- Kelompok katalog memakai NAMA FITUR yang dikenal konsumen (Produk AI, Ebook & Toolkit, Klinik, CASHFLOW-PBJ, Ruang Simpan, Jasa AI Custom, Jasa Manusia→dokumenproyek.com) agar "tidak kehilangan jejak".
+- Halaman lama /produk (builder Paket Bisnis/Modul/Chatbot) dipindah ke /produk-builder; hub baru = client/src/pages/katalog-produk.tsx di /produk. Menu header "Produk AI"→"Produk".
+- Nama dipilih "Produk", bukan "Katalog" (bahasa pembeli).
+
 # Rak digital "Ebook & Toolkit"
 
 - Halaman /ebook-toolkit; sumber data tunggal client/src/data/digital-products.ts (harga tetap dari pricing.ts).
