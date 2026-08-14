@@ -20487,10 +20487,12 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                   });
                 }
 
-                // Send delivery email — await so we can fall back to WA if it fails immediately
-                let emailSent = false;
+                // Send delivery email — await so we can fall back to WA if it fails immediately.
+                // Result ditangkap dengan reason+detail (sama dengan jalur manual order)
+                // agar admin tidak menebak-nebak penyebab kegagalan pengiriman otomatis.
+                let emailResult: { sent: boolean; reason?: string; detail?: string };
                 try {
-                  const emailResult = await sendDigitalProductDeliveryEmail({
+                  emailResult = await sendDigitalProductDeliveryEmail({
                     to: customerEmail,
                     customerName: customerName || null,
                     productName: matched.name,
@@ -20498,14 +20500,14 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                     expiryHours: isPermanentLink ? null : 24,
                     orderCorrelationTag,
                   });
-                  emailSent = emailResult.sent;
-                  if (emailResult.sent) {
-                    console.log(`[DigitalDelivery] Email terkirim ke ${customerEmail} untuk "${matched.name}" (token: ${dpAccessToken})`);
-                  } else {
-                    console.error(`[DigitalDelivery] Email gagal ke ${customerEmail}: ${(emailResult as any).reason} — ${(emailResult as any).detail ?? ""}`);
-                  }
                 } catch (emailErr: any) {
-                  console.error("[DigitalDelivery] sendEmail error:", emailErr?.message);
+                  emailResult = { sent: false, reason: "exception", detail: emailErr?.message || String(emailErr) };
+                }
+                const emailSent = emailResult.sent;
+                if (emailSent) {
+                  console.log(`[DigitalDelivery] Email terkirim ke ${customerEmail} untuk "${matched.name}" (token: ${dpAccessToken})`);
+                } else {
+                  console.error(`[DigitalDelivery] Email gagal ke ${customerEmail} untuk "${matched.name}" (${emailResult.reason}${emailResult.detail ? `: ${emailResult.detail}` : ""})`);
                 }
 
                 // Immediate WA fallback: Brevo rejected the send synchronously
