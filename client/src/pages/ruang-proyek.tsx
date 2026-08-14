@@ -22,8 +22,10 @@ import { apiRequest } from "@/lib/queryClient";
 import {
   FolderKanban, Plus, Trash2, ArrowLeft, FileText, ClipboardList,
   Calculator, MessageCircle, HardDrive, TrendingUp, TrendingDown, Loader2,
-  Wand2, Copy, Printer, CheckCircle2,
+  Wand2, Copy, Printer, CheckCircle2, Award, ExternalLink, Compass,
 } from "lucide-react";
+import { RuangProyekPanduan } from "@/components/ruang-proyek-panduan";
+import { Switch } from "@/components/ui/switch";
 import {
   STANDARD_ADMIN_DOCS, STAGE_LABEL, STAGE_ORDER, GENERATOR_TEMPLATES,
   type AdminDoc, type AdminDocStage, type AdminDocStatus, type GeneratorTemplate,
@@ -36,6 +38,7 @@ type Project = {
   description: string | null; status: string; contractValue: number | null;
   startDate: string | null; endDate: string | null;
   checklist: ChecklistItem[]; adminDocs: AdminDoc[]; costItems: CostItem[]; linkedFileIds: string[];
+  isShowcased: boolean; showValue: boolean; showClient: boolean;
   createdAt: string; updatedAt: string;
 };
 type RsFile = { id: string; original_name: string; mime_type: string; size_bytes: number };
@@ -124,6 +127,10 @@ export default function RuangProyekPage() {
 function ProjectList({ projects, isLoading, onOpen, onCreate }: {
   projects: Project[]; isLoading: boolean; onOpen: (id: string) => void; onCreate: () => void;
 }) {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const showcasedCount = projects.filter((p) => p.isShowcased).length;
+  const etalaseUrl = user?.id ? `${window.location.origin}/etalase/${user.id}` : null;
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -135,9 +142,17 @@ function ProjectList({ projects, isLoading, onOpen, onCreate }: {
             Standar administrasi & dokumentasi proyek: dokumen baku per tahapan, generator dokumen, costing & rugi-laba.
           </p>
         </div>
-        <Button onClick={onCreate} data-testid="button-create-project">
-          <Plus className="h-4 w-4 mr-2" /> Proyek Baru
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          {etalaseUrl && showcasedCount > 0 && (
+            <Button variant="outline" data-testid="button-copy-etalase"
+              onClick={() => { navigator.clipboard.writeText(etalaseUrl).then(() => toast({ title: "Tautan etalase disalin", description: "Bagikan ke calon klien Anda." })); }}>
+              <Award className="h-4 w-4 mr-2" /> Salin Tautan Portfolio ({showcasedCount})
+            </Button>
+          )}
+          <Button onClick={onCreate} data-testid="button-create-project">
+            <Plus className="h-4 w-4 mr-2" /> Proyek Baru
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
@@ -327,6 +342,7 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
           <TabsTrigger value="costing" data-testid="tab-costing"><Calculator className="h-4 w-4 mr-1" /> Costing & Rugi-Laba</TabsTrigger>
           <TabsTrigger value="dokumen" data-testid="tab-dokumen"><FileText className="h-4 w-4 mr-1" /> Arsip Dokumen</TabsTrigger>
           <TabsTrigger value="konsultasi" data-testid="tab-konsultasi"><MessageCircle className="h-4 w-4 mr-1" /> Konsultasi AI</TabsTrigger>
+          <TabsTrigger value="panduan" data-testid="tab-panduan"><Compass className="h-4 w-4 mr-1" /> Panduan Alur</TabsTrigger>
         </TabsList>
 
         <TabsContent value="administrasi">
@@ -354,7 +370,47 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
             </Button>
           </CardContent></Card>
         </TabsContent>
+        <TabsContent value="panduan">
+          <RuangProyekPanduan />
+        </TabsContent>
       </Tabs>
+
+      {/* Pajang ke Portfolio (etalase publik) */}
+      <Card className="mt-6">
+        <CardContent className="pt-4 pb-4">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="flex items-start gap-3">
+              <Award className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-medium text-sm">Pajang ke Portfolio</p>
+                <p className="text-xs text-muted-foreground max-w-md">
+                  Tampilkan proyek ini di etalase publik Anda sebagai bukti rekam jejak ke calon klien.
+                  Nilai kontrak & nama klien hanya tampil bila Anda izinkan.
+                </p>
+              </div>
+            </div>
+            <Switch checked={project.isShowcased}
+              onCheckedChange={(v) => patchMut.mutate({ isShowcased: v } as any)}
+              data-testid="switch-showcase" />
+          </div>
+          {project.isShowcased && (
+            <div className="mt-3 pl-8 space-y-2">
+              <label className="flex items-center gap-2 text-xs">
+                <Switch checked={project.showValue}
+                  onCheckedChange={(v) => patchMut.mutate({ showValue: v } as any)}
+                  data-testid="switch-show-value" />
+                Tampilkan nilai kontrak di etalase
+              </label>
+              <label className="flex items-center gap-2 text-xs">
+                <Switch checked={project.showClient}
+                  onCheckedChange={(v) => patchMut.mutate({ showClient: v } as any)}
+                  data-testid="switch-show-client" />
+                Tampilkan nama pemberi kerja di etalase
+              </label>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </>
   );
 }

@@ -2805,6 +2805,9 @@ export const ruangProyekProjects = pgTable("ruang_proyek_projects", {
   adminDocs:     jsonb("admin_docs").notNull().default([]),     // [{id,key,label,stage,status,fileId?,note?}]
   costItems:     jsonb("cost_items").notNull().default([]),     // [{id,label,type:'biaya'|'pendapatan',amount}]
   linkedFileIds: jsonb("linked_file_ids").notNull().default([]),// [uuid ruang_simpan_files]
+  isShowcased:   boolean("is_showcased").notNull().default(false), // tampil di etalase publik /etalase/:userId
+  showValue:     boolean("show_value").notNull().default(false),   // izinkan nilai kontrak tampil di etalase
+  showClient:    boolean("show_client").notNull().default(false),  // izinkan nama klien tampil di etalase
   createdAt:     timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt:     timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [

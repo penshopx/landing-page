@@ -63,6 +63,9 @@ const patchSchema = createSchema.partial().extend({
   adminDocs: z.array(adminDocSchema).max(300).optional(),
   costItems: z.array(costItemSchema).max(500).optional(),
   linkedFileIds: z.array(z.string().regex(UUID_RE)).max(200).optional(),
+  isShowcased: z.boolean().optional(),
+  showValue: z.boolean().optional(),
+  showClient: z.boolean().optional(),
 });
 
 function mapRow(r: any) {
@@ -86,6 +89,9 @@ function mapRow(r: any) {
     adminDocs: arr(r.admin_docs),
     costItems: arr(r.cost_items),
     linkedFileIds: arr(r.linked_file_ids),
+    isShowcased: r.is_showcased === true,
+    showValue: r.show_value === true,
+    showClient: r.show_client === true,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -114,6 +120,10 @@ async function ensureRuangProyekTable() {
     );
     CREATE INDEX IF NOT EXISTS idx_ruang_proyek_user ON ruang_proyek_projects (user_id, created_at);
     ALTER TABLE ruang_proyek_projects ADD COLUMN IF NOT EXISTS admin_docs jsonb NOT NULL DEFAULT '[]'::jsonb;
+    ALTER TABLE ruang_proyek_projects ADD COLUMN IF NOT EXISTS is_showcased boolean NOT NULL DEFAULT false;
+    ALTER TABLE ruang_proyek_projects ADD COLUMN IF NOT EXISTS show_value boolean NOT NULL DEFAULT false;
+    ALTER TABLE ruang_proyek_projects ADD COLUMN IF NOT EXISTS show_client boolean NOT NULL DEFAULT false;
+    CREATE INDEX IF NOT EXISTS idx_ruang_proyek_showcase ON ruang_proyek_projects (user_id) WHERE is_showcased;
   `);
 }
 
@@ -204,6 +214,9 @@ export function registerRuangProyekRoutes(app: Express) {
       put("admin_docs", JSON.stringify(d.adminDocs));
     }
     if (d.costItems !== undefined) put("cost_items", JSON.stringify(d.costItems));
+    if (d.isShowcased !== undefined) put("is_showcased", d.isShowcased);
+    if (d.showValue !== undefined) put("show_value", d.showValue);
+    if (d.showClient !== undefined) put("show_client", d.showClient);
     if (d.linkedFileIds !== undefined) {
       // Anti-IDOR: setiap file yang dikaitkan harus milik user ini di Ruang Simpan.
       if (d.linkedFileIds.length > 0) {
@@ -232,6 +245,35 @@ export function registerRuangProyekRoutes(app: Express) {
       if (!rows[0]) return res.status(404).json({ error: "Proyek tidak ditemukan" });
       res.json(mapRow(rows[0]));
     } catch (e) { safeErr(res, e, "PATCH update"); }
+  });
+
+  // ── Etalase publik (Portfolio proyek) — TANPA login, hanya field aman ──
+  // Nilai kontrak & nama klien hanya tampil bila pemilik mengizinkan per proyek.
+  app.get("/api/etalase/:userId", async (req, res) => {
+    const userId = String(req.params.userId || "").trim();
+    if (!userId || userId.length > 64 || !/^[A-Za-z0-9_-]+$/.test(userId)) {
+      return res.status(400).json({ error: "ID tidak valid" });
+    }
+    try {
+      const { rows } = await pool.query(
+        `SELECT name, location, description, status, start_date, end_date,
+                contract_value, client, show_value, show_client
+         FROM ruang_proyek_projects
+         WHERE user_id = $1 AND is_showcased = true
+         ORDER BY COALESCE(end_date, start_date, created_at::date) DESC
+         LIMIT 100`,
+        [userId]
+      );
+      res.json(rows.map((r) => ({
+        name: r.name,
+        location: r.location,
+        description: r.description,
+        status: r.status,
+        year: r.end_date ? String(r.end_date).slice(0, 4) : r.start_date ? String(r.start_date).slice(0, 4) : null,
+        contractValue: r.show_value === true && r.contract_value !== null ? Number(r.contract_value) : null,
+        client: r.show_client === true ? r.client : null,
+      })));
+    } catch (e) { safeErr(res, e, "GET etalase"); }
   });
 
   // ── Hapus ──
