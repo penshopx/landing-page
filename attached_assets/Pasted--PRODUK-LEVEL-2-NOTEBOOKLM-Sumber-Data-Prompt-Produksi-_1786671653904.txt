@@ -1,0 +1,697 @@
+# PRODUK LEVEL 2: NOTEBOOKLM
+## Sumber Data + Prompt Produksi (Modul, Video, Podcast)
+
+---
+
+## BAGIAN 1: SUMBER DATA YANG DIMASUKKAN KE NOTEBOOKLM
+
+---
+
+### 📋 PRINSIP DASAR
+
+NotebookLM bekerja dengan prinsip: **Garbage In = Garbage Out.** Semakin terstruktur dan lengkap sumber yang Anda unggah, semakin tajam output yang dihasilkan. Jangan masukkan semua sekaligus dalam satu file besar. **Pecah menjadi dokumen terpisah per kategori** agar NotebookLM bisa melakukan *cross-reference* dengan presisi.
+
+---
+
+### 📂 STRUKTUR FILE YANG DIUNGGAH (Total: 12–15 Dokumen)
+
+| No | Nama File | Format | Isi | Fungsi |
+|:---:|-----------|:------:|-----|--------|
+| 1 | `01_EBOOK_PREMIUM_FULL.md` | PDF / TXT | Seluruh teks Bab 1–9 (tanpa catatan desain) | Sumber utama narasi & konsep |
+| 2 | `02_APPENDICES_A1-A3.md` | PDF / TXT | Cash Triage, Termin Tracker, Buffer Calculator | Sumber template & rumus |
+| 3 | `03_APPENDICES_A4-A6.md` | PDF / TXT | 12 Template Surat/WA + Checklist + Payung Hukum | Sumber script & referensi legal |
+| 4 | `04_KASUS_PAK_R.md` | TXT | Kisah Pak R versi LENGKAP (setup + resolusi) | Sumber storytelling untuk podcast/video |
+| 5 | `05_DATA_ANGKA.md` | TXT / CSV | Semua angka: nilai proyek, termin, buffer, burn rate, timeline pencairan | Sumber untuk contoh kalkulasi di modul |
+| 6 | `06_PAYUNG_HUKUM.md` | TXT | UU 2/2017, Perpres 46/2025, SSUK, FIDIC, PP 38/2016 (ringkasan pasal) | Sumber untuk modul hukum & podcast |
+| 7 | `07_GLOSARIUM_KONSTRUKSI.md` | TXT | Daftar istilah: BAST, SPP, SPM, SP2D, KPPN, SSUK, TGR, dll. + definisi 2 kalimat | Sumber agar NotebookLM tidak salah pakai istilah |
+| 8 | `08_PERSONA_PEMBACA.md` | TXT | Deskripsi detail target audience (lihat bawah) | Sumber tone & level bahasa |
+| 9 | `09_TONE_GUIDE.md` | TXT | Aturan gaya bahasa: "Bos", metafora, larangan kata (lihat bawah) | Sumber konsistensi suara |
+| 10 | `10_PANCINGAN_EBOOK.md` | PDF | Ebook pancingan 14 halaman (versi gratis) | Referensi struktur hook & CTA |
+| 11 | `11_FAQ_KONTRAKTOR.md` | TXT | 20-30 pertanyaan yang paling sering ditanyakan kontraktor UKM (lihat bawah) | Sumber untuk modul Q&A dan podcast |
+| 12 | `12_STRUKTUR_MODUL.md` | TXT | Outline modul yang Anda inginkan (lihat bawah) | Kerangka agar NotebookLM tidak melantur |
+
+---
+
+### 📝 DETAIL FILE PENDUKUNG (Yang Harus Anda Tulis Sendiri)
+
+#### File 08: PERSONA PEMBACA
+
+```text
+NAMA FIKTIF: Pak R (Representasi Target Audience)
+USIA: 35-55 tahun
+PENDIDIKAN: STM / D3 Teknik Sipil / otodidak dari lapangan
+PENGALAMAN: 5-15 tahun jadi kontraktor
+BENTUK USAHA: CV atau Perorangan
+NILAI PROYEK: Rp 500 juta - Rp 10 miliar
+LOKASI: Kabupaten / Kota tier 2-3 di Indonesia
+TIM: 5-20 orang (mandor, tukang, 1 admin)
+MASALAH UTAMA: Kas sering minus, tidak punya sistem, 
+              bergantung pada "feeling" dan "koneksi"
+BAHASA: Indonesia sehari-hari, campur istilah lapangan, 
+        tidak suka bahasa akademis
+MEDIA KONSUMSI: WhatsApp, YouTube, podcast di mobil/pickup
+WAKTU BELAJAR: Malam hari (20.00-23.00) atau di perjalanan
+KETAHANAN FOKUS: Rendah untuk teks panjang. Tinggi untuk 
+               cerita dan contoh konkret.
+```
+
+#### File 09: TONE GUIDE
+
+```text
+ATURAN GAYA BAHASA:
+
+1. PANGGILAN: "Bos" (bukan "Anda", bukan "Saudara", bukan "Pak/Bu")
+2. NADA: Senior di lapangan yang ngomong sambil ngopi jam 10 malam.
+   Tegas. Jujur. Tidak menggurui. Kadang kasar tapi selalu empatik.
+3. METAfora WAJIB: 
+   - Cash flow = oksigen / napas
+   - Buffer = tabung oksigen cadangan
+   - Profit = cerita Lebaran / angka di atas kertas
+   - Birokrasi = hutan rimba / antrean
+   - Kontrak = perisai / pedang
+4. LARANGAN:
+   - Jangan gunakan kata "inovasi", "sinergi", "holistik", "komprehensif"
+   - Jangan gunakan kalimat pasif berlebihan
+   - Jangan gunakan "menurut para ahli..." tanpa konteks lapangan
+   - Jangan motivasional kosong ("Anda pasti bisa!")
+5. STRUKTUR KALIMAT: Pendek. Maksimal 20 kata per kalimat. 
+   Jika lebih, pecah jadi dua.
+6. ANGKA: Selalu gunakan contoh konkret. 
+   Jangan bilang "sejumlah besar uang". Bilang "Rp 1,1 miliar".
+7. EMOSI: Boleh marah, boleh tegas, boleh empatik. 
+   Tapi JANGAN PERNAH merendahkan pembaca.
+```
+
+#### File 11: FAQ KONTRAKTOR (20 Pertanyaan)
+
+```text
+1. "Termin sudah 3 bulan belum cair, saya harus ngapain?"
+2. "PPK minta fee 5%, kalau tidak kasih, berkas ditahan. Gimana?"
+3. "Boleh nggak saya pakai DP proyek baru untuk bayar proyek lama?"
+4. "Subkon mengancam stop kerja kalau belum dibayar. Saya belum 
+    punya uang. Harus bilang apa?"
+5. "Apakah saya bisa kena penjara kalau kurangi spek material 
+    sedikit saja?"
+6. "Rekening perusahaan dan pribadi masih jadi satu. 
+    Apakah sudah terlambat untuk pisahkan?"
+7. "Berapa persen margin yang sehat untuk proyek pemerintah?"
+8. "Kalau PPK ganti orang di tengah proyek, apakah kontrak 
+    saya masih berlaku?"
+9. "Bagaimana cara tahu berkas saya ada di meja PPK atau di KPPN?"
+10. "Apakah saya boleh menghentikan pekerjaan kalau belum dibayar?"
+11. "Denda keterlambatan 1/1000 per hari itu dihitung dari 
+    nilai kontrak atau nilai termin?"
+12. "Kalau proyek putus kontrak, apakah jaminan pelaksanaan 
+    pasti dicairkan?"
+13. "Bagaimana cara menghitung buffer kalau proyek saya 
+    cuma Rp 500 juta?"
+14. "Supplier mengancam tidak kirim material. Saya harus 
+    bayar dulu atau negosiasi?"
+15. "Apakah ada template surat untuk menagih PPK yang sopan 
+    tapi tegas?"
+16. "Kalau APBD telat cair karena PAD kurang, apakah saya 
+    bisa klaim bunga?"
+17. "Berapa lama proses SP2D di KPPN dalam kondisi normal?"
+18. "Apakah saya perlu pengacara untuk menagih termin Rp 200 juta?"
+19. "Bagaimana cara membaca Kurva-S untuk tahu apakah proyek 
+    saya sehat?"
+20. "Kalau saya sudah blacklist, berapa lama baru boleh 
+    ikut tender lagi?"
+```
+
+#### File 12: STRUKTUR MODUL
+
+```text
+MODUL 1: DIAGNOSIS (Bab 1-3)
+  - Sesi 1.1: Profit vs Cash Flow (15 menit)
+  - Sesi 1.2: 5 Akar Masalah (20 menit)
+  - Sesi 1.3: 3 Kesalahan Fatal + Death Spiral (20 menit)
+
+MODUL 2: SISTEM INTERNAL (Bab 4-6)
+  - Sesi 2.1: Cash Triage Matrix (25 menit)
+  - Sesi 2.2: Termin Tracker 7-Titik (25 menit)
+  - Sesi 2.3: Buffer Protocol (20 menit)
+
+MODUL 3: PERTAHANAN EKSTERNAL (Bab 7-8)
+  - Sesi 3.1: Dokumen Zero-Defect (20 menit)
+  - Sesi 3.2: Hukum & Eskalasi (25 menit)
+
+MODUL 4: SKALA & MINDSET (Bab 9)
+  - Sesi 4.1: Dari Bertahan ke Bertumbuh (20 menit)
+  - Sesi 4.2: Dashboard CEO + 3 Metrik (15 menit)
+
+MODUL 5: PRAKTIKUM (Appendices)
+  - Sesi 5.1: Cara Mengisi Cash Triage Matrix (15 menit)
+  - Sesi 5.2: Cara Setup Termin Tracker di Excel (15 menit)
+  - Sesi 5.3: Cara Menghitung Buffer untuk Proyek Anda (15 menit)
+  - Sesi 5.4: Cara Menggunakan 12 Template Surat (10 menit)
+```
+
+---
+
+---
+
+## BAGIAN 2: PROMPT UNTUK PENULISAN DI NOTEBOOKLM
+
+---
+
+### 📋 PRINSIP PROMPTING DI NOTEBOOKLM
+
+1. **Selalu sebutkan sumber** yang harus dipakai. NotebookLM akan mengabaikan sumber yang tidak disebut jika ada banyak file.
+2. **Beri constraint** (batasan) yang jelas: panjang, format, tone, larangan.
+3. **Satu prompt = satu output.** Jangan minta modul + video + podcast sekaligus.
+4. **Gunakan persona** di setiap prompt agar tone konsisten.
+5. **Minta struktur dulu, baru minta isi.** (Two-step prompting).
+
+---
+
+## A. PROMPT UNTUK MODUL (Teks / PDF Pembelajaran)
+
+---
+
+### Prompt A1: Generate Outline Modul (Langkah Pertama)
+
+```text
+Bertindaklah sebagai Instructional Designer untuk kontraktor UKM 
+Indonesia. 
+
+Berdasarkan sumber [01_EBOOK_PREMIUM_FULL] dan [12_STRUKTUR_MODUL], 
+buatkan outline detail untuk MODUL [nomor sesi, misal: 2.1 - Cash 
+Triage Matrix].
+
+Struktur outline harus mencakup:
+1. Judul Sesi (maksimal 8 kata, punchy)
+2. Learning Objective (3 poin, gunakan kata kerja: "Mampu...", 
+   "Dapat...", "Memahami...")
+3. Hook / Pembuka (1 paragraf yang bikin pembaca merasa "ini gue")
+4. Konten Inti (pecah jadi 3-5 sub-bagian)
+5. Contoh Kasus (gunakan data dari [05_DATA_ANGKA] dan 
+   [04_KASUS_PAK_R])
+6. Lembar Kerja / Latihan (1 tugas praktis yang bisa dikerjakan 
+   dalam 15 menit)
+7. Ringkasan (5 bullet points)
+8. Jembatan ke Sesi Berikutnya (2 kalimat)
+
+Tone: Gunakan [09_TONE_GUIDE]. Panggil pembaca "Bos". 
+Bahasa Indonesia praktis, bukan akademis.
+Panjang outline: maksimal 500 kata.
+```
+
+---
+
+### Prompt A2: Generate Isi Modul Lengkap (Setelah Outline Disetujui)
+
+```text
+Berdasarkan outline yang sudah disetujui di atas, tulis ISI LENGKAP 
+untuk Sesi [nomor dan judul sesi].
+
+Gunakan sumber utama: [01_EBOOK_PREMIUM_FULL] Bab [X].
+Gunakan sumber pendukung: [02_APPENDICES] untuk template/rumus, 
+[05_DATA_ANGKA] untuk contoh kalkulasi.
+
+Aturan penulisan:
+- Panjang: 1.500 - 2.500 kata
+- Struktur: Ikuti outline yang sudah dibuat
+- Setiap konsep WAJIB disertai contoh angka konkret 
+  (jangan bilang "sejumlah besar", bilang "Rp 350 juta")
+- Setiap 300 kata, sisipkan satu "kotak peringatan" atau 
+  "kotak tips" (format: > ⚠️ atau > 💡)
+- Gunakan tabel jika ada perbandingan atau langkah-langkah
+- Akhiri dengan 3 pertanyaan refleksi untuk pembaca
+- Tone: Senior lapangan, tegas, jujur. Gunakan [09_TONE_GUIDE].
+- JANGAN gunakan bahasa motivasional kosong.
+- JANGAN gunakan kata "inovasi", "sinergi", "holistik".
+
+Format output: Markdown dengan heading, bold, tabel, dan blockquote.
+```
+
+---
+
+### Prompt A3: Generate Lembar Kerja / Worksheet (Per Modul)
+
+```text
+Berdasarkan isi Sesi [X] yang sudah ditulis, buatkan LEMBAR KERJA 
+(Worksheet) yang bisa dicetak dan diisi langsung oleh kontraktor.
+
+Format:
+- Judul worksheet
+- Petunjuk pengisian (3 kalimat)
+- Tabel / kotak-kotak kosong yang harus diisi 
+  (gunakan format Markdown table dengan kolom kosong)
+- 1 contoh pengisian yang sudah lengkap (agar pembaca paham 
+    cara mengisinya)
+- Kotak "Catatan untuk Anda" (ruang bebas untuk menulis)
+
+Gunakan data dari [02_APPENDICES_A1-A3] sebagai basis template.
+Tone: Instruksional tapi tidak kaku. Seperti mandor yang 
+mengajari anak buahnya.
+```
+
+---
+
+### Prompt A4: Generate Kuis / Evaluasi (Per Modul)
+
+```text
+Berdasarkan Sesi [X], buatkan 10 pertanyaan kuis pilihan ganda 
+(A, B, C, D) untuk menguji pemahaman pembaca.
+
+Aturan:
+- 3 pertanyaan level INGAT (recall fakta/angka)
+- 4 pertanyaan level PAHAM (mengapa/konsekuensinya apa)
+- 3 pertanyaan level APLIKASI (studi kasus singkat, pembaca 
+  harus memilih tindakan yang benar)
+- Setiap pertanyaan disertai kunci jawaban + penjelasan 1 kalimat 
+  MENGAPA itu jawaban yang benar
+- Gunakan konteks proyek pemerintah Indonesia 
+  (PPK, termin, SP2D, dll.)
+- Jangan gunakan pertanyaan jebakan yang ambigu
+
+Sumber: [01_EBOOK_PREMIUM_FULL] + [05_DATA_ANGKA]
+```
+
+---
+
+---
+
+## B. PROMPT UNTUK VIDEO (Script YouTube / Course Video)
+
+---
+
+### Prompt B1: Generate Outline Seri Video (Langkah Pertama)
+
+```text
+Bertindaklah sebagai YouTube Scriptwriter untuk channel edukasi 
+kontraktor Indonesia.
+
+Berdasarkan sumber [01_EBOOK_PREMIUM_FULL] dan [12_STRUKTUR_MODUL], 
+buatkan outline untuk SERI VIDEO dengan ketentuan:
+
+Format video:
+- Durasi per video: 8-12 menit (bukan 30 menit, attention span 
+  kontraktor di YouTube pendek)
+- Total video: [X] video dalam satu playlist
+- Setiap video = 1 konsep spesifik (jangan gabungkan 2 topik)
+
+Untuk setiap video, berikan:
+1. Judul (maksimal 60 karakter, clickbait tapi jujur)
+2. Thumbnail text (maksimal 5 kata, besar, kontras)
+3. Hook 15 detik pertama (kalimat pembuka yang bikin tidak skip)
+4. 3 poin utama yang dibahas
+5. CTA di akhir (apa yang harus dilakukan penonton setelah nonton)
+
+Gunakan [08_PERSONA_PEMBACA] sebagai target audience.
+Tone: [09_TONE_GUIDE]. Seperti ngobrol di warung kopi, 
+bukan presentasi korporat.
+```
+
+---
+
+### Prompt B2: Generate Script Video Lengkap
+
+```text
+Tulis SCRIPT VIDEO LENGKAP untuk video berjudul: 
+"[Judul Video]"
+
+Durasi target: [8-12] menit (sekitar [1.200-1.800] kata 
+untuk kecepatan bicara normal Indonesia).
+
+Struktur script:
+
+[HOOK - 15 detik]
+(Kalimat pembuka yang langsung menohok. Bisa pertanyaan, 
+angka mengejutkan, atau pernyataan kontroversial. 
+TANPA intro "Halo guys welcome back".)
+
+[INTRO - 30 detik]
+(Perkenalan singkat siapa Anda, apa yang akan dibahas, 
+dan MENGAPA penonton harus stay sampai akhir. 
+Satu kalimat "janji" tentang apa yang mereka dapat.)
+
+[ISI - 7-9 menit]
+(Pecah jadi 3 segmen. Setiap segmen:
+ - Penjelasan konsep (gunakan analogi lapangan)
+ - Contoh angka konkret dari [05_DATA_ANGKA]
+ - Satu "tamparan" atau "aha moment"
+ - Transisi ke segmen berikutnya)
+
+[CTA / PENUTUP - 30 detik]
+(Ringkasan 1 kalimat. Call to action spesifik. 
+Bisa: "Download template di link deskripsi" atau 
+"Tonton video berikutnya tentang [topik]".)
+
+Aturan penulisan:
+- Tulis seperti ORANG BICARA, bukan orang menulis.
+- Gunakan kalimat pendek. Maksimal 15 kata per kalimat.
+- Sisipkan [JEDA] untuk momen dramatis.
+- Sisipkan [TAMPILKAN DI LAYAR: ...] untuk instruksi visual.
+- Sisipkan [B-ROLL: ...] untuk instruksi footage pendukung.
+- Gunakan kata "Bos", "gue", "lo" secara natural.
+- JANGAN gunakan "baiklah", "mari kita", "perlu diketahui bahwa".
+
+Sumber konten: [01_EBOOK_PREMIUM_FULL] Bab [X] + 
+[04_KASUS_PAK_R] untuk storytelling.
+```
+
+---
+
+### Prompt B3: Generate Hook & Thumbnail Alternatif
+
+```text
+Untuk video berjudul "[Judul]", buatkan:
+
+1. 5 alternatif HOOK (kalimat pembuka 15 detik pertama). 
+   Setiap hook harus berbeda pendekatan:
+   - Hook 1: Pertanyaan provokatif
+   - Hook 2: Angka mengejutkan
+   - Hook 3: Cerita singkat (2 kalimat)
+   - Hook 4: Pernyataan kontroversial
+   - Hook 5: "Kesalahan yang sedang Anda lakukan sekarang"
+
+2. 5 alternatif TEKS THUMBNAIL (maksimal 5 kata, 
+   harus bikin penasaran)
+
+3. 3 alternatif JUDUL VIDEO (A/B testing)
+
+Gunakan [08_PERSONA_PEMBACA] sebagai target.
+Tone: [09_TONE_GUIDE].
+```
+
+---
+
+### Prompt B4: Generate Deskripsi & Tags YouTube
+
+```text
+Untuk video "[Judul]", buatkan:
+
+1. DESKRIPSI VIDEO (200-300 kata):
+   - Paragraf 1: Hook (apa masalah yang dibahas)
+   - Paragraf 2: Apa yang akan dipelajari (bullet points)
+   - Paragraf 3: Timestamp (00:00 - Hook, 00:15 - Intro, dst.)
+   - Paragraf 4: CTA + link terkait
+   - Paragraf 5: Disclaimer singkat
+
+2. TAGS (15-20 tags):
+   Campuran keyword luas dan spesifik.
+   Contoh: "kontraktor pemerintah", "cash flow konstruksi", 
+   "termin proyek macet", "cara menagih PPK", dll.
+
+3. 3 PINNED COMMENT alternatives 
+   (pertanyaan yang memancing engagement di kolom komentar)
+
+SEO target: Kontraktor UKM Indonesia yang mencari solusi 
+cash flow proyek pemerintah.
+```
+
+---
+
+---
+
+## C. PROMPT UNTUK PODCAST (Audio / Script Narasi)
+
+---
+
+### Prompt C1: Generate Outline Seri Podcast (Langkah Pertama)
+
+```text
+Bertindaklah sebagai Podcast Producer untuk channel audio 
+kontraktor Indonesia.
+
+Format podcast:
+- Durasi per episode: 15-25 menit
+- Gaya: MONOLOG (satu orang bicara, seperti senior yang 
+  ngomong di mobil pickup sambil perjalanan ke proyek)
+- BUKAN interview. BUKAN panel. Satu suara. Intim. Personal.
+- Target: Didengarkan di mobil, di proyek, atau malam hari 
+  sebelum tidur.
+
+Berdasarkan [01_EBOOK_PREMIUM_FULL], buatkan outline untuk 
+[X] episode podcast dengan struktur:
+
+Untuk setiap episode:
+1. Judul Episode (provokatif, seperti judul obrolan warung)
+2. Durasi target
+3. Cold Open (30 detik pertama: cerita atau pertanyaan 
+   yang langsung menarik)
+4. Segmen 1: Masalah (5-7 menit)
+5. Segmen 2: Penjelasan / Sistem (7-10 menit)
+6. Segmen 3: Aksi Konkret (3-5 menit)
+7. Penutup + Teaser episode berikutnya (1 menit)
+
+Gunakan [04_KASUS_PAK_R] sebagai benang merah storytelling.
+Tone: [09_TONE_GUIDE]. Seperti ngobrol satu lawan satu, 
+bukan ceramah.
+```
+
+---
+
+### Prompt C2: Generate Script Podcast Lengkap
+
+```text
+Tulis SCRIPT PODCAST LENGKAP untuk episode berjudul:
+"[Judul Episode]"
+
+Durasi target: [15-25] menit (sekitar [2.500-4.000] kata 
+untuk kecepatan bicara natural Indonesia, termasuk jeda).
+
+Struktur script:
+
+[COLD OPEN - 30 detik]
+(Mulai LANGSUNG dengan cerita atau pernyataan. 
+TANPA "Halo selamat datang di podcast...". 
+Contoh: "Bos, gue pernah lihat kontraktor nangis di parkiran 
+kantor dinas. Bukan karena proyeknya rugi. Tapi karena...")
+
+[INTRO - 30 detik]
+(Nama podcast, nama host, topik hari ini. 
+Satu kalimat: "Kalau lo pernah [masalah], episode ini buat lo.")
+
+[SEGMEN 1: MASALAH - 5-7 menit]
+(Ceritakan masalahnya. Gunakan data dari [04_KASUS_PAK_R]. 
+Buat pendengar merasa "ini gue banget". 
+Gunakan jeda dramatis. Biarkan momen "tamparan" bernapas.)
+
+[SEGMEN 2: PENJELASAN - 7-10 menit]
+(Jelaskan akar masalah dan solusinya. 
+Gunakan analogi lapangan. 
+Setiap 2 menit, sisipkan mini-summary: 
+"Jadi intinya gini, Bos...")
+
+[SEGMEN 3: AKSI - 3-5 menit]
+(Berikan 1-3 langkah konkret yang bisa dilakukan BESOK PAGI. 
+Spesifik. Bukan "perbaiki manajemen", tapi 
+"buka Excel, bikin 4 kolom, isi setiap Jumat".)
+
+[PENUTUP - 1 menit]
+(Ringkasan 1 kalimat. 
+Teaser episode berikutnya. 
+Kalimat penutup signature yang konsisten tiap episode.)
+
+Aturan penulisan:
+- Tulis seperti ORANG BICARA, bukan membaca teks.
+- Gunakan "gue", "lo", "Bos" secara natural.
+- Sisipkan [JEDA 2 DETIK] atau [JEDA 3 DETIK] untuk 
+  momen dramatis.
+- Sisipkan [TARIK NAPAS] untuk transisi antar segmen.
+- Gunakan pengulangan untuk penekanan: 
+  "Bukan karena bodoh. Bukan karena malas. Tapi karena 
+  nggak ada yang pernah ngajarin."
+- JANGAN terdengar seperti membaca buku. 
+  Harus terdengar seperti NGOMONG.
+- Boleh ada "eh", "nah", "gini ya", "tapi tunggu dulu" 
+  untuk naturalness.
+
+Sumber: [01_EBOOK_PREMIUM_FULL] Bab [X] + 
+[04_KASUS_PAK_R] + [05_DATA_ANGKA].
+```
+
+---
+
+### Prompt C3: Generate "Cold Open" Alternatif
+
+```text
+Untuk episode podcast tentang [topik], buatkan 5 alternatif 
+COLD OPEN (30 detik pertama).
+
+Setiap cold open harus berbeda pendekatan:
+- Open 1: Cerita personal ("Gue pernah...")
+- Open 2: Angka mengejutkan ("Tahu nggak, Bos...")
+- Open 3: Pertanyaan retoris ("Pernah nggak lo...")
+- Open 4: Dialog imajiner ("Bayangin lo lagi di...")
+- Open 5: Kontradiksi ("RAB bilang untung. 
+  Rekening bilang minus. Dua-duanya benar.")
+
+Aturan:
+- Maksimal 80 kata per cold open (≈ 30 detik bicara)
+- Harus bikin pendengar STOP scrolling dan terus dengerin
+- Gunakan [09_TONE_GUIDE]
+- JANGAN mulai dengan "Halo", "Selamat datang", 
+  "Di episode kali ini"
+```
+
+---
+
+### Prompt C4: Generate Show Notes & Distribusi
+
+```text
+Untuk episode podcast "[Judul]", buatkan:
+
+1. SHOW NOTES (untuk deskripsi di Spotify/Apple Podcasts):
+   - Ringkasan episode (3-4 kalimat)
+   - Timestamp per segmen
+   - 3 key takeaways (bullet points)
+   - Link / resource yang disebutkan
+   - CTA (subscribe, share, review)
+
+2. SOCIAL MEDIA CUTS (untuk promosi di IG Reels / TikTok):
+   - 3 kutipan paling "nendang" dari episode 
+     (maksimal 25 kata per kutipan, untuk text overlay)
+   - 1 pertanyaan engagement untuk caption
+   - 3 hashtag relevan
+
+3. EMAIL NEWSLETTER (untuk kirim ke subscriber):
+   - Subject line (maksimal 50 karakter, bikin penasaran)
+   - Preview text (maksimal 90 karakter)
+   - Body email (150 kata: masalah → solusi → CTA dengerin)
+
+Tone: [09_TONE_GUIDE]. Konsisten dengan suara podcast.
+```
+
+---
+
+---
+
+## D. PROMPT TAMBAHAN: CROSS-FORMAT CONSISTENCY
+
+---
+
+### Prompt D1: Quality Check (Setelah Generate Apapun)
+
+```text
+Review teks yang baru saja kamu generate. 
+Periksa terhadap aturan berikut:
+
+1. Apakah tone sesuai [09_TONE_GUIDE]? 
+   (Tegas, jujur, tidak menggurui, pakai "Bos")
+2. Apakah ada kalimat lebih dari 20 kata? 
+   (Jika ada, pecah jadi dua)
+3. Apakah ada kata terlarang? 
+   ("inovasi", "sinergi", "holistik", "komprehensif", 
+   "baiklah", "mari kita", "perlu diketahui")
+4. Apakah setiap konsep disertai contoh angka konkret?
+5. Apakah ada bagian yang terdengar seperti buku teks? 
+   (Jika ada, ubah jadi bahasa lapanngan)
+6. Apakah persona [08_PERSONA_PEMBACA] terlayani? 
+   (Apakah kontraktor STM yang baca ini bisa langsung paham?)
+
+Berikan revisi untuk setiap pelanggaran yang ditemukan.
+```
+
+---
+
+### Prompt D2: Generate Transisi Antar Format
+
+```text
+Saya sudah punya:
+- Modul teks: [paste ringkasan modul]
+- Video script: [paste ringkasan video]
+- Podcast script: [paste ringkasan podcast]
+
+Ketiganya membahas topik yang sama: [topik].
+
+Buatkan:
+1. Kalimat pembuka video yang MERUJUK ke modul: 
+   "Kalau lo mau versi lengkap dengan template, 
+   cek modul di..."
+2. Kalimat di podcast yang MERUJUK ke video: 
+   "Gue udah bikin video visualnya, biar lo bisa lihat 
+   matriksnya langsung. Link di show notes."
+3. Kalimat di modul yang MERUJUK ke podcast: 
+   "Kalau lo lebih suka dengerin sambil nyetir, 
+   gue udah rekam versi podcastnya di episode [X]."
+
+Tujuan: Membuat pembaca/penonton/pendengar berpindah 
+antar format dalam ekosistem produk.
+```
+
+---
+
+---
+
+## E. WORKFLOW PRODUKSI DI NOTEBOOKLM
+
+---
+
+### 📋 LANGKAH-LANGKAH EKSEKUSI
+
+```text
+FASE 1: SETUP (Hari 1)
+─────────────────────
+□ Buat project baru di NotebookLM
+□ Upload 12-15 dokumen (Bagian 1 di atas)
+□ Pastikan semua dokumen ter-index dengan benar
+□ Test dengan pertanyaan sederhana: 
+  "Apa itu Cash Triage Matrix?" 
+  → Jika jawaban akurat, sumber sudah benar.
+
+FASE 2: PRODUKSI MODUL (Hari 2-4)
+─────────────────────
+□ Generate outline semua sesi (Prompt A1)
+□ Review & edit outline
+□ Generate isi per sesi (Prompt A2)
+□ Generate worksheet per sesi (Prompt A3)
+□ Generate kuis per sesi (Prompt A4)
+□ Quality check semua output (Prompt D1)
+□ Export ke PDF / Word
+
+FASE 3: PRODUKSI VIDEO (Hari 5-7)
+─────────────────────
+□ Generate outline seri video (Prompt B1)
+□ Review & pilih judul terbaik (Prompt B3)
+□ Generate script per video (Prompt B2)
+□ Generate deskripsi & tags (Prompt B4)
+□ Quality check (Prompt D1)
+□ Serahkan ke editor video / rekam sendiri
+
+FASE 4: PRODUKSI PODCAST (Hari 8-10)
+─────────────────────
+□ Generate outline seri podcast (Prompt C1)
+□ Generate cold open alternatif (Prompt C3)
+□ Generate script per episode (Prompt C2)
+□ Generate show notes (Prompt C4)
+□ Quality check (Prompt D1)
+□ Rekam audio (gunakan ElevenLabs / rekam sendiri)
+
+FASE 5: INTEGRASI (Hari 11-12)
+─────────────────────
+□ Generate cross-format transitions (Prompt D2)
+□ Pastikan semua CTA mengarah ke level produk berikutnya
+□ Final review: baca/dengar semua output secara berurutan
+□ Publish
+```
+
+---
+
+---
+
+## 📊 RINGKASAN: APA YANG ANDA PUNYA SEKARANG
+
+| Komponen | Status |
+|----------|:------:|
+| Daftar 12-15 file sumber untuk NotebookLM | ✅ |
+| Detail isi file pendukung (Persona, Tone, FAQ, Struktur) | ✅ |
+| 4 Prompt untuk Modul (Outline, Isi, Worksheet, Kuis) | ✅ |
+| 4 Prompt untuk Video (Outline, Script, Hook, SEO) | ✅ |
+| 4 Prompt untuk Podcast (Outline, Script, Cold Open, Show Notes) | ✅ |
+| 2 Prompt untuk Quality Check & Cross-Format | ✅ |
+| Workflow produksi 12 hari | ✅ |
+
+---
+
+Bos, ini sudah cukup lengkap untuk Anda langsung buka NotebookLM dan mulai produksi. 
+
+**Saran saya sebelum mulai:**
+1. Tulis dulu file `08_PERSONA`, `09_TONE_GUIDE`, dan `11_FAQ` dari template di atas. Sesuaikan dengan pengalaman riil Anda di lapangan.
+2. Upload semua sumber, test dengan 2-3 pertanyaan. Jika output NotebookLM masih "kaku", tambahkan lebih banyak contoh kasus nyata Anda ke file sumber.
+3. Jangan generate semua sekaligus. Satu sesi per hari. Review, edit, baru lanjut.
+
+Mau lanjut ke **Level 3 (Toolkit + AI Spesialis)** atau mau refine dulu bagian NotebookLM ini? 🫡

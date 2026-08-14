@@ -11,7 +11,7 @@ import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
 import { useContactNumbers } from "@/lib/contact";
-import { Bot, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2 } from "lucide-react";
+import { Bot, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2, FolderKanban } from "lucide-react";
 
 
 const PLAN_BADGE_CONFIG: Record<string, { label: string; className: string }> = {
@@ -247,7 +247,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
 
   // Baris 1 — pintu masuk utama (kategori besar)
   const navRow1 = [
-    { href: "/trilogi",           label: "Peta Jalan",          icon: Route,         badge: "Mulai di Sini" },
+    { href: "/ruang-proyek",      label: "Ruang Proyek",        icon: FolderKanban,  badge: "Portfolio" },
     { href: "/klinik-konsultasi", label: "Klinik Konsultasi",   icon: Stethoscope },
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },

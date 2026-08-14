@@ -1,0 +1,149 @@
+# BAB 5
+## TERMIN TRACKER 7-TITIK
+### *Berhenti Meneror PPK. Mulai Melacak Uang Anda yang Sedang "Nyasar" di Birokrasi.*
+
+---
+
+Bos, saya yakin Anda pernah mengalami adegan ini:
+
+Anda butuh uang untuk bayar tukang (Kuadran Merah di Bab 4). Anda buka WhatsApp, cari kontak PPK (Pejabat Pembuat Komitmen). Anda ketik: 
+*"Selamat pagi Pak, maaf mengganggu. Mohon info untuk termin pertama kapan ya Pak cairnya? Soalnya di lapangan sudah mendesak."*
+
+PPK membalas 3 jam kemudian: 
+*"Pagi Pak. Sedang diproses ya. Mohon bersabar."*
+
+Anda diam. Anda bingung. Anda marah. Tapi Anda tidak bisa membalas apa-apa. 
+
+Bos, masalahnya bukan pada PPK-nya. Masalahnya adalah **Anda tidak tahu kata "diproses" itu artinya apa, dan berkas Anda sedang tidur di meja siapa.** Anda menagih dengan emosi, sementara birokrasi negara berjalan dengan **SOP dan urutan meja.**
+
+Di proyek pemerintah (APBN/APBD), uang tidak langsung melompat dari kas negara ke rekening Anda. Uang itu harus melewati **pos pemeriksaan (checkpoint)**. Jika Anda tidak tahu pos mana yang sedang dilewati, Anda seperti menelepon kurir JNE dan bertanya *"Paket saya di mana?"* padahal paket Anda masih di gudang *seller*.
+
+Mulai hari ini, hentikan kebiasaan meneror PPK dengan pertanyaan *"Kapan cair?"*. Ganti dengan **Termin Tracker 7-Titik.**
+
+---
+
+## 7 POS PEMERIKSAAN UANG ANDA
+
+Setiap termin pembayaran di proyek pemerintah wajib melewati 7 meja ini. Jika macet di meja ke-3, jangan teriak ke orang di meja ke-6. 
+
+```text
+[OPNAME] ➔ [BAST] ➔ [VERIFIKASI PPK] ➔ [SPP] ➔ [SPM] ➔ [SP2D/KPPN] ➔ [REKENING]
+  (1)        (2)         (3)            (4)      (5)        (6)           (7)
+```
+
+Mari kita bedah satu per satu, dan apa yang harus Anda lakukan di setiap titik.
+
+### 📍 Titik 1: Opname Lapangan (Pengukuran Progres)
+Ini titik nol. Tim teknis dari Owner/Konsultan Supervisi turun ke lapangan mengukur volume pekerjaan yang sudah jadi. 
+* **Risiko Delay:** Cuaca buruk, tim teknis sibuk di proyek lain, atau volume Anda dianggap kurang sesuai gambar.
+* **Tugas Anda:** Dampingi tim teknis. Siapkan *back-up data* ukuran (sketsa, foto progres ber-timestamp, hasil uji lab beton/aspal). Jangan biarkan mereka mengukur sendiri tanpa didampingi mandor Anda.
+
+### 📍 Titik 2: BAST (Berita Acara Serah Terima) Pekerjaan
+Setelah opname sepakat, dibuatlah BAST. Ini adalah **dokumen legal** yang menyatakan negara "mengakui" Anda telah menyelesaikan pekerjaan senilai Rp X.
+* **Risiko Delay:** Draft BAST salah ketik, atau ada revisi minor dari tim teknis.
+* **Tugas Anda:** Kejar draft BAST. Pastikan angka di BAST sama persis dengan angka di *invoice* yang akan Anda kirim.
+
+### 📍 Titik 3: Verifikasi PPK & Tim Teknis (Meja Paling Rawan)
+BAST dan *invoice* masuk ke meja PPK. Di sini PPK dan tim teknis akan mencocokkan dokumen Anda dengan RAB, kontrak, dan bukti fisik.
+* **Risiko Delay:** **Ini adalah kuburan berkas.** Jika ada satu lembar faktur pajak yang kurang, satu foto dokumentasi yang buram, atau satu tanda tangan mandor yang hilang, PPK akan menaruh berkas Anda di **bawah tumpukan** dan memproses berkas kontraktor lain yang dokumennya rapi. PPK takut pada audit BPK. Berkas yang "bolong" adalah risiko bagi karier beliau.
+* **Tugas Anda:** Terapkan prinsip **Zero-Defect** (Nol Cacat). Susun dokumen persis seperti yang PPK inginkan. (Checklist Zero-Defect ada di *Appendices A5*).
+
+### 📍 Titik 4: Penerbitan SPP (Surat Permintaan Pembayaran)
+Jika PPK lolos verifikasi, staf/bendahara pengeluaran akan membuat SPP. Ini adalah "formulir permintaan uang" internal dinas.
+* **Risiko Delay:** Bendahara sedang cuti, atau salah input kode akun (MAK).
+* **Tugas Anda:** *Follow-up* sopan ke staf bendahara. Pastikan kode rekening perusahaan Anda tidak salah ketik satu angka pun.
+
+### 📍 Titik 5: Penerbitan SPM (Surat Perintah Membayar)
+SPP diverifikasi oleh Pejabat Penandatangan SPM (biasanya PPK itu sendiri atau atasan beliau). SPM adalah perintah resmi ke negara: *"Tolong bayar kontraktor ini."*
+* **Risiko Delay:** PPK sedang dinas luar kota dan tidak ada yang boleh menggantikan tanda tangan.
+* **Tugas Anda:** Pantau jadwal PPK. Jika beliau dinas luar, pastikan SPM ditandatangani *sebelum* beliau berangkat.
+
+### 📍 Titik 6: SP2D & KPPN (Kantor Pelayanan Perbendaharaan Negara)
+SPM dikirim ke KPPN. KPPN menerbitkan SP2D (Surat Perintah Pencairan Dana). Di era sekarang, ini diproses lewat aplikasi **SAKTI / OMSPAN**.
+* **Risiko Delay:** Sistem SAKTI *down* (sangat sering terjadi di akhir tahun), atau kuota kas negara sedang diblokir sementara oleh Kementerian Keuangan.
+* **Tugas Anda:** Minta *screenshot* status SPM di aplikasi SAKTI dari bendahara PPK. Jika statusnya sudah "SP2D Terbit", uang Anda sudah dipegang negara dan tinggal ditransfer bank.
+
+### 📍 Titik 7: Pencairan Bank
+Uang masuk dari Rekening Kas Negara ke Rekening Perusahaan Anda.
+* **Risiko Delay:** Transfer antar-bank (jika rekening Anda beda bank dengan rekening penampungan dinas) bisa butuh 1x24 jam.
+
+---
+
+## 🛠️ DELIVERABLE: SCRIPT FOLLOW-UP TANPA TERLIHAT MENGEMIS
+
+Kontraktor amatir menagih dengan merengek. Kontraktor profesional menagih dengan **data dan bantuan administratif.** 
+
+Gunakan script ini di WhatsApp sesuai di titik mana berkas Anda sedang tertahan.
+
+### Script A: Saat Berkas di Titik 3 (Verifikasi PPK)
+*Tujuannya: Menunjukkan Anda proaktif dan membantu PPK mengurangi beban kerjanya.*
+
+> "Selamat siang Pak [Nama PPK]. Mohon maaf mengganggu waktunya. 
+> 
+> Terkait berkas termin ke-[X] yang kami submit hari [Hari], saya ingin memastikan apakah ada dokumen *back-up* atau foto progres yang kurang jelas dari sisi kami? 
+> 
+> Jika ada yang perlu kami perbaiki atau lengkapi agar sesuai dengan standar verifikasi Tim Teknis/BPK, mohon infonya Pak. Segera saya antarkan revisinya hari ini juga agar tidak menghambat proses SPP di meja Bapak. Terima kasih banyak Pak."
+
+**Psikologi Script ini:** Anda tidak bertanya *"Kapan cair?"*. Anda bertanya *"Apakah ada yang kurang dari dokumen saya?"*. Ini memuji PPK secara tidak langsung (menganggap beliau teliti) dan menawarkan bantuan. PPK akan langsung mengecek tumpukan berkas Anda.
+
+### Script B: Saat Berkas di Titik 5 (Menunggu Tanda Tangan SPM)
+*Tujuannya: Mengingatkan tanpa mendesak, menggunakan alasan operasional lapangan.*
+
+> "Sore Pak [Nama PPK]. Izin menginfokan Pak, untuk progres fisik di lapangan saat ini sudah mencapai [X]%, dan kami sedang persiapan mobilisasi material untuk tahap berikutnya minggu depan. 
+> 
+> Terkait SPM termin sebelumnya, apakah sudah bisa ditandatangani hari ini Pak? Kami perlu kepastian arus kas untuk membayar supplier material tahap berikutnya agar jadwal kerja di lapangan tidak mundur dari *kurva-S* yang Bapak targetkan. Mohon arahannya Pak. Terima kasih."
+
+**Psikologi Script ini:** Anda mengaitkan pencairan uang dengan **keberhasilan proyek PPK** (*kurva-S* tidak mundur). PPK punya KPI (Key Performance Indicator) agar proyeknya selesai tepat waktu. Anda menggunakan KPI beliau sebagai *leverage* (daya tawar) Anda.
+
+### Script C: Saat Berkas di Titik 6 (Sudah di KPPN)
+*Tujuannya: Memastikan tidak ada *error* di sistem SAKTI.*
+
+> "Pagi Pak [Nama Bendahara]. Izin konfirmasi, untuk SPM atas nama CV [Nama CV] apakah di aplikasi SAKTI statusnya sudah *SP2D Terbit* atau masih ada *return* (catatan) dari KPPN Pak? 
+> 
+> Jika ada *return* atau *error* sistem, mohon info kode *error*-nya Pak, biar saya bantu cek atau siapkan dokumen pendukungnya. Terima kasih Pak."
+
+---
+
+## ATURAN EMAS TRACKER: UPDATE SETIAP HARI SENIN & KAMIS
+
+Anda tidak perlu menelepon PPK setiap hari. Itu membuat Anda terlihat putus asa dan mengganggu waktu kerja beliau. 
+
+**SOP Follow-Up:**
+1. **Senin Pagi:** Cek tracker. Di mana posisi berkas? Kirim Script A/B/C yang sesuai.
+2. **Kamis Siang:** Jika belum ada pergerakan dari hari Senin, kirim *reminder* singkat atau telepon staf bendahara (bukan PPK-nya langsung, kecuali urgen).
+3. **Jumat Sore:** Masukkan status termin ini ke dalam **Rapat Triase** (Bab 4). Jika termin diprediksi cair minggu depan, Anda bisa mulai menjadwalkan pembayaran untuk subkon di Kuadran Kuning.
+
+Dengan sistem ini, Anda memegang kendali. Anda tahu persis di mana uang Anda berada. Anda tidak lagi diteror oleh ketidakpastian.
+
+Dan ketika Anda sudah tahu *kapan* uang itu akan datang, pertanyaan berikutnya adalah: **Bagaimana jika uang itu telat 8 minggu?** 
+
+Itulah yang akan kita amankan di **Bab 6: Buffer Protocol.**
+
+---
+
+### 🔑 POIN KUNCI BAB 5
+
+> 1. **Berhenti bertanya "Kapan cair?".** Itu pertanyaan emosional yang tidak bisa dijawab oleh birokrasi.
+> 2. **Pahami 7 Titik Pencairan.** Anda harus tahu apakah uang Anda sedang diukur di lapangan (Opname), di meja PPK (Verifikasi), atau di server KPPN (SAKTI).
+> 3. **Terapkan Prinsip Zero-Defect.** PPK tidak menahan uang Anda karena jahat. Beliau menahan karena takut pada audit BPK. Buat dokumen Anda anti-peluru agar PPK *ingin* memprosesnya lebih dulu.
+> 4. **Gunakan Script Follow-Up Profesional.** Tawarkan bantuan administratif, kaitkan pencairan dengan target *kurva-S* proyek, dan hindari nada merengek.
+> 5. **Follow-up cukup 2 kali seminggu.** Senin dan Kamis. Biarkan PPK bekerja, sementara Anda melacak dari belakang layar.
+
+---
+
+## 🎨 CATATAN DESAIN BAB 5
+
+| Elemen | Spesifikasi |
+|--------|-------------|
+| **Visualisasi 7 Titik (Flowchart)** | Horizontal timeline dengan 7 ikon (Kaca Pembesar, Dokumen, Meja Kerja, Surat, Tanda Tangan, Gedung Bank, Uang). Beri warna merah pada Titik 3 (Verifikasi PPK) sebagai "Zona Rawan". |
+| **Tabel Matriks Risiko & Tugas** | Zebra-stripe abu terang. Kolom "Tugas Anda" di-highlight dengan background kuning muda agar terlihat sebagai *action item*. |
+| **Kotak Script (Deliverable)** | Desain *bubble chat* WhatsApp (Hijau muda). Beri label "Script A", "Script B", "Script C" dengan font tebal. Tambahkan ikon *clipboard* 📋 di sebelahnya. |
+| **Callout "Aplikasi SAKTI"** | Box kecil bergaya *tech-info* dengan ikon server/laptop. Menjelaskan secara singkat apa itu SAKTI/OMSPAN untuk menambah kredibilitas penulis. |
+| **Kotak Poin Kunci** | Konsisten: background navy `#1E2528`, border putih tipis, ikon 🔑. |
+
+---
+
+✅ **STATUS: BAB 5 PREMIUM — RAMPUNG.** 
+Sistem Lapis Kedua (Termin Tracker) sudah di tangan pembaca. Mereka sekarang punya peta jalan untuk menagih uang negara secara profesional.
+
+Lanjut ke **Bab 6: Buffer Protocol 10-15%** (Sistem Lapis Ketiga: Cara menghitung dan menjaga "oksigen cadangan" agar perusahaan tidak mati mendadak)? 🫡

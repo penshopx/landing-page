@@ -1,0 +1,401 @@
+# RUANG PROYEK — PAKET LENGKAP
+## *Blueprint Cash Flow + Copy Landing + Wireframe*
+
+---
+
+Konsep terkunci, Bos:
+
+```text
+RUANG PROYEK  (nama fitur di menu — mudah dipahami)
+│
+├── PORTFOLIO        (tampilan perusahaan: semua proyek, 1 layar)
+│
+└── PROYEK A  ──▶  WORKROOM  (ruang kerja per proyek)
+                     └── Terpasang: BLUEPRINT "CASH FLOW"
+```
+
+Sekarang saya交付 (serahkan) tiga deliverable sekaligus.
+
+---
+
+---
+
+# 📦 DELIVERABLE 1: STRUKTUR ISI "BLUEPRINT CASH FLOW"
+### *Manifest Instalasi — Apa Saja yang "Terkabel" Saat Dipasang*
+
+---
+
+```text
+╔═══════════════════════════════════════════════════════╗
+║  BLUEPRINT #001 — CASH FLOW                             ║
+║  Kode: BP-CF-001                                        ║
+║  Lahir dari: Ebook "Kas Merah, RAB Hijau"               ║
+║  AI Pemimpin: SI KAS                                    ║
+║  Status: SIAP PASANG                                    ║
+╚═══════════════════════════════════════════════════════╝
+```
+
+Saat blueprint ini dipasang ke sebuah Proyek, **9 modul** berikut otomatis terkabel:
+
+---
+
+### MODUL 1 — DASHBOARD (Ruang Kelola)
+
+| Widget yang Muncul | Fungsi |
+|--------------------|--------|
+| **Health Check** | Status 🟢🟡🔴 per proyek + Runway (hari) |
+| **Cash Heatmap** | Peta panas: proyek mana menghasilkan vs memakan kas |
+| **Termin Pipeline 7-Titik** | Visual posisi uang di birokrasi |
+| **Buffer Gauge** | Pengukur oksigen cadangan (cukup / menipis / kritis) |
+| **Rasio Kas vs Tagihan** | Perbandingan saldo vs piutang belum cair |
+
+---
+
+### MODUL 2 — STRUKTUR DOKUMEN (Ruang Simpan)
+
+Folder otomatis dibuat per proyek:
+
+```text
+📁 PROYEK [NAMA] — [Blueprint: CASH FLOW]
+├── 📁 01_KONTRAK & LEGALITAS
+├── 📁 02_BAST & TERMIN
+├──  03_FINANSIAL (Invoice, Faktur, SSP, Rekening Koran)
+├── 📁 04_TEKNIS & FOTO PROGRES
+├── 📁 05_KORESPONDENSI (Surat PPK, Screenshot WA)
+├── 📁 06_SUBKON & SUPPLIER
+└── 📁 07_AUDIT & PERTANGGUNGJAWABAN
+```
+
+---
+
+### MODUL 3 — KONFIGURASI AI (Klinik Konsultasi)
+
+| AI | Peran dalam Blueprint Cash Flow |
+|----|--------------------------------|
+| **SI KAS** | ️ PEMIMPIN. Semua kasus kas lari ke dia dulu |
+| **SI BERKAS** | Pendamping. Urus termin & PPK |
+| **SI LAPANGAN** | Pendamping. Urus subkon & supplier |
+| **SI PASAL** | Standby. Dipanggil jika eskalasi hukum |
+| **SI DARURAT** | Standby. Dipanggil jika krisis |
+| **SI STRATEGI / SI PAJAK** | On-demand (dipanggil manual) |
+
+Orchestrator (SI BOS) dikonfigurasi: **prioritaskan aspek kas & keselamatan** di atas yang lain.
+
+---
+
+### MODUL 4 — FOKUS BEDAH DOKUMEN
+
+Jenis dokumen yang diprioritaskan + checklist cash-specific:
+
+- **Kontrak** → fokus klausul pembayaran, denda, bunga keterlambatan
+- **BAST** → validasi angka vs invoice (deteksi selisih = penundaan cair)
+- **Invoice** → validasi pajak & kesesuaian nilai
+- **Surat PPK** → deteksi tenggat & implikasi kas
+
+---
+
+### MODUL 5 — TOOLKIT AKTIF
+
+| Tool | Status |
+|------|:------:|
+| Cash Triage Board | ✅ Aktif |
+| Termin Tracker 7-Titik | ✅ Aktif |
+| Buffer Calculator | ✅ Aktif |
+| Surat Generator (12 template) | ✅ Aktif |
+| Zero-Defect Checklist | ✅ Aktif |
+| Friday Review Sheet | ✅ Aktif |
+| Red Flags Scanner | ✅ Aktif |
+
+---
+
+### MODUL 6 — AUTOMASI & ALERT
+
+| Trigger | Alert |
+|---------|-------|
+| Termin > estimasi hari normal di satu titik | 🔔 "Termin macet di Titik X" + script follow-up |
+| Runway < 21 hari | 🔴 "Buffer menipis. Aktifkan protokol." |
+| Jaminan / dokumen mau expired (H-14) | 🟡 "Perpanjang sekarang." |
+| Selisih angka BAST vs Invoice | 🔴 "Ada selisih Rp X. Cek sebelum submit." |
+| Jumat 14.00 | 📋 "Waktunya Friday Review." |
+
+---
+
+### MODUL 7 — RITUAL / SOP MINGGUAN
+
+```text
+SENIN 09.00  → Cek Termin Pipeline, kirim follow-up
+RABU  13.00  → Telepon staf bendahara (jika belum respons)
+KAMIS 15.00  → Update tracker, siapkan surat jika delay
+JUMAT 15.00  → RAPAT TRIASE (30 menit) + Friday Review
+```
+
+---
+
+### MODUL 8 — KPI / METRIK YANG DIPANTAU
+
+| Metrik | Target Sehat |
+|--------|:------------:|
+| Runway | > 30 hari |
+| Burn Rate | terukur & stabil |
+| Aging Receivables | < 45 hari |
+| Rasio Kas vs Tagihan | > 30% |
+| Buffer | 10-15% (APBN) / 15-20% (APBD) |
+
+---
+
+### MODUL 9 — MATERI BELAJAR TERTAUT
+
+User bisa buka langsung dari Workroom:
+- 📖 Bab 4-6 (Sistem Internal) dari ebook
+- 🎬 Video: Cash Triage, Termin Tracker, Buffer
+- 🎧 Podcast: episode terkait
+- 📄 Worksheet & kuis modul
+
+---
+
+### ♾️ EKSTENSIBILITAS: BLUEPRINT BERIKUTNYA
+
+| Kode | Blueprint | AI Pemimpin | Status |
+|:----:|-----------|:-----------:|:------:|
+| BP-CF-001 | **CASH FLOW** | SI KAS | ✅ SIAP |
+| BP-TD-002 | TENDER & MENANG | SI STRATEGI | 🔜 Segera |
+| BP-K3-003 | K3 / SAFETY | SI LAPANGAN | 🔜 Segera |
+| BP-PJ-004 | PAJAK KONSTRUKSI | SI PAJAK | 🔜 Segera |
+| BP-AD-005 | ADMINISTRASI & AUDIT | SI BERKAS | 🔜 Segera |
+
+**Mesinnya sama. Cetak birunya yang berganti.** Setiap ebook baru = blueprint baru = produk Level 4 baru.
+
+---
+
+---
+
+# 📝 DELIVERABLE 2: COPY LANDING PAGE "RUANG PROYEK"
+
+---
+
+## [HERO]
+
+> # Anda Sudah Punya Ilmunya.
+> # Sekarang, **Pasang Sistemnya** di Proyek Anda.
+>
+> Ebook memberi tahu Anda penyakitnya.
+> **Ruang Proyek** menjalankan pengobatannya.
+>
+> Pilih proyeknya. Pasang cetak birunya.
+> Seluruh fitur Gustafta langsung **bekerja untuk perusahaan Anda.**
+>
+> **[ PASANG BLUEPRINT CASH FLOW → ]**
+> *[Lihat cara kerja — 2 menit]*
+
+---
+
+## [MASALAH — SINGKAT]
+
+> **Fitur yang berserakan = alat yang tidak terpakai.**
+>
+> Anda punya Klinik Konsultasi. Punya Bedah Dokumen. Punya Ruang Kelola, Ruang Simpan, Toolkit.
+>
+> Tapi tanpa satu tempat yang **menyatukan semuanya**, itu seperti punya pisau, wajan, dan bumbu — tapi **tidak ada dapur.**
+>
+> Ruang Proyek adalah **dapur Anda.**
+
+---
+
+## [CARA KERJA — 3 LANGKAH]
+
+> ### 1️⃣ PILIH PROYEK
+> Buka Ruang Proyek. Pilih proyek yang sedang berjalan — atau buat yang baru.
+>
+> ### 2️⃣ PASANG CETAK BIRU
+> Klik "Pasang Blueprint Cash Flow". Dalam 10 detik, seluruh fitur terkabel untuk arus kas proyek itu.
+>
+> ### 3️⃣ JALANKAN PERUSAHAAN
+> Dashboard hidup. Dokumen tersusun. AI siap ditanya. Alert bekerja saat Anda tidur.
+> **Anda tinggal eksekusi.**
+
+---
+
+## [APA YANG ANDA DAPAT — MAPPING FITUR]
+
+> Saat Blueprint Cash Flow terpasang di satu proyek, ini yang langsung hidup:
+>
+> | Fitur Gustafta | Berubah Menjadi |
+> |----------------|-----------------|
+> | Ruang Kelola | Dashboard kas: runway, buffer, termin pipeline |
+> | Ruang Simpan | Brankas dokumen tersusun rapi per proyek |
+> | Klinik Konsultasi | Rapat direksi virtual (SI KAS memimpin) |
+> | Bedah Dokumen | Dokter yang mendiagnosis kontrak & BAST Anda |
+> | Toolkit | Triage, tracker, buffer — terintegrasi, bukan file terpisah |
+> | Automasi | Karyawan yang tidak tidur: alert termin & buffer |
+
+---
+
+## [LOGIKA HARGA — OBJECTION HANDLING]
+
+> **Berapa biaya SATU termin Rp 500 juta yang macet 3 bulan?**
+>
+> Denda subkon, sewa alat nganggur, bunga darurat, produktivitas turun → **Rp 185 juta+**.
+>
+> Harga Ruang Proyek: mulai **Rp 200.000/bulan**.
+>
+> Anda tidak membeli software.
+> Anda membeli **asuransi terhadap kebodohan arus kas.**
+
+---
+
+## [CTA AKHIR]
+
+> **Ilmu tanpa sistem = wacana.**
+> **Ilmu + sistem = perusahaan yang bertahan.**
+>
+> **[ BUKA RUANG PROYEK SAYA → ]**
+> *Mulai dari 3 bulan. Upgrade kapan saja. Data Anda tetap aman.*
+
+---
+
+---
+
+# 🖥️ DELIVERABLE 3: WIREFRAME RUANG PROYEK
+
+---
+
+## SCREEN A — PORTFOLIO (Tampilan Perusahaan)
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│ GUSTAFTA  │ Peta Jalan │ Ruang Proyek ▼ │ Klinik │ ...     │
+├────────────────────────────────────────────────────────────┤
+│  RUANG PROYEK                          [+ BUAT PROYEK BARU] │
+│                                                            │
+│  TAB: [PORTFOLIO]  [PROYEK]                                │
+│  ─────────────────────────────                             │
+│  📊 KESEHATAN PERUSAHAAN                                    │
+│  Total Kas: Rp 487 jt │ Tagihan Belum Cair: Rp 2,1 M       │
+│  Rasio: 23% 🟡  │  Rekomendasi: Jangan ambil proyek baru    │
+│  ─────────────────────────────                             │
+│  DAFTAR PROYEK:                                            │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │ 🏗️ Proyek A — Gedung Dinas  │ 🟡 WASPADA │ Runway 23h│ │
+│  │    Blueprint: CASH FLOW ✅   │ [BUKA WORKROOM →]      │ │
+│  ├──────────────────────────────────────────────────────┤ │
+│  │ 🏗️ Proyek B — Jalan Kabupaten│ 🟢 SEHAT  │ Runway 67h│ │
+│  │    Blueprint: CASH FLOW ✅   │ [BUKA WORKROOM →]      │ │
+│  ├──────────────────────────────────────────────────────┤ │
+│  │ 🏗️ Proyek C — Irigasi Desa  │ 🔴 KRITIS │ Runway 9h │ │
+│  │    Blueprint: CASH FLOW ✅   │ [BUKA WORKROOM →]      │ │
+│  └──────────────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## SCREEN B — PILIH / PASANG BLUEPRINT
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│  PROYEK BARU: [Nama Proyek: ____________]                  │
+│                                                            │
+│  PASANG CETAK BIRU (pilih satu):                           │
+│  ┌──────────────────────────────────────────────────────┐ │
+│  │ 💰 CASH FLOW  [BP-CF-001]              ✅ SIAP        │ │
+│  │    "Sistem arus kas: triage, tracker, buffer."        │ │
+│  │    [ PASANG BLUEPRINT INI → ]                         │ │
+│  ├──────────────────────────────────────────────────────┤ │
+│  │ 🎯 TENDER & MENANG  [BP-TD-002]        🔴 SEGERA      │ │
+│  ├──────────────────────────────────────────────────────┤ │
+│  │ 🦺 K3 / SAFETY  [BP-K3-003]            🔴 SEGERA      │ │
+│  └──────────────────────────────────────────────────────┘ │
+│                                                            │
+│  [ BATAL ]                                                 │
+└────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## SCREEN C — WORKROOM (Proyek Terpasang Blueprint)
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│ ← Kembali ke Portfolio                                     │
+│ 🏗️ WORKROOM: PROYEK A — Gedung Dinas                       │
+│ Blueprint terpasang: 💰 CASH FLOW ✅                        │
+│                                                            │
+│ TAB: [DASHBOARD] [DOKUMEN] [KONSULTASI] [TOOLKIT]          │
+│      [AUTOMASI] [LOG]                                      │
+│ ─────────────────────────────────────────────────────────  │
+│ (isi tab DASHBOARD)                                        │
+│  Status: 🟡 WASPADA │ Runway: 23 hari │ Buffer: 12% 🟢     │
+│                                                            │
+│  TERMIN PIPELINE — Termin 2 (Rp 1,05 M)                   │
+│  [OPNAME✅]→[BAST✅]→[VERIF🟡 H-12]→[SPP]→[SPM]→[SP2D]→[BANK]│
+│  [KIRIM FOLLOW-UP] [LIHAT SCRIPT]                          │
+│                                                            │
+│  AKSI HARI INI (dari AI):                                  │
+│  ☐ Follow-up PPK (script siap)                             │
+│  ☐ Token payment subkon pondasi Rp 15 jt                   │
+│                                                            │
+│  [💬 TANYA AI (Rapat Direksi)]  [🔍 BEDAH DOKUMEN]          │
+└────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## SCREEN D — PROSES INSTALASI (Setelah Klik "Pasang")
+
+```text
+┌────────────────────────────────────────────────────────────┐
+│  MEMASANG BLUEPRINT CASH FLOW ke PROYEK A...               │
+│                                                            │
+│  ✅ Membuat struktur folder Ruang Simpan                   │
+│  ✅ Mengaktifkan dashboard kas (Ruang Kelola)              │
+│  ✅ Mengkonfigurasi AI (SI KAS memimpin)                   │
+│  ✅ Mengaktifkan Toolkit (triage, tracker, buffer)         │
+│  ✅ Menyalakan automasi & alert                            │
+│  ⏳ Menyambungkan materi belajar...                        │
+│                                                            │
+│  [████████████░░░░] 85%                                    │
+│                                                            │
+│  Siap! Workroom Proyek A sekarang hidup.                   │
+│  [ BUKA WORKROOM → ]                                       │
+└────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📌 CATATAN INTERAKSI (Untuk Developer Replit)
+
+| Elemen | Perilaku |
+|--------|----------|
+| **Portfolio** | Default saat buka Ruang Proyek. Roll-up semua proyek. |
+| **Buat Proyek Baru** | Wajib pilih blueprint sebelum Workroom aktif. |
+| **Pasang Blueprint** | Proses ~10 detik, tampilkan Screen D (progress). |
+| **Ganti Blueprint** | Bisa, tapi data lama tetap tersimpan (tidak hilang). |
+| **Tier gating** | T1 = 1 proyek, T2 = 3 proyek, T3 = 10 proyek. |
+| **Workroom memory** | AI mengingat konteks proyek ini di semua chat. |
+
+---
+
+---
+
+## ✅ RINGKASAN
+
+| Item | Keputusan |
+|------|-----------|
+| Nama fitur di menu | **RUANG PROYEK** |
+| Isi di dalamnya | **WORKROOM** (per proyek) + **PORTFOLIO** (perusahaan) |
+| Yang dilahirkan ebook | **BLUEPRINT / CETAK BIRU** |
+| Blueprint #001 | **CASH FLOW** (9 modul terkabel) |
+| Prinsip | "Pilih proyek → pasang cetak biru → semua fitur bekerja" |
+| Ekstensibilitas | Setiap ebook baru = blueprint baru, mesin sama |
+
+---
+
+Bos, tiga deliverable sudah diserahkan: **Manifest Blueprint Cash Flow, Copy Landing, dan Wireframe 4 layar.**
+
+Langkah berikutnya yang paling masuk akal:
+
+1. **Tulis System Prompt "mode blueprint"** — agar AI otomatis berubah perilaku saat Blueprint Cash Flow terpasang (SI KAS memimpin, dll).
+2. **Buat struktur database Replit** — tabel untuk Proyek, Blueprint, Workroom, Dokumen, Log (biar developer langsung bisa bangun).
+3. **Lanjut ke blueprint #002 (Tender)** sebagai proof bahwa mesinnya extensible.
+
+Tunjuk, saya gas. 🫡

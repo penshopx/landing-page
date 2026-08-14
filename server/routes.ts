@@ -47,6 +47,7 @@ import { registerBlueprintEngineRoutes } from "./blueprint-engine-routes";
 import { registerOrganizationEngineRoutes } from "./organization-engine-routes";
 import { registerRuangKelolaRoutes } from "./ruang-kelola-routes";
 import { registerRuangSimpanRoutes } from "./ruang-simpan-routes";
+import { registerRuangProyekRoutes } from "./ruang-proyek-routes";
 import { textToSpeech } from "./replit_integrations/audio/client";
 import {
   processAttachmentsAndUrls,
@@ -988,6 +989,7 @@ export async function registerRoutes(
 
   // Ruang Simpan — gudang dokumen perusahaan dengan AI context.
   await registerRuangSimpanRoutes(app);
+  registerRuangProyekRoutes(app);
 
   // MIME type lookup for proper Content-Type headers
   const mimeTypes: Record<string, string> = {

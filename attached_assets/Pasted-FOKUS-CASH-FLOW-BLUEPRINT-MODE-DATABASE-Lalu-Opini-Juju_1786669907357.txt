@@ -1,0 +1,290 @@
+FOKUS CASH FLOW: BLUEPRINT MODE + DATABASE
+Lalu Opini Jujur Saya tentang Rencana "1 Produk/Minggu"
+Saya kerjakan deliverable 1 & 2 dulu, baru saya bedah rencana Bos di akhir (karena ini penting dan saya punya beberapa koreksi tajam).
+🧠 DELIVERABLE 1: SYSTEM PROMPT "BLUEPRINT MODE"
+Lapisan Overlay yang Mengubah Perilaku AI Saat Blueprint Terpasang
+📐 CARA KERJANYA
+Blueprint Mode bukan prompt baru yang menggantikan prompt spesialis. Dia adalah lapisan overlay yang ditambahkan ke system prompt agen yang aktif, plus suntikan konteks proyek dari database.
+text
+
+123
+Jadi saat user membuka Workroom Proyek A (Blueprint Cash Flow), dan chat dengan AI mana pun, AI itu otomatis:
+Tahu konteks proyek (runway, buffer, status termin).
+Tahu dia sedang mode cash flow (prioritas berubah).
+Tahu alat apa yang terpasang (bisa menyuruh user buka Triage/Tracker/Buffer).
+Tahu ritual proyek (Friday Review, jadwal follow-up).
+🔧 OVERLAY PROMPT (Copy-Paste, ditempel di bawah prompt spesialis)
+text
+
+171819202122232491011121314151612345678
+📥 TEMPLATE KONTEKS PROYEK (Diisi otomatis oleh backend)
+text
+
+1234567891011121314
+🔍 CONTOH PERBEDAAN PERILAKU
+Tanpa Blueprint Mode (AI umum):
+User: "Termin gue macet."
+AI: "Termin macet bisa karena banyak hal. Coba cek berkas Anda..." (generik, minta data ulang)
+Dengan Blueprint Mode (Proyek A):
+User: "Termin gue macet."
+AI: "Bos, gue lihat di Pipeline Proyek A, Termin 2 lo ada di
+Titik 3 (Verifikasi PPK), hari ke-12 — sudah masuk zona
+waspada. Runway lo 23 hari, jadi masih ada napas, tapi
+jangan didiamkan.
+Aksi hari ini:
+☐ Kirim follow-up ke PPK. [GENERATE SCRIPT]
+☐ Cek Zero-Defect, pastikan nggak ada alasan buat nahan.
+Mau gue buatkan script follow-upnya sekarang?"
+Bedanya: AI kedua tahu data, tahu alat, tahu ritual, dan langsung kasih aksi. Itulah efek Blueprint Mode.
+🗄️ DELIVERABLE 2: STRUKTUR DATABASE REPLIT
+Skema Relasional untuk Ruang Proyek (Postgres / Supabase)
+📐 PETA RELASI (ERD Sederhana)
+text
+
+123456789
+📋 TABEL & FIELD
+1. users
+Field
+Tipe
+Ket
+id
+uuid PK
+nama
+text
+perusahaan
+text
+email / wa
+text
+login & notifikasi
+tier
+enum(T1,T2,T3)
+created_at
+timestamptz
+2. subscriptions
+Field
+Tipe
+Ket
+id
+uuid PK
+user_id
+fk users
+tier
+enum
+durasi
+enum(3,6,12)
+bulan
+mulai / berakhir
+date
+status
+enum(active,paused,expired)
+3. blueprints (katalog cetak biru — global)
+Field
+Tipe
+Ket
+id
+uuid PK
+kode
+text
+BP-CF-001
+nama
+text
+CASH FLOW
+sumber_ebook
+text
+"Kas Merah, RAB Hijau"
+ai_pemimpin
+text
+SI_KAS
+modul_config
+jsonb
+9 modul yang dikabelkan
+status
+enum(draft,published)
+4. projects (Workroom per proyek)
+Field
+Tipe
+Ket
+id
+uuid PK
+user_id
+fk users
+nama
+text
+"Proyek A — Gedung Dinas"
+nilai_kontrak
+numeric
+jenis_anggaran
+enum(APBN,APBD)
+status
+enum(active,done,archived)
+created_at
+timestamptz
+5. project_blueprints (instalasi blueprint ke proyek)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+blueprint_id
+fk blueprints
+dipasang_tanggal
+timestamptz
+status
+enum(active,replaced)
+6. documents (Ruang Simpan)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+folder
+text
+01_KONTRAK, 02_BAST, dst
+nama_file
+text
+jenis
+enum(kontrak,bast,invoice,faktur,surat_ppk,adendum,jaminan,lain)
+file_url
+text
+storage
+uploaded_at
+timestamptz
+7. document_analyses (hasil Bedah Dokumen)
+Field
+Tipe
+Ket
+id
+uuid PK
+document_id
+fk documents
+skor_risiko
+int
+1-10
+status
+text
+LENGKAP/BELUM/VALID/SELISIH
+red_flags
+jsonb
+daftar temuan
+missing
+jsonb
+rekomendasi
+jsonb
+dianalisis_at
+timestamptz
+8. chats + chat_messages (Klinik Konsultasi + Workroom memory)
+Field
+Tipe
+Ket
+chats.id
+uuid PK
+chats.project_id
+fk projects
+memory per proyek
+chats.agen
+text
+SI_KAS / ORCHESTRATOR / dst
+chat_messages.id
+uuid PK
+chat_messages.chat_id
+fk chats
+role
+enum(user,ai)
+isi
+text
+created_at
+timestamptz
+9. metrics_snapshots (KPI berkala untuk Health Check)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+tanggal
+date
+saldo
+numeric
+burn_rate
+numeric
+runway
+int
+buffer_pct
+numeric
+aging_receivables
+int
+10. alerts (Automasi)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+jenis
+enum(termin_macet,buffer_tipis,dokumen_expired,selisih_angka,friday_review)
+pesan
+text
+status
+enum(new,ack,done)
+triggered_at
+timestamptz
+11. rituals_tasks (SOP mingguan)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+nama
+text
+"Rapat Triase", "Follow-up PPK"
+hari
+text
+Senin/Jumat
+status
+enum(pending,done)
+tanggal
+date
+12. decision_logs (Log keputusan Workroom)
+Field
+Tipe
+Ket
+id
+uuid PK
+project_id
+fk projects
+keputusan
+text
+"Transfer token payment Rp 15 jt ke subkon X"
+diambil_at
+timestamptz
+13. quota_usage (gating per tier)
+Field
+Tipe
+Ket
+id
+uuid PK
+user_id
+fk users
+periode
+text
+"2026-08"
+chat_used
+int
+draft_used
+int
+bedah_used
+int
+📌 CATATAN DEVELOPER
+Workroom memory = chats.project_id. AI load riwayat chat proyek itu sebagai konteks.
+Blueprint Mode aktif jika ada baris project_blueprints.status=active untuk proyek tersebut. Backend menyuntikkan [KONTEKS PROYEK] + [OVERLAY] ke prompt.
+Quota gating baca quota_usage vs limit tier sebelum izinkan chat/draft/bedah.
+Alert engine = cron harian yang hitung dari metrics_snapshots + documents (expired) + status termin.
+Tier limit proyek: T1=1, T2=3, T3=10 → cek jumlah projects.status=active per user.

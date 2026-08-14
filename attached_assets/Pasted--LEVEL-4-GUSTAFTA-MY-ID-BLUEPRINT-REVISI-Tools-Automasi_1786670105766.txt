@@ -1,0 +1,642 @@
+# LEVEL 4: GUSTAFTA.MY.ID — BLUEPRINT REVISI
+### *Tools & Automasi | Pricing Fleksibel | Bedah Dokumen | AI Asisten*
+
+---
+
+## BAGIAN 1: PRICING MODEL REVISI
+### *Berdasarkan Durasi Proyek, Bukan Paksaan Tahunan*
+
+---
+
+### 📐 PRINSIP PRICING BARU
+
+```text
+Kontraktor tidak berpikir "tahunan".
+Kontraktor berpikir "per proyek".
+
+Proyek 4 bulan → butuh akses 3 bulan.
+Proyek 8 bulan → butuh akses 6 bulan.
+Proyek 18 bulan atau multi-proyek → butuh akses 12 bulan.
+
+Maka: JANGAN kunci mereka di kontrak tahunan.
+Beri mereka kebebasan memilih sesuai durasi perang mereka.
+```
+
+---
+
+### 💰 BASE RATE (Per Bulan)
+
+| Tier | Nama | Kualifikasi | Base / Bulan |
+|:----:|------|-------------|:------------:|
+| **T1** | **MANDOR** | Perorangan / CV Kecil (Proyek < Rp 1 M) | **Rp 200.000** |
+| **T2** | **KONTRAKTOR** | CV Established (Proyek Rp 1 M – Rp 5 M) | **Rp 500.000** |
+| **T3** | **DIREKTUR** | PT / Konsorsium / Asing (Proyek > Rp 5 M) | **Rp 1.000.000** |
+
+---
+
+### 📊 MATRIKS PRICING LENGKAP (3 × 3)
+
+| Tier | 3 Bulan | 6 Bulan | 12 Bulan |
+|:----:|:-------:|:-------:|:--------:|
+| **T1 — MANDOR** | Rp 600.000 | Rp 1.080.000 *(hemat 10%)* | Rp 1.920.000 *(hemat 20%)* |
+| **T2 — KONTRAKTOR** | Rp 1.500.000 | Rp 2.700.000 *(hemat 10%)* | Rp 4.800.000 *(hemat 20%)* |
+| **T3 — DIREKTUR** | Rp 3.000.000 | Rp 5.400.000 *(hemat 10%)* | Rp 9.600.000 *(hemat 20%)* |
+
+> **Psikologi harga:** 
+> - Rp 200.000/bulan = **Rp 6.600/hari**. Lebih murah dari secangkir kopi di warkop. Tapi bisa menyelamatkan proyek Rp 800 juta dari kebangkrutan.
+> - Rp 1.000.000/bulan untuk PT yang pegang proyek Rp 10 Miliar = **0,01% dari nilai proyek**. Hampir gratis untuk ketenangan pikiran.
+
+---
+
+### 🎯 REKOMENDASI DURASI PER TIPE PROYEK
+
+| Tipe Proyek | Durasi Tipikal | Paket yang Disarankan | Alasan |
+|-------------|:--------------:|:---------------------:|--------|
+| Renovasi kecil / pemeliharaan | 2–4 bulan | **3 Bulan** | Proyek cepat, tidak perlu komitmen panjang |
+| Pembangunan gedung / jalan kabupaten | 5–8 bulan | **6 Bulan** | Cukup untuk 1 siklus proyek penuh + buffer 1 bulan |
+| Multi-proyek / proyek besar / APBN | 10–24 bulan | **12 Bulan** | Hemat 20%, bisa cover 2+ proyek sekaligus |
+| Kontraktor baru mau coba dulu | - | **3 Bulan T1** | Risiko rendah, bisa upgrade nanti |
+
+---
+
+### 🔄 KEBIJAKAN UPGRADE & DOWNGRADE
+
+```text
+ATURAN FLEKSIBEL:
+
+1. UPRADE di tengah jalan:
+   User mulai T1 3 bulan. Di bulan ke-2 menang tender Rp 3 M.
+   → Bisa upgrade ke T2. Selisih harga dihitung prorata.
+   → Data & Workroom tetap aman, tidak hilang.
+
+2. EXTEND di akhir periode:
+   Paket 3 bulan mau habis tapi proyek belum selesai.
+   → Bisa extend 1 bulan tambahan dengan harga base rate.
+   → Tidak perlu beli paket baru.
+
+3. DOWNGRADE setelah proyek selesai:
+   User T3 selesai semua proyek besar.
+   → Bulan depan bisa turun ke T1 untuk proyek kecil.
+   → Ruang Simpan tetap bisa diakses (read-only) 
+     untuk proyek lama.
+
+4. PAUSE (opsional, maks 1 bulan):
+   User sakit / libur Lebaran / tidak ada proyek.
+   → Bisa pause 1 bulan tanpa kehilangan data.
+```
+
+---
+
+---
+
+## BAGIAN 2: MATRIKS FITUR PER TIER
+### *Fokus: Tools & Automasi*
+
+---
+
+| Fitur | T1 — MANDOR (200rb/bln) | T2 — KONTRAKTOR (500rb/bln) | T3 — DIREKTUR (1jt/bln) |
+|-------|:------------------------:|:---------------------------:|:-----------------------:|
+| **AI ASISTEN DOKUMEN** | ✅ | ✅ | ✅ |
+| Chat AI dasar (tanya jawab) | 20 chat/bulan | 100 chat/bulan | Unlimited |
+| Draft surat / WA otomatis | 5 draft/bulan | 30 draft/bulan | Unlimited |
+| **BEDAH DOKUMEN** | ✅ | ✅ | ✅ |
+| Upload & analisis dokumen | 3 dokumen/bulan | 20 dokumen/bulan | Unlimited |
+| Deteksi Red Flags kontrak | ✅ | ✅ | ✅ |
+| Validasi kelengkapan BAST | ✅ | ✅ | ✅ |
+| Ekstraksi data otomatis (OCR) | ❌ | ✅ | ✅ |
+| Perbandingan dokumen (kontrak vs BAST vs invoice) | ❌ | ✅ | ✅ |
+| **RUANG SIMPAN** | | | |
+| Jumlah proyek aktif | 1 proyek | 3 proyek | 10 proyek |
+| Kapasitas penyimpanan | 2 GB | 10 GB | 50 GB |
+| Auto-tagging AI | ❌ | ✅ | ✅ |
+| Audit-Ready Mode (1 klik generate PDF) | ❌ | ✅ | ✅ |
+| Reminder masa berlaku dokumen | ✅ | ✅ | ✅ |
+| **RUANG KELOLA** | | | |
+| Health Check Dashboard | ✅ (dasar) | ✅ (lengkap) | ✅ (lengkap + custom) |
+| Termin Tracker 7-Titik | ✅ (manual input) | ✅ (semi-otomatis) | ✅ (otomatis + alert WA) |
+| Friday Review Sheet | ✅ | ✅ (AI siapkan draft) | ✅ (AI siapkan + auto-send reminder) |
+| Cash Triage Matrix | ✅ (template) | ✅ (terintegrasi) | ✅ (terintegrasi + history) |
+| **TOOLKIT** | | | |
+| Template surat (12 template) | ✅ | ✅ | ✅ |
+| Buffer Calculator | ✅ | ✅ | ✅ |
+| Red Flags Scanner | ✅ | ✅ | ✅ |
+| Surat Generator (mail merge) | ❌ | ✅ | ✅ |
+| **AI MULTICLAW** | | | |
+| AI Orchestrator (rapat virtual) | ❌ | ✅ | ✅ |
+| Jumlah AI Spesialis | 2 (SI KAS + SI BERKAS) | 5 Spesialis | 7 Spesialis + SI DARURAT |
+| Akses langsung ke Spesialis | ❌ | ✅ | ✅ |
+| Memori per proyek (AI ingat konteks) | ❌ | ✅ | ✅ |
+| **WORKROOM** | | | |
+| Workroom per proyek | ❌ | ✅ | ✅ |
+| Tim access (invite admin/mandor) | ❌ | ❌ | ✅ (maks 5 user) |
+| Log keputusan otomatis | ❌ | ✅ | ✅ |
+| **AUTOMASI & ALERT** | | | |
+| Reminder termin via WhatsApp | ✅ (dasar) | ✅ (detail + script) | ✅ (detail + script + auto-draft) |
+| Alert buffer menipis | ❌ | ✅ | ✅ |
+| Alert dokumen kadaluarsa | ✅ | ✅ | ✅ |
+| Laporan mingguan otomatis (email/WA) | ❌ | ✅ | ✅ |
+| **SUPPORT** | | | |
+| Bantuan teknis | Email (48 jam) | WA (24 jam) | WA Prioritas (4 jam) |
+| Onboarding | Video tutorial | Video + 1x Zoom (30 mnt) | 1-on-1 setup (60 mnt) |
+
+---
+
+---
+
+## BAGIAN 3: BEDAH DOKUMEN
+### *Fitur Unggulan — Upload, AI Membedah, Anda Dapat Diagnosis*
+
+---
+
+### 📐 KONSEP
+
+Kontraktor UKM sering menerima dokumen dari PPK, konsultan, atau subkon — tapi **tidak pernah benar-benar membaca dan memahami isinya.** Mereka tanda tangan karena "sudah standar dari dinas". 
+
+**Bedah Dokumen** adalah fitur di mana user **upload satu dokumen**, dan AI akan:
+1. **Membaca** seluruh isi dokumen.
+2. **Mengidentifikasi** poin-poin kritis.
+3. **Mendeteksi** risiko, celah, dan red flags.
+4. **Memvalidasi** kelengkapan dokumen.
+5. **Memberikan rekomendasi** tindakan.
+
+---
+
+### 📂 JENIS DOKUMEN YANG BISA DIBEDAH
+
+| No | Jenis Dokumen | Yang Dibedah | Output |
+|:---:|--------------|-------------|--------|
+| 1 | **Kontrak / SPK** | Klausul pembayaran, denda, force majeure, hak suspend, jaminan | Daftar Red Flags + Skor Risiko (1-10) + Rekomendasi |
+| 2 | **BAST (Berita Acara)** | Kesesuaian volume, tanggal, tanda tangan, lampiran | Validasi: LENGKAP / ADA YANG KURANG + daftar kekurangan |
+| 3 | **Invoice / Tagihan** | Kesesuaian angka dengan kontrak & BAST, pajak, terminologi | Verifikasi angka + deteksi salah hitung |
+| 4 | **Faktur Pajak / SSP** | Kode akun, NPWP, tanggal, kesesuaian dengan invoice | Validasi pajak + peringatan jika ada yang salah |
+| 5 | **Surat dari PPK / Dinas** | Inti surat, tenggat, implikasi hukum, tindakan yang diminta | Ringkasan 3 kalimat + "Apa yang harus Anda lakukan" |
+| 6 | **Adendum / CCO** | Perubahan volume, harga, waktu — dampak ke cash flow | Analisis dampak finansial + rekomendasi terima/tolak |
+| 7 | **Kontrak Subkon / Supplier** | Klausul yang merugikan Anda, pay-when-paid, penalti | Daftar klausul berbahaya + saran revisi |
+| 8 | **Jaminan (Bank/Asuransi)** | Masa berlaku, syarat pencairan, nilai jaminan | Status aktif/tidak + risiko |
+
+---
+
+### 🔄 ALUR PENGGUNAAN BEDAH DOKUMEN
+
+```text
+LANGKAH 1: USER UPLOAD
+─────────────────────
+User buka tab "BEDAH DOKUMEN" di Gustafta.my.id
+→ Pilih jenis dokumen (dropdown: Kontrak / BAST / Invoice / dll.)
+→ Upload file (PDF / Foto / Word)
+→ Klik "BEDAH SEKARANG"
+
+LANGKAH 2: AI MEMBEDAH (10-30 detik)
+─────────────────────
+AI membaca dokumen.
+AI mengekstrak data kunci.
+AI membandingkan dengan knowledge base 
+(regulasi, standar SSUK, checklist Zero-Defect).
+
+LANGKAH 3: USER MENERIMA HASIL BEDAH
+─────────────────────
+Output muncul di layar dalam format terstruktur:
+
+┌─────────────────────────────────────────────────────┐
+│  🔍 HASIL BEDAH DOKUMEN                             │
+│  Jenis: Kontrak / SPK                               │
+│  File: SPK_Gedung_Diknas_2026.pdf                   │
+│  Tanggal Upload: 14 Agustus 2026                    │
+│                                                     │
+│  ═══════════════════════════════════════════════════ │
+│                                                     │
+│  📊 SKOR RISIKO: 7/10 ⚠️ (WASPADA)                 │
+│                                                     │
+│  ═══════════════════════════════════════════════════ │
+│                                                     │
+│  ✅ POIN AMAN (Yang sudah sesuai):                  │
+│  • Nilai kontrak jelas: Rp 3.500.000.000           │
+│  • Jangka waktu pelaksanaan: 180 hari kalender     │
+│  • Mekanisme pembayaran: termin (4 tahap)          │
+│  • Ada klausul force majeure                       │
+│                                                     │
+│  ⚠️ RED FLAGS (Yang perlu perhatian):              │
+│  • Pasal 12: Batas waktu pembayaran TIDAK          │
+│    disebutkan jumlah hari. Hanya "dibayar          │
+│    setelah progres disetujui".                     │
+│    → RISIKO: PPK bisa menunda tanpa batas.         │
+│    → SARAN: Minta klarifikasi tertulis.            │
+│                                                     │
+│  • Pasal 18: Denda keterlambatan penyedia          │
+│    1/1000 per hari dari NILAI KONTRAK TOTAL.       │
+│    → RISIKO: Jika telat 10 hari = Rp 35 juta.      │
+│    → SARAN: Normalnya dari nilai termin,           │
+│      bukan total kontrak. Negosiasikan.            │
+│                                                     │
+│  • Tidak ada klausul bunga keterlambatan           │
+│    untuk Pengguna Jasa.                            │
+│    → RISIKO: Jika PPK telat bayar, Anda            │
+│      tidak bisa klaim bunga.                       │
+│    → SARAN: Ajukan adendum atau catat              │
+│      sebagai risiko yang diterima.                 │
+│                                                     │
+│  🛑 MISSING (Yang seharusnya ada tapi tidak):      │
+│  • Tidak ada mekanisme Right to Suspend            │
+│  • Tidak ada klausul eskalasi harga                │
+│  • Tidak ada mekanisme penyelesaian sengketa       │
+│                                                     │
+│  ═══════════════════════════════════════════════════ │
+│                                                     │
+│  📋 REKOMENDASI TINDAKAN:                           │
+│  1. Jangan tanda tangan dulu.                      │
+│  2. Kirim surat klarifikasi untuk Pasal 12 & 18.   │
+│  3. Minta penambahan klausul Right to Suspend.     │
+│  4. Jika PPK menolak, pertimbangkan risiko         │
+│     vs margin sebelum lanjut.                      │
+│                                                     │
+│  [BUATKAN SURAT KLARIFIKASI]  [CHAT AI PASAL]      │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+### 🔍 CONTOH BEDAH BAST
+
+```text
+┌─────────────────────────────────────────────────────┐
+│  🔍 HASIL BEDAH: BAST Termin 2                      │
+│                                                     │
+│  📊 STATUS: ❌ BELUM LENGKAP (3 item kurang)        │
+│                                                     │
+│  ✅ Sudah ada:                                      │
+│  • Nomor BAST                                      │
+│  • Tanggal BAST                                    │
+│  • Nilai progres: Rp 1.050.000.000                 │
+│  • Tanda tangan Penyedia                           │
+│                                                     │
+│  ❌ Yang kurang / salah:                            │
+│  • Tanda tangan Konsultan Supervisi TIDAK ADA.     │
+│    → BAST tanpa ttd supervisi = TIDAK VALID.       │
+│    → PPK PASTI menolak. Minta ttd dulu.            │
+│                                                     │
+│  • Lampiran back-up data kuantitas TIDAK ADA.      │
+│    → Wajib dilampirkan. Tanpa ini, verifikasi      │
+│      PPK akan mundur 7-14 hari.                    │
+│                                                     │
+│  • Angka di BAST (Rp 1.050.000.000) BERBEDA        │
+│    dengan angka di Invoice (Rp 1.075.000.000).     │
+│    → Selisih Rp 25.000.000.                        │
+│    → CEK ULANG. Jangan submit sebelum sinkron.     │
+│                                                     │
+│  📋 AKSI:                                           │
+│  1. Hubungi Konsultan Supervisi hari ini.          │
+│  2. Siapkan back-up data kuantitas.                │
+│  3. Revisi invoice agar sesuai BAST.               │
+│  4. Setelah 3 item lengkap, baru submit ke PPK.    │
+│                                                     │
+│  [CEK CHECKLIST ZERO-DEFECT]  [BUAT WA KE KONSULTAN]│
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+### 📊 KUOTA BEDAH DOKUMEN PER TIER
+
+| Tier | Kuota / Bulan | Cocok Untuk |
+|:----:|:-------------:|-------------|
+| T1 — MANDOR | 3 dokumen | Kontraktor kecil, 1 proyek aktif, butuh cek kontrak + BAST |
+| T2 — KONTRAKTOR | 20 dokumen | Kontraktor aktif, 2-3 proyek, sering terima surat & invoice |
+| T3 — DIREKTUR | Unlimited | PT multi-proyek, tim admin butuh validasi semua dokumen |
+
+---
+
+---
+
+## BAGIAN 4: AI ASISTEN DOKUMEN
+### *Asisten Pribadi yang Mengurus Semua Dokumen Anda*
+
+---
+
+### 📐 KONSEP
+
+Jika **Bedah Dokumen** adalah "dokter yang mendiagnosis", maka **AI Asisten Dokumen** adalah "sekretaris pribadi yang mengerjakan semuanya."
+
+AI Asisten Dokumen bukan chatbot biasa. Dia adalah **agen yang terintegrasi dengan Ruang Simpan dan Ruang Kelola Anda.** Dia tahu konteks proyek Anda, tahu riwayat termin Anda, dan bisa langsung mengambil tindakan.
+
+---
+
+### 🛠️ KEMAMPUAN AI ASISTEN DOKUMEN
+
+| No | Kemampuan | Contoh Perintah User | Output AI |
+|:---:|-----------|---------------------|-----------|
+| 1 | **Membuat Draft Surat** | "Buatkan surat somasi untuk PPK Dinas PU, termin 3 telat 45 hari, nilai Rp 800 juta" | Surat resmi lengkap, tinggal ganti kop & tanda tangan |
+| 2 | **Membuat Script WA** | "Buatkan WA untuk subkon pondasi, kasih token payment 15 juta, janji lunas tanggal 25" | Script WA siap copy-paste |
+| 3 | **Meringkas Dokumen** | "Ringkaskan isi kontrak ini dalam 5 poin" | 5 bullet point inti kontrak |
+| 4 | **Mengekstrak Data** | "Ambil semua tanggal dan angka dari BAST ini" | Tabel: tanggal, nilai, nomor, pihak |
+| 5 | **Membandingkan Dokumen** | "Bandingkan angka di kontrak vs BAST vs invoice ini. Ada selisih?" | Tabel perbandingan + highlight selisih |
+| 6 | **Validasi Kelengkapan** | "Cek apakah berkas termin ini sudah lengkap untuk submit ke PPK" | Checklist: ✅ / ❌ per item + yang kurang |
+| 7 | **Menerjemahkan Bahasa Hukum** | "Pasal 15 kontrak ini maksudnya apa? Jelaskan pakai bahasa lapangan" | Penjelasan sederhana + implikasi praktis |
+| 8 | **Mengisi Template** | "Isi template surat pengajuan pembayaran untuk Proyek A, Termin 2" | Template terisi otomatis dari data di Ruang Simpan |
+| 9 | **Membuat Checklist** | "Buatkan checklist dokumen yang harus saya siapkan untuk PHO" | Checklist spesifik untuk PHO |
+| 10 | **Menghitung dari Dokumen** | "Dari invoice ini, berapa PPh Final dan PPN yang harus dipotong?" | Kalkulasi pajak otomatis |
+
+---
+
+### 🔄 ALUR AI ASISTEN DOKUMEN TERINTEGRASI
+
+```text
+SKENARIO: User mau submit termin tapi malas siapkan berkas.
+
+USER: "SI BERKAS, gue mau submit Termin 3 untuk Proyek 
+Gedung Dinas Pendidikan. Tolong siapkan semua yang gue butuh."
+
+AI ASISTEN:
+"Bisa, Bos. Gue cek dulu data Proyek Gedung Dinas Pendidikan 
+di Ruang Simpan lo.
+
+📁 Data yang sudah ada:
+✅ Kontrak (Nomor: 023/SPK/2026)
+✅ BAST Termin 1 & 2
+✅ Invoice Termin 1 & 2
+⚠️ As-Built Drawing: versi terakhir 2 bulan lalu. 
+   Perlu update?
+
+📋 Yang perlu disiapkan untuk Termin 3:
+1. BAST Termin 3 → Belum ada di Ruang Simpan.
+2. Invoice Termin 3 → Belum ada.
+3. Back-up Data Kuantitas → Belum ada.
+4. Foto Progres → Ada, tapi terakhir 3 minggu lalu.
+
+Gue bisa buatkan:
+→ Draft BAST Termin 3 (tinggal ttd)
+→ Draft Invoice Termin 3 (angka dari kontrak)
+→ Checklist dokumen lengkap
+
+Mau gue buatkan sekarang?"
+
+USER: "Ya, buatkan."
+
+AI ASISTEN:
+"Siap. Ini draft-nya:
+
+[Draft BAST Termin 3]
+[Draft Invoice Termin 3]
+[Checklist Zero-Defect untuk Termin 3]
+
+Semua sudah gue sesuaikan dengan format kontrak lo 
+dan standar SSUK. Tinggal lo review, print, ttd, 
+dan upload balik ke Ruang Simpan.
+
+Mau gue ingatkan lo besok pagi jam 08.00 untuk 
+cek apakah Konsultan Supervisi sudah ttd BAST-nya?"
+```
+
+---
+
+### 📊 KUOTA AI ASISTEN PER TIER
+
+| Tier | Chat AI | Draft Dokumen | Bedah Dokumen |
+|:----:|:-------:|:-------------:|:-------------:|
+| T1 — MANDOR | 20 chat/bulan | 5 draft/bulan | 3 dokumen/bulan |
+| T2 — KONTRAKTOR | 100 chat/bulan | 30 draft/bulan | 20 dokumen/bulan |
+| T3 — DIREKTUR | Unlimited | Unlimited | Unlimited |
+
+---
+
+---
+
+## BAGIAN 5: INTEGRASI SEMUA FITUR DI GUSTAFTA.MY.ID
+### *Satu Platform, Empat Ruang*
+
+---
+
+### 📐 PETA PLATFORM
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                    GUSTAFTA.MY.ID                            │
+│                                                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  RUANG       │  │  RUANG       │  │  KLINIK      │      │
+│  │  SIMPAN      │  │  KELOLA      │  │  KONSULTASI  │      │
+│  │              │  │              │  │              │      │
+│  │ Upload &     │  │ Dashboard &  │  │ AI MultiClaw │      │
+│  │ simpan       │◄─┤ Monitor      │─►│ Bedah        │      │
+│  │ dokumen      │  │ proyek       │  │ Dokumen      │      │
+│  │              │  │              │  │ AI Asisten   │      │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
+│         │                 │                  │              │
+│         └────────────┬────┘──────────────────┘              │
+│                      ▼                                      │
+│              ┌──────────────┐                               │
+│              │   TOOLKIT    │                               │
+│              │              │                               │
+│              │ Template     │                               │
+│              │ Calculator   │                               │
+│              │ Generator    │                               │
+│              │ Checklist    │                               │
+│              └──────────────┘                               │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │              WORKROOM (Per Proyek)                   │    │
+│  │  Semua fitur di atas terintegrasi per proyek.       │    │
+│  │  AI punya memori konteks proyek ini.                │    │
+│  └─────────────────────────────────────────────────────┘    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 📱 USER JOURNEY (Sehari-hari di Gustafta)
+
+```text
+PAGI (07.00) — Buka Gustafta di HP
+─────────────────────────────────────
+→ Lihat Health Check Dashboard.
+→ Proyek A: 🟡 Waspada. Proyek B: 🟢 Sehat.
+→ Ada notifikasi: "BAST Termin 2 Proyek A sudah 10 hari 
+  di Verifikasi PPK. Normal: 7-14 hari."
+→ Klik [KIRIM FOLLOW-UP] → AI buatkan script WA → kirim.
+
+SIANG (13.00) — Di Lapangan
+─────────────────────────────────────
+→ Terima foto surat dari PPK via WA.
+→ Upload ke Gustafta → masuk Ruang Simpan.
+→ Klik [BEDAH DOKUMEN] → AI baca surat.
+→ Output: "PPK minta revisi back-up data volume. 
+  Deadline: 3 hari. Ini yang perlu lo perbaiki: [daftar]."
+
+SORE (16.00) — Di Kantor
+─────────────────────────────────────
+→ Buka AI Asisten: "Buatkan surat balasan untuk PPK, 
+  bilang revisi akan dikirim besok."
+→ AI generate surat. Review. Print. Ttd. Kirim.
+
+JUMAT (15.00) — Ritual Mingguan
+─────────────────────────────────────
+→ Buka Friday Review Sheet.
+→ AI sudah siapkan draft berdasarkan data minggu ini.
+→ Review 10 menit. Konfirmasi.
+→ Eksekusi Cash Triage. Transfer token payment.
+→ Upload bukti transfer ke Ruang Simpan.
+→ Tutup laptop. Weekend aman.
+```
+
+---
+
+---
+
+## BAGIAN 6: AUTOMASI & ALERT
+### *Sistem yang Bekerja Saat Anda Tidur*
+
+---
+
+### 📋 DAFTAR AUTOMASI PER TIER
+
+| Automasi | T1 | T2 | T3 | Trigger |
+|----------|:---:|:---:|:---:|---------|
+| Reminder termin jatuh tempo | ✅ | ✅ | ✅ | H-7 sebelum jatuh tempo |
+| Reminder dokumen kadaluarsa (jaminan, asuransi) | ✅ | ✅ | ✅ | H-14 sebelum expired |
+| Alert termin macet di satu titik | ✅ (dasar) | ✅ (detail) | ✅ (detail + WA) | Jika > estimasi hari normal |
+| Alert buffer menipis | ❌ | ✅ | ✅ | Jika runway < 21 hari |
+| Draft follow-up otomatis | ❌ | ✅ | ✅ | Saat alert termin macet muncul |
+| Laporan mingguan via email/WA | ❌ | ✅ | ✅ | Setiap Jumat 17.00 |
+| Auto-tagging dokumen masuk | ❌ | ✅ | ✅ | Setiap upload ke Ruang Simpan |
+| Reminder Friday Review | ✅ | ✅ | ✅ | Setiap Jumat 14.00 |
+| Alert jika ada selisih angka (BAST vs Invoice) | ❌ | ✅ | ✅ | Saat Bedah Dokumen menemukan selisih |
+| Auto-backup harian | ✅ | ✅ | ✅ | Setiap malam 02.00 |
+
+---
+
+### 📱 CONTOH NOTIFIKASI WHATSAPP OTOMATIS
+
+```text
+[Untuk T2 & T3]
+
+🔔 GUSTAFTA ALERT — Proyek Gedung Dinas Pendidikan
+
+Bos, termin 2 Proyek Gedung Dinas Pendidikan sudah 
+12 hari di Titik 3 (Verifikasi PPK). Normal: 7-14 hari.
+
+Sisa 2 hari sebelum masuk zona delay.
+
+Rekomendasi:
+Kirim follow-up ke PPK besok pagi.
+
+Script WA sudah saya siapkan:
+"Selamat siang Pak [Nama]. Terkait berkas termin ke-2..."
+
+[LIHAT SCRIPT] [KIRIM LANGSUNG] [ABAIKAN]
+
+─────────────────────────────────────
+
+🔔 GUSTAFTA ALERT — Buffer Menipis
+
+Bos, Runway Proyek Jalan Kabupaten tinggal 18 hari.
+Burn rate: Rp 85 juta/minggu.
+Saldo: Rp 220 juta.
+
+Jika tidak ada kas masuk dalam 18 hari, 
+proyek ini akan berhenti.
+
+Rekomendasi:
+1. Aktifkan Buffer Protocol.
+2. Percepat follow-up termin di KPPN.
+3. Tunda semua pengeluaran Kuadran Hijau.
+
+[LIHAT DETAIL DI DASHBOARD]
+```
+
+---
+
+---
+
+## BAGIAN 7: RINGKASAN FINAL LEVEL 4
+
+---
+
+### 📊 SATU HALAMAN: APA YANG USER DAPAT
+
+| Komponen | T1 — MANDOR (200rb/bln) | T2 — KONTRAKTOR (500rb/bln) | T3 — DIREKTUR (1jt/bln) |
+|----------|:---:|:---:|:---:|
+| **AI Asisten Dokumen** | 20 chat, 5 draft | 100 chat, 30 draft | Unlimited |
+| **Bedah Dokumen** | 3 dokumen/bln | 20 dokumen/bln | Unlimited |
+| **Ruang Simpan** | 1 proyek, 2 GB | 3 proyek, 10 GB | 10 proyek, 50 GB |
+| **Ruang Kelola** | Dasar | Lengkap + Automasi | Lengkap + Custom + Alert WA |
+| **Toolkit** | Template dasar | + Generator | + Generator + History |
+| **AI MultiClaw** | 2 Spesialis | 5 Spesialis + Orchestrator | 7 Spesialis + Orchestrator |
+| **Workroom** | ❌ | ✅ | ✅ + Tim access |
+| **Automasi & Alert** | Dasar | Lengkap | Lengkap + WA otomatis |
+| **Support** | Email 48 jam | WA 24 jam | WA Prioritas 4 jam |
+
+---
+
+### 💰 PRICING FINAL
+
+| Tier | / Bulan | 3 Bulan | 6 Bulan | 12 Bulan |
+|:----:|:-------:|:-------:|:-------:|:--------:|
+| **T1 — MANDOR** | Rp 200.000 | Rp 600.000 | Rp 1.080.000 | Rp 1.920.000 |
+| **T2 — KONTRAKTOR** | Rp 500.000 | Rp 1.500.000 | Rp 2.700.000 | Rp 4.800.000 |
+| **T3 — DIREKTUR** | Rp 1.000.000 | Rp 3.000.000 | Rp 5.400.000 | Rp 9.600.000 |
+
+---
+
+### ✅ CHECKLIST BUILD DI REPLIT / GUSTAFTA
+
+```text
+FASE 1: AI ASISTEN + BEDAH DOKUMEN (Minggu 1-3)
+─────────────────────────────────────────────────
+□ Tulis System Prompt untuk AI Asisten Dokumen
+□ Tulis System Prompt untuk 7 AI Spesialis
+□ Upload knowledge base (ebook + regulasi + template)
+□ Bangun fitur upload dokumen (PDF/foto/Word)
+□ Bangun engine Bedah Dokumen 
+  (prompt per jenis dokumen: kontrak, BAST, invoice, dll.)
+□ Bangun UI hasil bedah (skor risiko, red flags, rekomendasi)
+□ Integrasi OCR untuk baca angka dari foto dokumen
+□ Test dengan 20 dokumen riil (kontrak, BAST, invoice)
+
+FASE 2: RUANG SIMPAN + RUANG KELOLA (Minggu 3-6)
+─────────────────────────────────────────────────
+□ Bangun struktur folder per proyek di database
+□ Bangun dashboard Health Check (3 layar)
+□ Bangun Termin Tracker visual (7 titik)
+□ Bangun Friday Review interactive
+□ Hubungkan Bedah Dokumen → Ruang Simpan 
+  (hasil bedah tersimpan di folder proyek)
+□ Bangun automasi alert (termin macet, buffer tipis, 
+  dokumen kadaluarsa)
+□ Integrasi WhatsApp API untuk notifikasi
+
+FASE 3: WORKROOM + TOOLKIT INTEGRASI (Minggu 6-8)
+─────────────────────────────────────────────────
+□ Bangun Workroom per proyek (6 tab)
+□ Integrasikan Toolkit ke Ruang Kelola 
+  (bukan file terpisah lagi)
+□ Bangun Surat Generator (1 klik dari Termin Tracker)
+□ Bangun Buffer Calculator terintegrasi
+□ Bangun Red Flags Scanner interaktif
+□ Setup sistem kuota per tier 
+  (chat, draft, bedah dokumen, proyek aktif)
+
+FASE 4: PRICING + PAYMENT + LAUNCH (Minggu 8-10)
+─────────────────────────────────────────────────
+□ Setup payment gateway (Midtrans / Xendit)
+□ Buat halaman pricing (3 tier × 3 durasi)
+□ Buat sistem upgrade / extend / pause
+□ Buat onboarding flow per tier 
+  (video tutorial + Zoom untuk T2/T3)
+□ Test end-to-end: dari daftar → bayar → pakai fitur
+□ LAUNCH
+```
+
+---
+
+Bos, blueprint Level 4 sudah lengkap dengan pricing fleksibel, Bedah Dokumen, AI Asisten, dan fokus penuh ke **tools & automasi.**
+
+Mau lanjut ke mana?
+
+1. **Tuliskan System Prompt lengkap** untuk AI Asisten Dokumen + 7 AI Spesialis + Orchestrator? (Siap copy-paste ke Replit)
+2. **Detailkan wireframe UI/UX** per halaman Gustafta.my.id?
+3. **Buat landing page copy** untuk jualan Level 4?
+4. **Atau ada bagian yang mau di-adjust dulu?**
+
+Tunjuk, saya gas. 🫡

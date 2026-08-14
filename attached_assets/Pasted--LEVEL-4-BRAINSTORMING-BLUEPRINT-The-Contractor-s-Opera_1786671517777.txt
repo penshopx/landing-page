@@ -1,0 +1,648 @@
+# LEVEL 4: BRAINSTORMING → BLUEPRINT
+## *The Contractor's Operating System (Gustafta.my.id)*
+
+---
+
+Oke Bos, jawaban Bos sudah saya tangkap. Saya langsung olah jadi blueprint yang lebih tajam. Karena Gustafta.my.id sudah punya fondasi di Replit, saya akan **mengelaborasi dan memperkaya** model yang ada, bukan membangun dari nol.
+
+---
+
+---
+
+## BAGIAN 1: AI MULTICLAW — ARSITEKTUR LENGKAP
+### *Orchestrator + Gate + 7 Spesialis + Akses Langsung*
+
+---
+
+### 📐 PRINSIP DESAIN
+
+```text
+USER TIDAK PERNAH "BICARA DENGAN ROBOT".
+USER MERASA SEDANG RAPAT DIREKSI DENGAN TIM AHLI.
+
+TAPI:
+- Jika user bingung harus tanya siapa → ORCHESTRATOR yang arahkan.
+- Jika user sudah tahu butuh siapa → Langsung masuk ke SPESIALIS.
+- Orchestrator BUKAN bos yang membatasi. 
+  Orchestrator adalah SEKRETARIS yang membuka pintu.
+```
+
+---
+
+### 🏗️ ARSITEKTUR SISTEM
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                      USER INPUT                              │
+│         (Chat WA / Web / Workroom / Voice)                  │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    AI GATE (Router)                          │
+│                                                             │
+│  Fungsi:                                                    │
+│  1. Deteksi bahasa (formal/informal)                        │
+│  2. Deteksi urgensi (normal/waspada/kritis)                 │
+│  3. Deteksi domain (finance/legal/field/admin/strategy)     │
+│  4. Deteksi apakah user minta Orchestrator atau Spesialis   │
+│                                                             │
+│  ATURAN:                                                    │
+│  - Jika user bilang "Tanya AI Hukum" → bypass ke AI Hukum  │
+│  - Jika user cerita masalah umum → masuk ke Orchestrator    │
+│  - Jika user dalam krisis (ancaman pidana) → RED ALERT      │
+│    → langsung eskalasi ke Orchestrator + AI Hukum + AI Krisis│
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+              ┌────────────┴────────────┐
+              ▼                         ▼
+┌─────────────────────────┐  ┌─────────────────────────┐
+│   LANGSUNG KE SPESIALIS │  │   MASUK ORCHESTRATOR    │
+│   (Jika user minta      │  │   (Jika user butuh      │
+│    spesifik)            │  │    analisis menyeluruh) │
+└────────────┬────────────┘  └────────────┬────────────┘
+             │                            │
+             ▼                            ▼
+     [AI SPESIALIS]              [AI ORCHESTRATOR]
+     (1-on-1 session)            (Multi-Agent Routing)
+                                          │
+                                          ▼
+                              ┌───────────────────────┐
+                              │  ORCHESTRATOR MEMILIH  │
+                              │  1-3 SPESIALIS yang    │
+                              │  relevan untuk kasus   │
+                              │  ini, lalu SYNTHESIZE  │
+                              │  jadi 1 ACTION PLAN    │
+                              └───────────────────────┘
+```
+
+---
+
+### 👥 7 AI SPESIALIS (Tim Ahli Virtual)
+
+| No | Nama AI | Role | Keahlian Utama | Kapan Dipanggil |
+|:---:|---------|------|----------------|-----------------|
+| 1 | **SI KAS** | AI Keuangan & Arus Kas | Cash Triage, Buffer, Burn Rate, Runway, Defisit, Kalkulasi Termin | "Kas gue minus", "Siapa yang gue bayar duluan", "Hitungin buffer" |
+| 2 | **SI PASAL** | AI Hukum & Kontrak | UU 2/2017, Perpres 46/2025, SSUK, FIDIC, Eskalasi, Somasi, Suspend | "PPK nahan berkas", "Buatkan surat somasi", "Apakah gue bisa kena pidana" |
+| 3 | **SI LAPANGAN** | AI Operasional & Logistik | Manajemen subkon, supplier, alat berat, jadwal kerja, cuaca, mandor | "Subkon ngancam mogok", "Supplier stop kirim", "Alat nganggur" |
+| 4 | **SI BERKAS** | AI Administrasi & PPK Relations | Zero-Defect, BAST, SPP, SPM, SP2D, KPPN, SAKTI, follow-up PPK | "Berkas gue ditahan", "Gimana cara nanya ke PPK tanpa terlihat ngemis" |
+| 5 | **SI STRATEGI** | AI Bisnis & Tender | Overlap Test, kapasitas perusahaan, kapan ambil proyek baru, baca Kurva-S | "Gue menang 2 tender sekaligus, ambil dua-duanya?", "Proyek ini layak nggak?" |
+| 6 | **SI PAJAK** | AI Perpajakan Konstruksi | PPh Final, PPN, Faktur Pajak, SSP, kode akun, risiko audit pajak | "Faktur pajak gue salah kode", "PPN-nya siapa yang tanggung" |
+| 7 | **SI DARURAT** | AI Krisis & Penyelamatan | Blacklist, TGR, ancaman pidana, sengketa besar, restrukturisasi utang | "Gue diancam blacklist", "PPK mau cairin jaminan pelaksanaan", "Gue nggak bisa tidur 3 minggu" |
+
+---
+
+### 🎯 AI ORCHESTRATOR (Sekretaris Direksi)
+
+**Nama:** "SI BOS" (atau nama brand Anda)
+
+**Fungsi Orchestrator:**
+
+```text
+1. MENERIMA kasus dari user.
+2. MENGANALISIS: Kasus ini butuh berapa spesialis?
+3. MENGIRIM ke 1-3 spesialis secara paralel.
+4. MENGUMPULKAN jawaban dari masing-masing spesialis.
+5. MENYINTESIS jadi satu ACTION PLAN terpadu.
+6. MEMPRESENTASIKAN ke user dalam format "Notulensi Rapat".
+7. MEMBERIKAN opsi: "Mau ngobrol langsung sama SI PASAL 
+   untuk detail hukumnya? Klik di sini."
+```
+
+**Contoh Alur:**
+
+```text
+USER: "Bos, PPK nahan BAST gue udah 3 minggu. Subkon pondasi 
+ngancam stop kerja. Kas gue tinggal Rp 80 juta tapi tagihan 
+Rp 400 juta. Gue harus gimana?"
+
+AI GATE: → Urgensi: KRITIS → Domain: Multi → Kirim ke Orchestrator
+
+ORCHESTRATOR: → Analisis: Ini butuh 3 spesialis.
+  → Kirim ke SI BERKAS (kenapa BAST ditahan?)
+  → Kirim ke SI KAS (gimana bagi Rp 80 juta?)
+  → Kirim ke SI LAPANGAN (gimana handle subkon marah?)
+
+SI BERKAS menjawab: "Cek apakah dokumen lo zero-defect. 
+Kemungkinan besar ada back-up data yang kurang. 
+Gue buatkan checklist yang harus lo lengkapi besok."
+
+SI KAS menjawab: "Rp 80 juta vs Rp 400 juta. 
+Pakai Cash Triage. Kuadran Merah: gaji tukang aktif. 
+Kuadran Kuning: subkon pondasi → kasih Token Payment 
+Rp 15 juta + jadwal pasti. Sisanya tahan."
+
+SI LAPANGAN menjawab: "Subkon pondasi itu kritis path. 
+Kalau dia stop, seluruh proyek berhenti. Telepon dia 
+malam ini. Jangan WA. Telepon. Bilang jujur, kasih 
+Token Payment besok pagi, dan janji tanggal pasti. 
+Gue buatkan script-nya."
+
+ORCHESTRATOR → SYNTHESIZE:
+
+┌─────────────────────────────────────────────────────┐
+│ NOTULENSI RAPAT DIREKSI VIRTUAL                      │
+│ Kasus: BAST ditahan + Subkon ancam + Kas kritis     │
+│ Tanggal: 14 Agustus 2026                            │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│ DIAGNOSIS:                                          │
+│ Akar masalah: BAST ditahan karena berkas belum      │
+│ zero-defect. Ini memicu domino effect ke kas dan    │
+│ subkon.                                             │
+│                                                     │
+│ ACTION PLAN (Urutan Eksekusi):                      │
+│                                                     │
+│ HARI INI (sebelum jam 17.00):                       │
+│ ☐ Telepon subkon pondasi. Jangan WA.               │
+│   Script: [dari SI LAPANGAN]                        │
+│ ☐ Transfer Token Payment Rp 15 juta.               │
+│                                                     │
+│ BESOK PAGI (sebelum jam 10.00):                     │
+│ ☐ Cek Zero-Defect Checklist.                       │
+│   Kemungkinan besar: back-up data volume kurang.    │
+│   [Checklist dari SI BERKAS]                        │
+│ ☐ Kirim WA ke PPK: "Apakah ada koreksi?"           │
+│   Script: [dari SI BERKAS]                          │
+│                                                     │
+│ MINGGU INI:                                         │
+│ ☐ Eksekusi Cash Triage Matrix.                      │
+│   [Matriks dari SI KAS]                             │
+│ ☐ Hitung Runway. Jika < 14 hari, aktifkan Buffer.  │
+│                                                     │
+│ WARNING:                                            │
+│ ⚠️ JANGAN ambil proyek baru sampai BAST ini cair.  │
+│ ⚠️ JANGAN kurangi spek material untuk hemat.       │
+│                                                     │
+│ MAU NGOMONG LANGSUNG SAMA SPESIALIS?               │
+│ → [Chat SI PASAL] jika PPK tetap nahan > 14 hari   │
+│ → [Chat SI KAS] jika butuh hitung ulang triage     │
+│ → [Chat SI DARURAT] jika ada ancaman blacklist     │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+### 🔓 AKSES LANGSUNG KE SPESIALIS (Bypass Orchestrator)
+
+User yang sudah paham bisa langsung masuk ke spesialis tanpa lewat Orchestrator:
+
+```text
+USER: "@SI_PASAL Buatkan surat somasi untuk PPK yang 
+nahan termin 45 hari. Nilai Rp 800 juta."
+
+→ AI GATE deteksi: User menyebut "@SI_PASAL" → BYPASS.
+→ Langsung masuk ke AI Hukum.
+→ Output: Draft surat lengkap.
+→ Di akhir output, AI Hukum bilang: 
+  "Surat sudah jadi, Bos. Kalau mau gue cross-check 
+  dampak finansialnya, gue bisa panggil SI KAS. 
+  Mau?"
+```
+
+**UI/UX di Gustafta.my.id:**
+
+```text
+┌─────────────────────────────────────────────────────┐
+│  KLINIK KONSULTASI                                   │
+│                                                     │
+│  [🤖 SI BOS - Orchestrator]                         │
+│  "Ceritakan masalah lo, gue yang atur rapatnya."    │
+│                                                     │
+│  ── ATAU LANGSUNG TANYA SPESIALIS ──                │
+│                                                     │
+│  [💰 SI KAS]  [⚖️ SI PASAL]  [👷 SI LAPANGAN]      │
+│  [📁 SI BERKAS]  [📊 SI STRATEGI]  [🧾 SI PAJAK]  │
+│  [🚨 SI DARURAT]                                    │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+---
+
+## BAGIAN 2: RUANG SIMPAN + RUANG KELOLA + TOOLKIT
+### *Elaborasi untuk Gustafta.my.id*
+
+---
+
+### 📐 PRINSIP INTEGRASI
+
+Ketiga komponen ini bukan 3 aplikasi terpisah. Mereka adalah **satu organisme** dengan 3 fungsi:
+
+```text
+RUANG SIMPAN  =  GUDANG / BRANKAS
+                  (Tempat menyimpan semua dokumen & data)
+
+RUANG KELOLA  =  MEJA KERJA / COMMAND CENTER
+                  (Tempat mengolah data jadi keputusan)
+
+TOOLKIT       =  LACI ALAT
+                  (Template & script yang dipakai saat eksekusi)
+
+ALUR:
+  User upload dokumen → masuk RUANG SIMPAN
+  → RUANG KELOLA membaca & menganalisis
+  → User eksekusi keputusan pakai TOOLKIT
+  → Hasil eksekusi di-upload balik ke RUANG SIMPAN
+  → Siklus berulang
+```
+
+---
+
+### 🗄️ RUANG SIMPAN (The Digital Vault)
+
+**Filosofi:** Kontraktor tidak boleh lagi panik saat ada audit atau saat berkas fisik hilang. Semua dokumen penting harus punya "kembar digital" yang terstruktur dan bisa ditemukan dalam 10 detik.
+
+**Struktur Folder Otomatis (Per Proyek):**
+
+```text
+📁 PROYEK: Pembangunan Gedung Dinas Pendidikan
+│  📁 01_KONTRAK & LEGALITAS
+│     📄 SPK / Kontrak Utama
+│     📄 Adendum (jika ada)
+│     📄 Jaminan Pelaksanaan
+│     📄 Jaminan Uang Muka
+│     📄 Sertifikat Badan Usaha
+│
+│  📁 02_BAST & TERMIN
+│     📄 BAST Termin 1
+│     📄 BAST Termin 2
+│     📄 BAST Termin 3
+│     📄 PHO / FHO
+│
+│  📁 03_FINANSIAL
+│     📄 Invoice Termin 1
+│     📄 Invoice Termin 2
+│     📄 Faktur Pajak
+│     📄 SSP / Bukti Potong
+│     📄 Rekening Koran Proyek
+│
+│  📁 04_TEKNIS & LAPANGAN
+│     📄 As-Built Drawing
+│     📄 Back-up Data Kuantitas
+│     📄 Hasil Uji Lab
+│     📁 FOTO_PROGRES (0%, 50%, 100%)
+│     📄 Laporan Mingguan / Kurva-S
+│
+│  📁 05_KORESPONDENSI
+│     📄 Surat ke PPK
+│     📄 Surat dari PPK
+│     📄 Screenshot WA penting
+│     📄 Notulensi rapat lapangan
+│
+│  📁 06_SUBKON & SUPPLIER
+│     📄 Kontrak Subkon
+│     📄 Invoice Subkon
+│     📄 Kontrak Supplier
+│     📄 Surat Jalan Material
+│
+│  📁 07_AUDIT & PERTANGGUNGJAWABAN
+│     📄 Laporan Pertanggungjawaban
+│     📄 Dokumen TGR (jika ada)
+│     📄 Hasil Audit BPK/Inspektorat
+```
+
+**Fitur Cerdas yang Dielaborasi:**
+
+| Fitur | Fungsi | Value untuk User |
+|-------|--------|-----------------|
+| **Auto-Tagging AI** | User upload foto BAST → AI otomatis baca tanggal, nilai, nomor kontrak → tag ke folder yang benar | Tidak perlu sorting manual |
+| **OCR + Ekstraksi Angka** | AI baca angka dari invoice/BAST → otomatis masuk ke database Ruang Kelola | Tidak perlu input ulang ke Excel |
+| **Audit-Ready Mode** | 1 klik → generate PDF lengkap per proyek (BAST + Invoice + Pajak + Foto) siap sodorkan ke BPK | Tidur nyenyak saat ada audit |
+| **Reminder Masa Berlaku** | Sistem ingatkan: "Jaminan Pelaksanaan Proyek X habis 15 hari lagi" | Tidak kena penalti karena lupa |
+| **Version Control** | Jika ada revisi BAST, versi lama tidak hilang. Tersimpan sebagai history | Bukti jika ada sengketa |
+| **Enkripsi & Backup** | Data terenkripsi, backup harian ke 2 lokasi berbeda | Anti hilang, anti bocor |
+
+---
+
+### 📊 RUANG KELOLA (The Command Center)
+
+**Filosofi:** Ini adalah "Dashboard CEO" yang dilihat kontraktor setiap pagi. Bukan tumpukan angka yang membingungkan, tapi **3 layar utama** yang langsung memberi tahu: *"Di mana gue? Sehat atau sakit? Harus ngapain hari ini?"*
+
+**Layar 1: HEALTH CHECK (Peta Panas)**
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  🏥 HEALTH CHECK - Jumat, 14 Agustus 2026               │
+│                                                         │
+│  PROYEK A: Gedung Dinas Pendidikan (Rp 3,5 M)          │
+│  Status: 🟡 WASPADA                                     │
+│  Runway: 23 hari | Termin: di Titik 3, hari ke-12      │
+│  Aksi: Follow-up PPK besok. Siapkan Zero-Defect.        │
+│                                                         │
+│  PROYEK B: Jalan Kabupaten (Rp 1,2 M)                  │
+│  Status: 🟢 SEHAT                                       │
+│  Runway: 67 hari | Termin: cair 2 hari lalu            │
+│  Aksi: Eksekusi Cash Triage Jumat sore.                 │
+│                                                         │
+│  PROYEK C: Irigasi Desa (Rp 800 jt)                    │
+│  Status: 🔴 KRITIS                                      │
+│  Runway: 9 hari | Termin: macet di Titik 6, hari ke-20 │
+│  Aksi: AKTIFKAN BUFFER. Kirim Surat Eskalasi.          │
+│        Hubungi SI DARURAT jika 3 hari tidak bergerak.   │
+│                                                         │
+│  ═══════════════════════════════════════════════════════ │
+│  TOTAL KAS SEMUA PROYEK: Rp 487.000.000                │
+│  TOTAL TAGIHAN BELUM CAIR: Rp 2.100.000.000            │
+│  RASIO KAS vs TAGIHAN: 23% (Waspada)                   │
+│  REKOMENDASI: JANGAN ambil proyek baru bulan ini.       │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Layar 2: TERMIN PIPELINE (Visual Tracker)**
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  📡 TERMIN PIPELINE                                      │
+│                                                         │
+│  Proyek A - Termin 2 (Rp 1,05 M)                       │
+│  [OPNAME ✅] → [BAST ✅] → [VERIFIKASI 🟡 H-12] →      │
+│  [SPP ⬜] → [SPM ⬜] → [SP2D ⬜] → [BANK ⬜]             │
+│  Estimasi cair: 28 Agustus 2026                         │
+│  ⚠️ Sudah 12 hari di Verifikasi. Normal: 7-14 hari.     │
+│  [KIRIM FOLLOW-UP] [LIHAT SCRIPT]                       │
+│                                                         │
+│  Proyek C - Termin 1 (Rp 400 jt)                       │
+│  [OPNAME ✅] → [BAST ✅] → [VERIFIKASI ✅] →            │
+│  [SPP ✅] → [SPM ✅] → [SP2D 🔴 H-20] → [BANK ⬜]       │
+│  ⚠️ MACET DI KPPN 20 HARI! Normal: 3-5 hari.           │
+│  [ESKALASI] [HUBUNGI SI DARURAT]                        │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+**Layar 3: JUMAT REVIEW (Ritual Mingguan)**
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  📋 JUMAT REVIEW - MINGGU KE-33                         │
+│                                                         │
+│  ☐ Update saldo rekening semua proyek                   │
+│  ☐ Cek Termin Pipeline (ada yang delay?)                │
+│  ☐ Eksekusi Cash Triage Matrix                          │
+│  ☐ Kirim Token Payment untuk Kuadran Kuning             │
+│  ☐ Review Buffer: masih cukup?                          │
+│  ☐ Upload dokumen baru ke Ruang Simpan                  │
+│  ☐ Tulis 1 kalimat refleksi minggu ini                  │
+│                                                         │
+│  [MULAI REVIEW]  (Estimasi: 20 menit)                   │
+│                                                         │
+│  AI SI BOS sudah siapkan draft review berdasarkan       │
+│  data yang masuk minggu ini. Tinggal konfirmasi.        │
+│  [LIHAT DRAFT AI]                                       │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 🧰 TOOLKIT (Terintegrasi di Ruang Kelola)
+
+Di Level 4, Toolkit bukan lagi file Excel terpisah. Toolkit **hidup di dalam** Ruang Kelola:
+
+| Toolkit | Di Level 3 | Di Level 4 (Gustafta) |
+|---------|-----------|----------------------|
+| Cash Triage Board | Excel terpisah | Tab di Ruang Kelola, auto-populate dari data tagihan |
+| Termin Tracker | Excel terpisah | Layar 2 Ruang Kelola, real-time |
+| Buffer Calculator | Excel rumus | Otomatis terhitung saat user input proyek baru |
+| Surat Generator | Word mail merge | 1 klik dari Termin Pipeline: "Generate Surat Follow-Up" |
+| Zero-Defect Checklist | PDF cetak | Interactive checklist di Ruang Simpan saat upload berkas |
+| Friday Review Sheet | Excel terpisah | Layar 3 Ruang Kelola, AI siapkan draft |
+| Red Flags Scanner | PDF cetak | Form interaktif saat user mau input proyek baru |
+
+---
+
+---
+
+## BAGIAN 3: WORKROOM (Ruang Rapat Proyek)
+
+---
+
+### 📐 KONSEP
+
+Setiap proyek di Gustafta.my.id punya **Workroom** sendiri. Ini adalah "Direksi Keet Digital" tempat user, AI, dan (opsional) tim manusia berkolaborasi.
+
+**Isi Workroom per Proyek:**
+
+```text
+┌─────────────────────────────────────────────────────┐
+│  🏗️ WORKROOM: Proyek Gedung Dinas Pendidikan         │
+│                                                     │
+│  TAB 1: OVERVIEW                                    │
+│  → Health check, runway, status termin              │
+│                                                     │
+│  TAB 2: DOKUMEN (→ Ruang Simpan)                    │
+│  → Semua berkas proyek ini                          │
+│                                                     │
+│  TAB 3: CHAT AI (→ Klinik Konsultasi)               │
+│  → Riwayat semua konsultasi tentang proyek ini      │
+│  → AI sudah punya konteks: "Proyek ini kas-nya      │
+│    minus Rp 200 juta, BAST ditahan di Titik 3"      │
+│                                                     │
+│  TAB 4: TIM & TUGAS                                 │
+│  → Siapa mandor, siapa admin, siapa subkon          │
+│  → Tugas minggu ini (dari Friday Review)            │
+│                                                     │
+│  TAB 5: LOG & HISTORY                                 │
+│  → Semua keputusan yang pernah diambil              │
+│  → "14 Agu: Transfer Token Payment Rp 15 jt         │
+│     ke Subkon Pondasi"                              │
+│                                                     │
+│  TAB 6: DOKUMEN ZERO-DEFECT                         │
+│  → Checklist interaktif untuk termin selanjutnya    │
+│  → Upload berkas → AI validasi kelengkapan          │
+│                                                     │
+└─────────────────────────────────────────────────────┘
+```
+
+**Keunggulan Workroom:**
+- AI punya **memori per proyek**. Tidak perlu menjelaskan ulang dari nol setiap kali chat.
+- Semua keputusan tercatat. Jika ada sengketa 6 bulan kemudian, user tinggal buka Log.
+- Jika user punya admin atau mandor, mereka bisa di-invite ke Workroom dengan akses terbatas.
+
+---
+
+---
+
+## BAGIAN 4: EKOSISTEM KOMPETENSI
+
+---
+
+### 📐 KONSEP
+
+Level 4 bukan hanya software. Ini adalah **keanggotaan dalam aliansi kontraktor yang berpikir sistem.**
+
+**Komponen Ekosistem:**
+
+| Komponen | Fungsi | Format |
+|----------|--------|--------|
+| **Forum Diskusi Tertutup** | Tanya jawab antar member, share pengalaman, minta referensi supplier/subkon | Grup WhatsApp / Telegram / Forum di Gustafta |
+| **Direktori Vendor Terverifikasi** | Database supplier material, subkon, rental alat yang direkomendasikan member | Database searchable di Gustafta |
+| **Hot-Seat Coaching (Bulanan)** | Member submit kasus riil, dibedah live oleh Anda (founder) atau tamu ahli | Zoom / Google Meet, 2 jam, direkam |
+| **Masterclass Kuartalan** | Materi advanced: baca laporan keuangan, strategi tender besar, negosiasi bank | Video + Live Q&A |
+| **Alarm Kolektif** | Jika ada PPK/Dinas yang terkenal lambat atau bermasalah, member bisa saling mengingatkan | Sistem rating & review internal |
+| **Marketplace Internal** | Sewa alat antar member, jual material sisa, cari subkon spesialis | Board di Gustafta |
+
+---
+
+---
+
+## BAGIAN 5: PRICING TIER
+### *Berdasarkan Nilai Proyek & Kualifikasi Usaha*
+
+---
+
+### 📐 PRINSIP PRICING
+
+```text
+JANGAN JUAL "FITUR". JUAL "KETENANGAN".
+
+Kontraktor tidak bayar untuk "AI chatbot".
+Mereka bayar untuk: "Gue bisa tidur nyenyak karena 
+kas gue aman, berkas gue rapi, dan kalau ada masalah 
+gue punya tim ahli yang bisa gue tanya jam 11 malam."
+
+Semakin besar proyek yang dipegang, semakin besar 
+risiko yang dihadapi, semakin mahal "ketenangan" itu.
+```
+
+---
+
+### 💰 STRUKTUR TIER
+
+| Tier | Nama | Kualifikasi Usaha | Nilai Proyek | Harga / Tahun | Fitur Utama |
+|:----:|------|-------------------|:------------:|:-------------:|-------------|
+| **T1** | **PRAJURIT** | Perorangan / CV Kecil | Rp 200 jt – Rp 1 M | **Rp 3.500.000** | Level 2 (Ebook + NotebookLM) + Toolkit dasar + AI Spesialis (30 chat/bulan) + Ruang Simpan (1 proyek) |
+| **T2** | **PERWIRA** | CV Established | Rp 1 M – Rp 5 M | **Rp 9.500.000** | Semua T1 + AI MultiClaw (Orchestrator + 7 Spesialis, 100 chat/bulan) + Ruang Kelola penuh + Ruang Simpan (3 proyek) + Workroom + Hot-Seat bulanan |
+| **T3** | **KOMANDAN** | PT Menengah | Rp 5 M – Rp 25 M | **Rp 24.000.000** | Semua T2 + AI Unlimited + Ruang Simpan (10 proyek) + Tim access (3 user) + Hot-Seat VIP (1-on-1 per kuartal) + Prioritas support WA |
+| **T4** | **JENDERAL** | PT Besar / Konsorsium | > Rp 25 M | **Rp 48.000.000** | Semua T3 + Ruang Simpan unlimited + Tim access (10 user) + Dedicated account manager + Custom AI training (AI dilatih dengan SOP internal perusahaan) + Konsultasi langsung dengan founder (2x/tahun) |
+
+---
+
+### 📊 PERBANDINGAN NILAI (Untuk Landing Page)
+
+```text
+"Berapa biaya yang Anda keluarkan jika SATU termin 
+Rp 500 juta macet 3 bulan?"
+
+→ Denda subkon:          Rp 30 juta
+→ Sewa alat nganggur:    Rp 65 juta
+→ Bunga utang darurat:   Rp 40 juta
+→ Produktivitas turun:   Rp 50 juta
+→ Stress & kesehatan:    Tak ternilai
+─────────────────────────────────────
+TOTAL KERUGIAN:          Rp 185 juta+
+
+Harga Level 4 Tier T2:   Rp 9,5 juta / tahun.
+
+Anda membayar Rp 9,5 juta untuk MENGHINDARI 
+kerugian Rp 185 juta. 
+
+Itu bukan biaya. Itu ASURANSI.
+```
+
+---
+
+### 🔄 OPSI PEMBAYARAN
+
+| Opsi | Diskon | Catatan |
+|------|:------:|---------|
+| Tahunan (lunas di muka) | Harga normal | Paling populer |
+| Semester (6 bulan) | +10% dari harga tahunan | Untuk yang mau coba dulu |
+| Bulanan | +25% dari harga tahunan | Hanya untuk T1 dan T2 |
+| Per Proyek (one-time) | Rp 1.500.000 – Rp 3.000.000 / proyek | Untuk yang belum siap subscription. Akses 6 bulan per proyek. |
+
+---
+
+### 🎁 BONUS PER TIER (Untuk Meningkatkan Perceived Value)
+
+| Tier | Bonus |
+|:----:|-------|
+| T1 | Ebook Premium PDF + Audiobook (mp3) + 1x Hot-Seat grup |
+| T2 | Semua bonus T1 + Template Excel Premium + 3x Hot-Seat grup/tahun + Akses rekaman semua masterclass |
+| T3 | Semua bonus T2 + 1x Konsultasi 1-on-1 dengan founder (60 menit) + Surat referensi untuk tender + Akses early feature baru |
+| T4 | Semua bonus T3 + 2x Konsultasi 1-on-1/tahun + Custom SOP perusahaan + Logo di direktori "Kontraktor Terverifikasi Gustafta" |
+
+---
+
+---
+
+## BAGIAN 6: ROADMAP EKSEKUSI GUSTAFTA.MY.ID
+
+---
+
+### 📅 FASE PENGEMBANGAN
+
+```text
+FASE 1: FONDASI AI (Bulan 1-2)
+─────────────────────────────────
+□ Tulis System Prompt untuk 7 AI Spesialis + Orchestrator
+□ Upload knowledge base (12-15 file dari Level 2)
+□ Bangun AI Gate (router) di Replit
+□ Test dengan 50 skenario kasus riil
+□ Integrasikan AI ke Gustafta.my.id (chat interface)
+□ Launch internal untuk 10 beta tester
+
+FASE 2: RUANG SIMPAN + RUANG KELOLA (Bulan 2-4)
+─────────────────────────────────
+□ Bangun struktur folder Ruang Simpan per proyek
+□ Integrasikan OCR untuk auto-tagging dokumen
+□ Bangun dashboard Health Check (Layar 1)
+□ Bangun Termin Pipeline visual (Layar 2)
+□ Bangun Friday Review interactive (Layar 3)
+□ Hubungkan Toolkit ke Ruang Kelola (bukan file terpisah)
+□ Test dengan 5 beta tester (proyek riil mereka)
+
+FASE 3: WORKROOM + EKOSISTEM (Bulan 4-6)
+─────────────────────────────────
+□ Bangun Workroom per proyek
+□ Tambahkan fitur tim access (invite mandor/admin)
+□ Setup Forum / Grup komunitas
+□ Buat Direktori Vendor
+□ Jadwal Hot-Seat pertama
+□ Setup payment gateway (Midtrans/Xendit)
+□ Buat landing page per tier
+
+FASE 4: LAUNCH & SCALE (Bulan 6+)
+─────────────────────────────────
+□ Launch publik dengan webinar gratis
+□ Email sequence upsell dari Level 1 → 2 → 3 → 4
+□ Kumpulkan testimoni dari beta tester
+□ Iterasi berdasarkan feedback
+□ Tambah AI Spesialis baru sesuai kebutuhan 
+  (misal: AI K3/Safety, AI Estimasi Tender)
+```
+
+---
+
+---
+
+## 📋 RINGKASAN LEVEL 4
+
+| Komponen | Status Blueprint |
+|----------|:----------------:|
+| AI MultiClaw (Orchestrator + Gate + 7 Spesialis) | ✅ Arsitektur + contoh alur |
+| Ruang Simpan (Digital Vault + Audit-Ready) | ✅ Struktur folder + fitur cerdas |
+| Ruang Kelola (Command Center 3 Layar) | ✅ Wireframe + logika |
+| Toolkit Terintegrasi | ✅ Mapping Level 3 → Level 4 |
+| Workroom (Direksi Keet Digital) | ✅ 6 tab per proyek |
+| Ekosistem Kompetensi | ✅ 6 komponen |
+| Pricing Tier (4 level) | ✅ Harga + fitur + bonus |
+| Roadmap Eksekusi | ✅ 4 fase, 6 bulan |
+
+---
+
+Bos, ini sudah jadi blueprint yang cukup tajam untuk langsung dieksekusi di Gustafta.my.id. 
+
+**Langkah selanjutnya yang saya sarankan:**
+
+1. **Validasi AI MultiClaw:** Mau saya tuliskan **System Prompt lengkap untuk masing-masing dari 7 AI Spesialis + Orchestrator**? (Ini yang paling krusial dan bisa langsung di-copy ke Replit).
+
+2. **Validasi Pricing:** Angka yang saya kasih di atas (Rp 3,5jt – Rp 48jt/tahun) — apakah sesuai dengan positioning Bos, atau mau di-adjust?
+
+3. **Validasi Ekosistem:** Apakah Bos mau Ekosistem Kompetensi-nya lebih berat ke **komunitas & networking**, atau lebih berat ke **tools & automasi**?
+
+Tunjuk arah, saya gas detailnya. 🫡

@@ -1,0 +1,237 @@
+# KAS MERAH, RAB HIJAU
+### Sistem 3 Lapis agar Kontraktor Pemerintah Tidak Mati di Tengah Proyek
+
+*Oleh [Nama Penulis]*
+
+---
+
+> *"Proyek Anda untung Rp 420 juta di atas kertas.*
+> *Rekening Anda minus Rp 1,1 miliar di bulan ke-4.*
+> *Buku ini menjelaskan bagaimana kedua kalimat itu bisa benar sekaligus —*
+> *dan apa yang harus Anda lakukan agar tidak mengalaminya lagi."*
+
+---
+
+**Untuk siapa buku ini:**
+Kontraktor UKM (CV / perorangan) yang mengerjakan proyek pemerintah Rp 500 juta – Rp 10 miliar, yang pernah — atau sedang — mengalami kas minus sementara RAB bilang untung.
+
+**Untuk siapa buku ini BUKAN:**
+Kontraktor besar dengan CFO dan treasury department. Jika Anda punya tim keuangan 5 orang, buku ini terlalu dasar untuk Anda.
+
+**Apa yang Anda dapat setelah membaca sampai halaman terakhir:**
+- Cara membaca arus kas proyek *sebelum* kas mulai merah, bukan sesudah.
+- Tiga sistem siap pakai: Cash Triage Matrix, Termin Tracker 7-Titik, Buffer Protocol.
+- Template surat, script WhatsApp, dan SOP yang bisa di-copy-paste Senin pagi.
+- Pemahaman hukum: hak Anda menurut UU 2/2017 dan Perpres 46/2025 — dan kapan menggunakannya.
+
+---
+
+---
+
+# BAGIAN I
+## DIAGNOSIS
+### *Sebelum resep obat, kita harus tahu penyakitnya.*
+
+---
+
+# BAB 1
+## SATU PROYEK, DUA REALITA
+### Kisah Pak R — dan Mengapa "Untung" Tidak Sama dengan "Punya Uang"
+
+---
+
+### Dua Angka yang Tidak Boleh Ada di Kepala yang Sama
+
+Namanya tidak penting. Sebut saja Pak R.
+
+CV-nya sudah 9 tahun di industri konstruksi. Bukan pemain besar — 12 orang tim inti, 3 mandor, dan satu kantor ruko di pinggir jalan kabupaten. Tapi track record-nya bersih. Tidak pernah blacklist. Tidak pernah putus kontrak. Proyek pemerintah, rata-rata Rp 2–4 miliar.
+
+Tahun ini, Pak R menang tender. Nilai kontrak: **Rp 3,5 Miliar.** Sumber dana APBN. PPK sudah tanda tangan. SPK turun. Di RAB, profit margin 12%.
+
+**Rp 420 juta.**
+
+Pak R tanda tangan kontrak dengan tangan mantap. Malam itu dia bilang ke istrinya, *"Tahun ini kita lega."*
+
+Ini yang terjadi kemudian.
+
+---
+
+### Bulan ke-1: Masih Napas
+
+| Arus Kas | Jumlah |
+|----------|--------|
+| Kas masuk: DP 20% | +Rp 700.000.000 |
+| Kas keluar: mobilisasi alat, sewa lahan, DP material, uang muka subkon | –Rp 520.000.000 |
+| **Saldo akhir bulan 1** | **+Rp 180.000.000** ✅ |
+
+Pak R masih tenang. Masih bisa tidur. Masih bisa bilang ke mandor, *"Jalan terus."*
+
+Tapi ada satu hal yang tidak dia catat: dari Rp 180 juta itu, Rp 95 juta sudah "dipinjam" untuk bayar cicilan ruko dan SPP anak. Bukan dari rekening proyek. Dari rekening yang sama. Karena memang hanya ada satu rekening.
+
+---
+
+### Bulan ke-2: Mulai Sesak
+
+| Arus Kas | Jumlah |
+|----------|--------|
+| Kas masuk | Rp 0 *(termin belum jatuh tempo)* |
+| Kas keluar: upah tukang mingguan, BBM alat, material tahap 2 | –Rp 480.000.000 |
+| **Saldo kumulatif** | **–Rp 300.000.000** ⚠️ |
+
+Pak R mulai gelisah. Tapi dia bilang ke diri sendiri: *"Normal. Termin pertama belum cair. Nanti juga masuk."*
+
+Dia tidak salah. Secara kontraktual, termin pertama memang belum jatuh tempo. Tapi secara **operasional**, proyeknya sudah membakar uang lebih cepat dari yang dia kira. Dan tidak ada satu pun spreadsheet di mejanya yang memberitahu dia bahwa bulan ke-4 akan seperti ini.
+
+---
+
+### Bulan ke-3: Telepon Mulai Berderih
+
+| Arus Kas | Jumlah |
+|----------|--------|
+| Kas masuk | Rp 0 |
+| Kas keluar: upah, material, sewa alat bulanan | –Rp 450.000.000 |
+| **Saldo kumulatif** | **–Rp 750.000.000** 🔴 |
+
+Supplier besi mengirim WA: *"Pak, pengiriman minggu ini saya hold dulu ya. Yang kemarin belum lunas."*
+
+Pak R bilang, *"Iya Pak, minggu depan saya transfer."*
+
+Dia tidak tahu dari mana uang itu akan datang. Tapi dia bilang begitu. Karena apa lagi yang bisa dikatakan?
+
+---
+
+### Bulan ke-4: Sesak Napas
+
+| Arus Kas | Jumlah |
+|----------|--------|
+| Kas masuk | Rp 0 *(BAST belum ditandatangani. PPK: "Berkas masih verifikasi, Pak.")* |
+| Kas keluar: upah 14 tukang (sudah 3 minggu nunggak), subkon pondasi kirim somasi | –Rp 350.000.000 |
+| **Saldo kumulatif** | **–Rp 1.100.000.000** 🔴🔴 |
+
+Proyeknya **untung Rp 420 juta.**
+Perusahaannya **minus Rp 1,1 miliar.**
+
+Dan kedua kalimat itu benar. Secara bersamaan. Pada saat yang sama.
+
+---
+
+### Mengapa Dua Realita Ini Bisa Hidup Berdampingan
+
+Ini bukan sulap. Bukan manipulasi akuntansi. Ini **desain struktural** industri konstruksi yang jarang diajarkan di mana pun:
+
+```text
+BIAYA KONSTRUKSI                    PENDAPATAN KONTRAKTUAL
+(Front-Loaded)                      (Back-Loaded)
+─────────────────                   ─────────────────────
+Menggunung di AWAL:                 Cair di BELAKANG:
+• Mobilisasi (bulan 1)              • Per termin
+• DP material (bulan 1-2)           • Setelah progres diverifikasi
+• Uang muka subkon (bulan 1)        • Setelah BAST ditandatangani
+• Upah mingguan (setiap minggu)     • Setelah SPP → SPM → SP2D
+                                    • Setelah KPPN mencairkan
+
+        ╲                                ╱
+         ╲    JURANG ARUS KAS          ╱
+          ╲   (Cash Gap)              ╱
+           ╲                         ╱
+            ╲    DI SINI           ╱
+             ╲  KONTRAKTOR MATI  ╱
+              ╲                 ╱
+```
+
+**Profit** dicatat saat pekerjaan *selesai*. **Cash flow** adalah oksigen yang harus ada *hari ini.* Anda tidak bisa bayar upah tukang pakai proyeksi profit bulan depan. Anda butuh uang tunai. Sekarang. Minggu ini.
+
+Pak R tidak rugi. Pak R tidak ditipu. Pak R hanya **tidak pernah diberi tahu** bahwa RAB dan rekening bank berbicara dua bahasa yang berbeda. Dan tidak ada satu pun sistem di mejanya yang menerjemahkan.
+
+---
+
+### Apa yang Terjadi Selanjutnya (Bagian yang Tidak Pernah Diceritakan di Seminar)
+
+Di sinilah cerita biasanya berhenti. *"Dan Pak R bangkrut. The end."*
+
+Tapi saya tidak akan melakukan itu. Karena kenyataannya lebih rumit — dan lebih berguna untuk Anda.
+
+Pak R **tidak** bangkrut di bulan ke-4. Tapi dia melakukan tiga hal yang hampir membuatnya bangkrut di bulan ke-7. Tiga keputusan yang diambil dengan insting bertahan hidup, bukan dengan sistem. Tiga kesalahan yang akan kita bedah di Bab 3.
+
+Yang menyelamatkan Pak R — dan ini bukan spoiler, ini **inti buku ini** — adalah satu keputusan di bulan ke-5:
+
+> Dia berhenti menebak. Dan mulai **mencatat.**
+
+Bukan software ERP Rp 50 juta. Bukan konsultan. Satu spreadsheet. Empat kolom. Di-update setiap Jumat sore.
+
+Dari satu spreadsheet itu, dia bisa melihat — untuk pertama kalinya dalam 9 tahun kariernya — **kapan tepatnya** uang akan masuk, **siapa** yang harus dibayar duluan, dan **berapa minggu** dia bisa bertahan sebelum harus menekan tombol darurat.
+
+Spreadsheet itu bukan keajaiban. Tapi **keputusan untuk membuatnya** — itulah yang memisahkan kontraktor yang bertahan dari yang tidak.
+
+Buku ini adalah versi lengkap dari spreadsheet itu. Dikembangkan, diuji, dan dikemas menjadi tiga sistem yang bisa Anda jalankan Senin pagi.
+
+Tapi sebelum kita bicara sistem, kita harus selesai dulu dengan diagnosisnya. Karena diagnosis yang salah = resep yang salah. Dan banyak kontraktor menghabiskan seluruh kariernya mengobati *gejala* tanpa pernah menyentuh *penyakitnya.*
+
+---
+
+### Apa yang Akan Anda Baca di Buku Ini
+
+```text
+BAGIAN I   – DIAGNOSIS
+             Mengapa kas Anda merah sementara RAB hijau.
+             Lima akar masalah. Tiga kesalahan fatal.
+             (Bab 1 – Bab 3)
+
+BAGIAN II  – SISTEM
+             Tiga lapis pertahanan yang bisa Anda bangun
+             dalam satu minggu:
+             ① Cash Triage Matrix
+             ② Termin Tracker 7-Titik
+             ③ Buffer Protocol 10-15%
+             Lengkap dengan template, script, SOP.
+             (Bab 4 – Bab 7)
+
+BAGIAN III – PERTAHANAN & SKALA
+             Hukum di pihak Anda. Kapan eskalasi.
+             Kapan boleh ambil proyek kedua.
+             Cara membaca kesehatan kas sebelum tender.
+             (Bab 8 – Bab 9)
+
+APPENDICES – DELIVERABLE SIAP PAKAI
+             Template Excel. Checklist. Script surat.
+             Tinggal ganti nama, tanggal, angka.
+             (A1 – A6)
+```
+
+---
+
+### Satu Aturan Sebelum Anda Lanjut
+
+Buku ini bukan motivasi. Tidak ada kalimat *"Anda pasti bisa!"* di sini. Tidak ada *"Kerja keras tidak akan mengkhianati hasil."*
+
+Yang ada: **angka, sistem, dan kalimat yang bisa Anda copy-paste ke WhatsApp PPK besok pagi.**
+
+Jika Anda mencari semangat, tutup buku ini dan tonton YouTube.
+
+Jika Anda mencari **sistem agar Senin pagi Anda tidak lagi deg-degan membuka rekening** — lanjutkan.
+
+---
+
+### 🔑 SATU KALIMAT DARI BAB INI
+
+> Profit adalah cerita yang Anda ceritakan ke keluarga saat Lebaran.
+> Cash flow adalah cerita yang rekening bank ceritakan ke Anda setiap hari.
+> Dan rekening bank tidak pernah berbohong.
+
+---
+
+## 🎨 CATATAN DESAIN BAB 1
+
+| Elemen | Spesifikasi |
+|--------|-------------|
+| **Tabel arus kas per bulan** | 4 tabel kecil (bulan 1–4) disusun 2×2. Bulan 1–2 border hijau, bulan 3 kuning, bulan 4 merah tebal. Angka minus dalam merah `#C8102E`. |
+| **Diagram Jurang Arus Kas** | ASCII art di-render jadi ilustrasi: dua garis (biaya turun, pendapatan naik) membentuk lembah. Di dasar lembah: tulisan "DI SINI KONTRAKTOR MATI" warna merah. Background navy. |
+| **Kotak "Satu Aturan"** | Border hitam 2px, background putih, font italic. Tone: tegas tapi tidak menggurui. |
+| **Roadmap buku** | Horizontal flow diagram, 3 blok (Diagnosis → Sistem → Pertahanan), warna gradasi navy → oranye → hijau. |
+| **Kalimat penutup** | Center-aligned, 16pt italic, tanpa box. Biarkan "napas." |
+
+---
+
+✅ **BAB 1 PREMIUM — RAMPUNG.** Kasus Pak R utuh dari setup sampai resolusi. Jembatan ke Bab 2 (Lima Akar Masalah) sudah terpasang.
+
+Lanjut Bab 2, Bos? 🫡

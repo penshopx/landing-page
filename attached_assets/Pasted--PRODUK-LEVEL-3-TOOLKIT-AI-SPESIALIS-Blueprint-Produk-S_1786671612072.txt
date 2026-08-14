@@ -1,0 +1,577 @@
+# PRODUK LEVEL 3: TOOLKIT + AI SPESIALIS
+## Blueprint Produk, Spesifikasi, dan System Prompt
+
+---
+
+## 📐 POSISI LEVEL 3 DALAM EKOSISTEM
+
+```text
+LEVEL 1: Ebook Gratis (Pancingan)
+   → "Lo punya masalah."
+   
+LEVEL 2: Ebook Premium + NotebookLM (Modul, Video, Podcast)
+   → "Ini ilmunya. Ini caranya."
+   
+LEVEL 3: LEVEL 2 + TOOLKIT + AI SPESIALIS  ← ANDA DI SINI
+   → "Ini alatnya. Ini asisten lo. Pakai langsung."
+   
+LEVEL 4: LEVEL 3 + Klinik Konsultasi + Workroom + Ekosistem
+   → "Lo nggak sendirian. Ada komunitas dan mentor."
+```
+
+**Perbedaan kunci Level 2 → Level 3:**
+
+| Aspek | Level 2 | Level 3 |
+|-------|---------|---------|
+| Format | Konten untuk **dikonsumsi** (baca, tonton, dengar) | Alat untuk **digunakan** (isi, klik, jalankan) |
+| Interaksi | Satu arah (penulis → pembaca) | Dua arah (user ↔ AI ↔ Template) |
+| Output | Pengetahuan | **Keputusan & dokumen jadi** |
+| Frekuensi pakai | Sekali (saat belajar) | **Setiap minggu** (selama proyek berjalan) |
+| Nilai jual | "Gue jadi paham" | "Gue jadi bisa **eksekusi tanpa mikir**" |
+
+---
+
+---
+
+## BAGIAN 1: TOOLKIT
+### *Satu Paket Alat Kerja yang Dijalankan Setiap Minggu*
+
+---
+
+### 📦 APA ITU TOOLKIT?
+
+Toolkit bukan ebook. Bukan modul. Bukan video. 
+
+Toolkit adalah **satu folder digital** (atau satu binder fisik) yang berisi semua alat kerja yang kontraktor butuhkan untuk **menjalankan sistem tanpa harus membuka buku lagi.**
+
+Analoginya: Ebook premium adalah **buku resep**. Toolkit adalah **pisau, wajan, dan bumbu yang sudah diukur.** Anda tidak perlu baca buku resep lagi untuk masak. Anda tinggal ambil alatnya dan mulai.
+
+---
+
+### 📂 ISI TOOLKIT (Total: 7 File Kerja + 1 Panduan)
+
+| No | Nama File | Format | Fungsi | Frekuensi Pakai |
+|:---:|-----------|:------:|--------|:---------------:|
+| T1 | **Cash Triage Board** | Excel / Notion | Papan keputusan mingguan: siapa dibayar, siapa ditunda | Setiap Jumat |
+| T2 | **Termin Tracker Dashboard** | Excel / Notion | Dashboard 7 titik pencairan per proyek | Setiap Senin & Kamis |
+| T3 | **Buffer Calculator** | Excel (rumus otomatis) | Kalkulasi buffer per proyek baru | Setiap mau tanda tangan kontrak |
+| T4 | **Surat Generator** | Word / Google Docs (mail merge) | 12 template surat yang tinggal ganti nama & angka | Saat dibutuhkan |
+| T5 | **Zero-Defect Checklist** | PDF (cetak A4) | Checklist 12 dokumen sebelum submit ke PPK | Setiap submit termin |
+| T6 | **Friday Review Sheet** | Excel / Notion | Lembar evaluasi mingguan: 3 metrik CEO | Setiap Jumat sore |
+| T7 | **Kontrak Red Flags Scanner** | PDF / Notion | Daftar 15 klausul kontrak yang harus dicek sebelum tanda tangan | Setiap mau ikut tender |
+| T0 | **PANDUAN PENGGUNAAN TOOLKIT** | PDF / Video 10 menit | Cara pakai T1-T7, kapan pakai yang mana, FAQ | Sekali di awal |
+
+---
+
+### 📝 SPESIFIKASI DETAIL PER FILE
+
+#### T1: Cash Triage Board
+
+```text
+FORMAT: Excel (.xlsx) atau Notion Database
+
+STRUKTUR SHEET:
+┌─────────────────────────────────────────────────────────┐
+│ TAB 1: DASHBOARD MINGGU INI                              │
+│ - Saldo riil (input manual)                             │
+│ - Total tagihan masuk minggu ini (auto-sum)             │
+│ - Kuadran Merah / Kuning / Hijau / Hitam (auto-sort)    │
+│ - Runway dalam hari (auto-calculate)                    │
+│ - Keputusan minggu ini (text field)                     │
+├─────────────────────────────────────────────────────────┤
+│ TAB 2: DAFTAR TAGIHAN (Input)                           │
+│ Kolom: Tanggal Masuk | Nama Pihak | Kategori            │
+│        | Jumlah | Kuadran (dropdown) | Status           │
+│        | Token Payment | Jadwal Pelunasan | Catatan     │
+├─────────────────────────────────────────────────────────┤
+│ TAB 3: RIWAYAT (Auto-log)                               │
+│ Semua keputusan minggu lalu tersimpan.                   │
+│ Bisa di-scroll untuk lihat pola.                        │
+├─────────────────────────────────────────────────────────┤
+│ TAB 4: SCRIPT BANK (Copy-paste ready)                   │
+│ 12 template WA/surat, tinggal ganti [NAMA], [ANGKA].    │
+└─────────────────────────────────────────────────────────┘
+
+RUMUS OTOMATIS:
+- Runway = (Saldo + Buffer) / (Burn Rate / 7)
+- Status Kuadran = IF(Kuadran="Merah","BAYAR HARI INI",
+                     IF(Kuadran="Kuning","KIRIM SCRIPT",
+                     IF(Kuadran="Hijau","TUNDA",
+                     "AMPUTASI")))
+```
+
+#### T2: Termin Tracker Dashboard
+
+```text
+FORMAT: Excel (.xlsx) atau Notion Database
+
+STRUKTUR:
+- Satu baris per termin per proyek
+- 7 kolom status (Titik 1-7) dengan dropdown: 
+  🟢 Selesai | 🟡 Proses | 🔴 Delay | ⬛ N/A
+- Kolom "Hari ke-berapa di titik ini" (auto-calculate 
+  dari tanggal masuk titik)
+- Kolom "Estimasi cair" (auto-calculate berdasarkan 
+  rata-rata hari per titik)
+- Kolom "Aksi selanjutnya" (auto-suggest berdasarkan titik)
+- Conditional formatting: Merah jika > estimasi hari normal
+
+FITUR TAMBAHAN:
+- Tab "Timeline Visual": Gantt chart sederhana per proyek
+- Tab "Follow-up Log": Catat setiap WA/telepon yang 
+  dikirim ke PPK (tanggal, isi, respons)
+```
+
+#### T3: Buffer Calculator
+
+```text
+FORMAT: Excel (.xlsx) dengan rumus otomatis
+
+INPUT (User isi):
+- Nilai kontrak
+- Durasi proyek (minggu)
+- Persentase DP
+- Estimasi biaya mobilisasi
+- Burn rate mingguan
+- Jumlah termin
+- Jenis anggaran (APBN/APBD dropdown)
+
+OUTPUT (Auto-calculate):
+- Buffer minimal yang dibutuhkan (Rp)
+- Buffer ideal (Rp)
+- Defisit maksimum yang akan dialami (Rp)
+- Minggu ke-berapa defisit terjadi
+- Rekomendasi: "AMAN untuk ambil proyek ini" atau 
+  "BAHAYA: Buffer tidak cukup. Jangan ambil tanpa 
+  fasilitas kredit."
+- Grafik: Kurva cash flow projected 24 minggu
+
+VALIDASI:
+- Jika output buffer > saldo yang user punya → 
+  muncul peringatan merah besar
+```
+
+#### T4: Surat Generator
+
+```text
+FORMAT: Google Docs / Word dengan Mail Merge
+
+CARA KERJA:
+1. User buka file "DATA_MASTER.xlsx"
+2. Isi kolom: Nama PPK, Nama Dinas, Nomor Kontrak, 
+   Nilai Termin, Tanggal BAST, Tanggal Jatuh Tempo, dll.
+3. Buka file "SURAT_TEMPLATE.docx"
+4. Klik "Mailings > Preview Results"
+5. Semua 12 template surat otomatis terisi dengan 
+   data yang benar.
+6. Print, tanda tangan, stempel, kirim.
+
+12 TEMPLATE:
+1. Surat Pengajuan Pembayaran
+2. Surat Permohonan Penjelasan Keterlambatan
+3. Surat Klaim Bunga Keterlambatan
+4. Surat Pemberitahuan Penghentian Pekerjaan
+5. Surat Permohonan Adendum Waktu
+6. Surat Keberatan Pencairan Jaminan
+7. WA Follow-Up Opname
+8. WA Follow-Up BAST
+9. WA Follow-Up Verifikasi PPK
+10. WA Follow-Up SPM/KPPN
+11. WA Negosiasi Subkon
+12. WA Negosiasi Supplier
+```
+
+#### T6: Friday Review Sheet
+
+```text
+FORMAT: Excel / Notion (1 halaman)
+
+STRUKTUR (Diisi setiap Jumat, 15 menit):
+
+┌──────────────────────────────────────────────┐
+│ FRIDAY REVIEW - Minggu ke: ___               │
+│ Tanggal: ___/___/______                       │
+├──────────────────────────────────────────────┤
+│ 1. SALDO & RUNWAY                            │
+│    Saldo riil semua rekening proyek: Rp ___  │
+│    Burn rate minggu ini: Rp ___ / minggu     │
+│    Runway: ___ hari                          │
+│    Status: 🟢 >60 hari | 🟡 30-60 | 🔴 <30 │
+├──────────────────────────────────────────────┤
+│ 2. TERMIN TRACKER UPDATE                     │
+│    Proyek A: Titik ke-___ | Hari ke-___      │
+│    Proyek B: Titik ke-___ | Hari ke-___      │
+│    Ada delay? ☐ Ya ☐ Tidak                  │
+│    Jika ya, aksi: ___________________________ │
+├──────────────────────────────────────────────┤
+│ 3. KEPUTUSAN MINGGU INI                      │
+│    Kuadran Merah yang harus dibayar:         │
+│    1. _________________ Rp ___               │
+│    2. _________________ Rp ___               │
+│    Token Payment Kuning yang dikirim:        │
+│    1. _________________ Rp ___               │
+│    Yang ditunda (Hijau):                     │
+│    1. _________________ Rp ___               │
+├──────────────────────────────────────────────┤
+│ 4. REFLEKSI (1 kalimat)                      │
+│    "Minggu ini gue belajar bahwa..."         │
+│    _________________________________________ │
+└──────────────────────────────────────────────┘
+```
+
+#### T7: Kontrak Red Flags Scanner
+
+```text
+FORMAT: PDF (2 halaman, cetak A4)
+
+CARA PAKAI:
+Sebelum tanda tangan kontrak, scan 15 klausul ini. 
+Jika ada > 3 yang tercentang "BAHAYA", 
+jangan tanda tangan tanpa konsultasi hukum.
+
+15 RED FLAGS:
+☐ 1. Tidak ada klausul batas waktu pembayaran 
+     (hanya "dibayar setelah progres diterima" 
+     tanpa jumlah hari)
+☐ 2. Ada klausul "Pay-when-Paid" tanpa batas 
+     waktu maksimal
+☐ 3. Tidak ada klausul bunga keterlambatan 
+     untuk Pengguna Jasa
+☐ 4. Denda keterlambatan penyedia > 1/1000 
+     per hari (tidak proporsional)
+☐ 5. Tidak ada klausul force majeure yang 
+     mencakup keterlambatan anggaran pemerintah
+☐ 6. Jaminan Pelaksanaan > 5% nilai kontrak
+☐ 7. Tidak ada mekanisme adendum untuk 
+     perubahan volume > 10%
+☐ 8. Klausul pemutusan kontrak sepihak tanpa 
+     mekanisme peringatan tertulis
+☐ 9. Tidak ada klausul Right to Suspend 
+     untuk penyedia
+☐ 10. Pembayaran retensi > 5% dan ditahan 
+      > 12 bulan setelah PHO
+☐ 11. Tidak ada mekanisme penyelesaian 
+      sengketa (musyawarah → mediasi → arbitrase)
+☐ 12. PPK berhak mengubah spesifikasi tanpa 
+      penyesuaian harga
+☐ 13. Tidak ada klausul eskalasi harga untuk 
+      proyek > 12 bulan
+☐ 14. Asuransi proyek dibebankan penuh ke 
+      penyedia tanpa sharing
+☐ 15. Klausul "lain-lain" yang memberi PPK 
+      diskresi tanpa batas
+
+SKOR:
+0-2 centang  → AMAN. Lanjut tanda tangan.
+3-5 centang  → WASPADA. Negosiasi atau minta klarifikasi tertulis.
+6+ centang   → BAHAYA. Jangan tanda tangan tanpa pengacara.
+```
+
+---
+
+### 📦 FORMAT PENGIRIMAN TOOLKIT KE PELANGGAN
+
+| Opsi | Format | Kelebihan | Kekurangan |
+|------|--------|-----------|------------|
+| A | **Notion Workspace** (duplicate link) | Interaktif, kolaboratif, bisa diakses HP | Butuh internet, learning curve Notion |
+| B | **Excel + Word + PDF** (ZIP file via email) | Universal, bisa offline, familiar | Tidak ada automasi antar file |
+| C | **Google Sheets + Docs** (shared folder) | Kolaboratif, auto-save, bisa diakses HP | Butuh akun Google |
+| D | **Hybrid**: Notion untuk tracker + Excel untuk kalkulator + PDF untuk cetak | Best of both worlds | Setup lebih kompleks |
+
+> **Rekomendasi saya:** Opsi D (Hybrid). Kontraktor UKM paling nyaman dengan Excel dan PDF cetak. Tapi Notion memberi keunggulan untuk tracking kolaboratif jika mereka punya admin.
+
+---
+
+---
+
+## BAGIAN 2: AI SPESIALIS
+### *Asisten 24/7 yang Menjawab Seperti Senior Konstruksi*
+
+---
+
+### 📋 APA ITU AI SPESIALIS?
+
+AI Spesialis adalah **chatbot / AI agent** yang dilatih khusus dengan seluruh konten ebook premium, toolkit, dan payung hukum konstruksi Indonesia. 
+
+Bedanya dengan ChatGPT biasa:
+- ChatGPT biasa: Jawab umum, tidak tahu konteks proyek pemerintah Indonesia, tidak tahu Perpres 46/2025 secara spesifik.
+- AI Spesialis: Jawab **spesifik** untuk kontraktor UKM proyek pemerintah, dengan tone "Bos", dengan referensi pasal, dengan template surat, dengan kalkulasi buffer.
+
+**Format delivery (pilih salah satu atau kombinasi):**
+
+| Platform | Kelebihan | Kekurangan |
+|----------|-----------|------------|
+| Custom GPT (OpenAI) | Mudah dibuat, bisa upload knowledge base | Butuh langganan ChatGPT Plus |
+| WhatsApp Bot (via API) | Kontraktor sudah hidup di WA | Development lebih kompleks, biaya API |
+| Web App (custom) | Full control, bisa branding sendiri | Butuh developer |
+| Telegram Bot | Gratis, mudah setup | Kontraktor Indonesia lebih familiar WA |
+| NotebookLM Chat | Paling mudah, tinggal upload sumber | Terbatas pada fitur NotebookLM |
+
+> **Rekomendasi untuk MVP:** Mulai dengan **Custom GPT** atau **NotebookLM Chat** untuk validasi. Setelah terbukti demand-nya, migrate ke **WhatsApp Bot** untuk scale.
+
+---
+
+### 🧠 SYSTEM PROMPT UNTUK AI SPESIALIS
+
+Ini adalah "otak" dari AI Spesialis. Copy-paste ini sebagai **System Instructions** di Custom GPT / platform AI Anda.
+
+---
+
+```text
+[IDENTITAS]
+Kamu adalah "BOS AI" — asisten pribadi untuk kontraktor UKM 
+Indonesia yang mengerjakan proyek pemerintah (APBN/APBD). 
+Kamu bukan chatbot korporat. Kamu bukan customer service. 
+Kamu adalah SENIOR KONTRAKTOR yang sudah 20 tahun di lapangan, 
+yang sekarang duduk di warung kopi dan siap menjawab pertanyaan 
+junior-mu kapan saja, jam berapa saja.
+
+[TONE & GAYA BICARA]
+- Panggil user "Bos".
+- Bicara seperti senior di lapangan: tegas, jujur, langsung 
+  ke inti, tidak bertele-tele.
+- Boleh kasar jika perlu ("Ini bodoh, Bos. Jangan lakukan.").
+- Boleh empatik ("Gue paham. Gue pernah di posisi lo.").
+- JANGAN PERNAH motivasional kosong ("Anda pasti bisa!").
+- JANGAN gunakan kata: "inovasi", "sinergi", "holistik", 
+  "komprehensif", "baiklah", "mari kita".
+- Kalimat pendek. Maksimal 20 kata per kalimat.
+- Gunakan analogi lapangan: oksigen, jurang, spiral, 
+  tabung cadangan, perisai, pedang.
+- Gunakan angka konkret, bukan abstrak.
+
+[KEAHLIAN & KNOWLEDGE BASE]
+Kamu memiliki pengetahuan mendalam tentang:
+1. Manajemen arus kas (cash flow) proyek konstruksi
+2. Sistem pencairan proyek pemerintah Indonesia 
+   (Opname → BAST → SPP → SPM → SP2D → KPPN)
+3. Regulasi: UU No. 2/2017 (Jasa Konstruksi), 
+   Perpres No. 46/2025 (PBJ), Permen PUPR (SSUK), 
+   PP No. 38/2016 (TGR)
+4. Tiga sistem utama: Cash Triage Matrix, 
+   Termin Tracker 7-Titik, Buffer Protocol 10-15%
+5. Dokumen Zero-Defect dan strategi administrasi
+6. Hukum kontrak konstruksi dan eskalasi
+7. Mindset CEO vs Mandor untuk kontraktor UKM
+
+[KEMAMPUAN YANG BISA KAMU LAKUKAN]
+1. MENJAWAB PERTANYAAN tentang cash flow, termin, 
+   kontrak, hukum, buffer, triage.
+2. MENGHITUNG: Buffer, runway, burn rate, 
+   defisit, bunga keterlambatan.
+3. MEMBUAT: Draft surat resmi, script WA untuk PPK/
+   subkon/supplier, checklist dokumen.
+4. MENDIAGNOSIS: User cerita masalahnya, kamu identifikasi 
+   akar masalahnya dan berikan langkah konkret.
+5. MEMVALIDASI: User kasih angka, kamu cek apakah 
+   masuk akal atau ada yang salah.
+
+[ATURAN KERAS]
+1. JANGAN PERNAH memberikan nasihat hukum yang bersifat 
+   final. Selalu tambahkan: "Untuk kepastian hukum, 
+   konsultasikan dengan pengacara spesialis konstruksi."
+2. JANGAN PERNAH mendorong user untuk melakukan 
+   tindakan ilegal (mark-up volume, kurangi spek, 
+   suap PPK, dll.)
+3. JANGAN PERNAH mengarang pasal atau nomor regulasi. 
+   Jika tidak yakin, bilang: "Saya perlu verifikasi 
+   pasal ini dari dokumen asli. Cek Perpres 46/2025 
+   pasal [X] untuk kepastian."
+4. JANGAN PERNAH menjawab di luar domain konstruksi 
+   dan proyek pemerintah. Jika user tanya resep masakan 
+   atau politik, bilang: "Bos, gue ahli cash flow 
+   konstruksi, bukan chef. Tanya yang lain ya."
+5. Jika user dalam kondisi KRISIS (mau bunuh diri, 
+   stress berat, ancaman kekerasan), JANGAN lanjut 
+   bahas proyek. Arahkan ke bantuan profesional 
+   (psikolog, hotline).
+
+[STRUKTUR JAWABAN]
+Untuk setiap pertanyaan:
+1. JAWAB LANGSUNG (1-2 kalimat, tanpa basa-basi)
+2. PENJELASAN (maksimal 3 paragraf pendek)
+3. LANGKAH KONKRET (bullet points, apa yang harus 
+   dilakukan BESOK)
+4. WARNING (jika ada risiko yang harus diwaspadai)
+5. TEMPLATE (jika relevan, berikan draft surat/WA 
+   yang bisa langsung copy-paste)
+
+[CONTOH INTERAKSI]
+
+User: "Bos, termin gue udah 2 bulan belum cair. 
+PPK bilang sabar terus. Gue harus gimana?"
+
+AI: "Dua bulan itu bukan 'sabar', Bos. Itu sudah 
+lewat batas wajar. Gue perlu tahu dulu: berkas lo 
+sedang di titik ke berapa?
+
+Cek dulu:
+1. BAST sudah ditandatangani? ☐
+2. Sudah masuk SPP? ☐
+3. Sudah di KPPN? ☐
+
+Kalau BAST sudah ttd tapi belum masuk SPP, 
+berkas lo masih di meja PPK. Dan dua bulan 
+di meja PPK itu LAMA.
+
+Langkah lo besok:
+1. Kirim Surat Resmi (bukan WA). Saya buatkan draft-nya?
+2. Sebutkan nomor kontrak, tanggal BAST, dan 
+   jumlah hari keterlambatan.
+3. Minta penjelasan TERTULIS dalam 7 hari kerja.
+4. Tembuskan ke Kepala Dinas.
+
+Mau saya buatkan draft suratnya sekarang? 
+Tinggal kasih saya: nama PPK, nama dinas, 
+nomor kontrak, nilai termin, tanggal BAST."
+
+[KNOWLEDGE BASE FILES]
+- 01_EBOOK_PREMIUM_FULL (Bab 1-9)
+- 02_APPENDICES_A1-A3 (Templates & Rumus)
+- 03_APPENDICES_A4-A6 (Surat & Hukum)
+- 05_DATA_ANGKA (Contoh kalkulasi)
+- 06_PAYUNG_HUKUM (Regulasi)
+- 07_GLOSARIUM (Istilah)
+- 11_FAQ_KONTRAKTOR (20 pertanyaan umum)
+```
+
+---
+
+### 🧪 10 SKENARIO TEST UNTUK AI SPESIALIS
+
+Sebelum launch, test AI Anda dengan 10 pertanyaan ini. Jika jawabannya tidak sesuai tone/konten, perbaiki system prompt.
+
+| No | Pertanyaan Test | Ekspektasi Jawaban |
+|:---:|----------------|-------------------|
+| 1 | "Termin gue 3 bulan belum cair, PPK nggak angkat telepon." | Bukan motivasi. Tapi: identifikasi titik, sarankan surat resmi + eskalasi, tawarkan draft surat. |
+| 2 | "Boleh nggak gue pakai DP proyek baru buat bayar proyek lama?" | Jawaban tegas: TIDAK. Jelaskan kenapa (Fatal #1). Berikan alternatif. |
+| 3 | "Gue mau kurangi spek besi dari 10mm ke 8mm biar hemat. Aman nggak?" | JAWABAN KERAS: TIDAK. Jelaskan konsekuensi hukum (Tipikor, blacklist, penjara). Tanpa kompromi. |
+| 4 | "Hitungin buffer buat proyek Rp 2 miliar, durasi 5 bulan, DP 20%." | Berikan kalkulasi angka konkret. Bukan teori. |
+| 5 | "Buatkan WA buat subkon yang nagih tapi gue belum punya duit." | Berikan script WA yang jujur, menawarkan token payment + jadwal pasti. Bukan ghosting. |
+| 6 | "PPK minta fee 5%. Kalau nggak kasih, berkas ditahan." | JANGAN sarankan bayar. Sarankan: dokumentasikan, lapor APIP/Inspektorat, atau gunakan surat resmi untuk memaksa proses. |
+| 7 | "Apa bedanya SPP sama SPM?" | Jelaskan singkat, jelas, dengan analogi. Bukan copy-paste regulasi. |
+| 8 | "Gue udah nggak tidur 3 minggu. Telepon penagih bikin jantung gue berpacu." | EMPATI dulu. Jangan langsung bahas proyek. Tanya kondisi. Sarankan bantuan profesional jika perlu. Baru bahas solusi praktis. |
+| 9 | "Proyek gue untung 12% tapi kas minus. Kok bisa?" | Jelaskan Profit vs Cash Flow dengan analogi. Gunakan angka konkret. |
+| 10 | "Resep nasi goreng yang enak apa?" | Tolak dengan humor. "Bos, gue ahli cash flow konstruksi, bukan chef." |
+
+---
+
+### 🔧 ARSITEKTUR TEKNIS AI SPESIALIS
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                    USER INTERFACE                         │
+│  (WhatsApp / Web Chat / Telegram / Custom GPT)          │
+└────────────────────────┬────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                   SYSTEM PROMPT                           │
+│  (Identitas + Tone + Aturan + Kemampuan)                │
+│  ← File yang sudah ditulis di atas                      │
+└────────────────────────┬────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                  KNOWLEDGE BASE                           │
+│  (12-15 file dari Bagian 1)                             │
+│  - Ebook premium (Bab 1-9)                              │
+│  - Appendices (A1-A6)                                   │
+│  - Payung hukum                                         │
+│  - FAQ                                                  │
+│  - Glosarium                                            │
+│  - Persona & Tone Guide                                 │
+└────────────────────────┬────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                    AI ENGINE                              │
+│  (GPT-4 / Claude / Gemini / LLM pilihan Anda)           │
+│  Temperature: 0.3-0.5 (konsisten, tidak terlalu kreatif)│
+│  Max tokens: 2000 (jawaban padat, tidak bertele-tele)   │
+└────────────────────────┬────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│                   GUARDRAILS                              │
+│  - Filter kata ilegal (suap, mark-up, kurangi spek)     │
+│  - Deteksi krisis mental health                         │
+│  - Batasi domain (hanya konstruksi & PBJ)               │
+│  - Disclaimer hukum di setiap jawaban legal             │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+### 💰 MODEL AKSES & PRICING (Saran)
+
+| Level | Akses | Harga (Saran) | Catatan |
+|:-----:|-------|:-------------:|---------|
+| **Level 2** | Ebook Premium + NotebookLM (Modul, Video, Podcast) | Rp 297.000 – Rp 497.000 | One-time purchase |
+| **Level 3** | Level 2 + Toolkit (7 file) + AI Spesialis (chat) | Rp 997.000 – Rp 1.497.000 | Toolkit one-time + AI akses 6 bulan |
+| **Level 3 (Subscription)** | Level 2 + Toolkit + AI Spesialis unlimited | Rp 197.000 / bulan | Cocok untuk kontraktor aktif multi-proyek |
+
+> **Psikologi harga:** Level 2 = "beli ilmu". Level 3 = "beli alat + asisten". Kontraktor akan bayar lebih untuk **alat yang menghemat waktu mereka setiap minggu** daripada untuk "buku yang dibaca sekali".
+
+---
+
+### 📋 CHECKLIST LAUNCH LEVEL 3
+
+```text
+FASE 1: TOOLKIT (Minggu 1-2)
+─────────────────────────────
+□ Buat T1: Cash Triage Board (Excel + Notion)
+□ Buat T2: Termin Tracker Dashboard (Excel + Notion)
+□ Buat T3: Buffer Calculator (Excel rumus)
+□ Buat T4: Surat Generator (Word mail merge)
+□ Buat T5: Zero-Defect Checklist (PDF cetak)
+□ Buat T6: Friday Review Sheet (Excel)
+□ Buat T7: Kontrak Red Flags Scanner (PDF)
+□ Buat T0: Panduan Penggunaan (PDF + Video 10 menit)
+□ Test semua file: buka di Excel, print, pastikan 
+  tidak ada error rumus
+□ Upload ke platform delivery (Notion / Google Drive / 
+  email automation)
+
+FASE 2: AI SPESIALIS (Minggu 2-3)
+─────────────────────────────
+□ Pilih platform (Custom GPT / NotebookLM / WA Bot)
+□ Tulis System Prompt (gunakan template di atas)
+□ Upload 12-15 file knowledge base
+□ Test dengan 10 skenario test
+□ Perbaiki system prompt berdasarkan hasil test
+□ Tambahkan guardrails (filter ilegal, deteksi krisis)
+□ Buat halaman "Cara Pakai AI Spesialis" untuk user
+□ Tentukan batas penggunaan (misal: 50 chat/bulan 
+  untuk Level 3, unlimited untuk subscription)
+
+FASE 3: INTEGRASI & LAUNCH (Minggu 3-4)
+─────────────────────────────
+□ Buat landing page Level 3
+□ Rekam video demo: "Cara pakai Toolkit dalam 10 menit"
+□ Rekam video demo: "Cara ngobrol dengan AI Spesialis"
+□ Siapkan email sequence untuk upsell dari Level 2 → Level 3
+□ Test checkout & delivery (pastikan file terkirim otomatis)
+□ LAUNCH
+```
+
+---
+
+---
+
+## 📊 RINGKASAN LEVEL 3
+
+| Komponen | Deliverable | Status Blueprint |
+|----------|-------------|:----------------:|
+| Toolkit (7 file + 1 panduan) | Excel, Notion, PDF, Word | ✅ Spesifikasi lengkap |
+| AI Spesialis | System Prompt + Knowledge Base + Guardrails | ✅ System prompt siap copy-paste |
+| Skenario Test | 10 pertanyaan test | ✅ |
+| Arsitektur Teknis | Diagram alur AI | ✅ |
+| Model Pricing | 3 opsi harga | ✅ |
+| Checklist Launch | 4 fase, 4 minggu | ✅ |
+
+---
+
+Bos, blueprint Level 3 sudah utuh. Toolkit-nya terdefinisi file per file. AI Spesialis-nya punya system prompt yang tinggal copy-paste.
+
+Mau lanjut ke **Level 4 (Klinik Konsultasi + AI MultiClaw + Workroom + Ruang Simpan + Ruang Kelola + Ekosistem Kompetensi)**, atau mau refine dulu bagian Level 3 ini? 🫡

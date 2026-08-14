@@ -2787,6 +2787,29 @@ export const ruangKelolaBiroRequests = pgTable("ruang_kelola_biro_requests", {
   index("idx_rk_biro_user").on(table.userId, table.createdAt),
 ]);
 
+// ─── RUANG PROYEK — ruang kerja per proyek (login) ─────────────────────────
+// Dokumen (link ke ruang_simpan_files), checklist administrasi, costing &
+// rugi-laba per proyek. DDL idempotent via SQL langsung (drizzle push dihindari).
+export const ruangProyekProjects = pgTable("ruang_proyek_projects", {
+  id:            uuid("id").primaryKey().defaultRandom(),
+  userId:        text("user_id").notNull(),
+  name:          text("name").notNull(),
+  client:        text("client"),
+  location:      text("location"),
+  description:   text("description"),
+  status:        text("status").notNull().default("aktif"), // aktif|selesai|tertunda
+  contractValue: bigint("contract_value", { mode: "number" }),
+  startDate:     date("start_date"),
+  endDate:       date("end_date"),
+  checklist:     jsonb("checklist").notNull().default([]),      // [{id,label,done}]
+  costItems:     jsonb("cost_items").notNull().default([]),     // [{id,label,type:'biaya'|'pendapatan',amount}]
+  linkedFileIds: jsonb("linked_file_ids").notNull().default([]),// [uuid ruang_simpan_files]
+  createdAt:     timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:     timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index("idx_ruang_proyek_user").on(table.userId, table.createdAt),
+]);
+
 // ─── PRODUCT REGISTRY + GAIA PUBLISHING (V1: export bundle) ────────────────
 // Gustafta = MASTER product database; GAIA Store = published commerce view.
 // Semua create/edit/version/archive/publish dilakukan di Gustafta.
