@@ -526,6 +526,78 @@ test(
 );
 
 test(
+  "certificate email: sent to the UPDATED address when user changes email before final completion",
+  { skip: SKIP },
+  async () => {
+    const courseTitle = `Email Change Course ${RUN}`;
+    const courseId = await seedCourse(courseTitle);
+
+    // Dedicated user so email mutation doesn't affect other tests.
+    const changeUserId = `test-change-${RUN}`;
+    const oldEmail = `old-address-${RUN}@example.com`;
+    const newEmail = `new-address-${RUN}@example.com`;
+    await queryDb(
+      `INSERT INTO users (id, email, first_name, role, is_active)
+       VALUES ($1, $2, 'Changer', 'user', true)
+       ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email`,
+      [changeUserId, oldEmail]
+    );
+
+    try {
+      const lesson1 = await seedLesson(courseId, 1);
+      const lesson2 = await seedLesson(courseId, 2);
+      await seedEnrollment(changeUserId, courseId);
+
+      // Complete lesson 1 while the OLD email is on file (partial progress —
+      // any cached value would hold the stale address).
+      const resPartial = await markProgress(changeUserId, lesson1, courseId);
+      assert.equal(resPartial.status, 200, `Expected 200, got ${resPartial.status}`);
+      const partialBody = await resPartial.json() as any;
+      assert.ok(partialBody.progress < 100, "Progress must be below 100 after lesson 1");
+
+      // User changes their email BEFORE the final lesson completion.
+      await queryDb(`UPDATE users SET email = $1 WHERE id = $2`, [newEmail, changeUserId]);
+
+      const callsBefore = capturedBrevoCalls.length;
+
+      // Trigger the final lesson — cert email must read the fresh row.
+      const res = await markProgress(changeUserId, lesson2, courseId);
+      assert.equal(res.status, 200, `Expected 200, got ${res.status}`);
+      const body = await res.json() as any;
+      assert.equal(body.progress, 100, "Progress should be 100 after final lesson");
+      assert.ok(body.certificateCode, "Response should contain certificateCode");
+
+      const emailArrived = await waitForNewBrevoCall(callsBefore);
+      assert.ok(emailArrived, "Brevo fetch should have been called after final lesson completion");
+
+      const emailBody = capturedBrevoCalls[callsBefore].body;
+      assert.ok(
+        Array.isArray(emailBody.to) && emailBody.to.length === 1,
+        "Email must have exactly one recipient"
+      );
+      assert.equal(
+        emailBody.to[0].email,
+        newEmail,
+        "Certificate email must go to the UPDATED address"
+      );
+      assert.notEqual(
+        emailBody.to[0].email,
+        oldEmail,
+        "Certificate email must NOT go to the stale (old) address"
+      );
+
+      // No captured call in this window may target the old address.
+      const staleCalls = capturedBrevoCalls
+        .slice(callsBefore)
+        .filter((c) => Array.isArray(c.body?.to) && c.body.to.some((t: any) => t.email === oldEmail));
+      assert.equal(staleCalls.length, 0, "No Brevo call may target the old email address");
+    } finally {
+      await queryDb(`DELETE FROM users WHERE id = $1`, [changeUserId]).catch(() => {});
+    }
+  }
+);
+
+test(
   "certificate email: falls back to email prefix (not 'Peserta') when student has no first_name or last_name",
   { skip: SKIP },
   async () => {
