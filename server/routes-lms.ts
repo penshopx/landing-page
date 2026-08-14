@@ -350,10 +350,12 @@ const SEED_COURSES = [
 // Reconcile-per-slug: upsert courses and lessons so content changes in
 // SEED_COURSES are reflected in an already-seeded database.
 // Returns separate "added" and "updated" counts.
-export async function seedLmsData(): Promise<{ added: number; updated: number }> {
+export async function seedLmsData(): Promise<{ added: number; updated: number; addedTitles: string[]; updatedTitles: string[] }> {
   try {
     let added = 0;
     let updated = 0;
+    const addedTitles: string[] = [];
+    const updatedTitles: string[] = [];
 
     for (const courseData of SEED_COURSES) {
       const { lessons, ...course } = courseData;
@@ -402,6 +404,7 @@ export async function seedLmsData(): Promise<{ added: number; updated: number }>
           });
         }
         added++;
+        addedTitles.push(course.title);
       } else {
         // ── Existing course: compare and update if anything changed ──────────
         courseId = existing.id;
@@ -503,12 +506,15 @@ export async function seedLmsData(): Promise<{ added: number; updated: number }>
           console.log(`[LMS] ${staleLessonIds.length} pelajaran usang dinonaktifkan di kursus "${course.slug}".`);
         }
 
-        if (courseWasUpdated) updated++;
+        if (courseWasUpdated) {
+          updated++;
+          updatedTitles.push(course.title);
+        }
       }
     }
 
     console.log(`[LMS] Seed selesai — ${added} kursus baru, ${updated} kursus diperbarui (total target: ${SEED_COURSES.length}).`);
-    return { added, updated };
+    return { added, updated, addedTitles, updatedTitles };
   } catch (e) {
     console.error("[LMS] Seed error:", e);
     throw e; // propagate so seedLmsDataTracked can set error status
@@ -638,9 +644,12 @@ export function registerLmsRoutes(
     }
     lmsSeedStatus = "pending";
     try {
-      const { added, updated } = await activeSeedFn();
+      const result = await activeSeedFn();
+      const { added, updated } = result;
+      const addedTitles = (result as any).addedTitles ?? [];
+      const updatedTitles = (result as any).updatedTitles ?? [];
       lmsSeedStatus = added === 0 && updated === 0 ? "skipped" : "done";
-      res.json({ ok: true, added, updated });
+      res.json({ ok: true, added, updated, addedTitles, updatedTitles });
     } catch (e: any) {
       lmsSeedStatus = "error";
       console.error("[LMS] Manual reseed error:", e);

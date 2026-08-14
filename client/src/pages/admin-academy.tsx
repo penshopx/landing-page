@@ -1125,6 +1125,8 @@ export function LmsHealthCard({
 
   // Auto-retry countdown — starts at 30s when seedStatus === "error"
   const [retryIn, setRetryIn] = useState<number | null>(null);
+  // Confirmation dialog before a manual re-seed (it overwrites manual edits to seeded lessons)
+  const [confirmReseedOpen, setConfirmReseedOpen] = useState(false);
 
   const reseedMut = useMutation({
     mutationFn: () => apiRequest("POST", "/api/admin/lms/reseed"),
@@ -1134,7 +1136,12 @@ export function LmsHealthCard({
       const parts: string[] = [];
       if (added > 0) parts.push(`${added} kursus baru`);
       if (upd > 0) parts.push(`${upd} kursus diperbarui`);
-      const description = parts.length > 0 ? parts.join(", ") : "Tidak ada perubahan konten.";
+      let description = parts.length > 0 ? parts.join(", ") : "Tidak ada perubahan konten.";
+      const titles: string[] = [
+        ...(Array.isArray(data?.addedTitles) ? data.addedTitles : []),
+        ...(Array.isArray(data?.updatedTitles) ? data.updatedTitles : []),
+      ];
+      if (titles.length > 0) description += ` — ${titles.join(", ")}`;
       toast({ title: "Reseed selesai", description });
       setRetryIn(null);
       onRefresh();
@@ -1210,7 +1217,7 @@ export function LmsHealthCard({
                 variant="outline"
                 size="sm"
                 className="h-7 text-xs gap-1"
-                onClick={() => reseedMut.mutate()}
+                onClick={() => setConfirmReseedOpen(true)}
                 disabled={reseedMut.isPending || health.seeding}
                 title="Jalankan ulang seed data kursus"
                 data-testid="button-lms-reseed"
@@ -1219,6 +1226,31 @@ export function LmsHealthCard({
                 {reseedMut.isPending ? "Memulai…" : "Re-seed"}
               </Button>
             )}
+            <AlertDialog open={confirmReseedOpen} onOpenChange={setConfirmReseedOpen}>
+              <AlertDialogContent data-testid="dialog-reseed-confirm">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Jalankan Re-seed?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Re-seed akan mengembalikan semua kursus bawaan (seed) ke konten kanonik.
+                    Perubahan manual yang pernah Anda lakukan pada judul atau isi lesson
+                    kursus seed akan <strong>ditimpa dan hilang</strong>. Kursus yang Anda
+                    buat sendiri (bukan seed) tidak terpengaruh.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel data-testid="button-reseed-cancel">Batal</AlertDialogCancel>
+                  <AlertDialogAction
+                    data-testid="button-reseed-confirm"
+                    onClick={() => {
+                      setConfirmReseedOpen(false);
+                      reseedMut.mutate();
+                    }}
+                  >
+                    Ya, timpa dengan konten seed
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               variant="ghost"
               size="icon"
