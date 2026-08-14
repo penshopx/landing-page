@@ -134,6 +134,27 @@ async function completeLesson(studentId: string, courseId: number, lessonId: num
   );
 }
 
+async function enrollCompletedStudent(studentId: string, courseId: number): Promise<void> {
+  // Enrollment in the "finished course" state: progress=100 + completed_at set.
+  await queryDb(
+    `INSERT INTO lms_enrollments (user_id, course_id, progress, completed_at)
+     VALUES ($1, $2, 100, NOW())`,
+    [studentId, courseId]
+  );
+}
+
+async function getEnrollmentRow(
+  studentId: string,
+  courseId: number
+): Promise<{ progress: number; completedAt: Date | null } | null> {
+  const rows = await queryDb(
+    `SELECT progress, completed_at FROM lms_enrollments WHERE user_id = $1 AND course_id = $2`,
+    [studentId, courseId]
+  );
+  if (rows.length === 0) return null;
+  return { progress: Number(rows[0].progress), completedAt: rows[0].completed_at };
+}
+
 async function getEnrollmentProgress(studentId: string, courseId: number): Promise<number | null> {
   const rows = await queryDb(
     `SELECT progress FROM lms_enrollments WHERE user_id = $1 AND course_id = $2`,
@@ -248,6 +269,74 @@ test(
       progress,
       50,
       `Expected progress=50 (1/2 remaining lessons completed), got ${progress}`
+    );
+  }
+);
+
+test(
+  "completed_at is cleared when a lesson deletion drops the student below 100%",
+  { skip: SKIP },
+  async () => {
+    const suffix = Math.random().toString(36).slice(2, 8);
+    const studentId = `student-pr-${RUN}-${suffix}`;
+
+    // Course starts with 2 lessons; student finishes both → 100% + completed_at.
+    const courseId = await createCourse(`d-${suffix}`);
+    const lessonId1 = await addLesson(courseId, `d1-${suffix}`);
+    const lessonId2 = await addLesson(courseId, `d2-${suffix}`);
+
+    await enrollCompletedStudent(studentId, courseId);
+    await completeLesson(studentId, courseId, lessonId1);
+    await completeLesson(studentId, courseId, lessonId2);
+
+    // Course grows: admin adds a 3rd lesson the student hasn't done yet.
+    await addLesson(courseId, `d3-${suffix}`);
+
+    // Pre-condition: enrollment still marked finished.
+    const before = await getEnrollmentRow(studentId, courseId);
+    assert.ok(before, "enrollment row must exist");
+    assert.equal(before!.progress, 100);
+    assert.ok(before!.completedAt !== null, "completed_at must be set before deletion");
+
+    // Admin deletes lesson 1 (completed). Remaining: lesson2 (done) + lesson3
+    // (not done) → 1/2 = 50% → completed_at must be cleared.
+    await deleteLesson(lessonId1);
+
+    const after = await getEnrollmentRow(studentId, courseId);
+    assert.ok(after, "enrollment row must still exist");
+    assert.equal(after!.progress, 50, `Expected progress=50, got ${after!.progress}`);
+    assert.equal(
+      after!.completedAt,
+      null,
+      "completed_at must be NULL when progress drops below 100 after lesson deletion"
+    );
+  }
+);
+
+test(
+  "completed_at is preserved when the student remains at 100% after a lesson deletion",
+  { skip: SKIP },
+  async () => {
+    const suffix = Math.random().toString(36).slice(2, 8);
+    const studentId = `student-pr-${RUN}-${suffix}`;
+
+    const courseId = await createCourse(`e-${suffix}`);
+    const lessonId1 = await addLesson(courseId, `e1-${suffix}`);
+    const lessonId2 = await addLesson(courseId, `e2-${suffix}`);
+
+    await enrollCompletedStudent(studentId, courseId);
+    await completeLesson(studentId, courseId, lessonId1);
+    await completeLesson(studentId, courseId, lessonId2);
+
+    // Delete lesson 2 → 1 lesson remains, 1 valid progress row → still 100%.
+    await deleteLesson(lessonId2);
+
+    const after = await getEnrollmentRow(studentId, courseId);
+    assert.ok(after, "enrollment row must still exist");
+    assert.equal(after!.progress, 100);
+    assert.ok(
+      after!.completedAt !== null,
+      "completed_at must be preserved when the student is still at 100% after deletion"
     );
   }
 );
