@@ -1314,16 +1314,7 @@ export default function AdminAcademyPage() {
     isLoading: healthLoading,
     refetch: refetchHealth,
     dataUpdatedAt: healthUpdatedAt,
-  } = useQuery<{
-    seedStatus: string;
-    seeding: boolean;
-    counts: {
-      totalCourses: number;
-      activeCourses: number;
-      totalLessons: number;
-      totalEnrollments: number;
-    };
-  }>({
+  } = useQuery<LmsHealth>({
     queryKey: ["/api/admin/lms/health"],
     queryFn: () => apiRequest("GET", "/api/admin/lms/health"),
     enabled: isAdmin,
