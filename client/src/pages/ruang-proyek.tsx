@@ -25,6 +25,7 @@ import {
   Wand2, Copy, Printer, CheckCircle2, Award, ExternalLink, Compass,
 } from "lucide-react";
 import { RuangProyekPanduan } from "@/components/ruang-proyek-panduan";
+import RuangProyekLanding from "@/pages/ruang-proyek-landing";
 import { Switch } from "@/components/ui/switch";
 import {
   STANDARD_ADMIN_DOCS, STAGE_LABEL, STAGE_ORDER, GENERATOR_TEMPLATES,
@@ -81,23 +82,7 @@ export default function RuangProyekPage() {
   const selected = projects.find((p) => p.id === selectedId) ?? null;
 
   if (!authLoading && !user) {
-    return (
-      <div className="min-h-screen bg-background">
-        <SharedHeader />
-        <div className="container mx-auto px-4 py-24 text-center max-w-lg">
-          <FolderKanban className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-          <h1 className="text-2xl font-bold mb-2">Ruang Proyek</h1>
-          <p className="text-muted-foreground mb-6">
-            Rujukan standar administrasi & dokumentasi proyek: daftar dokumen baku per tahapan,
-            generator dokumen (SPK, BAST, laporan progres), hitung biaya & rugi-laba,
-            dan konsultasi AI. Masuk dulu untuk mulai.
-          </p>
-          <Button asChild data-testid="button-login-ruang-proyek">
-            <a href="/api/login">Masuk untuk Mulai</a>
-          </Button>
-        </div>
-      </div>
-    );
+    return <RuangProyekLanding />;
   }
 
   return (

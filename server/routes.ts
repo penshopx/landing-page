@@ -2930,7 +2930,7 @@ export async function registerRoutes(
         agent => agent.name === "Gustafta Helpdesk" || agent.name === "Gustafta Assistant"
       );
       const { gustaftaKnowledgeBaseAgent } = await import("./seed-knowledge-base");
-      const VERSION_MARKER = "HELPDESK_v2_PAYMENT_INTEGRATION";
+      const VERSION_MARKER = "HELPDESK_v3_RUANG_PROYEK";
       if (!helpdeskExisting) {
         const helpdesk = await storage.createAgent(gustaftaKnowledgeBaseAgent as any);
         createdAgents.push(helpdesk);

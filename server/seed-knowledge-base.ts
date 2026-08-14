@@ -813,6 +813,32 @@ Bedah Dokumen kini mendukung **gambar teknis engineering** (JPG/PNG/WEBP) selain
 - Gambar Teknis (Denah, Struktur, MEP, Shop Drawing, Gambar Kapal)
 - Dokumen Proyek Umum (Method Statement, BAP, RMK)
 
+### 5.21 RUANG PROYEK — RUANG KERJA PER PROYEK + PORTFOLIO PUBLIK
+
+**URL Akses:** /ruang-proyek (perlu login) · Etalase publik: /etalase/{id-pengguna}
+**Tagline:** Satu ruang kerja per proyek — administrasi, dokumen, rugi-laba, konsultasi AI — lalu pajang ke portfolio publik.
+
+**Konsep Penting (jelaskan dengan analogi dapur vs etalase):**
+- **Ruang Proyek = dapur** — tempat kerja internal & privat per proyek.
+- **Portfolio/Etalase = etalase** — pajangan publik untuk calon klien; hanya cermin dari Ruang Proyek, satu arah, tidak bisa diedit dari luar.
+
+**Isi Ruang Proyek (per proyek, 6 tab):**
+1. **Administrasi Proyek** — daftar dokumen baku per tahapan (persiapan → pelaksanaan → serah terima) terisi otomatis saat proyek dibuat. TIDAK baku/kaku: dokumen tak relevan bisa ditandai "Tidak perlu" atau dihapus, dan dokumen khusus di luar standar bisa DITAMBAH sendiri (kotak "Tambah dokumen khusus proyek ini" di bagian bawah tab).
+2. **Generator Dokumen** — buat draf SPK, BAST, laporan progres, dll.
+3. **Costing & Rugi-Laba** — catat pendapatan & biaya, laba/rugi terhitung otomatis.
+4. **Arsip Dokumen** — kaitkan file dari Ruang Simpan ke proyek (file tetap tersimpan di Ruang Simpan).
+5. **Konsultasi AI** — bawa konteks proyek ke Klinik Konsultasi.
+6. **Panduan Alur** — peta 6 langkah integrasi fitur: Ruang Simpan (simpan dokumen) → Bedah Dokumen (periksa sebelum tanda tangan) → Administrasi & Arsip (lacak kelengkapan) → Costing + Toolkit CASHFLOW-PBJ (/toolkit-cashflow, gratis) → Klinik Konsultasi → Portfolio.
+
+**Pajang ke Portfolio (fitur etalase):**
+- Di detail proyek ada saklar **"Pajang ke Portfolio"**. Proyek yang dipajang tampil di halaman etalase publik pengguna (tanpa perlu login untuk melihat).
+- **Privasi default aman:** nilai kontrak & nama pemberi kerja TERSEMBUNYI kecuali pemilik menyalakan izinnya per proyek.
+- Proyek berjalan pun boleh dipajang (tampil "Sedang Berjalan") — tidak wajib menunggu selesai.
+- Tombol **"Salin Tautan Portfolio"** di halaman daftar proyek — bagikan tautan ke calon klien via WA/proposal sebagai bukti rekam jejak.
+- Matikan saklar → langsung hilang dari etalase.
+
+**Untuk siapa:** kontraktor, penyedia jasa, dan pelaku pengadaan yang ingin administrasi proyek rapi + punya bukti rekam jejak untuk memenangkan klien berikutnya.
+
 ═══════════════════════════════════════════════════════════
 ## BAGIAN 6: PANDUAN STEP-BY-STEP
 ═══════════════════════════════════════════════════════════
@@ -1153,7 +1179,7 @@ Semua sistem menggunakan AI multi-agen dengan streaming real-time dan terintegra
 ## BAGIAN 11: SISTEM PEMBAYARAN & MONETISASI CHATBOT
 ═══════════════════════════════════════════════════════════
 
-HELPDESK_v2_PAYMENT_INTEGRATION
+HELPDESK_v3_RUANG_PROYEK
 
 Gustafta memiliki sistem self-service **menjual akses chatbot premium** kepada pengguna akhir (client) menggunakan dua payment gateway utama:
 
