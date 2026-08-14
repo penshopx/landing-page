@@ -97,6 +97,11 @@ const files = [
   // never stays inflated after a lesson is deleted. Also checks the 409
   // enrollment guard and 401 without auth. Skipped when DATABASE_URL is absent.
   resolve(__dirname, "lms-lesson-delete-progress.test.ts"),
+  // DB integration: guard regression test — a lesson whose course has student
+  // progress cannot be deleted silently. DELETE without ?force=true → 409 with
+  // enrolledStudents > 0 and nothing deleted; with ?force=true → 200 and the
+  // progress rows are gone. Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "lms-lesson-delete-guard.test.ts"),
   // HTTP mirror + unit + static: confirms the email-health test endpoint's
   // no-admin-email guard returns 400 with the friendly message the UI renders.
   resolve(__dirname, "admin-email-test-no-email.test.ts"),
