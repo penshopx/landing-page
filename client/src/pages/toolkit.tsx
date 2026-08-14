@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   FileSearch, FileText, BookOpen, GraduationCap, BarChart3,
   Hammer, Calculator, ClipboardList, Microscope, Award,
-  ArrowRight, Wrench, Layers, Brain
+  ArrowRight, Wrench, Layers, Brain, Wallet
 } from "lucide-react";
 
 interface ToolItem {
@@ -38,6 +38,14 @@ const CATEGORIES: ToolCategory[] = [
         href: "/bedah-dokumen",
         badge: "Unggulan",
         badgeColor: "bg-blue-500 text-white",
+      },
+      {
+        icon: Wallet,
+        title: "Toolkit CASHFLOW-PBJ",
+        desc: "7 alat arus kas kontraktor proyek pemerintah: Cash Triage, Termin Tracker 7-Titik, Buffer Calculator, 12 template surat, Zero-Defect Checklist, Friday Review, dan Red Flags Scanner.",
+        href: "/toolkit-cashflow",
+        badge: "Baru",
+        badgeColor: "bg-emerald-500 text-white",
       },
       {
         icon: FileText,

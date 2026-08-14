@@ -437,6 +437,74 @@ export const RUANG_SIMPAN_PLANS = [
   },
 ] as const;
 
+// ─── CASHFLOW-PBJ — paket langganan ekosistem arus kas kontraktor ────────────
+// HARGA SIMULASI (belum final — bisa berubah). 3 tier × 3 durasi.
+// Diskon durasi: 6 bulan hemat 10%, 12 bulan hemat 20%.
+export interface CashflowDuration {
+  key: string;          // ex: "mandor_3"
+  bulan: 3 | 6 | 12;
+  total: number;        // total harga paket (Rp)
+  perBulan: number;     // efektif per bulan (Rp)
+  hemat?: string;       // "Hemat 10%"
+}
+export interface CashflowTier {
+  key: string;          // "mandor" | "kontraktor" | "direktur"
+  nama: string;
+  target: string;
+  perBulan: number;     // harga dasar per bulan
+  highlight: boolean;
+  fitur: string[];
+  durations: CashflowDuration[];
+}
+function cfDurations(prefix: string, perBulan: number): CashflowDuration[] {
+  const mk = (bulan: 3 | 6 | 12, disc: number, hemat?: string): CashflowDuration => {
+    const total = Math.round(perBulan * bulan * (1 - disc) / 1000) * 1000;
+    return { key: `${prefix}_${bulan}`, bulan, total, perBulan: Math.round(total / bulan), hemat };
+  };
+  return [mk(3, 0), mk(6, 0.10, "Hemat 10%"), mk(12, 0.20, "Hemat 20%")];
+}
+export const CASHFLOW_TIERS: CashflowTier[] = [
+  {
+    key: "mandor", nama: "T1 — MANDOR", target: "Kontraktor kecil, 1 proyek aktif",
+    perBulan: 200_000, highlight: false,
+    fitur: [
+      "Toolkit lengkap: Triage, Tracker 7-Titik, Buffer, 12 Surat, Zero-Defect, Friday Review, Red Flags",
+      "2 AI Spesialis (SI KAS + SI BERKAS)",
+      "Bedah Dokumen: 3 dokumen/bulan",
+      "Health Check dasar + alert dokumen kadaluarsa",
+      "Bantuan teknis via email",
+    ],
+    durations: cfDurations("mandor", 200_000),
+  },
+  {
+    key: "kontraktor", nama: "T2 — KONTRAKTOR", target: "Kontraktor aktif, 2-3 proyek",
+    perBulan: 500_000, highlight: true,
+    fitur: [
+      "Semua fitur T1",
+      "5 AI Spesialis + Pak Arga (rapat direksi virtual)",
+      "Akses langsung ke tiap spesialis + memori per proyek",
+      "Bedah Dokumen: 20 dokumen/bulan",
+      "Workroom per proyek + log keputusan otomatis",
+      "Alert buffer menipis + laporan mingguan otomatis",
+      "Bantuan via WhatsApp (24 jam)",
+    ],
+    durations: cfDurations("kontraktor", 500_000),
+  },
+  {
+    key: "direktur", nama: "T3 — DIREKTUR", target: "PT multi-proyek dengan tim admin",
+    perBulan: 1_000_000, highlight: false,
+    fitur: [
+      "Semua fitur T2",
+      "7 AI Spesialis lengkap + SI DARURAT (mode krisis)",
+      "Bedah Dokumen: tanpa batas",
+      "Akses tim: undang admin/mandor (maks 5 pengguna)",
+      "Alert termin otomatis via WhatsApp + auto-draft surat",
+      "Onboarding 1-on-1 (60 menit) + dukungan WA prioritas (4 jam)",
+    ],
+    durations: cfDurations("direktur", 1_000_000),
+  },
+];
+
 /** Format angka rupiah penuh, mis. 299000 → "Rp 299.000" */
 export function formatIDR(amount: number): string {
   return new Intl.NumberFormat("id-ID", {

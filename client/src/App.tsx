@@ -95,6 +95,8 @@ import KonsultanPajakPage from "@/pages/konsultan-pajak";
 import KonsultanKeuanganPage from "@/pages/konsultan-keuangan";
 import ExecutiveSummaryPage from "@/pages/executive-summary";
 import ToolkitPage from "@/pages/toolkit";
+import ToolkitCashflowPage from "@/pages/toolkit-cashflow";
+import CashflowPbjPage from "@/pages/cashflow-pbj";
 import BiroJasaSbuPage from "@/pages/biro-jasa-sbu";
 import JasaDokumenPage from "@/pages/jasa-dokumen";
 import JasaKeuanganPage from "@/pages/jasa-keuangan";
@@ -592,6 +594,8 @@ function Router() {
       <Route path="/konsultan-keuangan" component={KonsultanKeuanganPage} />
       <Route path="/executive-summary" component={ExecutiveSummaryPage} />
       <Route path="/toolkit" component={ToolkitPage} />
+      <Route path="/toolkit-cashflow" component={ToolkitCashflowPage} />
+      <Route path="/cashflow-pbj" component={CashflowPbjPage} />
       <Route path="/biro-jasa-sbu" component={BiroJasaSbuPage} />
       <Route path="/jasa-dokumen" component={JasaDokumenPage} />
       <Route path="/jasa-keuangan" component={JasaKeuanganPage} />
