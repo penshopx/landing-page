@@ -180,6 +180,22 @@ export default function CashflowPbjPage() {
         </div>
       </section>
 
+      {/* Konsultasi manusia — layanan terpisah */}
+      <section className="max-w-3xl mx-auto px-4 pb-14">
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-center" data-testid="card-konsultan-terpisah">
+          <p className="text-sm font-semibold text-white mb-1">Butuh pendampingan langsung dari konsultan manusia?</p>
+          <p className="text-xs text-slate-400 mb-3">
+            Sesi konsultasi privat (review kontrak, penyelamatan kas, pendampingan kasus) tersedia sebagai
+            <span className="text-amber-300 font-semibold"> layanan terpisah dengan tarif per sesi</span> — tidak termasuk dalam paket aplikasi di atas.
+          </p>
+          <Button asChild variant="outline" size="sm">
+            <a href={waLink("Halo Gustafta, saya ingin tanya tarif sesi konsultasi privat CASHFLOW-PBJ.")} target="_blank" rel="noopener noreferrer" data-testid="link-tanya-konsultan">
+              Tanya Tarif Konsultasi
+            </a>
+          </Button>
+        </div>
+      </section>
+
       {/* CTA akhir */}
       <section className="max-w-3xl mx-auto px-4 pb-16 text-center">
         <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-8">

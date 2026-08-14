@@ -466,19 +466,19 @@ function cfDurations(prefix: string, perBulan: number): CashflowDuration[] {
 export const CASHFLOW_TIERS: CashflowTier[] = [
   {
     key: "mandor", nama: "T1 — MANDOR", target: "Kontraktor kecil, 1 proyek aktif",
-    perBulan: 200_000, highlight: false,
+    perBulan: 299_000, highlight: false,
     fitur: [
       "Toolkit lengkap: Triage, Tracker 7-Titik, Buffer, 12 Surat, Zero-Defect, Friday Review, Red Flags",
       "2 AI Spesialis (SI KAS + SI BERKAS)",
       "Bedah Dokumen: 3 dokumen/bulan",
       "Health Check dasar + alert dokumen kadaluarsa",
-      "Bantuan teknis via email",
+      "Pusat bantuan & panduan penggunaan",
     ],
-    durations: cfDurations("mandor", 200_000),
+    durations: cfDurations("mandor", 299_000),
   },
   {
     key: "kontraktor", nama: "T2 — KONTRAKTOR", target: "Kontraktor aktif, 2-3 proyek",
-    perBulan: 500_000, highlight: true,
+    perBulan: 749_000, highlight: true,
     fitur: [
       "Semua fitur T1",
       "5 AI Spesialis + Pak Arga (rapat direksi virtual)",
@@ -486,22 +486,22 @@ export const CASHFLOW_TIERS: CashflowTier[] = [
       "Bedah Dokumen: 20 dokumen/bulan",
       "Workroom per proyek + log keputusan otomatis",
       "Alert buffer menipis + laporan mingguan otomatis",
-      "Bantuan via WhatsApp (24 jam)",
+      "Pusat bantuan & panduan video lengkap",
     ],
-    durations: cfDurations("kontraktor", 500_000),
+    durations: cfDurations("kontraktor", 749_000),
   },
   {
     key: "direktur", nama: "T3 — DIREKTUR", target: "PT multi-proyek dengan tim admin",
-    perBulan: 1_000_000, highlight: false,
+    perBulan: 1_490_000, highlight: false,
     fitur: [
       "Semua fitur T2",
       "7 AI Spesialis lengkap + SI DARURAT (mode krisis)",
-      "Bedah Dokumen: tanpa batas",
+      "Bedah Dokumen: tanpa batas (batas wajar 100 dok/bulan)",
       "Akses tim: undang admin/mandor (maks 5 pengguna)",
       "Alert termin otomatis via WhatsApp + auto-draft surat",
-      "Onboarding 1-on-1 (60 menit) + dukungan WA prioritas (4 jam)",
+      "Paket video onboarding mandiri langkah demi langkah",
     ],
-    durations: cfDurations("direktur", 1_000_000),
+    durations: cfDurations("direktur", 1_490_000),
   },
 ];
 
