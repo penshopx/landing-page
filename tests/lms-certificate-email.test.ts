@@ -459,6 +459,73 @@ test(
 );
 
 test(
+  "certificate email: logs [LMS] error when BREVO_API_KEY is missing (not_configured path)",
+  { skip: SKIP },
+  async () => {
+    const courseTitle = `No Key Course ${RUN}`;
+    const courseId = await seedCourse(courseTitle);
+
+    const lesson1 = await seedLesson(courseId, 1);
+    await seedEnrollment(TEST_USER_ID, courseId);
+
+    // Simulate a rotated/removed key: sendEmail reads process.env at call time,
+    // so deleting it here (no restart) must hit the "not_configured" early return.
+    const savedKey = process.env.BREVO_API_KEY;
+    delete process.env.BREVO_API_KEY;
+
+    // Capture console.error calls.
+    const errorMessages: string[] = [];
+    const origConsoleError = console.error;
+    console.error = (...args: any[]) => {
+      errorMessages.push(args.map(String).join(" "));
+    };
+
+    const brevoCallsBefore = capturedBrevoCalls.length;
+
+    try {
+      const res = await markProgress(TEST_USER_ID, lesson1, courseId);
+      assert.equal(res.status, 200, `Expected 200, got ${res.status}`);
+
+      const body = await res.json() as any;
+      assert.equal(body.progress, 100, "Progress should be 100 after the only lesson");
+      assert.ok(body.certificateCode, "Response should contain certificateCode");
+
+      // Wait long enough for the fire-and-forget email attempt to complete.
+      await new Promise((r) => setTimeout(r, 1500));
+
+      // No HTTP call to Brevo must have been made (early return before fetch).
+      assert.equal(
+        capturedBrevoCalls.length,
+        brevoCallsBefore,
+        "No Brevo fetch should occur when BREVO_API_KEY is unset"
+      );
+
+      // The [LMS] error log must have fired with the not_configured reason.
+      const lmsErrors = errorMessages.filter((m) => m.includes("[LMS] Certificate email failed"));
+      assert.ok(
+        lmsErrors.length > 0,
+        `Expected a console.error with "[LMS] Certificate email failed" prefix but got: ${JSON.stringify(errorMessages)}`
+      );
+      assert.ok(
+        lmsErrors.some((m) => m.includes("not_configured")),
+        `Error log must mention reason "not_configured", got: ${JSON.stringify(lmsErrors)}`
+      );
+      assert.ok(
+        lmsErrors.some((m) => m.includes(TEST_USER_ID)),
+        `Error log must include userId "${TEST_USER_ID}", got: ${JSON.stringify(lmsErrors)}`
+      );
+      assert.ok(
+        lmsErrors.some((m) => m.includes(String(courseId))),
+        `Error log must include courseId "${courseId}", got: ${JSON.stringify(lmsErrors)}`
+      );
+    } finally {
+      console.error = origConsoleError;
+      process.env.BREVO_API_KEY = savedKey;
+    }
+  }
+);
+
+test(
   "certificate email: falls back to email prefix (not 'Peserta') when student has no first_name or last_name",
   { skip: SKIP },
   async () => {
