@@ -416,6 +416,145 @@ export function AcademyStatCards({
   );
 }
 
+// ---- Store WA Dialog (named exports so tests can exercise the real logic) ----
+// The dialog title + body for the "Store Order WA" dialog. isDigital is derived
+// SOLELY from the order's own downloadPath field (joined server-side in
+// GET /api/store/admin/orders) — never from a separate storeProducts lookup that
+// may not have loaded yet (Task #173). Tests: tests/admin-store-wa-dialog.vitest.tsx
+export function storeWaDialogTitle(order: { downloadPath: string | null } | null | undefined): string {
+  return order?.downloadPath ? "Kirim Konfirmasi File Digital via WA" : "Kirim Link Akses Chatbot via WA";
+}
+
+export interface StoreWaOrder {
+  id: number;
+  productId: number;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  amount: number;
+  status: string;
+  midtransOrderId: string;
+  accessToken: string;
+  createdAt: string;
+  downloadPath: string | null;
+  productName: string | null;
+}
+
+export function StoreWaDialogBody({
+  order,
+  appUrl,
+  contactDisplay,
+  contactDisplay2,
+}: {
+  order: StoreWaOrder;
+  appUrl: string;
+  contactDisplay: string;
+  contactDisplay2: string;
+}) {
+  const { toast } = useToast();
+  const isDigital = !!(order.downloadPath);
+  // Digital orders share the access PAGE (validates payment, resolves fresh 24h link) — never the raw storage path.
+  const accessUrl = `${appUrl}/store/access/${order.accessToken}`;
+  const productLabel = order.productName ?? order.midtransOrderId ?? "produk";
+  const msg = isDigital
+    ? `Halo ${order.customerName}! 👋
+
+Terima kasih sudah membeli *${productLabel}* di Gustafta Store 🎉
+
+File digital Anda sudah dikirim ke email ${order.customerEmail}.
+Jika belum masuk, cek folder Spam/Promotions.
+
+Anda juga bisa langsung download di sini:
+${accessUrl}
+
+Butuh bantuan? Hubungi kami:
+📱 WA: ${contactDisplay} / ${contactDisplay2}
+
+Selamat menggunakan! 🚀
+— Tim Gustafta`
+    : `Halo ${order.customerName}! 👋
+
+Terima kasih sudah membeli Chatbot di Gustafta Store 🎉
+
+Berikut link akses eksklusif Anda:
+${accessUrl}
+
+Link ini berisi:
+✅ Chat langsung dengan AI Chatbot Anda
+✅ Kode embed untuk dipasang di website
+✅ Panduan penggunaan
+
+⚠️ *Simpan link ini* — link Anda bersifat permanen dan bisa dibuka kapan saja dari browser manapun.
+
+Butuh bantuan? Hubungi kami:
+📱 WA: ${contactDisplay} / ${contactDisplay2}
+
+Selamat menggunakan! 🚀
+— Tim Gustafta`;
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  const rawPhone = order.customerPhone?.replace(/\D/g, "") ?? "";
+  const phoneNum = rawPhone.startsWith("0") ? "62" + rawPhone.slice(1) : rawPhone;
+  // Strict E.164 validation: must start with 62 and have at least 8 trailing digits
+  const validPhone = /^62\d{8,}$/.test(phoneNum);
+  const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : null;
+  return (
+    <div className="space-y-4">
+      <div className="bg-muted/50 rounded-lg p-3 text-sm">
+        <p className="font-medium">{order.customerName}</p>
+        <p className="text-xs text-muted-foreground">{order.customerEmail}</p>
+        {order.customerPhone && <p className="text-xs text-muted-foreground">{order.customerPhone}</p>}
+        <p className="text-xs mt-1">{order.status === "paid" ? "✅ Lunas" : "⏳ Pending"} · {order.midtransOrderId}</p>
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Link Akses</p>
+        <div className="flex gap-2">
+          <Input value={accessUrl} readOnly className="text-xs font-mono" data-testid="input-store-access-link" />
+          <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(accessUrl); toast({ title: "Link disalin!" }); }} data-testid="button-copy-store-link">
+            <Copy className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Preview Pesan WA</p>
+        <div data-testid="store-wa-msg-preview" className="bg-[#dcf8c6] dark:bg-green-900/30 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap text-foreground leading-relaxed max-h-56 overflow-y-auto border border-green-200 dark:border-green-800">
+          {msg}
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <Button variant="outline" className="flex-1 text-xs" onClick={() => { navigator.clipboard.writeText(msg); toast({ title: "Pesan disalin!" }); }} data-testid="button-copy-store-wa-msg">
+          <Copy className="h-3.5 w-3.5 mr-1.5" /> Salin Teks
+        </Button>
+        <Button
+          className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+          onClick={() => {
+            if (waDirectUrl) {
+              window.open(waDirectUrl, "_blank");
+            } else if (rawPhone) {
+              // Phone present but not a valid Indonesian E.164 number
+              toast({
+                title: "Nomor tidak valid",
+                description: `"${order.customerPhone}" bukan nomor WA yang valid. Salin teks dan kirim manual.`,
+                variant: "destructive",
+              });
+            } else {
+              // No phone stored — open WA with text only
+              window.open(waUrl, "_blank");
+            }
+          }}
+          data-testid="button-open-store-wa"
+        >
+          <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> {validPhone ? "WA Langsung" : "Buka WA"}
+        </Button>
+      </div>
+      {validPhone && (
+        <p className="text-xs text-muted-foreground text-center">
+          "WA Langsung" membuka chat ke nomor {order.customerPhone} dengan pesan sudah terisi.
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ---- Modul WA Dialog body (named export so tests can exercise the real logic) ----
 // Renders the content of the "Kirim Link Akses Modul via WA" dialog:
 // - Valid Indonesian E.164 phone → button label "WA Langsung", opens wa.me/<phone>
@@ -4024,113 +4163,17 @@ export default function AdminPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-green-500" />
-              {storeWaDialog.order?.downloadPath ? "Kirim Konfirmasi File Digital via WA" : "Kirim Link Akses Chatbot via WA"}
+              {storeWaDialogTitle(storeWaDialog.order)}
             </DialogTitle>
           </DialogHeader>
-          {storeWaDialog.order && (() => {
-            const order = storeWaDialog.order!;
-            const isDigital = !!(order.downloadPath);
-            // Digital orders share the access PAGE (validates payment, resolves fresh 24h link) — never the raw storage path.
-            const accessUrl = `${appUrl}/store/access/${order.accessToken}`;
-            const productLabel = order.productName ?? order.midtransOrderId ?? "produk";
-            const msg = isDigital
-              ? `Halo ${order.customerName}! 👋
-
-Terima kasih sudah membeli *${productLabel}* di Gustafta Store 🎉
-
-File digital Anda sudah dikirim ke email ${order.customerEmail}.
-Jika belum masuk, cek folder Spam/Promotions.
-
-Anda juga bisa langsung download di sini:
-${accessUrl}
-
-Butuh bantuan? Hubungi kami:
-📱 WA: ${contact.display} / ${contact.display2}
-
-Selamat menggunakan! 🚀
-— Tim Gustafta`
-              : `Halo ${order.customerName}! 👋
-
-Terima kasih sudah membeli Chatbot di Gustafta Store 🎉
-
-Berikut link akses eksklusif Anda:
-${accessUrl}
-
-Link ini berisi:
-✅ Chat langsung dengan AI Chatbot Anda
-✅ Kode embed untuk dipasang di website
-✅ Panduan penggunaan
-
-⚠️ *Simpan link ini* — link Anda bersifat permanen dan bisa dibuka kapan saja dari browser manapun.
-
-Butuh bantuan? Hubungi kami:
-📱 WA: ${contact.display} / ${contact.display2}
-
-Selamat menggunakan! 🚀
-— Tim Gustafta`;
-            const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-            const rawPhone = order.customerPhone?.replace(/\D/g, "") ?? "";
-            const phoneNum = rawPhone.startsWith("0") ? "62" + rawPhone.slice(1) : rawPhone;
-            // Strict E.164 validation: must start with 62 and have at least 8 trailing digits
-            const validPhone = /^62\d{8,}$/.test(phoneNum);
-            const waDirectUrl = validPhone ? `https://wa.me/${phoneNum}?text=${encodeURIComponent(msg)}` : null;
-            return (
-              <div className="space-y-4">
-                <div className="bg-muted/50 rounded-lg p-3 text-sm">
-                  <p className="font-medium">{order.customerName}</p>
-                  <p className="text-xs text-muted-foreground">{order.customerEmail}</p>
-                  {order.customerPhone && <p className="text-xs text-muted-foreground">{order.customerPhone}</p>}
-                  <p className="text-xs mt-1">{order.status === "paid" ? "✅ Lunas" : "⏳ Pending"} · {order.midtransOrderId}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-1.5">Link Akses</p>
-                  <div className="flex gap-2">
-                    <Input value={accessUrl} readOnly className="text-xs font-mono" data-testid="input-store-access-link" />
-                    <Button variant="outline" size="sm" onClick={() => { navigator.clipboard.writeText(accessUrl); toast({ title: "Link disalin!" }); }} data-testid="button-copy-store-link">
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-2">Preview Pesan WA</p>
-                  <div className="bg-[#dcf8c6] dark:bg-green-900/30 rounded-lg p-3 text-sm font-mono whitespace-pre-wrap text-foreground leading-relaxed max-h-56 overflow-y-auto border border-green-200 dark:border-green-800">
-                    {msg}
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1 text-xs" onClick={() => { navigator.clipboard.writeText(msg); toast({ title: "Pesan disalin!" }); }} data-testid="button-copy-store-wa-msg">
-                    <Copy className="h-3.5 w-3.5 mr-1.5" /> Salin Teks
-                  </Button>
-                  <Button
-                    className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => {
-                      if (waDirectUrl) {
-                        window.open(waDirectUrl, "_blank");
-                      } else if (rawPhone) {
-                        // Phone present but not a valid Indonesian E.164 number
-                        toast({
-                          title: "Nomor tidak valid",
-                          description: `"${order.customerPhone}" bukan nomor WA yang valid. Salin teks dan kirim manual.`,
-                          variant: "destructive",
-                        });
-                      } else {
-                        // No phone stored — open WA with text only
-                        window.open(waUrl, "_blank");
-                      }
-                    }}
-                    data-testid="button-open-store-wa"
-                  >
-                    <MessageCircle className="h-3.5 w-3.5 mr-1.5" /> {validPhone ? "WA Langsung" : "Buka WA"}
-                  </Button>
-                </div>
-                {validPhone && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    "WA Langsung" membuka chat ke nomor {order.customerPhone} dengan pesan sudah terisi.
-                  </p>
-                )}
-              </div>
-            );
-          })()}
+          {storeWaDialog.order && (
+            <StoreWaDialogBody
+              order={storeWaDialog.order}
+              appUrl={appUrl}
+              contactDisplay={contact.display}
+              contactDisplay2={contact.display2}
+            />
+          )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setStoreWaDialog({ open: false, order: null })}>Tutup</Button>
           </DialogFooter>
