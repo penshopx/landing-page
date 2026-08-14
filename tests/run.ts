@@ -102,6 +102,13 @@ const files = [
   // enrolledStudents > 0 and nothing deleted; with ?force=true → 200 and the
   // progress rows are gone. Skipped when DATABASE_URL is absent.
   resolve(__dirname, "lms-lesson-delete-guard.test.ts"),
+  // DB integration: course-level delete guard — DELETE /api/admin/lms/courses/:id
+  // without ?force=true → 409 + enrollmentCount when students are enrolled;
+  // with ?force=true → 200 and ALL dependent rows (enrollments, lesson_progress,
+  // certificates, lessons) removed in one transaction. Also statically checks the
+  // admin-academy.tsx two-stage force-confirm dialog only sends force=true after
+  // explicit confirmation. Skipped when DATABASE_URL is absent.
+  resolve(__dirname, "lms-force-delete-cascade.test.ts"),
   // HTTP mirror + unit + static: confirms the email-health test endpoint's
   // no-admin-email guard returns 400 with the friendly message the UI renders.
   resolve(__dirname, "admin-email-test-no-email.test.ts"),
