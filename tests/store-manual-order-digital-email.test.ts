@@ -375,6 +375,89 @@ test(
   },
 );
 
+// ══════════════════════════════════════════════════════════════════════════════
+// SUPABASE_URL hilang → 503 deskriptif, email TIDAK dikirim (Task: no silent skip)
+// ══════════════════════════════════════════════════════════════════════════════
+
+test(
+  "routes.ts — SUPABASE_URL hilang: handler mengembalikan 503 deskriptif SEBELUM kirim email",
+  () => {
+    // Guard config-hilang harus ada di catch resolveDownloadUrl…
+    assert.match(
+      BLOCK,
+      /belum dikonfigurasi[\s\S]*?status\s*\(\s*503\s*\)/,
+      "Handler harus menangkap error 'belum dikonfigurasi' dari Supabase Storage " +
+        "dan mengembalikan HTTP 503 dengan pesan yang bisa dibaca admin (bukan 500 stack trace).",
+    );
+    // …dan return 503 itu terjadi SEBELUM sendDigitalProductDeliveryEmail dipanggil,
+    // sehingga tidak ada email delivery yang dikirim tanpa link unduhan valid.
+    const guardIdx = BLOCK.indexOf("belum dikonfigurasi");
+    const sendIdx = BLOCK.indexOf("sendDigitalProductDeliveryEmail({");
+    assert.ok(guardIdx !== -1, "Guard 'belum dikonfigurasi' harus ada di handler.");
+    assert.ok(sendIdx !== -1, "Pemanggilan sendDigitalProductDeliveryEmail harus ada.");
+    assert.ok(
+      guardIdx < sendIdx,
+      "Guard 503 config-hilang harus berada SEBELUM pemanggilan " +
+        "sendDigitalProductDeliveryEmail — email tidak boleh dikirim saat signed URL gagal dibuat.",
+    );
+    // Pesan 503 harus menyebut secret yang hilang agar admin tahu apa yang harus diperbaiki.
+    assert.match(
+      BLOCK,
+      /503[\s\S]{0,400}SUPABASE_URL/,
+      "Pesan error 503 harus menyebut SUPABASE_URL agar admin tahu secret mana yang hilang.",
+    );
+  },
+);
+
+test(
+  "resolveDownloadUrl: path Supabase relatif + SUPABASE_URL unset → throw 'belum dikonfigurasi' (bukan email diam-diam dilewati)",
+  async () => {
+    const realUrl = process.env.SUPABASE_URL;
+    const realKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    delete process.env.SUPABASE_URL;
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    // Fetch stub yang MELEDAK bila dipanggil — memastikan tidak ada network call
+    // (baik ke Supabase maupun Brevo) saat konfigurasi hilang.
+    const realFetch = globalThis.fetch;
+    let fetchCalled = false;
+    (globalThis as any).fetch = async () => {
+      fetchCalled = true;
+      throw new Error("fetch tidak boleh dipanggil saat SUPABASE_URL hilang");
+    };
+
+    try {
+      const { resolveDownloadUrl } = await import(
+        "../server/lib/supabase-storage"
+      );
+      await assert.rejects(
+        () => resolveDownloadUrl("OSS/Template-SPTJM-OSS.docx", 86_400),
+        (err: any) => {
+          assert.match(
+            String(err?.message ?? ""),
+            /belum dikonfigurasi/,
+            "Error harus menyebut 'belum dikonfigurasi' — pesan inilah yang " +
+              "dipetakan handler manual order menjadi HTTP 503 deskriptif.",
+          );
+          return true;
+        },
+        "resolveDownloadUrl harus THROW (bukan mengembalikan URL kosong/undefined) " +
+          "saat SUPABASE_URL tidak diset dan downloadPath adalah path Supabase relatif. " +
+          "Jika ia mengembalikan nilai, handler akan mengirim email dengan link rusak.",
+      );
+      assert.equal(
+        fetchCalled,
+        false,
+        "Tidak boleh ada network call (Supabase/Brevo) saat konfigurasi hilang.",
+      );
+    } finally {
+      (globalThis as any).fetch = realFetch;
+      if (realUrl !== undefined) process.env.SUPABASE_URL = realUrl;
+      if (realKey !== undefined) process.env.SUPABASE_SERVICE_ROLE_KEY = realKey;
+    }
+  },
+);
+
 test(
   "resolveDownloadUrl: URL eksternal https:// dikembalikan tanpa modifikasi (tanpa Supabase)",
   async () => {

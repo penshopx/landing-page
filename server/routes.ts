@@ -8004,6 +8004,14 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           signedUrl = await resolveDownloadUrl(sp.downloadPath, 86_400);
         } catch (storageErr: any) {
           const msg: string = storageErr?.message ?? "";
+          if (msg.includes("belum dikonfigurasi")) {
+            // SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY hilang → jangan kirim email,
+            // jangan bocorkan stack trace; beri pesan yang bisa ditindaklanjuti admin.
+            console.error(`[ManualOrder Digital] Supabase Storage belum dikonfigurasi — email TIDAK dikirim ke ${email} untuk "${sp.name}"`);
+            return res.status(503).json({
+              error: "Supabase Storage belum dikonfigurasi (SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY hilang). Set secret tersebut lalu ulangi order — email pengiriman TIDAK dikirim.",
+            });
+          }
           if (msg.includes("402") || msg.includes("egress") || msg.includes("quota") || msg.includes("restricted")) {
             return res.status(503).json({
               error: "Supabase Storage melebihi batas egress quota. Upgrade plan Supabase di dashboard (supabase.com/dashboard → Billing) untuk mengaktifkan kembali pengiriman file.",
