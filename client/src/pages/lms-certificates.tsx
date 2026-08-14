@@ -100,7 +100,7 @@ async function downloadCertificatePdf(params: {
   doc.setFont("helvetica", "italic");
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text(`Verifikasi: gustafta.my.id/lms/verify/${certificateCode}`, W / 2, H - 28, { align: "center" });
+  doc.text(`Verifikasi: ${window.location.host}/lms/verify/${certificateCode}`, W / 2, H - 28, { align: "center" });
 
   doc.setDrawColor(r, g, b);
   doc.setLineWidth(0.8);
@@ -187,7 +187,7 @@ function CertificateCard({ cert }: { cert: Certificate }) {
             </Button>
           </a>
           <a
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`)}`}
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${window.location.origin}/lms/verify/${cert.certificateCode}`)}`}
             target="_blank"
             rel="noopener noreferrer"
             data-testid={`link-linkedin-share-${cert.id}`}
@@ -204,7 +204,7 @@ function CertificateCard({ cert }: { cert: Certificate }) {
             className="gap-1 text-xs px-2.5"
             onClick={async () => {
               try {
-                await navigator.clipboard.writeText(`https://gustafta.my.id/lms/verify/${cert.certificateCode}`);
+                await navigator.clipboard.writeText(`${window.location.origin}/lms/verify/${cert.certificateCode}`);
                 toast({ title: "URL disalin!" });
               } catch {
                 toast({ title: "Gagal menyalin URL", description: "Browser memblokir akses clipboard. Salin manual dari kode sertifikat.", variant: "destructive" });

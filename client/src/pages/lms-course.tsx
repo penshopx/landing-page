@@ -103,7 +103,7 @@ async function downloadCertificatePdf(params: {
   doc.setFont("helvetica", "italic");
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
-  doc.text(`Dapat diverifikasi di: https://gustafta.my.id/lms/verify/${certificateCode}`, W / 2, H - 28, { align: "center" });
+  doc.text(`Dapat diverifikasi di: ${window.location.origin}/lms/verify/${certificateCode}`, W / 2, H - 28, { align: "center" });
 
   // Seal placeholder (circle)
   doc.setDrawColor(r, g, b);
