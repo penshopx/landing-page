@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { parseSubAgentsValue } from "./db-storage";
 import { db, pool } from "./db";
+import { sendWaMessage } from "./lib/wa-delivery";
 import { customDomains, partners, insertPartnerSchema, partnerTopupRequests, trialRequests, subscriptionsTable, vouchers, series as seriesTable, bigIdeas as bigIdeasTable, toolboxes as toolboxesTable, agents as agentsTable, cores as coresTable, systemConfig, clientSubscriptions, storeProducts } from "@shared/schema";
 import { users } from "@shared/models/auth";
 import { eq, and, desc, sql as sqlExpr, inArray, isNull, or } from "drizzle-orm";
@@ -33669,9 +33670,10 @@ Buat blueprint yang terasa personal, didasarkan pada detail nyata dari dialog. G
         metadata: { profesi: profesi || "", profilBidang: profilBidang || "", gambaranJudul: gambaranJudul || "", capturedAt: new Date().toISOString() },
       });
 
-      // Notifikasi ke admin via WA (fire-and-forget)
-      const fonnteKey = process.env.FONNTE_API_KEY;
-      if (fonnteKey) {
+      // Notifikasi ke admin via WA (fire-and-forget).
+      // Selalu lewat sendWaMessage — helper mencatat SETIAP kegagalan
+      // (termasuk token Fonnte yang hilang) dengan prefix "[WA] Delivery failed".
+      {
         const adminPhone = "6282299417818";
         const msgParts = [
           `📋 *Lead Baru dari Konsultasi*`,
@@ -33682,11 +33684,7 @@ Buat blueprint yang terasa personal, didasarkan pada detail nyata dari dialog. G
           gambaranJudul ? `Gambaran: ${gambaranJudul}` : null,
           `Waktu: ${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}`,
         ].filter(Boolean).join("\n");
-        fetch("https://api.fonnte.com/send", {
-          method: "POST",
-          headers: { Authorization: fonnteKey, "Content-Type": "application/json" },
-          body: JSON.stringify({ target: adminPhone, message: msgParts, countryCode: "62" }),
-        }).catch(() => {/* abaikan error notif */});
+        void sendWaMessage({ target: adminPhone, message: msgParts, context: `lead ${lead.id}` });
       }
 
       return res.json({ ok: true, leadId: lead.id });

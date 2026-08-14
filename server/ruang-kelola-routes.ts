@@ -17,6 +17,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { pool } from "./db";
 import { isAuthenticated } from "./replit_integrations/auth";
+import { sendWaMessage } from "./lib/wa-delivery";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
@@ -616,8 +617,7 @@ Kembalikan HANYA JSON valid (tanpa markdown/backtick/penjelasan apapun):
 
       // Notify admin via WA — L9: sanitize all user-supplied content
       const adminPhone = process.env.SUPERADMIN_PHONE || "6282299417818";
-      const waToken    = process.env.FONNTE_API_KEY;
-      if (waToken) {
+      {
         const { rows: profileRows } = await pool.query(
           `SELECT company_name, phone FROM ruang_kelola_profiles WHERE user_id = $1`, [userId]
         );
@@ -635,11 +635,9 @@ Kembalikan HANYA JSON valid (tanpa markdown/backtick/penjelasan apapun):
           + (nt ? `Catatan: ${nt}\n` : "")
           + `\nID Request: ${rows[0].id}`;
 
-        fetch("https://api.fonnte.com/send", {
-          method: "POST",
-          headers: { Authorization: waToken },
-          body: new URLSearchParams({ target: adminPhone, message: msg }),
-        }).catch(() => {});
+        // Fire-and-forget — sendWaMessage mencatat SETIAP kegagalan
+        // (termasuk token Fonnte yang hilang) dengan prefix "[WA] Delivery failed".
+        void sendWaMessage({ target: adminPhone, message: msg, context: `biro-request ${rows[0].id}` });
       }
 
       res.json({ ok: true, request: rows[0] });
