@@ -11,8 +11,9 @@ import { SharedHeader } from "@/components/shared-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowRight, Bot, BookOpen, Stethoscope, Wallet, HardDrive,
-  Wrench, Users, ExternalLink,
+  ArrowRight, Bot, BookOpen, Stethoscope, HardDrive, Check,
+  Wrench, Users, ExternalLink, FolderKanban, GraduationCap, Brain,
+  FileSearch, Presentation,
 } from "lucide-react";
 import {
   CASHFLOW_EBOOK, CASHFLOW_TIERS, KLINIK_DOKUMEN, RUANG_SIMPAN_PLANS,
@@ -31,6 +32,8 @@ type Kelompok = {
   cta: string;
   eksternal?: boolean;
   badge?: string;
+  /** contoh jenis produk dalam kelompok ini */
+  jenis?: string[];
 };
 
 const ruangSimpanBerbayar = RUANG_SIMPAN_PLANS.find((p) => p.amount > 0);
@@ -72,15 +75,83 @@ const KELOMPOK: Kelompok[] = [
     cta: "Lihat Layanan Klinik",
   },
   {
-    slug: "cashflow-pbj",
-    nama: "CASHFLOW-PBJ",
-    icon: Wallet,
+    slug: "ruang-proyek",
+    nama: "Ruang Proyek",
+    icon: FolderKanban,
     warna: "text-emerald-600 dark:text-emerald-400",
     bg: "bg-emerald-600",
-    ringkas: "Paket langganan pengelolaan kas proyek pemerintah: toolkit lengkap + tim AI spesialis kas (SI KAS, SI BERKAS, dan kawan-kawan) yang mengawal termin Anda.",
+    ringkas: "Rumah produk-produk pengelolaan proyek. Produk pertamanya: CASHFLOW-PBJ — paket langganan pengelolaan kas proyek pemerintah dengan tim AI spesialis kas. Produk lain menyusul di sini.",
+    jenis: [
+      `CASHFLOW-PBJ — mulai ${formatIDR(CASHFLOW_TIERS[0].perBulan)}/bulan`,
+      "Etalase portfolio proyek untuk tender",
+    ],
     hargaMulai: `Mulai ${formatIDR(CASHFLOW_TIERS[0].perBulan)}/bulan`,
-    href: "/cashflow-pbj",
-    cta: "Lihat Paket CASHFLOW-PBJ",
+    href: "/ruang-proyek",
+    cta: "Buka Ruang Proyek",
+  },
+  {
+    slug: "brain-project",
+    nama: "Brain Project",
+    icon: Brain,
+    warna: "text-purple-600 dark:text-purple-400",
+    bg: "bg-purple-600",
+    ringkas: "Jasa konsultansi & pendampingan proyek — otak kedua untuk pengambilan keputusan di proyek Anda, dari persiapan sampai serah terima.",
+    jenis: [
+      "Pendampingan persiapan & strategi tender",
+      "Pendampingan pelaksanaan (jadwal, biaya, risiko)",
+      "Review progres & rencana tindak korektif",
+      "Pendampingan serah terima & administrasi akhir",
+    ],
+    hargaMulai: "Lihat paket di halaman Brain Project",
+    href: "/brain-project",
+    cta: "Lihat Layanan Brain Project",
+  },
+  {
+    slug: "bedah-dokumen",
+    nama: "Bedah Dokumen",
+    icon: FileSearch,
+    warna: "text-cyan-700 dark:text-cyan-400",
+    bg: "bg-cyan-600",
+    ringkas: "Analisis mendalam dokumen proyek Anda oleh AI — temukan risiko, klausul jebakan, dan peluang sebelum tanda tangan atau memasukkan penawaran.",
+    jenis: [
+      "Bedah dokumen kontrak & addendum",
+      "Bedah RKS / SDP / dokumen tender",
+      "Bedah BQ / RAB & spesifikasi teknis",
+      "Bedah laporan & berita acara",
+    ],
+    hargaMulai: "Termasuk paket langganan — lihat ketentuan",
+    href: "/bedah-dokumen",
+    cta: "Lihat Layanan Bedah Dokumen",
+  },
+  {
+    slug: "bimtek-skk",
+    nama: "Bimtek SKK",
+    icon: GraduationCap,
+    warna: "text-rose-600 dark:text-rose-400",
+    bg: "bg-rose-600",
+    ringkas: "Produk mentoring persiapan Uji Kompetensi SKK Konstruksi — bimbingan terarah sampai siap uji, termasuk penyiapan portofolio.",
+    jenis: [
+      "Mentoring persiapan Uji Kompetensi SKK",
+      "Penyusunan portofolio uji",
+    ],
+    hargaMulai: "Lihat paket di halaman Bimtek SKK",
+    href: "/klinik-uji-kompetensi",
+    cta: "Lihat Paket Bimtek SKK",
+  },
+  {
+    slug: "pkb-pub",
+    nama: "PKB-PUB",
+    icon: Presentation,
+    warna: "text-amber-700 dark:text-amber-400",
+    bg: "bg-amber-600",
+    ringkas: "Lini e-Learning & Executive Summary — belajar terstruktur, lalu hasil belajarnya dirangkum jadi laporan eksekutif yang siap dilaporkan ke atasan, sponsor, atau institusi.",
+    jenis: [
+      "e-Learning (pembelajaran mandiri terstruktur)",
+      "Executive Summary hasil belajar / kegiatan",
+    ],
+    hargaMulai: "Lihat paket di halaman PKB-PUB",
+    href: "/executive-summary",
+    cta: "Lihat Layanan PKB-PUB",
   },
   {
     slug: "ruang-simpan",
@@ -160,7 +231,18 @@ export default function KatalogProdukPage() {
                   )}
                 </div>
                 <h2 className={`text-lg font-black leading-snug mb-2 ${k.warna}`}>{k.nama}</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4 flex-1">{k.ringkas}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">{k.ringkas}</p>
+                {k.jenis && (
+                  <ul className="space-y-1.5 mb-4">
+                    {k.jenis.map((j) => (
+                      <li key={j} className="flex items-start gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <Check className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${k.warna}`} />
+                        <span>{j}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="flex-1" />
                 <p className="text-sm font-bold text-slate-900 dark:text-white mb-5">{k.hargaMulai}</p>
                 {k.eksternal ? (
                   <Button asChild variant="outline" className="gap-2 w-fit">
