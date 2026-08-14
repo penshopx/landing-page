@@ -21,6 +21,12 @@ function ProductCard({ p }: { p: DigitalProduct }) {
           {isEbook ? <BookOpen className="h-5 w-5 text-white" /> : <Hammer className="h-5 w-5 text-white" />}
         </div>
         <div className="flex items-center gap-2">
+          {p.tier === "lead" && (
+            <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 border-0">Ebook Gratis</Badge>
+          )}
+          {p.tier === "premium" && (
+            <Badge className="bg-slate-900 text-amber-300 dark:bg-amber-950 dark:text-amber-300 border-0">Premium</Badge>
+          )}
           {p.badge && <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300 border-0">{p.badge}</Badge>}
           <Badge
             variant="outline"

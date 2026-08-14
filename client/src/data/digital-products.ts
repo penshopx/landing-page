@@ -10,6 +10,8 @@ import { CASHFLOW_EBOOK } from "@/data/pricing";
 export type DigitalProduct = {
   slug: string;
   jenis: "ebook" | "toolkit";
+  /** Jenjang ebook: "lead" = pancingan gratis, "premium" = berbayar */
+  tier?: "lead" | "premium";
   judul: string;
   subjudul: string;
   deskripsi: string;
@@ -35,6 +37,7 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
       "Ebook lengkap 9 bab + 6 lampiran: Cash Triage Matrix, Termin Tracker 7-Titik, Buffer Protocol, 12 template surat & WhatsApp, checklist Zero-Defect, dan payung hukum pembayaran proyek pemerintah.",
     hargaLabel: CASHFLOW_EBOOK.hargaLabel,
     gratis: false,
+    tier: "premium",
     href: "/ebook-kas-merah",
     lini: "CASHFLOW-PBJ",
     badge: "Terbaru",
@@ -48,6 +51,7 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
       "Kenali 3 kesalahan pengelolaan kas yang paling sering mematikan kontraktor pemerintah — dan gambaran besar sistem 3 lapis untuk mencegahnya. Bisa langsung diunduh.",
     hargaLabel: "GRATIS",
     gratis: true,
+    tier: "lead",
     href: "/ebook-kas-merah",
     downloadHref: "/ebooks/kas-merah-mini-ebook.pdf",
     lini: "CASHFLOW-PBJ",
