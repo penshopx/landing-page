@@ -22,6 +22,8 @@ description: Pembagian peran gustafta.my.id vs dokumenproyek.com yang sudah dise
 - Kelompok katalog memakai NAMA FITUR yang dikenal konsumen (Produk AI, Ebook & Toolkit, Klinik, CASHFLOW-PBJ, Ruang Simpan, Jasa AI Custom, Jasa Manusia→dokumenproyek.com) agar "tidak kehilangan jejak".
 - Halaman lama /produk (builder Paket Bisnis/Modul/Chatbot) dipindah ke /produk-builder; hub baru = client/src/pages/katalog-produk.tsx di /produk. Menu header "Produk AI"→"Produk".
 - Nama dipilih "Produk", bukan "Katalog" (bahasa pembeli).
+- Kelompok katalog per Agu 2026: Produk AI (2 bentuk: AI Spesialis = 1 agen tanpa orchestrator; AI Claw = tim di bawah 1 orchestrator — pakai istilah ini konsisten), Ebook & Toolkit, Klinik, Ruang Proyek (payung produk; CASHFLOW-PBJ salah satu isinya), Brain Project (jasa pendampingan), Bedah Dokumen, Bimtek SKK (mentoring uji kompetensi), PKB-PUB (e-Learning & exec summary; kepanjangan belum dijelaskan Bos), Ruang Simpan, Jasa AI Custom, Jasa Manusia.
+- Harga Klinik DIREVISI naik (arahan Bos, basis: klinik = dialog+upload+perakitan Claw+workroom); Bos yang menyamakan harga produk di dashboard Scalev — sampai itu selesai, harga web vs checkout Scalev bisa beda.
 
 # Rak digital "Ebook & Toolkit"
 
