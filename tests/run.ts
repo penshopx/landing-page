@@ -81,6 +81,7 @@ const files = [
   // the real email helper and resolveDownloadUrl directly so signature
   // regressions are caught without booting a full server.
   resolve(__dirname, "store-manual-order-digital-email.test.ts"),
+  resolve(__dirname, "store-manual-order-email-fail-reason.test.ts"),
   // DB integration: confirms POST /api/admin/lms/cert-repair backfills every
   // completed enrollment without a certificate and GET /api/admin/lms/health
   // returns pendingCertificates=0 afterwards (the UI condition that hides the
