@@ -1092,14 +1092,53 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
     }
   });
 
+  // GET /api/admin/lms/courses/:id/enrollments — list a course's enrollments
+  // with student identity (name/email) so admins can pick who to reset.
+  app.get("/api/admin/lms/courses/:id/enrollments", isAuthenticated, requireAdminLms, async (req: any, res) => {
+    try {
+      const courseId = parseInt(req.params.id);
+      if (!Number.isFinite(courseId)) return res.status(400).json({ error: "ID tidak valid" });
+      const rows = await db.execute(sql`
+        SELECT e.id, e.user_id, e.progress, e.completed_at, e.enrolled_at,
+               u.first_name, u.last_name, u.email, u.phone, up.display_name
+        FROM lms_enrollments e
+        LEFT JOIN users u ON u.id = e.user_id
+        LEFT JOIN user_profiles up ON up.user_id = e.user_id
+        WHERE e.course_id = ${courseId}
+        ORDER BY e.enrolled_at DESC
+      `);
+      const list = ((rows.rows ?? rows) as any[]).map((r) => ({
+        id: r.id,
+        userId: r.user_id,
+        progress: Number(r.progress ?? 0),
+        completedAt: r.completed_at,
+        enrolledAt: r.enrolled_at,
+        studentName: resolveStudentName(r),
+        email: r.email ?? "",
+      }));
+      res.json(list);
+    } catch (e) {
+      console.error("[LMS-ADMIN] GET course enrollments:", e);
+      res.status(500).json({ error: "Gagal mengambil daftar enrollment" });
+    }
+  });
+
   // DELETE /api/admin/lms/courses/:courseId/enrollments/:userId — reset a
   // student's enrollment. MUST also clear lms_lesson_progress rows for the
   // same (user, course); otherwise a re-enroll would recalculate completion
   // from stale progress rows and instantly jump back to 100%.
+  //
+  // By default the student's certificate is PRESERVED (manual-removal
+  // semantics: a completed student keeps their cert, and re-enroll restores
+  // 100% so the cert stays consistent). Pass ?purgeCertificate=true for a
+  // FULL reset: the certificate is deleted in the same transaction so the
+  // student truly starts from zero on re-enroll. The admin-dashboard Reset
+  // button uses the full reset.
   app.delete("/api/admin/lms/courses/:courseId/enrollments/:userId", isAuthenticated, requireAdminLms, async (req: any, res) => {
     try {
       const courseId = parseInt(req.params.courseId);
       const userId = String(req.params.userId || "");
+      const purgeCertificate = String(req.query.purgeCertificate || "") === "true";
       if (!Number.isFinite(courseId) || !userId) {
         return res.status(400).json({ error: "courseId dan userId wajib diisi" });
       }
@@ -1110,7 +1149,14 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
         const enrollmentDeleted = await tx.delete(lmsEnrollments)
           .where(and(eq(lmsEnrollments.userId, userId), eq(lmsEnrollments.courseId, courseId)))
           .returning({ id: lmsEnrollments.id });
-        return { progressDeleted: progressDeleted.length, enrollmentDeleted: enrollmentDeleted.length };
+        let certificatesDeleted = 0;
+        if (purgeCertificate) {
+          const certRows = await tx.delete(lmsCertificates)
+            .where(and(eq(lmsCertificates.userId, userId), eq(lmsCertificates.courseId, courseId)))
+            .returning({ id: lmsCertificates.id });
+          certificatesDeleted = certRows.length;
+        }
+        return { progressDeleted: progressDeleted.length, enrollmentDeleted: enrollmentDeleted.length, certificatesDeleted };
       });
       if (result.enrollmentDeleted === 0 && result.progressDeleted === 0) {
         return res.status(404).json({ error: "Enrollment tidak ditemukan" });

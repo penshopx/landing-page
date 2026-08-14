@@ -821,6 +821,118 @@ function LessonsPanel({ course }: { course: Course }) {
   );
 }
 
+// ─── Enrollments Panel ────────────────────────────────────────────────────────
+type AdminEnrollment = {
+  id: number;
+  userId: string;
+  progress: number;
+  completedAt: string | null;
+  enrolledAt: string;
+  studentName: string;
+  email: string;
+};
+
+function EnrollmentsPanel({ course }: { course: Course }) {
+  const { toast } = useToast();
+  const [resetTarget, setResetTarget] = useState<AdminEnrollment | null>(null);
+
+  const { data: enrollments = [], isLoading, isError } = useQuery<AdminEnrollment[]>({
+    queryKey: ["/api/admin/lms/courses", course.id, "enrollments"],
+    queryFn: () => apiRequest("GET", `/api/admin/lms/courses/${course.id}/enrollments`),
+  });
+
+  const resetMut = useMutation({
+    mutationFn: (userId: string) =>
+      apiRequest(
+        "DELETE",
+        `/api/admin/lms/courses/${course.id}/enrollments/${encodeURIComponent(userId)}?purgeCertificate=true`
+      ),
+    onSuccess: () => {
+      toast({ title: "Enrollment direset", description: "Progress siswa untuk kursus ini dihapus." });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/courses", course.id, "enrollments"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/lms/health"] });
+      setResetTarget(null);
+    },
+    onError: (e: any) => {
+      toast({ title: "Gagal mereset enrollment", description: e?.message, variant: "destructive" });
+      setResetTarget(null);
+    },
+  });
+
+  return (
+    <div className="pl-6 pr-4 pb-4">
+      <p className="text-sm font-medium text-muted-foreground mb-3">
+        {enrollments.length} siswa terdaftar
+      </p>
+
+      {isLoading ? (
+        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+      ) : isError ? (
+        <p className="text-sm text-destructive">Gagal memuat daftar siswa. Coba muat ulang.</p>
+      ) : enrollments.length === 0 ? (
+        <p className="text-sm text-muted-foreground italic">Belum ada siswa terdaftar.</p>
+      ) : (
+        <div className="space-y-2">
+          {enrollments.map((e) => (
+            <div
+              key={e.id}
+              className="flex items-center gap-3 rounded-md border p-2.5"
+              data-testid={`row-enrollment-${e.id}`}
+            >
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{e.studentName}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {e.email || e.userId}
+                  {" · "}
+                  {new Date(e.enrolledAt).toLocaleDateString("id-ID")}
+                </p>
+              </div>
+              <Badge variant={e.completedAt ? "default" : "outline"} className="text-xs flex-shrink-0">
+                {e.progress}%
+              </Badge>
+              <Button
+                size="sm"
+                variant="outline"
+                className="text-destructive flex-shrink-0"
+                onClick={() => setResetTarget(e)}
+                data-testid={`button-reset-enrollment-${e.id}`}
+              >
+                <RefreshCw className="w-3.5 h-3.5 mr-1" /> Reset
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <AlertDialog open={!!resetTarget} onOpenChange={(o) => !o && setResetTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset enrollment siswa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Enrollment <strong>{resetTarget?.studentName}</strong> di kursus "{course.title}"
+              beserta seluruh progress lesson dan sertifikatnya (jika ada) akan dihapus permanen.
+              Siswa harus mendaftar ulang dan mulai dari nol.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(ev) => {
+                ev.preventDefault();
+                if (resetTarget && !resetMut.isPending) resetMut.mutate(resetTarget.userId);
+              }}
+              data-testid="button-confirm-reset-enrollment"
+            >
+              {resetMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : "Reset"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
 // ─── Sortable Course Card ─────────────────────────────────────────────────────
 function SortableCourseCard({
   course,
@@ -928,6 +1040,9 @@ function SortableCourseCard({
         {expanded && (
           <div className="border-t">
             <LessonsPanel course={course} />
+            <div className="border-t pt-4">
+              <EnrollmentsPanel course={course} />
+            </div>
           </div>
         )}
       </Card>
