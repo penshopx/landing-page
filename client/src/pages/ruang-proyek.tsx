@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
@@ -23,7 +22,12 @@ import { apiRequest } from "@/lib/queryClient";
 import {
   FolderKanban, Plus, Trash2, ArrowLeft, FileText, ClipboardList,
   Calculator, MessageCircle, HardDrive, TrendingUp, TrendingDown, Loader2,
+  Wand2, Copy, Printer, CheckCircle2,
 } from "lucide-react";
+import {
+  STANDARD_ADMIN_DOCS, STAGE_LABEL, STAGE_ORDER, GENERATOR_TEMPLATES,
+  type AdminDoc, type AdminDocStage, type AdminDocStatus, type GeneratorTemplate,
+} from "@/data/ruang-proyek-standards";
 
 type ChecklistItem = { id: string; label: string; done: boolean };
 type CostItem = { id: string; label: string; type: "biaya" | "pendapatan"; amount: number };
@@ -31,7 +35,7 @@ type Project = {
   id: string; name: string; client: string | null; location: string | null;
   description: string | null; status: string; contractValue: number | null;
   startDate: string | null; endDate: string | null;
-  checklist: ChecklistItem[]; costItems: CostItem[]; linkedFileIds: string[];
+  checklist: ChecklistItem[]; adminDocs: AdminDoc[]; costItems: CostItem[]; linkedFileIds: string[];
   createdAt: string; updatedAt: string;
 };
 type RsFile = { id: string; original_name: string; mime_type: string; size_bytes: number };
@@ -46,13 +50,18 @@ const STATUS_COLOR: Record<string, string> = {
   tertunda: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
 };
 
-const DEFAULT_CHECKLIST = [
-  "Kontrak / SPK ditandatangani",
-  "RAB / penawaran disetujui",
-  "Dokumen legalitas perusahaan lengkap",
-  "Jadwal pelaksanaan disusun",
-  "Berita acara serah terima (BAST)",
-];
+const DOC_STATUS_LABEL: Record<AdminDocStatus, string> = {
+  belum: "Belum", proses: "Proses", selesai: "Selesai", tidak_perlu: "Tidak perlu",
+};
+const DOC_STATUS_COLOR: Record<AdminDocStatus, string> = {
+  belum: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+  proses: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  selesai: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
+  tidak_perlu: "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 line-through",
+};
+
+const seedAdminDocs = (): AdminDoc[] =>
+  STANDARD_ADMIN_DOCS.map((d) => ({ id: newId(), key: d.key, label: d.label, stage: d.stage, status: "belum" as AdminDocStatus }));
 
 export default function RuangProyekPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -76,8 +85,9 @@ export default function RuangProyekPage() {
           <FolderKanban className="h-12 w-12 mx-auto mb-4 text-blue-600" />
           <h1 className="text-2xl font-bold mb-2">Ruang Proyek</h1>
           <p className="text-muted-foreground mb-6">
-            Satu ruang kerja untuk setiap proyek Anda: dokumen, checklist administrasi,
-            hitung biaya & rugi-laba, dan konsultasi AI. Masuk dulu untuk mulai.
+            Rujukan standar administrasi & dokumentasi proyek: daftar dokumen baku per tahapan,
+            generator dokumen (SPK, BAST, laporan progres), hitung biaya & rugi-laba,
+            dan konsultasi AI. Masuk dulu untuk mulai.
           </p>
           <Button asChild data-testid="button-login-ruang-proyek">
             <a href="/api/login">Masuk untuk Mulai</a>
@@ -122,7 +132,7 @@ function ProjectList({ projects, isLoading, onOpen, onCreate }: {
             <FolderKanban className="h-8 w-8 text-blue-600" /> Ruang Proyek
           </h1>
           <p className="text-muted-foreground mt-1">
-            Satu ruang untuk setiap proyek: dokumen, checklist, costing & rugi-laba, konsultasi AI.
+            Standar administrasi & dokumentasi proyek: dokumen baku per tahapan, generator dokumen, costing & rugi-laba.
           </p>
         </div>
         <Button onClick={onCreate} data-testid="button-create-project">
@@ -147,7 +157,8 @@ function ProjectList({ projects, isLoading, onOpen, onCreate }: {
         <div className="grid sm:grid-cols-2 gap-4">
           {projects.map((p) => {
             const laba = p.costItems.reduce((s, c) => s + (c.type === "pendapatan" ? c.amount : -c.amount), 0);
-            const doneCount = p.checklist.filter((c) => c.done).length;
+            const relevantDocs = p.adminDocs.filter((d) => d.status !== "tidak_perlu");
+            const doneCount = relevantDocs.filter((d) => d.status === "selesai").length;
             return (
               <Card key={p.id} className="cursor-pointer hover:border-blue-400 transition-colors"
                 onClick={() => onOpen(p.id)} data-testid={`card-project-${p.id}`}>
@@ -160,7 +171,7 @@ function ProjectList({ projects, isLoading, onOpen, onCreate }: {
                 </CardHeader>
                 <CardContent className="text-sm text-muted-foreground space-y-1">
                   {p.contractValue != null && <p>Nilai kontrak: <span className="font-medium text-foreground">{rupiah(p.contractValue)}</span></p>}
-                  <p>Checklist: {doneCount}/{p.checklist.length} · Dokumen: {p.linkedFileIds.length}</p>
+                  <p>Administrasi: {doneCount}/{relevantDocs.length} dokumen selesai · Arsip: {p.linkedFileIds.length}</p>
                   {p.costItems.length > 0 && (
                     <p className={laba >= 0 ? "text-green-600" : "text-red-600"}>
                       {laba >= 0 ? "Laba" : "Rugi"} sementara: {rupiah(Math.abs(laba))}
@@ -193,9 +204,9 @@ function CreateProjectDialog({ open, onClose, onCreated }: {
       const cv = Number(form.contractValue.replace(/[^\d]/g, ""));
       if (form.contractValue.trim() && Number.isFinite(cv)) body.contractValue = cv;
       const created: Project = await apiRequest("POST", "/api/ruang-proyek/projects", body);
-      // Isi checklist awal supaya user tidak mulai dari nol.
+      // Isi standar administrasi proyek supaya user langsung punya rujukan lengkap.
       return await apiRequest("PATCH", `/api/ruang-proyek/projects/${created.id}`, {
-        checklist: DEFAULT_CHECKLIST.map((label) => ({ id: newId(), label, done: false })),
+        adminDocs: seedAdminDocs(),
       }) as Project;
     },
     onSuccess: (p) => {
@@ -309,19 +320,23 @@ function ProjectDetail({ project, onBack }: { project: Project; onBack: () => vo
         </CardContent></Card>
       </div>
 
-      <Tabs defaultValue="costing">
+      <Tabs defaultValue="administrasi">
         <TabsList className="mb-4 flex-wrap h-auto">
+          <TabsTrigger value="administrasi" data-testid="tab-administrasi"><ClipboardList className="h-4 w-4 mr-1" /> Administrasi Proyek</TabsTrigger>
+          <TabsTrigger value="generator" data-testid="tab-generator"><Wand2 className="h-4 w-4 mr-1" /> Generator Dokumen</TabsTrigger>
           <TabsTrigger value="costing" data-testid="tab-costing"><Calculator className="h-4 w-4 mr-1" /> Costing & Rugi-Laba</TabsTrigger>
-          <TabsTrigger value="checklist" data-testid="tab-checklist"><ClipboardList className="h-4 w-4 mr-1" /> Checklist</TabsTrigger>
-          <TabsTrigger value="dokumen" data-testid="tab-dokumen"><FileText className="h-4 w-4 mr-1" /> Dokumen</TabsTrigger>
+          <TabsTrigger value="dokumen" data-testid="tab-dokumen"><FileText className="h-4 w-4 mr-1" /> Arsip Dokumen</TabsTrigger>
           <TabsTrigger value="konsultasi" data-testid="tab-konsultasi"><MessageCircle className="h-4 w-4 mr-1" /> Konsultasi AI</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="administrasi">
+          <AdminDocsTab project={project} onSave={(adminDocs) => patchMut.mutate({ adminDocs })} saving={patchMut.isPending} />
+        </TabsContent>
+        <TabsContent value="generator">
+          <GeneratorTab project={project} />
+        </TabsContent>
         <TabsContent value="costing">
           <CostingTab project={project} onSave={(costItems) => patchMut.mutate({ costItems })} saving={patchMut.isPending} />
-        </TabsContent>
-        <TabsContent value="checklist">
-          <ChecklistTab project={project} onSave={(checklist) => patchMut.mutate({ checklist })} saving={patchMut.isPending} />
         </TabsContent>
         <TabsContent value="dokumen">
           <DokumenTab project={project} onSave={(linkedFileIds) => patchMut.mutate({ linkedFileIds })} />
@@ -405,38 +420,190 @@ function CostingTab({ project, onSave, saving }: { project: Project; onSave: (it
   );
 }
 
-function ChecklistTab({ project, onSave, saving }: { project: Project; onSave: (items: ChecklistItem[]) => void; saving: boolean }) {
-  const [label, setLabel] = useState("");
+function AdminDocsTab({ project, onSave, saving }: { project: Project; onSave: (docs: AdminDoc[]) => void; saving: boolean }) {
+  const [customLabel, setCustomLabel] = useState("");
+  const [customStage, setCustomStage] = useState<AdminDocStage>("pelaksanaan");
+  // Proyek lama (dibuat sebelum fitur ini) bisa punya adminDocs kosong — tawarkan isi standar.
+  const docs = project.adminDocs;
+
+  const setStatus = (id: string, status: AdminDocStatus) =>
+    onSave(docs.map((d) => (d.id === id ? { ...d, status } : d)));
+
   return (
-    <Card>
-      <CardContent className="pt-6 space-y-4">
-        <div className="flex gap-2">
-          <Input placeholder="Tambah butir administrasi, mis. 'Jaminan pelaksanaan terbit'"
-            value={label} onChange={(e) => setLabel(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter" && label.trim()) { onSave([...project.checklist, { id: newId(), label: label.trim(), done: false }]); setLabel(""); } }}
-            data-testid="input-checklist-label" />
-          <Button disabled={!label.trim() || saving} data-testid="button-add-checklist"
-            onClick={() => { onSave([...project.checklist, { id: newId(), label: label.trim(), done: false }]); setLabel(""); }}>
-            <Plus className="h-4 w-4" />
+    <div className="space-y-4">
+      {docs.length === 0 && (
+        <Card><CardContent className="pt-6 text-center space-y-3">
+          <ClipboardList className="h-8 w-8 mx-auto text-blue-600" />
+          <p className="text-sm text-muted-foreground">Proyek ini belum punya daftar administrasi standar.</p>
+          <Button onClick={() => onSave(seedAdminDocs())} disabled={saving} data-testid="button-seed-admin-docs">
+            Isi Standar Administrasi Proyek ({STANDARD_ADMIN_DOCS.length} dokumen)
           </Button>
-        </div>
-        <div className="space-y-2">
-          {project.checklist.map((c) => (
-            <div key={c.id} className="flex items-center gap-3 group" data-testid={`row-checklist-${c.id}`}>
-              <Checkbox checked={c.done} disabled={saving}
-                onCheckedChange={(v) => onSave(project.checklist.map((x) => x.id === c.id ? { ...x, done: !!v } : x))}
-                data-testid={`checkbox-${c.id}`} />
-              <span className={`text-sm flex-1 ${c.done ? "line-through text-muted-foreground" : ""}`}>{c.label}</span>
-              <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100" disabled={saving}
-                onClick={() => onSave(project.checklist.filter((x) => x.id !== c.id))}>
-                <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
-              </Button>
+        </CardContent></Card>
+      )}
+
+      {STAGE_ORDER.map((stage) => {
+        const stageDocs = docs.filter((d) => d.stage === stage);
+        if (stageDocs.length === 0) return null;
+        const relevant = stageDocs.filter((d) => d.status !== "tidak_perlu");
+        const done = relevant.filter((d) => d.status === "selesai").length;
+        return (
+          <Card key={stage}>
+            <CardHeader className="pb-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <CardTitle className="text-base">{STAGE_LABEL[stage]}</CardTitle>
+                <Badge variant="secondary" className={done === relevant.length && relevant.length > 0 ? DOC_STATUS_COLOR.selesai : ""}>
+                  {done}/{relevant.length} selesai
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="divide-y">
+              {stageDocs.map((d) => (
+                <div key={d.id} className="flex items-center justify-between gap-2 py-2 group" data-testid={`row-admindoc-${d.key}`}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    {d.status === "selesai" && <CheckCircle2 className="h-4 w-4 text-green-600 shrink-0" />}
+                    <span className={`text-sm truncate ${d.status === "tidak_perlu" ? "line-through text-muted-foreground" : ""}`}>{d.label}</span>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Select value={d.status} onValueChange={(v) => setStatus(d.id, v as AdminDocStatus)} disabled={saving}>
+                      <SelectTrigger className="h-8 w-32 text-xs" data-testid={`select-status-${d.key}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(Object.keys(DOC_STATUS_LABEL) as AdminDocStatus[]).map((s) => (
+                          <SelectItem key={s} value={s}>{DOC_STATUS_LABEL[s]}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100" disabled={saving}
+                      onClick={() => onSave(docs.filter((x) => x.id !== d.id))} data-testid={`button-remove-doc-${d.key}`}>
+                      <Trash2 className="h-3.5 w-3.5 text-muted-foreground" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        );
+      })}
+
+      <Card>
+        <CardContent className="pt-4">
+          <p className="text-sm font-medium mb-2">Tambah dokumen khusus proyek ini</p>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Select value={customStage} onValueChange={(v) => setCustomStage(v as AdminDocStage)}>
+              <SelectTrigger className="sm:w-64" data-testid="select-custom-stage"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {STAGE_ORDER.map((s) => <SelectItem key={s} value={s}>{STAGE_LABEL[s]}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Input placeholder="Nama dokumen, mis. 'Izin lingkungan warga'"
+              value={customLabel} onChange={(e) => setCustomLabel(e.target.value)} data-testid="input-custom-doc" />
+            <Button disabled={!customLabel.trim() || saving} data-testid="button-add-custom-doc"
+              onClick={() => {
+                onSave([...docs, { id: newId(), key: `custom-${newId()}`, label: customLabel.trim(), stage: customStage, status: "belum" }]);
+                setCustomLabel("");
+              }}>
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function GeneratorTab({ project }: { project: Project }) {
+  const { toast } = useToast();
+  const [tplKey, setTplKey] = useState<string>(GENERATOR_TEMPLATES[0].key);
+  const [fields, setFields] = useState<Record<string, string>>({});
+  const [output, setOutput] = useState("");
+
+  const tpl = GENERATOR_TEMPLATES.find((t) => t.key === tplKey)!;
+
+  const generate = () => {
+    setOutput(tpl.render({
+      projectName: project.name,
+      client: project.client ?? "",
+      location: project.location ?? "",
+      contractValue: project.contractValue != null ? rupiah(project.contractValue) : "",
+      startDate: project.startDate ?? "",
+      endDate: project.endDate ?? "",
+    }, fields));
+  };
+
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(output); toast({ title: "Tersalin", description: "Dokumen disalin — tempel di Word/Docs untuk dirapikan." }); }
+    catch { toast({ title: "Gagal menyalin", variant: "destructive" }); }
+  };
+
+  const print = () => {
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(`<pre style="font-family: 'Times New Roman', serif; font-size: 12pt; white-space: pre-wrap; padding: 2cm;">${output.replace(/</g, "&lt;")}</pre>`);
+    w.document.close();
+    w.print();
+  };
+
+  return (
+    <div className="grid lg:grid-cols-2 gap-4">
+      <Card>
+        <CardContent className="pt-6 space-y-3">
+          <div>
+            <Label>Jenis dokumen</Label>
+            <Select value={tplKey} onValueChange={(v) => { setTplKey(v); setFields({}); setOutput(""); }}>
+              <SelectTrigger data-testid="select-generator-template"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {GENERATOR_TEMPLATES.map((t) => <SelectItem key={t.key} value={t.key}>{t.title}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1">{tpl.description}</p>
+          </div>
+          <p className="text-xs text-muted-foreground bg-muted/40 rounded p-2">
+            Data proyek (nama, klien, lokasi, nilai kontrak) diambil otomatis. Lengkapi sisanya:
+          </p>
+          {tpl.fields.map((f) => (
+            <div key={f.name}>
+              <Label className="text-sm">{f.label}</Label>
+              {f.multiline ? (
+                <Textarea rows={3} placeholder={f.placeholder} value={fields[f.name] ?? ""}
+                  onChange={(e) => setFields({ ...fields, [f.name]: e.target.value })} data-testid={`input-gen-${f.name}`} />
+              ) : (
+                <Input placeholder={f.placeholder} value={fields[f.name] ?? ""}
+                  onChange={(e) => setFields({ ...fields, [f.name]: e.target.value })} data-testid={`input-gen-${f.name}`} />
+              )}
             </div>
           ))}
-          {project.checklist.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">Checklist kosong.</p>}
-        </div>
-      </CardContent>
-    </Card>
+          <Button className="w-full" onClick={generate} data-testid="button-generate-doc">
+            <Wand2 className="h-4 w-4 mr-2" /> Buat Dokumen
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Hasil</p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" disabled={!output} onClick={copy} data-testid="button-copy-doc">
+                <Copy className="h-3.5 w-3.5 mr-1" /> Salin
+              </Button>
+              <Button variant="outline" size="sm" disabled={!output} onClick={print} data-testid="button-print-doc">
+                <Printer className="h-3.5 w-3.5 mr-1" /> Cetak
+              </Button>
+            </div>
+          </div>
+          {output ? (
+            <Textarea rows={22} value={output} onChange={(e) => setOutput(e.target.value)}
+              className="font-mono text-xs" data-testid="textarea-doc-output" />
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-16">
+              Pilih jenis dokumen, lengkapi isian, lalu klik "Buat Dokumen".
+              Hasilnya bisa diedit langsung, disalin, atau dicetak.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

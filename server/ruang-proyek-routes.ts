@@ -48,8 +48,19 @@ const createSchema = z.object({
   endDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
 });
 
+const adminDocSchema = z.object({
+  id: z.string().min(1).max(64),
+  key: z.string().min(1).max(64),
+  label: z.string().min(1).max(300),
+  stage: z.enum(["persiapan", "pelaksanaan", "serah_terima"]),
+  status: z.enum(["belum", "proses", "selesai", "tidak_perlu"]),
+  fileId: z.string().regex(UUID_RE).optional().nullable(),
+  note: z.string().max(500).optional().nullable(),
+});
+
 const patchSchema = createSchema.partial().extend({
   checklist: z.array(checklistItemSchema).max(200).optional(),
+  adminDocs: z.array(adminDocSchema).max(300).optional(),
   costItems: z.array(costItemSchema).max(500).optional(),
   linkedFileIds: z.array(z.string().regex(UUID_RE)).max(200).optional(),
 });
@@ -72,6 +83,7 @@ function mapRow(r: any) {
     startDate: r.start_date,
     endDate: r.end_date,
     checklist: arr(r.checklist),
+    adminDocs: arr(r.admin_docs),
     costItems: arr(r.cost_items),
     linkedFileIds: arr(r.linked_file_ids),
     createdAt: r.created_at,
@@ -96,10 +108,12 @@ async function ensureRuangProyekTable() {
       checklist jsonb NOT NULL DEFAULT '[]'::jsonb,
       cost_items jsonb NOT NULL DEFAULT '[]'::jsonb,
       linked_file_ids jsonb NOT NULL DEFAULT '[]'::jsonb,
+      admin_docs jsonb NOT NULL DEFAULT '[]'::jsonb,
       created_at timestamptz NOT NULL DEFAULT now(),
       updated_at timestamptz NOT NULL DEFAULT now()
     );
     CREATE INDEX IF NOT EXISTS idx_ruang_proyek_user ON ruang_proyek_projects (user_id, created_at);
+    ALTER TABLE ruang_proyek_projects ADD COLUMN IF NOT EXISTS admin_docs jsonb NOT NULL DEFAULT '[]'::jsonb;
   `);
 }
 
@@ -173,6 +187,22 @@ export function registerRuangProyekRoutes(app: Express) {
     if (d.startDate !== undefined) put("start_date", d.startDate ?? null);
     if (d.endDate !== undefined) put("end_date", d.endDate ?? null);
     if (d.checklist !== undefined) put("checklist", JSON.stringify(d.checklist));
+    if (d.adminDocs !== undefined) {
+      // fileId pada dokumen administrasi juga wajib milik user (anti-IDOR).
+      const fids = Array.from(new Set(d.adminDocs.map((x) => x.fileId).filter(Boolean))) as string[];
+      if (fids.length > 0) {
+        try {
+          const { rows } = await pool.query(
+            `SELECT id FROM ruang_simpan_files WHERE id = ANY($1::uuid[]) AND user_id = $2`,
+            [fids, userId]
+          );
+          if (rows.length !== fids.length) {
+            return res.status(400).json({ error: "Ada file yang tidak ditemukan di Ruang Simpan Anda" });
+          }
+        } catch (e) { return safeErr(res, e, "PATCH validate adminDocs files"); }
+      }
+      put("admin_docs", JSON.stringify(d.adminDocs));
+    }
     if (d.costItems !== undefined) put("cost_items", JSON.stringify(d.costItems));
     if (d.linkedFileIds !== undefined) {
       // Anti-IDOR: setiap file yang dikaitkan harus milik user ini di Ruang Simpan.

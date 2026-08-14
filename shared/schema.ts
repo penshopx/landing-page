@@ -2801,7 +2801,8 @@ export const ruangProyekProjects = pgTable("ruang_proyek_projects", {
   contractValue: bigint("contract_value", { mode: "number" }),
   startDate:     date("start_date"),
   endDate:       date("end_date"),
-  checklist:     jsonb("checklist").notNull().default([]),      // [{id,label,done}]
+  checklist:     jsonb("checklist").notNull().default([]),      // [{id,label,done}] (legacy — digantikan adminDocs)
+  adminDocs:     jsonb("admin_docs").notNull().default([]),     // [{id,key,label,stage,status,fileId?,note?}]
   costItems:     jsonb("cost_items").notNull().default([]),     // [{id,label,type:'biaya'|'pendapatan',amount}]
   linkedFileIds: jsonb("linked_file_ids").notNull().default([]),// [uuid ruang_simpan_files]
   createdAt:     timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
