@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>KAS MERAH, RAB HIJAU — Mini Ebook</title>
+<style>
+  @page { size: 148mm 210mm; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { font-family: 'Inter', 'Source Sans Pro', Arial, sans-serif; }
+  .page {
+    width: 148mm; height: 210mm; page-break-after: always;
+    position: relative; overflow: hidden; background: #fff; color: #1E2528;
+    padding: 16mm 14mm;
+  }
+  .page.dark { background: #1E2528; color: #fff; }
+  h1,h2,h3 { font-family: 'Montserrat', 'Arial Black', Arial, sans-serif; font-weight: 800; }
+  p { font-size: 10.5pt; line-height: 1.65; margin-bottom: 4.5mm; }
+  .kicker { font-size: 8pt; letter-spacing: 2.5px; text-transform: uppercase; color: #F28C28; font-weight: 700; margin-bottom: 4mm; }
+  .pagenum { position: absolute; bottom: 7mm; right: 14mm; font-size: 7.5pt; color: #999; }
+  .dark .pagenum { color: #5a6570; }
+  .footerbrand { position: absolute; bottom: 7mm; left: 14mm; font-size: 7.5pt; color: #999; letter-spacing: 1px; }
+  .dark .footerbrand { color: #5a6570; }
+
+  /* COVER */
+  .cover { padding: 0; }
+  .cover .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .5; }
+  .cover .overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(30,37,40,.55) 0%, rgba(30,37,40,.85) 55%, #1E2528 100%); }
+  .cover .content { position: absolute; inset: 0; padding: 18mm 14mm; display: flex; flex-direction: column; justify-content: flex-end; }
+  .cover .tag { color: #F28C28; font-size: 8.5pt; letter-spacing: 3px; font-weight: 700; margin-bottom: 6mm; }
+  .cover h1 { color: #fff; font-size: 21pt; line-height: 1.25; margin-bottom: 5mm; }
+  .cover h1 .red { color: #ff5a5a; }
+  .cover .q { color: #C8102E; font-size: 26pt; font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; margin-bottom: 6mm; }
+  .cover .sub { color: #cfd6da; font-size: 10.5pt; line-height: 1.6; margin-bottom: 10mm; }
+
+  .rule { width: 18mm; height: 1.4mm; background: #F28C28; margin: 5mm 0 7mm; }
+
+  table { width: 100%; border-collapse: collapse; margin: 5mm 0; font-size: 9.5pt; }
+  th { background: #1E2528; color: #fff; padding: 2.6mm 2mm; text-align: left; font-size: 8.5pt; letter-spacing: .5px; }
+  td { padding: 2.6mm 2mm; border-bottom: 1px solid #e4e6e8; }
+  tr.neg td { color: #C8102E; font-weight: 600; background: #fdf1f2; }
+  .mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .bigline { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 13.5pt; line-height: 1.45; margin: 6mm 0; }
+  .bigline .orange { color: #F28C28; } .bigline .red { color: #C8102E; }
+
+  .rootbox { display: flex; gap: 4mm; background: #F4F4F4; border-left: 2.5mm solid #F28C28; padding: 4mm 5mm; margin-bottom: 4mm; }
+  .rootbox .n { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 13pt; color: #C8102E; line-height: 1; }
+  .rootbox h3 { font-size: 10.5pt; margin-bottom: 1.5mm; }
+  .rootbox p { font-size: 9pt; line-height: 1.55; margin: 0; color: #3d474c; }
+
+  .sysbox { background: #262f33; border: 1px solid #39444a; border-radius: 3mm; padding: 5mm; margin-bottom: 5mm; }
+  .sysbox h3 { color: #F28C28; font-size: 11.5pt; margin-bottom: 2mm; }
+  .sysbox p { color: #d5dbde; font-size: 9pt; line-height: 1.55; margin-bottom: 2.5mm; }
+  .lockrow { background: #1a2124; border-radius: 2mm; padding: 3mm 4mm; font-size: 8.5pt; color: #9aa6ad; line-height: 1.5; }
+  .lockrow b { color: #e8b06a; }
+
+  .illus { width: 100%; border-radius: 3mm; display: block; margin: 4mm 0; }
+
+  .cta { padding: 0; }
+  .cta .inner { position: absolute; inset: 0; background: #F28C28; padding: 16mm 14mm; color: #fff; display: flex; flex-direction: column; }
+  .cta h2 { font-size: 17pt; line-height: 1.3; margin-bottom: 6mm; }
+  .cta ul { list-style: none; margin-bottom: 5mm; }
+  .cta li { font-size: 10.5pt; font-weight: 600; padding: 1.6mm 0; }
+  .cta .btn { display: block; background: #1E2528; color: #fff; text-align: center; font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 12.5pt; padding: 5.5mm; border-radius: 2.5mm; letter-spacing: .5px; margin: 5mm 0 3mm; }
+  .cta .url { text-align: center; font-size: 9.5pt; font-weight: 700; letter-spacing: .5px; }
+
+  .blank-word { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 17pt; text-align: center; margin: 8mm 0; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+
+<!-- 1 COVER -->
+<div class="page dark cover">
+  <img class="bg" src="../../attached_assets/generated_images/kasmerah-cover-bg.jpg">
+  <div class="overlay"></div>
+  <div class="content">
+    <div class="tag">MINI EBOOK GRATIS · SERI CASHFLOW-PBJ</div>
+    <h1>PROYEK ANDA UNTUNG Rp 420 JUTA.<br><span class="red">REKENING ANDA MINUS Rp 1,1 MILIAR.</span></h1>
+    <div class="q">Bagaimana mungkin?</div>
+    <p class="sub">Sebuah diagnosis 15 menit untuk kontraktor yang lelah pura-pura baik-baik saja.</p>
+    <p class="sub" style="font-size:8pt;letter-spacing:1.5px;color:#8b969c;">GUSTAFTA · SOLUSI CERDAS KONTRAKTOR INDONESIA</p>
+  </div>
+</div>
+
+<!-- 2 SEBELUM BACA -->
+<div class="page">
+  <div class="kicker">Sebelum Anda Baca Lebih Jauh</div>
+  <div class="rule"></div>
+  <p><b>Ebook ini BUKAN untuk Anda jika:</b></p>
+  <p>— Termin Anda selalu cair tepat waktu.<br>
+     — Subkon tidak pernah menagih dengan nada tinggi.<br>
+     — Kas perusahaan tidak pernah membuat Anda begadang.<br>
+     — Anda belum pernah menjawab telepon supplier sambil berkata, <i>"Iya Pak, minggu depan saya transfer,"</i> padahal di rekening tersisa Rp 12 juta.</p>
+  <p>Jika empat poin di atas tidak ada yang mengenai Anda — tutup ebook ini. Anda tidak butuh saya. Selamat bekerja.</p>
+  <p><b>Tapi jika satu saja membuat dada Anda sesak saat membacanya —</b></p>
+  <p>Lanjutkan. Dan jangan skip.</p>
+  <p>Karena 15 menit ke depan akan mengubah cara Anda melihat setiap proyek yang Anda pegang.</p>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">2</div>
+</div>
+
+<!-- 3 BAB 1a -->
+<div class="page">
+  <div class="kicker">Bab 1 — Tamparan Angka</div>
+  <h2 style="font-size:14pt;line-height:1.35;margin-bottom:4mm;">Satu Proyek. Satu Kontraktor. Satu Kebangkrutan yang Tidak Perlu Terjadi.</h2>
+  <div class="rule"></div>
+  <p>Namanya tidak penting. Sebut saja <b>Pak R</b>. CV-nya sudah 9 tahun. Proyek pemerintah. Nilai kontrak: <b>Rp 3,5 Miliar</b>.</p>
+  <p>Di RAB, profit margin 12%. Di atas kertas: <b>Rp 420 juta</b>. Pak R tanda tangan kontrak dengan tangan mantap.</p>
+  <p>Ini yang terjadi kemudian:</p>
+  <table>
+    <tr><th>Bulan</th><th>Kas Keluar</th><th>Kas Masuk</th><th>Saldo</th></tr>
+    <tr><td>1</td><td>Rp 520 jt <span style="color:#6a7479;font-size:8pt;">(mobilisasi, DP material)</span></td><td class="mono">Rp 700 jt (DP 20%)</td><td class="mono" style="color:#1a7f4e;font-weight:600;">+Rp 180 jt ✓</td></tr>
+    <tr class="neg"><td>2</td><td>Rp 480 jt</td><td class="mono">Rp 0</td><td class="mono">–Rp 300 jt</td></tr>
+    <tr class="neg"><td>3</td><td>Rp 450 jt</td><td class="mono">Rp 0</td><td class="mono">–Rp 750 jt</td></tr>
+    <tr class="neg"><td>4</td><td>Rp 350 jt</td><td class="mono">Rp 0</td><td class="mono"><b>–Rp 1,1 M ●</b></td></tr>
+  </table>
+  <img class="illus" src="../../attached_assets/generated_images/kasmerah-graph.jpg">
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">3</div>
+</div>
+
+<!-- 4 BAB 1b -->
+<div class="page">
+  <p>Termin pertama belum cair. BAST belum ditandatangani. PPK bilang, <i>"Berkasnya masih di verifikasi, Pak. Sabar ya."</i></p>
+  <p><b>Sementara itu:</b></p>
+  <p>— 14 tukang belum digaji 3 minggu.<br>
+     — Supplier besi mengirim WA: <i>"Maaf Pak, pengiriman saya stop dulu."</i><br>
+     — Subkon pondasi mengirim somasi.</p>
+  <div class="bigline">Proyeknya untung <span class="orange">Rp 420 juta</span>.<br>Perusahaannya sesak napas di <span class="red">minus Rp 1,1 miliar</span>.</div>
+  <p>Dan Pak R tidak bodoh. Pak R tidak malas. Pak R sudah 9 tahun di lapangan.</p>
+  <p>Pak R hanya tidak pernah diberi tahu bahwa <b>profit dan cash flow adalah dua binatang yang berbeda</b>. Dan tidak ada satu pun sistem di mejanya yang memberitahu dia di bulan ke-2 bahwa bulan ke-4 akan seperti ini.</p>
+  <p><b>Jika Anda pernah berada di posisi Pak R — atau sedang di sana sekarang — lanjutkan membaca.</b></p>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">4</div>
+</div>
+
+<!-- 5 BAB 2a -->
+<div class="page">
+  <div class="kicker">Bab 2 — Lima Akar Masalah</div>
+  <h2 style="font-size:14pt;line-height:1.35;margin-bottom:4mm;">Bukan "Kesialan". Bukan "Ekonomi Lesu". Ini Strukturnya.</h2>
+  <div class="rule"></div>
+  <div class="rootbox"><div class="n">①</div><div><h3>Profit ≠ Cash Flow.</h3><p>RAB bilang untung. Rekening bilang kosong. Biaya konstruksi front-loaded (menggunung di awal). Pendapatan back-loaded (cair belakangan, per termin). Jarak antara keduanya adalah jurang tempat kontraktor jatuh.</p></div></div>
+  <div class="rootbox"><div class="n">②</div><div><h3>Kontrak Anda asimetris.</h3><p>Di proyek pemerintah, draf kontrak disusun PPK. Anda tidak negosiasi. Anda menerima. Atau gugur. Risiko keterlambatan pencairan otomatis "diparkir" di pundak Anda. Padahal UU No. 2/2017 dan Perpres 46/2025 memberi Anda hak yang jarang Anda baca.</p></div></div>
+  <div class="rootbox"><div class="n">③</div><div><h3>Tidak ada buffer.</h3><p>Anda memulai proyek dengan DP sebagai satu-satunya amunisi. DP habis di bulan pertama. Setelah itu, proyek berjalan dengan harapan bahwa termin cair tepat waktu. Harapan bukan instrumen keuangan.</p></div></div>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">5</div>
+</div>
+
+<!-- 6 BAB 2b -->
+<div class="page">
+  <div class="rootbox"><div class="n">④</div><div><h3>Birokrasi negara dirancang hati-hati, bukan cepat.</h3><p>Opname → BAST → SPP → SPM → SP2D → KPPN. Setiap anak panah = potensi delay 7–14 hari kerja. PPK bukan musuh Anda. Dia hanya manusia yang takut tanda tangannya jadi temuan BPK.</p></div></div>
+  <div class="rootbox"><div class="n">⑤</div><div><h3>Anda mengelola dengan insting, bukan sistem.</h3><p>Tidak ada tracker. Tidak ada triage. Tidak ada protocol. Yang ada: telepon, emosi, dan "nanti saya pikirkan."</p></div></div>
+  <p style="margin-top:6mm;">Lima akar ini bukan teori. <b>Ini sedang bekerja di proyek Anda sekarang.</b></p>
+  <div class="bigline" style="font-size:12pt;">Pertanyaannya bukan apakah ini masalah Anda.<br><span class="orange">Pertanyaannya: apa yang Anda lakukan setelah tahu?</span></div>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">6</div>
+</div>
+
+<!-- 7 BAB 3a -->
+<div class="page dark">
+  <div class="kicker">Bab 3 — Cermin</div>
+  <h2 style="font-size:13.5pt;line-height:1.35;margin-bottom:4mm;color:#fff;">Tiga Keputusan yang Anda Kira Menyelamatkan — Padahal Membunuh.</h2>
+  <div class="rule"></div>
+  <p style="color:#d5dbde;">Kas minus. Telepon berdering. Otak reptil Anda menyala. Dan Anda melakukan satu dari tiga hal ini — atau ketiganya sekaligus:</p>
+  <div class="sysbox"><h3>① Ambil proyek baru.</h3><p>DP-nya langsung tersedot ke proyek lama. Sekarang Anda punya dua proyek sekarat, bukan satu.</p><div class="lockrow">Probabilitas selamat dalam 12 bulan turun ke <b>~15%</b>.</div></div>
+  <div class="sysbox"><h3>② "Pakai dulu."</h3><p>Rekening perusahaan = rekening pribadi. Rp 200 juta "hilang" tanpa jejak. Bulan depan, upah tukang tidak terbayar — dan Anda bahkan tidak bisa menjelaskan ke mana uangnya pergi.</p></div>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">7</div>
+</div>
+
+<!-- 8 BAB 3b -->
+<div class="page dark">
+  <div class="sysbox"><h3>③ Potong kompas.</h3><p>Jual ekskavator Rp 400 juta (beli Rp 850 juta). Pinjam rentenir 6%/bulan. Atau — yang paling gelap — kurangi spek material dan gelembungkan volume di laporan progres.</p><div class="lockrow">Yang terakhir bukan masalah bisnis. Itu <b>Pasal 78 Perpres 46/2025 dan UU Tipikor</b>. Empat sampai dua puluh tahun.</div></div>
+  <div class="bigline" style="color:#fff;margin-top:10mm;">Anda tidak butuh keberanian untuk bertahan.<br><span class="orange">Anda butuh sistem yang membuat keberanian itu tidak perlu.</span></div>
+  <p style="color:#d5dbde;">Sistemnya ada. Saya jelaskan di Bab 5. Tapi jangan loncat ke sana. Baca dulu halaman berikutnya.</p>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">8</div>
+</div>
+
+<!-- 9 BAB 4a -->
+<div class="page">
+  <div class="kicker">Bab 4 — PPK Bukan Musuh Anda</div>
+  <h2 style="font-size:13.5pt;line-height:1.35;margin-bottom:4mm;">(Tapi Anda Selama Ini Menagih dengan Cara yang Salah)</h2>
+  <div class="rule"></div>
+  <p>Anda marah pada PPK karena termin telat. Anda telepon. Anda WA. Anda datang ke kantor. Anda bilang, <i>"Pak, ini sudah lewat jatuh tempo."</i></p>
+  <p>Dan PPK tersenyum sopan, mengangguk, lalu berkata, <i>"Iya Pak, sedang diproses,"</i> — dan tidak ada yang berubah selama 3 minggu berikutnya.</p>
+  <p>Bukan karena PPK jahat. Bukan karena dia tidak peduli. Tapi karena setiap rupiah yang keluar dari KPPN harus lolos audit. Tanda tangan PPK ada di atas berkas itu. Jika satu dokumen kurang rapi, beliau yang kena TGR. <b>Pribadi. Bukan perusahaan. Bukan negara. Beliau.</b></p>
+  <p>Jadi PPK akan selalu memilih: <b>lambat tapi aman</b>, daripada cepat tapi berisiko.</p>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">9</div>
+</div>
+
+<!-- 10 BAB 4b -->
+<div class="page">
+  <p>Anda tidak bisa mengubah desain itu. Anda tidak perlu mengubahnya.</p>
+  <p>Yang perlu Anda lakukan adalah <b>memberi PPK alasan untuk cepat</b>. Dan alasan itu bukan telepon. Bukan WA. Bukan kunjungan.</p>
+  <p>Alasan itu adalah satu dokumen. Dokumen yang membuat berkas Anda <b>zero-defect</b> — BAST rapi, back-up data ukur lengkap, faktur pajak benar, tidak ada satu pun celah untuk ditahan.</p>
+  <div class="blank-word">Dokumen itu bernama __________.</div>
+  <p style="text-align:center;color:#6a7479;font-size:9pt;">(Ya. Saya kosongkan. Sengaja. Anda akan tahu namanya di versi lengkap.)</p>
+  <div class="bigline" style="font-size:12pt;margin-top:8mm;">Kontraktor yang dokumennya zero-defect tidak perlu menagih.<br><span class="orange">PPK yang memproses berkasnya sendiri yang menelepon: "Pak, SP2D-nya sudah cair."</span></div>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">10</div>
+</div>
+
+<!-- 11 BAB 5a -->
+<div class="page dark">
+  <div class="kicker">Bab 5 — Sistemnya Ada. Tapi Bukan di Sini.</div>
+  <h2 style="font-size:13.5pt;line-height:1.35;margin-bottom:3mm;color:#fff;">Tiga Lapisan yang Membedakan Kontraktor Bertahan vs. Kontraktor Bertumbuh.</h2>
+  <img class="illus" src="../../attached_assets/generated_images/kasmerah-gears.jpg" style="margin:3mm 0;height:52mm;object-fit:cover;">
+  <div class="sysbox"><h3>1 · CASH TRIAGE MATRIX</h3><p>Saat kas tinggal Rp 80 juta tapi tagihan antre Rp 400 juta — ini yang memutuskan siapa dibayar duluan, siapa dinegosiasi, siapa yang bisa tunggu. Tanpa emosi. Tanpa telepon panik jam 11 malam.</p><div class="lockrow"><span style="display:inline-block;background:#39444a;color:#e8b06a;font-size:7pt;font-weight:800;letter-spacing:1px;border-radius:1mm;padding:.6mm 1.6mm;margin-right:1.5mm;">TERKUNCI</span><b>Di versi lengkap:</b> matriks 4 kuadran + script negosiasi copy-paste untuk subkon dan supplier.</div></div>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">11</div>
+</div>
+
+<!-- 12 BAB 5b -->
+<div class="page dark">
+  <div class="sysbox"><h3>2 · TERMIN TRACKER 7-TITIK</h3><p>Anda tahu tagihan Anda di meja siapa, hari ke berapa, berapa hari lagi sebelum SP2D cair. Bukan menebak. Bukan "nanti saya tanya PPK." Tapi dashboard dengan 7 checkpoint dari Opname sampai rekening Anda.</p><div class="lockrow"><span style="display:inline-block;background:#39444a;color:#e8b06a;font-size:7pt;font-weight:800;letter-spacing:1px;border-radius:1mm;padding:.6mm 1.6mm;margin-right:1.5mm;">TERKUNCI</span><b>Di versi lengkap:</b> template Excel + Notion, SOP follow-up per titik, dan kalimat WhatsApp yang membuat PPK merespons dalam 2 jam.</div></div>
+  <div class="sysbox"><h3>3 · BUFFER PROTOCOL 10–15%</h3><p>Menjawab pertanyaan paling brutal: "Kalau termin telat 8 minggu, perusahaan saya masih hidup atau langsung mati?" Dengan angka pasti. Bukan perasaan.</p><div class="lockrow"><span style="display:inline-block;background:#39444a;color:#e8b06a;font-size:7pt;font-weight:800;letter-spacing:1px;border-radius:1mm;padding:.6mm 1.6mm;margin-right:1.5mm;">TERKUNCI</span><b>Di versi lengkap:</b> rumus kalkulasi berdasarkan durasi proyek + siklus APBN/APBD, dan kapan boleh "memakai" buffer tanpa merusak sistem.</div></div>
+  <p style="color:#d5dbde;font-size:9.5pt;">Ketiganya bukan tips terpisah. Mereka satu mesin. Memberikan satu potongan tanpa dua lainnya seperti memberi setir tanpa mesin dan roda. <b style="color:#F28C28;">Anda putar sekeras apa pun. Mobilnya tidak jalan.</b></p>
+  <div class="footerbrand">KAS MERAH, RAB HIJAU</div><div class="pagenum">12</div>
+</div>
+
+<!-- 13 CTA -->
+<div class="page cta">
+  <div class="inner">
+    <h2>Anda sekarang tahu.<br>Yang belum Anda punya: sistemnya.</h2>
+    <ul>
+      <li><span style="color:#1E2528;font-weight:800;">✓</span> Akar masalahnya.</li>
+      <li><span style="color:#1E2528;font-weight:800;">✓</span> Tiga kesalahan yang mempercepat kematian.</li>
+      <li><span style="color:#1E2528;font-weight:800;">✓</span> PPK bukan musuh — Anda yang menagih di tempat yang salah.</li>
+      <li><span style="color:#1E2528;font-weight:800;">✓</span> Sistemnya ADA.</li>
+    </ul>
+    <ul style="margin-bottom:2mm;">
+      <li><span style="font-weight:800;">✕</span> Matriksnya. &nbsp; <span style="font-weight:800;">✕</span> Template-nya. &nbsp; <span style="font-weight:800;">✕</span> Script-nya. &nbsp; <span style="font-weight:800;">✕</span> Protocol-nya.</li>
+    </ul>
+    <p style="font-size:9.5pt;line-height:1.6;">Jarak antara "tahu" dan "punya" adalah jarak antara kontraktor yang membaca ebook ini sambil deg-degan — dan kontraktor yang tidur nyenyak karena kasnya aman 8 minggu ke depan.</p>
+    <div style="background:rgba(30,37,40,.18);border-radius:2.5mm;padding:4mm 5mm;margin-top:2mm;">
+      <p style="font-family:'Montserrat',Arial,sans-serif;font-weight:800;font-size:11.5pt;margin-bottom:1.5mm;">KAS MERAH, RAB HIJAU — VERSI LENGKAP</p>
+      <p style="font-size:8.5pt;line-height:1.55;margin:0;">9 Bab + 6 Lampiran · Cash Triage Matrix · Termin Tracker 7-Titik · Buffer Protocol Calculator · 12 Template Surat &amp; WhatsApp Resmi untuk PPK, KPPN, dan Subkon · SOP Eskalasi Bertahap.</p>
+    </div>
+    <a class="btn" href="https://gustafta.my.id/ebook-kas-merah">AMBIL VERSI LENGKAP →</a>
+    <p class="url">gustafta.my.id/ebook-kas-merah</p>
+  </div>
+</div>
+
+<!-- 14 TENTANG PENULIS -->
+<div class="page dark">
+  <div class="kicker">Tentang Ebook Ini</div>
+  <div class="rule"></div>
+  <p style="color:#d5dbde;">Ebook ini disusun oleh tim <b style="color:#fff;">CASHFLOW-PBJ — Gustafta</b>, yang mendampingi kontraktor UKM di proyek pemerintah. Ditulis bukan dari ruang kuliah — tapi dari meja proyek, telepon subkon yang menagih, dan malam-malam di mana kas minus dan besok harus bayar upah.</p>
+  <p style="color:#d5dbde;"><b style="color:#F28C28;">Jika versi pancingan ini membuat Anda tidak bisa tidur — bayangkan apa yang versi lengkapnya lakukan.</b></p>
+  <div style="position:absolute;bottom:16mm;left:14mm;right:14mm;border-top:1px solid #39444a;padding-top:5mm;">
+    <p style="font-size:9pt;color:#9aa6ad;margin:0;">WA 0812-8794-1900 &nbsp;·&nbsp; gustafta.my.id/cashflow-pbj</p>
+    <p style="font-size:7.5pt;color:#5a6570;margin-top:2mm;">© 2026 Gustafta — Solusi Cerdas Kontraktor Indonesia. Dilarang memperbanyak tanpa izin.</p>
+  </div>
+</div>
+
+</body>
+</html>
