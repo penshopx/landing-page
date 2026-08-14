@@ -397,6 +397,86 @@ export function registerGaiaRegistryRoutes(app: Express, deps: {
     } catch (err: any) { res.status(500).json({ error: err.message }); }
   });
 
+  // ── IMPORT FROM STORE ──────────────────────────────────────────────────────
+  // Whitelist mapping dari item katalog Store → draft Registry. TIDAK pernah
+  // membaca prompt/secret/kredensial — sumber datanya adalah item katalog publik
+  // (buildStoreCatalogItems) yang memang sudah whitelist-only.
+  const STORE_IMPORT_TYPE = "AI_SPECIALIST";
+
+  function slugify(name: string): string {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "produk";
+  }
+
+  function mapStoreItemToDraft(item: any) {
+    const price = Math.max(0, parseInt(item.price, 10) || 0);
+    const shortDescription = (item.tagline || item.description || "").slice(0, 300) || null;
+    return {
+      name: String(item.name || "").trim(),
+      slug: slugify(String(item.name || "")),
+      productType: STORE_IMPORT_TYPE,
+      category: String(item.category || "GENERAL"),
+      shortDescription,
+      longDescription: item.productSummary || item.description || null,
+      features: Array.isArray(item.productFeatures) ? item.productFeatures.filter((f: any) => typeof f === "string") : [],
+      price,
+      currency: "IDR",
+      billingType: price > 0 ? "ONE_TIME" : "FREE",
+      engineType: item.agentId != null ? "GUSTAFTA_AGENT" : null,
+      accessType: "LOGIN_GUSTAFTA",
+      accessUrl: item.agentId != null ? `/chat/${item.agentId}` : "/store",
+      productUrl: item.paymentUrl || null,
+      status: "DRAFT",
+      gaiaStatus: "NOT_READY",
+    };
+  }
+
+  // Daftar item katalog Store untuk picker (metadata whitelist saja)
+  app.get("/api/admin/registry/store-catalog", ...guard, async (req: any, res) => {
+    try {
+      const { getStoreCatalogItems } = await import("./routes");
+      const search = typeof req.query.search === "string" ? req.query.search : "";
+      const items = await getStoreCatalogItems("Semua", search);
+      res.json(items.map((it: any) => ({
+        id: it.id,
+        agentId: it.agentId ?? null,
+        name: it.name,
+        category: it.category,
+        tagline: it.tagline || "",
+        price: it.price,
+        type: it.type,
+        emoji: it.emoji || "🤖",
+      })));
+    } catch (err: any) { res.status(500).json({ error: err.message }); }
+  });
+
+  // Buat DRAFT Registry product dari item katalog Store (satu klik)
+  app.post("/api/admin/registry/products/import-from-store", ...guard, async (req: any, res) => {
+    try {
+      const sourceId = String(req.body?.sourceId || "");
+      if (!sourceId) return res.status(400).json({ error: "sourceId wajib diisi." });
+      const { getStoreCatalogItems } = await import("./routes");
+      const items = await getStoreCatalogItems("Semua", "");
+      const item = items.find((it: any) => it.id === sourceId);
+      if (!item) return res.status(404).json({ error: "Item katalog Store tidak ditemukan." });
+      const draft = mapStoreItemToDraft(item);
+      if (!draft.name) return res.status(422).json({ error: "Item katalog tidak punya nama." });
+
+      // Slug unik: kalau tabrakan, tambahkan suffix pendek alih-alih gagal.
+      const [existing] = await db.select({ id: productRegistry.id })
+        .from(productRegistry).where(eq(productRegistry.slug, draft.slug));
+      if (existing) draft.slug = `${draft.slug}-${Date.now().toString(36)}`.slice(0, 90);
+
+      const productId = await generateProductId(draft.category);
+      const [row] = await db.insert(productRegistry)
+        .values({ ...(draft as any), productId })
+        .returning();
+      res.status(201).json(row);
+    } catch (err: any) {
+      if (String(err.code) === "23505") return res.status(409).json({ error: "Slug atau Product ID sudah dipakai produk lain." });
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // EXPORT HISTORY
   app.get("/api/admin/registry/export-history", ...guard, async (req: any, res) => {
     try {

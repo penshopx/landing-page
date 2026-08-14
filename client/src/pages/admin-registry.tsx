@@ -38,6 +38,11 @@ type RegistryProduct = {
   createdAt: string; updatedAt: string;
 };
 
+type StoreCatalogItem = {
+  id: string; agentId: number | null; name: string; category: string;
+  tagline: string; price: number; type: string; emoji: string;
+};
+
 type ExportHistory = {
   id: number; productId: string; productVersion: string; bundleVersion: string;
   exportStatus: string; checksum: string | null; detail: any; exportedAt: string;
@@ -112,6 +117,9 @@ export default function AdminRegistry() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [previewJson, setPreviewJson] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importSearch, setImportSearch] = useState("");
+  const [importingId, setImportingId] = useState<string | null>(null);
 
   const { data: products = [], isLoading } = useQuery<RegistryProduct[]>({
     queryKey: ["/api/admin/registry/products"],
@@ -125,6 +133,10 @@ export default function AdminRegistry() {
   const { data: packages = [] } = useQuery<Pkg[]>({ queryKey: ["/api/admin/registry/packages"] });
   const { data: matrix = [] } = useQuery<MatrixRow[]>({ queryKey: ["/api/admin/registry/access-matrix"] });
   const { data: gaiaPreview } = useQuery<GaiaPreviewData>({ queryKey: ["/api/admin/registry/gaia-preview"] });
+  const { data: storeCatalog = [], isLoading: storeCatalogLoading } = useQuery<StoreCatalogItem[]>({
+    queryKey: ["/api/admin/registry/store-catalog"],
+    enabled: importOpen,
+  });
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ["/api/admin/registry/products"] });
@@ -142,6 +154,18 @@ export default function AdminRegistry() {
     onSuccess: () => { invalidate(); setEditing(null); setCreating(false); toast({ title: "Produk tersimpan" }); },
     onError: (e: any) => toast({ title: "Gagal menyimpan", description: e.message, variant: "destructive" }),
   });
+
+  const importFromStore = async (item: StoreCatalogItem) => {
+    setImportingId(item.id);
+    try {
+      await apiRequest("POST", "/api/admin/registry/products/import-from-store", { sourceId: item.id });
+      invalidate();
+      setImportOpen(false);
+      toast({ title: "Produk diimpor sebagai DRAFT", description: `${item.name} — lengkapi lalu publish ke GAIA.` });
+    } catch (e: any) {
+      toast({ title: "Gagal impor", description: e.message, variant: "destructive" });
+    } finally { setImportingId(null); }
+  };
 
   const action = async (p: RegistryProduct, path: string, body?: any) => {
     setBusyId(p.id);
@@ -228,6 +252,7 @@ export default function AdminRegistry() {
           </div>
           <div className="flex gap-2">
             <Link href="/admin"><Button variant="outline" size="sm" data-testid="link-back-admin">← Admin</Button></Link>
+            <Button size="sm" variant="outline" onClick={() => { setImportSearch(""); setImportOpen(true); }} data-testid="button-import-from-store">Import from Store</Button>
             <Button size="sm" onClick={() => { setForm(EMPTY_FORM); setCreating(true); }} data-testid="button-create-product">+ Create Product</Button>
           </div>
         </div>
@@ -494,6 +519,35 @@ export default function AdminRegistry() {
             <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} data-testid="button-save-product">
               {saveMutation.isPending ? "Menyimpan…" : "Simpan"}
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import from Store picker */}
+      <Dialog open={importOpen} onOpenChange={(o) => !o && setImportOpen(false)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>Import from Store</DialogTitle></DialogHeader>
+          <p className="text-xs text-muted-foreground">Pilih item katalog Store — dibuat sebagai produk Registry berstatus DRAFT (metadata saja, tanpa prompt/secret).</p>
+          <Input placeholder="Cari item Store…" value={importSearch} onChange={e => setImportSearch(e.target.value)} data-testid="input-import-search" />
+          <div className="space-y-1.5">
+            {storeCatalogLoading && <p className="text-sm text-muted-foreground py-4 text-center">Memuat katalog Store…</p>}
+            {!storeCatalogLoading && storeCatalog
+              .filter(it => !importSearch || it.name.toLowerCase().includes(importSearch.toLowerCase()) || (it.category || "").toLowerCase().includes(importSearch.toLowerCase()))
+              .map(it => (
+                <div key={it.id} className="flex items-center gap-2 border rounded px-2 py-1.5 text-sm" data-testid={`import-row-${it.id}`}>
+                  <span className="text-lg">{it.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium truncate">{it.name}</div>
+                    <div className="text-xs text-muted-foreground truncate">
+                      {it.category} • {it.price > 0 ? `Rp ${Number(it.price).toLocaleString("id-ID")}` : "FREE"} • {it.type === "agent" ? "Agent" : "Store Product"}
+                    </div>
+                  </div>
+                  <Button size="sm" disabled={importingId !== null} onClick={() => importFromStore(it)} data-testid={`button-import-${it.id}`}>
+                    {importingId === it.id ? "Mengimpor…" : "Import"}
+                  </Button>
+                </div>
+              ))}
+            {!storeCatalogLoading && storeCatalog.length === 0 && <p className="text-sm text-muted-foreground py-4 text-center">Katalog Store kosong.</p>}
           </div>
         </DialogContent>
       </Dialog>
