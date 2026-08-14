@@ -29,6 +29,9 @@ const files = [
   // second open recomputes fresh max+10 from the current list.
   resolve(__dirname, "store-sort-order-form-close-reset.test.ts"),
   resolve(__dirname, "store-catalog-payment-link-clear.test.ts"),
+  // End-to-end cache invalidation: PATCH payment_url via HTTP → GET catalog
+  // immediately returns the NEW URL (warm cache invalidated, no TTL wait).
+  resolve(__dirname, "store-catalog-payment-url-update.test.ts"),
   // Integration + cache: confirms clearing a product's paymentUrl falls back to
   // the agent URL (or null) immediately after invalidation — without a redeploy.
   resolve(__dirname, "store-catalog-payment-link-fallback.test.ts"),
