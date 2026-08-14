@@ -463,6 +463,14 @@ function cfDurations(prefix: string, perBulan: number): CashflowDuration[] {
   };
   return [mk(3, 0), mk(6, 0.10, "Hemat 10%"), mk(12, 0.20, "Hemat 20%")];
 }
+// Ebook premium "KAS MERAH, RAB HIJAU" — HARGA SIMULASI (belum final).
+export const CASHFLOW_EBOOK = {
+  judul: "KAS MERAH, RAB HIJAU",
+  subjudul: "Sistem 3 Lapis agar Kontraktor Pemerintah Tidak Mati di Tengah Proyek",
+  harga: 149_000,
+  hargaLabel: "Rp 149.000",
+};
+
 export const CASHFLOW_TIERS: CashflowTier[] = [
   {
     key: "mandor", nama: "T1 — MANDOR", target: "Kontraktor kecil, 1 proyek aktif",

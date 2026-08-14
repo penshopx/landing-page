@@ -180,6 +180,20 @@ export default function CashflowPbjPage() {
         </div>
       </section>
 
+      {/* Ebook premium */}
+      <section className="max-w-3xl mx-auto px-4 pb-8">
+        <div className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-5 text-center" data-testid="card-ebook-kas-merah">
+          <p className="text-sm font-semibold text-white mb-1">Mau pahami sistemnya dulu sebelum berlangganan?</p>
+          <p className="text-xs text-slate-400 mb-3">
+            Ebook <span className="text-orange-300 font-semibold">"KAS MERAH, RAB HIJAU"</span> — 9 bab + 6 lampiran alat kerja:
+            Cash Triage, Termin Tracker 7-Titik, Buffer Protocol, 12 template surat &amp; WA. Bab 1 bisa dibaca gratis.
+          </p>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/ebook-kas-merah" data-testid="link-ebook-kas-merah">Baca Bab 1 Gratis</Link>
+          </Button>
+        </div>
+      </section>
+
       {/* Konsultasi manusia — layanan terpisah */}
       <section className="max-w-3xl mx-auto px-4 pb-14">
         <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-center" data-testid="card-konsultan-terpisah">
