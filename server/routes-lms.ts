@@ -1413,22 +1413,21 @@ Simpan email ini — kode sertifikat di atas bisa digunakan untuk memverifikasi 
         for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
         const certCode = `GUSTAFTA-${year}-${code}`;
         try {
-          await db.execute(sql.raw(
-            `INSERT INTO lms_certificates (user_id, course_id, certificate_code)
-             VALUES ('${row.user_id.replace(/'/g, "''")}', ${row.course_id}, '${certCode}')
-             ON CONFLICT (user_id, course_id) DO NOTHING`
-          ));
+          await db.execute(sql`
+            INSERT INTO lms_certificates (user_id, course_id, certificate_code)
+            VALUES (${row.user_id}, ${row.course_id}, ${certCode})
+            ON CONFLICT (user_id, course_id) DO NOTHING
+          `);
           backfilled++;
         } catch (_) { /* skip individual failures */ }
       }
       // Persist so health card reflects latest repair
       try {
-        await db.execute(sql.raw(
-          `INSERT INTO system_config (key, value) VALUES ('lms_cert_backfill_last', '${
-            JSON.stringify({ backfilled, total: rows.length, at: new Date().toISOString() }).replace(/'/g, "''")
-          }')
-           ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`
-        ));
+        await db.execute(sql`
+          INSERT INTO system_config (key, value)
+          VALUES ('lms_cert_backfill_last', ${JSON.stringify({ backfilled, total: rows.length, at: new Date().toISOString() })})
+          ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+        `);
       } catch (_) { /* non-critical */ }
 
       const stillPending = rows.length - backfilled;
