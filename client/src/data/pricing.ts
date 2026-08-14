@@ -284,54 +284,57 @@ export const CREDIT_PACKS: CreditPack[] = [
 ];
 
 // ─── Klinik Konsultasi AI ────────────────────────────────────────────────────
+// HARGA DIREVISI Agu 2026 (arahan Bos): Klinik = dialog/form + upload dokumen +
+// PERAKITAN AI CLAW yang lalu bekerja di workroom — harga mengikuti bobot itu.
+// PENTING: harga produk Scalev (scalevSlug) harus disamakan manual di dashboard Scalev.
 // Model harga untuk layanan Klinik: Per Sesi, Per Dokumen, Paket Tuntas.
 // Checkout via Scalev (scalevSlug). Jika scalevSlug kosong → fallback WA.
 
 export const KLINIK_SESI = [
-  { name: "Sesi Standar",           price: "Rp 150.000", amount: 150000, duration: "60 menit", desc: "Konsultasi 1 domain, 1 spesialis AI, ringkasan hasil",         tag: "",       scalevSlug: "klinik-sesi-standar" },
-  { name: "Sesi Lanjutan",          price: "Rp 300.000", amount: 300000, duration: "90 menit", desc: "Multi-domain, action plan tertulis + ringkasan eksekutif",      tag: "Populer", scalevSlug: "" },
-  { name: "Sesi Expert + Dokumen",  price: "Rp 500.000", amount: 500000, duration: "90 menit", desc: "Sesi penuh + 1 dokumen output siap pakai",                      tag: "",       scalevSlug: "klinik-sesi-expert" },
+  { name: "Sesi Standar",           price: "Rp 349.000", amount: 349000, duration: "60 menit", desc: "Konsultasi 1 domain, 1 spesialis AI, ringkasan hasil",         tag: "",       scalevSlug: "klinik-sesi-standar" },
+  { name: "Sesi Lanjutan",          price: "Rp 749.000", amount: 749000, duration: "90 menit", desc: "Multi-domain, action plan tertulis + ringkasan eksekutif",      tag: "Populer", scalevSlug: "" },
+  { name: "Sesi Expert + Dokumen",  price: "Rp 1.249.000", amount: 1249000, duration: "90 menit", desc: "Sesi penuh + 1 dokumen output siap pakai",                      tag: "",       scalevSlug: "klinik-sesi-expert" },
 ] as const;
 
 export const KLINIK_DOKUMEN = [
-  { name: "Dokumen Dasar",    price: "Rp 99.000",  amount: 99000,  scalevSlug: "klinik-dokumen-dasar",    desc: "Surat, checklist, laporan ringkas, RAB sederhana",           examples: ["Surat Permohonan", "Checklist K3", "RAB Pekerjaan Kecil"] },
-  { name: "Dokumen Teknis",   price: "Rp 249.000", amount: 249000, scalevSlug: "klinik-dokumen-teknis",   desc: "Metode pelaksanaan, spesifikasi teknis, RKK, RMPK, RMK",      examples: ["Metode Pelaksanaan", "Rencana Mutu Kontrak", "SMKK Singkat"] },
-  { name: "Dokumen Kompleks", price: "Rp 499.000", amount: 499000, scalevSlug: "klinik-dokumen-kompleks", desc: "AMDAL ringkas, kontrak, HSE Plan, studi kelayakan mini",      examples: ["UKL-UPL Ringkas", "Draft Kontrak Kerja", "HSE Plan Proyek"] },
+  { name: "Dokumen Dasar",    price: "Rp 249.000", amount: 249000,  scalevSlug: "klinik-dokumen-dasar",    desc: "Surat, checklist, laporan ringkas, RAB sederhana",           examples: ["Surat Permohonan", "Checklist K3", "RAB Pekerjaan Kecil"] },
+  { name: "Dokumen Teknis",   price: "Rp 599.000", amount: 599000, scalevSlug: "klinik-dokumen-teknis",   desc: "Metode pelaksanaan, spesifikasi teknis, RKK, RMPK, RMK",      examples: ["Metode Pelaksanaan", "Rencana Mutu Kontrak", "SMKK Singkat"] },
+  { name: "Dokumen Kompleks", price: "Rp 1.199.000", amount: 1199000, scalevSlug: "klinik-dokumen-kompleks", desc: "AMDAL ringkas, kontrak, HSE Plan, studi kelayakan mini",      examples: ["UKL-UPL Ringkas", "Draft Kontrak Kerja", "HSE Plan Proyek"] },
 ] as const;
 
 export const KLINIK_PAKET = [
   {
-    key: "tender",       scalevSlug: "klinik-tender",       name: "Klinik Tender",       price: "Rp 999.000",   amount: 999000,
+    key: "tender",       scalevSlug: "klinik-tender",       name: "Klinik Tender",       price: "Rp 2.499.000", amount: 2499000,
     desc: "Analisis dokumen + strategi menang + 2 dokumen output",
     includes: ["Analisis RKS / SDP / SSKK / SSUK", "Strategi penawaran & kalkulasi HPS", "2 dokumen output (metode / RAB)", "30 hari akses TenderBot + TENDERA"],
     tag: "Terlaris",
   },
   {
-    key: "sertifikasi",  scalevSlug: "klinik-sbu-skk",      name: "Klinik SBU & SKK",    price: "Rp 749.000",   amount: 749000,
+    key: "sertifikasi",  scalevSlug: "klinik-sbu-skk",      name: "Klinik SBU & SKK",    price: "Rp 1.749.000", amount: 1749000,
     desc: "Peta SBU/SKK + checklist + template portofolio uji kompetensi",
     includes: ["Peta SBU & SKK yang tepat untuk usaha Anda", "Checklist dokumen pendaftaran lengkap", "Template portofolio SKK siap diisi", "30 hari akses SertifikasiBot + SKK Coach"],
     tag: "",
   },
   {
-    key: "hukum",        scalevSlug: "klinik-legal",         name: "Klinik Legal",         price: "Rp 799.000",   amount: 799000,
+    key: "hukum",        scalevSlug: "klinik-legal",         name: "Klinik Legal",         price: "Rp 1.899.000", amount: 1899000,
     desc: "2 sesi konsultasi hukum + 1 dokumen hukum siap pakai",
     includes: ["2 sesi konsultasi dengan LexCom AI (17 spesialis)", "1 dokumen hukum (surat / kontrak / klausul review)", "Panduan langkah hukum selanjutnya", "30 hari akses LexCom"],
     tag: "",
   },
   {
-    key: "proyek",       scalevSlug: "klinik-proyek",        name: "Klinik Proyek",        price: "Rp 1.499.000", amount: 1499000,
+    key: "proyek",       scalevSlug: "klinik-proyek",        name: "Klinik Proyek",        price: "Rp 3.499.000", amount: 3499000,
     desc: "Diagnosa proyek + action plan + set dokumen manajemen proyek",
     includes: ["Diagnosa progres, biaya & risiko proyek", "Action plan & rencana tindak korektif", "3 dokumen manpro (jadwal / RMK / laporan)", "30 hari akses ProyekBot + BRAIN Project"],
     tag: "Paling Lengkap",
   },
   {
-    key: "perijinan",    scalevSlug: "klinik-perizinan",     name: "Klinik Perizinan",     price: "Rp 499.000",   amount: 499000,
+    key: "perijinan",    scalevSlug: "klinik-perizinan",     name: "Klinik Perizinan",     price: "Rp 1.249.000", amount: 1249000,
     desc: "Analisis KBLI + roadmap izin OSS-RBA + checklist per izin",
     includes: ["Peta KBLI & tingkat risiko usaha", "Roadmap perizinan OSS-RBA langkah demi langkah", "Checklist dokumen per jenis izin", "30 hari akses PerijinanBot + OSSClaw"],
     tag: "",
   },
   {
-    key: "iso",          scalevSlug: "klinik-iso",           name: "Klinik ISO",           price: "Rp 1.299.000", amount: 1299000,
+    key: "iso",          scalevSlug: "klinik-iso",           name: "Klinik ISO",           price: "Rp 2.999.000", amount: 2999000,
     desc: "Gap analysis + template dokumen sistem manajemen + persiapan audit",
     includes: ["Gap analysis ISO 9001 atau ISO 14001", "Template dokumen QMS / EMS siap adaptasi", "Panduan persiapan audit internal & eksternal", "30 hari akses ISO 9001 AI atau ISO 14001 AI"],
     tag: "",
