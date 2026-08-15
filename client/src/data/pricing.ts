@@ -167,6 +167,25 @@ export const HOSTING_PERIODS: HostingPeriod[] = [
   { key: "monthly_12", name: "12 Bulan", price: "Rp 1.999.000", priceNum: 1999000, period: "/tahun",   duration: "12 Bulan", savings: "Hemat Rp 389.000" },
 ];
 
+// ─── Hosting Premium / Claw (disetujui Bos, Agu 2026) ───────────────────────────
+// Chatbot Premium/Claw = tim agen dalam satu komando — beban model 3–7x chatbot
+// biasa, maka hosting-nya 2x: Rp 399rb/bln. Pemaketan mengikuti pola tangga biasa.
+export const HOSTING_PREMIUM = {
+  monthly: "Rp 399.000/bln",
+  quarterly: "Rp 599.000/3bln",
+  semiannual: "Rp 1.999.000/6bln",
+  annual: "Rp 3.999.000/thn",
+} as const;
+
+export const HOSTING_PREMIUM_SUMMARY = `${HOSTING_PREMIUM.monthly} · ${HOSTING_PREMIUM.quarterly} · ${HOSTING_PREMIUM.semiannual} · ${HOSTING_PREMIUM.annual}`;
+
+export const HOSTING_PERIODS_PREMIUM: HostingPeriod[] = [
+  { key: "premium_1",  name: "1 Bulan",  price: "Rp 399.000",   priceNum: 399000,  period: "/bulan",   duration: "1 Bulan" },
+  { key: "premium_3",  name: "3 Bulan",  price: "Rp 599.000",   priceNum: 599000,  period: "/3 bulan", duration: "3 Bulan",  savings: "Hemat Rp 598.000" },
+  { key: "premium_6",  name: "6 Bulan",  price: "Rp 1.999.000", priceNum: 1999000, period: "/6 bulan", duration: "6 Bulan",  savings: "Hemat Rp 395.000" },
+  { key: "premium_12", name: "12 Bulan", price: "Rp 3.999.000", priceNum: 3999000, period: "/tahun",   duration: "12 Bulan", savings: "Hemat Rp 789.000" },
+];
+
 // ─── Tier Layanan Jasa (dirakit tim Gustafta) ────────────────────────────────────
 // CANONICAL: 4 tier. Dipakai di /packs (dan halaman manapun yang menampilkan harga jasa).
 export interface ServiceTier {

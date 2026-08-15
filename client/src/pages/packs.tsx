@@ -14,7 +14,7 @@ import {
   Briefcase, Target, Megaphone, ShoppingBag, PieChart, Mic, PenLine, Repeat2, ChevronRight,
   Send, Loader2, Bot
 } from "lucide-react";
-import { SERVICE_TIERS, HOSTING_SUMMARY, HOSTING_RANGE, PRICING } from "@/data/pricing";
+import { SERVICE_TIERS, HOSTING_SUMMARY, HOSTING_PREMIUM_SUMMARY, HOSTING_RANGE, PRICING } from "@/data/pricing";
 import { useContactNumbers } from "@/lib/contact";
 
 interface Pack {
@@ -775,7 +775,7 @@ export default function PacksPage() {
           <div className="rounded-xl border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20 px-5 py-3 flex items-center gap-3 max-w-xl mx-auto">
             <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
             <p className="text-xs text-green-800 dark:text-green-300">
-              Paket Berlangganan (hosting) mulai <strong>{HOSTING_SUMMARY}</strong>.{" "}
+              Paket Berlangganan (hosting) chatbot biasa <strong>{HOSTING_SUMMARY}</strong> · Premium/Claw <strong>{HOSTING_PREMIUM_SUMMARY}</strong>.{" "}
               <a href="/pricing" className="underline underline-offset-2 hover:opacity-80">Lihat detail →</a>
             </p>
           </div>

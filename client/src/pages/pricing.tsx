@@ -13,7 +13,7 @@ import {
   Stethoscope, GraduationCap, Briefcase, ShoppingBag, Hammer, Scale,
   Hotel, Factory, ChevronRight, Lightbulb, Wrench
 } from "lucide-react";
-import { HOSTING, HOSTING_PERIODS, HOSTING_RANGE, SERVICE_TIERS } from "@/data/pricing";
+import { HOSTING, HOSTING_PERIODS, HOSTING_PREMIUM, HOSTING_PERIODS_PREMIUM, HOSTING_RANGE, SERVICE_TIERS } from "@/data/pricing";
 import { useContactNumbers } from "@/lib/contact";
 
 interface PricingTier {
@@ -826,7 +826,7 @@ export default function Pricing() {
               <span>⚡</span> Paket Berlangganan (Hosting) — berlaku untuk semua produk
             </div>
             <h2 className="text-2xl font-bold mb-2">Pilih Durasi Hosting</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto text-sm">Harga hosting sama untuk <strong>Paket Bisnis AI</strong> (DIY) maupun <strong>Paket Series Modul</strong> (done-for-you). Makin panjang durasi, makin hemat.</p>
+            <p className="text-muted-foreground max-w-xl mx-auto text-sm">Harga di bawah berlaku untuk <strong>chatbot biasa</strong> (1 agen). Makin panjang durasi, makin hemat.</p>
           </div>
           <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
             {subscriptionTiers.map((tier) => (
@@ -836,6 +836,24 @@ export default function Pricing() {
                 onSelect={handleSelectPlan}
               />
             ))}
+          </div>
+          {/* Hosting Premium / Claw — tim agen, beban model lebih besar → tarif 2x */}
+          <div className="mt-8 rounded-2xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/20 p-5 max-w-3xl mx-auto" data-testid="card-hosting-premium">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg">👑</span>
+              <h3 className="font-bold text-sm">Hosting Premium / AI Claw</h3>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-violet-600 text-white">Tim agen · 1 komando</span>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">Chatbot Premium/Claw menjalankan beberapa AI Spesialis sekaligus dalam satu komando orchestrator — fasilitas dan daya kerjanya lebih besar, sehingga tarif hostingnya berbeda dari chatbot biasa.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {HOSTING_PERIODS_PREMIUM.map((p) => (
+                <div key={p.key} className="rounded-xl bg-background border border-violet-200 dark:border-violet-800 px-3 py-2.5 text-center">
+                  <div className="text-[11px] text-muted-foreground">{p.name}</div>
+                  <div className="text-sm font-bold text-violet-700 dark:text-violet-300">{p.price}</div>
+                  {p.savings && <div className="text-[10px] text-green-600">{p.savings}</div>}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
