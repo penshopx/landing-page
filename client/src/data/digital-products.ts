@@ -25,6 +25,12 @@ export type DigitalProduct = {
   /** Lini produk, mis. "CASHFLOW-PBJ" */
   lini?: string;
   badge?: string;
+  /** Baris bonus (ditampilkan menonjol di kartu), mis. bonus mini ebook */
+  bonus?: string;
+  /** Label tombol utama; default "Beli & Akses" (berbayar) / "Buka" (gratis) */
+  ctaLabel?: string;
+  /** Kalimat pengantar di atas judul (mis. "Belum siap membeli?") */
+  preNote?: string;
 };
 
 export const DIGITAL_PRODUCTS: DigitalProduct[] = [
@@ -41,12 +47,14 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     href: "/ebook-kas-merah",
     lini: "CASHFLOW-PBJ",
     badge: "Terbaru",
+    bonus: "BONUS: Mini-Ebook \u201c3 Kesalahan Kas Kontraktor\u201d GRATIS",
+    ctaLabel: "Beli & Akses Ebook",
   },
   {
     slug: "mini-ebook-kas-merah",
     jenis: "ebook",
     judul: "Mini-Ebook: 3 Kesalahan Kas Kontraktor",
-    subjudul: "Versi ringkas 14 halaman — pengantar sistem KAS MERAH, RAB HIJAU",
+    subjudul: "PDF 14 halaman — kenali masalah cashflow sebelum kas benar-benar merah",
     deskripsi:
       "Kenali 3 kesalahan pengelolaan kas yang paling sering mematikan kontraktor pemerintah — dan gambaran besar sistem 3 lapis untuk mencegahnya. Bisa langsung diunduh.",
     hargaLabel: "GRATIS",
@@ -55,6 +63,7 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     href: "/ebook-kas-merah",
     downloadHref: "/ebooks/kas-merah-mini-ebook.pdf",
     lini: "CASHFLOW-PBJ",
+    preNote: "Belum siap membeli?",
   },
   {
     slug: "toolkit-cashflow",

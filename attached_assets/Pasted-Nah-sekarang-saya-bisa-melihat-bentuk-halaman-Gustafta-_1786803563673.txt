@@ -1,0 +1,122 @@
+Nah, **sekarang saya bisa melihat bentuk halaman Gustafta-nya**, dan menurut saya konsep yang kita bahas tadi **bisa diterapkan langsung pada halaman ini**.
+
+Dari screenshot, struktur sekarang sudah jelas:
+
+* Kiri: **KAS MERAH, RAB HIJAU — Rp149.000**
+* Kanan: **Mini-Ebook Gratis**
+* Keduanya berada di **Gustafta**
+* Tombol premium: **Lihat & Beli**
+* Tombol gratis: **Buka / Unduh Gratis**
+
+### Yang saya sarankan: jangan bongkar struktur ini
+
+Justru kita manfaatkan halaman ini sebagai **landing page dari Meta Ads**.
+
+Namun ada **satu perubahan penting**.
+
+Saat orang datang dari iklan, kartu premium harus menjadi **hero/penawaran utama**, sedangkan mini ebook diposisikan sebagai **bonus atau alternatif gratis**.
+
+Misalnya kartu kiri menjadi:
+
+> 🟣 PREMIUM · TERBARU · **Rp149.000**
+>
+> **KAS MERAH, RAB HIJAU**
+>
+> Sistem 3 Lapis agar Kontraktor Pemerintah Tidak Mati di Tengah Proyek
+>
+> 9 Bab + 6 Lampiran:
+> Cash Triage Matrix, Termin Tracker 7-Titik, Buffer Protocol, 12 template surat & WhatsApp, checklist Zero-Defect, dan payung hukum pembayaran proyek.
+>
+> 🎁 **BONUS: Mini Ebook “Diagnosis 15 Menit” GRATIS**
+>
+> **[BELI & AKSES EBOOK]**
+
+Sedangkan kartu kanan:
+
+> 🟢 **EBOOK GRATIS**
+>
+> **Mini-Ebook: 3 Kesalahan Kas Kontraktor**
+>
+> PDF 14 halaman untuk mengenali masalah cashflow sebelum kas benar-benar merah.
+>
+> **[UNDUH GRATIS]**
+
+---
+
+## Yang lebih penting: iklan Meta cukup mengarah ke halaman ini
+
+Jadi alurnya:
+
+**META ADS**
+↓
+**gustafta.my.id/ebook-toolkit**
+↓
+
+### Pengunjung melihat 2 pilihan
+
+**A. Sudah siap → Beli Rp149.000**
+
+→ pembayaran Scalev
+→ pembayaran terverifikasi
+→ akses ebook utama
+→ baca online
+→ download
+→ bonus mini ebook
+
+**B. Belum siap → Download gratis**
+
+→ dapat mini ebook
+→ masuk audience calon pembeli
+→ nanti bisa di-retarget
+
+Jadi benar-benar **satu halaman Gustafta menangkap dua tipe traffic**.
+
+---
+
+# Tapi ada satu hal yang saya ingin ubah dari iklannya
+
+**Jangan membuat iklan berbunyi:**
+
+> “Download ebook gratis + beli ebook Rp149.000”
+
+Itu membuat otak orang bertanya:
+
+> *“Kalau ada yang gratis, kenapa saya harus bayar?*”
+
+Lebih bagus:
+
+### **KAS MERAH, RAB HIJAU — Rp149.000**
+
+**Sistem lengkap cashflow kontraktor pemerintah**
+
+🎁 **Bonus Mini Ebook Diagnosis 15 Menit GRATIS**
+
+Lalu iklan mengarahkan ke halaman yang sekarang.
+
+Dengan begitu **produk Rp149.000 tetap menjadi pusat gravitasi**, sementara produk gratis berfungsi sebagai **jaring pengaman untuk orang yang belum siap membeli**.
+
+---
+
+### Dan saya melihat peluang yang lebih bagus lagi dari halaman Anda
+
+Di screenshot sekarang tombol premium masih bertuliskan:
+
+> **Lihat & Beli**
+
+Saya akan mengubahnya menjadi:
+
+> **BELI & AKSES**
+
+atau
+
+> **DAPATKAN EBOOK**
+
+Karena **“Lihat & Beli” terdengar seperti katalog**, sedangkan iklan Meta membutuhkan tindakan yang lebih jelas.
+
+Untuk tombol gratis:
+
+> **Unduh Gratis**
+
+sudah bagus. **Pertahankan.**
+
+Jadi secara keseluruhan, **saya tidak akan membuat landing page baru**. Halaman `/ebook-toolkit` yang sekarang sudah bisa menjadi **pusat funnel Meta Ads → Gustafta → pembayaran → akses digital**. Tinggal kita optimalkan copy dan hierarki penawarannya.

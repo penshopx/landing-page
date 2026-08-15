@@ -2,14 +2,19 @@ import { Link } from "wouter";
 import { SharedHeader } from "@/components/shared-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, BookOpen, Download, Hammer, Lock } from "lucide-react";
+import { ArrowRight, BookOpen, Download, Gift, Hammer, Lock } from "lucide-react";
 import { DIGITAL_PRODUCTS, type DigitalProduct } from "@/data/digital-products";
 
 function ProductCard({ p }: { p: DigitalProduct }) {
   const isEbook = p.jenis === "ebook";
+  const isHero = p.tier === "premium";
   return (
     <div
-      className="flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-7 hover:shadow-lg transition-shadow"
+      className={`flex flex-col bg-white dark:bg-slate-900 border rounded-3xl p-7 hover:shadow-lg transition-shadow ${
+        isHero
+          ? "border-orange-400 dark:border-orange-600 ring-2 ring-orange-400/60 shadow-lg shadow-orange-100 dark:shadow-orange-950/30"
+          : "border-slate-200 dark:border-slate-800"
+      }`}
       data-testid={`card-digital-${p.slug}`}
     >
       <div className="flex items-start justify-between mb-4">
@@ -37,17 +42,30 @@ function ProductCard({ p }: { p: DigitalProduct }) {
         </div>
       </div>
 
+      {p.preNote && (
+        <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 mb-1">{p.preNote}</p>
+      )}
       {p.lini && (
         <p className="text-[11px] font-bold text-orange-500 uppercase tracking-widest mb-1">{p.lini}</p>
       )}
       <h3 className="text-lg font-black text-slate-900 dark:text-white leading-snug mb-1">{p.judul}</h3>
       <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">{p.subjudul}</p>
-      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-6 flex-1">{p.deskripsi}</p>
+      <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4 flex-1">{p.deskripsi}</p>
+
+      {p.bonus && (
+        <div
+          className="flex items-start gap-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 px-3 py-2.5 mb-5"
+          data-testid={`text-bonus-${p.slug}`}
+        >
+          <Gift className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+          <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">{p.bonus}</p>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-3">
-        <Button asChild variant={p.gratis ? "outline" : "default"} className="gap-2">
+        <Button asChild variant={p.gratis ? "outline" : "default"} className={`gap-2 ${isHero ? "bg-orange-600 hover:bg-orange-700 text-white" : ""}`}>
           <Link href={p.href} data-testid={`link-digital-${p.slug}`}>
-            {p.gratis ? "Buka" : "Lihat & Beli"} <ArrowRight className="h-4 w-4" />
+            {p.ctaLabel ?? (p.gratis ? "Buka" : "Beli & Akses")} <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>
         {p.downloadHref && (
