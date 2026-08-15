@@ -1218,6 +1218,8 @@ export default function PacksPage() {
 }
 
 function PackCard({ pack, onNavigate }: { pack: Pack; onNavigate: (path: string) => void }) {
+  const contact = useContactNumbers();
+  const waLink = (msg: string) => contact.waLink(msg, true);
   const waMsg = `Halo, saya tertarik dengan ${pack.name}. Bisa ceritakan lebih lanjut dan proses ordernya seperti apa?`;
 
   return (
@@ -1317,6 +1319,8 @@ function PackCard({ pack, onNavigate }: { pack: Pack; onNavigate: (path: string)
 }
 
 function PackCardMini({ pack }: { pack: Pack }) {
+  const contact = useContactNumbers();
+  const waLink = (msg: string) => contact.waLink(msg, true);
   const waMsg = `Halo, saya tertarik dengan ${pack.name} yang belum tersedia. Kapan bisa dipakai dan bagaimana cara pesannya?`;
   return (
     <div
