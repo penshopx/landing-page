@@ -147,10 +147,10 @@ export default function Store() {
 
 
   // Profesi filter is applied client-side by keyword, so it must see the WHOLE
-  // result set (server caps limit at 500) — one page of 24 would look empty.
+  // result set (server caps limit at 1000) — one page of 24 would look empty.
   const catalogParams = new URLSearchParams({
     page: profesiFilter ? "1" : String(page),
-    limit: profesiFilter ? "500" : String(LIMIT),
+    limit: profesiFilter ? "1000" : String(LIMIT),
     ...(search ? { search } : {}),
     ...(selectedCategory ? { category: selectedCategory } : {}),
   }).toString();

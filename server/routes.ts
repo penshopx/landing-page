@@ -286,6 +286,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
     userId: agentsTable.userId,
     isListed: agentsTable.isListed,
     isCertified: agentsTable.isCertified,
+    isPublic: agentsTable.isPublic,
     licenseClass: agentsTable.licenseClass,
     licensePrice: agentsTable.licensePrice,
     paymentUrl: agentsTable.paymentUrl,
@@ -341,10 +342,12 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
     .filter((a) => {
       if (spAgentIds.has(a.id)) return false;
       if (a.parentAgentId != null) return false;
-      // Only include chatbot bundles (2+ components) — single agents not sold standalone
+      // Bundles (2+ komponen) selalu tayang. Agen tunggal ("chatbot biasa" /
+      // AI Spesialis solo) kini juga dijual — tapi HANYA yang publik, supaya
+      // agen internal/tersembunyi tidak ikut tampil di etalase.
       const subCount = parseSubAgentsValue(a.agenticSubAgents).length;
       const childCount = childCountMap.get(a.id) ?? 0;
-      if ((1 + Math.max(subCount, childCount)) < 2) return false;
+      if ((1 + Math.max(subCount, childCount)) < 2 && (a as any).isPublic !== true) return false;
       // Gerbang persetujuan publikasi: agen buatan kreator independen (punya user_id nyata)
       // HANYA tayang bila pemiliknya memilih "Terbitkan ke Store" (isListed = true).
       // Agen resmi/seeded Gustafta (user_id = "") TIDAK terpengaruh — tetap tayang seperti biasa.
@@ -7470,7 +7473,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       // Cap raised to 500: items come pre-computed from the shared cache, so a
       // large limit is a cheap slice — needed by the client-side profesi filter,
       // which must see the whole result set, not one page.
-      const limit = Math.min(500, Math.max(12, parseInt(String(req.query.limit || "24"))));
+      const limit = Math.min(1000, Math.max(12, parseInt(String(req.query.limit || "24"))));
       const search = String(req.query.search || "").trim().toLowerCase();
       const category = String(req.query.category || "").trim();
 
