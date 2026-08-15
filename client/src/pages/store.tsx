@@ -146,14 +146,17 @@ export default function Store() {
   });
 
 
+  // Profesi filter is applied client-side by keyword, so it must see the WHOLE
+  // result set (server caps limit at 500) — one page of 24 would look empty.
   const catalogParams = new URLSearchParams({
-    page: String(page), limit: String(LIMIT),
+    page: profesiFilter ? "1" : String(page),
+    limit: profesiFilter ? "500" : String(LIMIT),
     ...(search ? { search } : {}),
     ...(selectedCategory ? { category: selectedCategory } : {}),
   }).toString();
 
   const { data: catalog, isLoading } = useQuery<CatalogResponse>({
-    queryKey: ["/api/store/catalog", page, search, selectedCategory],
+    queryKey: ["/api/store/catalog", page, search, selectedCategory, profesiFilter],
     queryFn: async () => { const res = await fetch(`/api/store/catalog?${catalogParams}`); return res.json(); },
   });
 
@@ -252,16 +255,19 @@ export default function Store() {
   };
 
   const items = catalog?.items || [];
-  const total = catalog?.total || 0;
-  const pages = catalog?.pages || 1;
 
-  // Client-side profesi filter applied on top of server results
+  // Client-side profesi filter applied on top of server results (full set when active)
   const displayItems = profesiFilter
     ? items.filter((a) => {
         const text = `${a.name} ${a.tagline || ""} ${a.description || ""}`.toLowerCase();
         return PROFESI_BUNDLES[profesiFilter]?.keywords.some((kw) => text.includes(kw));
       })
     : items;
+
+  const total = profesiFilter ? displayItems.length : (catalog?.total || 0);
+  const pages = profesiFilter ? Math.max(1, Math.ceil(displayItems.length / LIMIT)) : (catalog?.pages || 1);
+  // With profesi active, paginate the filtered list client-side at the normal page size
+  const pageItems = profesiFilter ? displayItems.slice((page - 1) * LIMIT, page * LIMIT) : displayItems;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -454,6 +460,7 @@ export default function Store() {
                 setProfesiFilter(profesiFilter === key ? "" : key);
                 setSelectedCategory("");
                 setSearch("");
+                setPage(1);
                 setSearchInput("");
                 setPage(1);
               }}
@@ -531,7 +538,7 @@ export default function Store() {
                 <div key={i} className="h-64 bg-gray-100 rounded-2xl animate-pulse" />
               ))}
             </div>
-          ) : displayItems.length === 0 ? (
+          ) : pageItems.length === 0 ? (
             <div className="text-center py-20 text-gray-400">
               <Bot className="h-16 w-16 mx-auto mb-4 opacity-20" />
               {search || selectedCategory || profesiFilter ? (
@@ -556,7 +563,7 @@ export default function Store() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {displayItems.map((agent) => (
+              {pageItems.map((agent) => (
                 <AgentCard key={agent.id} agent={agent} onBuy={handleBuyNow} onAddToCart={handleAddToCart} onDetail={handleDetail} />
               ))}
               {page === 1 && !search && !selectedCategory && !profesiFilter && <CustomChatbotCard />}

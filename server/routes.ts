@@ -7467,7 +7467,10 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
   app.get("/api/store/catalog", async (req, res) => {
     try {
       const page = Math.max(1, parseInt(String(req.query.page || "1")));
-      const limit = Math.min(48, Math.max(12, parseInt(String(req.query.limit || "24"))));
+      // Cap raised to 500: items come pre-computed from the shared cache, so a
+      // large limit is a cheap slice — needed by the client-side profesi filter,
+      // which must see the whole result set, not one page.
+      const limit = Math.min(500, Math.max(12, parseInt(String(req.query.limit || "24"))));
       const search = String(req.query.search || "").trim().toLowerCase();
       const category = String(req.query.category || "").trim();
 
