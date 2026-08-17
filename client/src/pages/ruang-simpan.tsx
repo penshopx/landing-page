@@ -1693,7 +1693,7 @@ function RuangSimpanLandingPage() {
                   "Simpan file + AI baca & pahami isinya",
                   "Cari di dalam isi dokumen (full-text)",
                   "Konteks otomatis ke Klinik, Bedah Dokumen, Tender",
-                  "Terintegrasi Ruang Kelola — link dokumen legal langsung",
+                  "Terintegrasi Radar Legalitas — link dokumen legal langsung",
                   "15 MB gratis, upgrade saat sudah butuh lebih",
                 ].map(t => (
                   <li key={t} className="flex items-start gap-2">
@@ -1738,7 +1738,7 @@ function RuangSimpanLandingPage() {
             {[
               { icon: ScanSearch,    color:"text-blue-600 bg-blue-50 dark:bg-blue-900/20",    title:"Cari Isi Dokumen",        desc:"Full-text search ke dalam konten PDF, DOCX, dan TXT — bukan hanya nama file." },
               { icon: BrainCircuit,  color:"text-violet-600 bg-violet-50 dark:bg-violet-900/20", title:"Konteks AI Otomatis",    desc:"Semua fitur AI Gustafta otomatis membaca dokumen Anda saat Anda menggunakannya." },
-              { icon: ClipboardList, color:"text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20", title:"Link ke Ruang Kelola", desc:"Hubungkan file scan dengan catatan SBU, NIB, SKK — satu klik dari dashboard." },
+              { icon: ClipboardList, color:"text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20", title:"Link ke Radar Legalitas", desc:"Hubungkan file scan dengan catatan SBU, NIB, SKK — satu klik dari dashboard." },
               { icon: FolderOpen,    color:"text-orange-600 bg-orange-50 dark:bg-orange-900/20", title:"Folder Terstruktur",    desc:"7 kategori default: Legalitas, Teknis, Tender, SDM, dan lainnya. Buat folder sendiri." },
               { icon: Shield,        color:"text-red-600 bg-red-50 dark:bg-red-900/20",     title:"Kuasa Digital & Audit",   desc:"Beri akses terbatas ke konsultan/biro jasa. Riwayat download & setiap perubahan tercatat otomatis." },
               { icon: DatabaseZap,   color:"text-teal-600 bg-teal-50 dark:bg-teal-900/20",  title:"Preview & Download",      desc:"Lihat gambar langsung di browser. Download kapan saja, tanpa batas." },

@@ -833,13 +833,14 @@ export default function Landing() {
               { icon: "🗺️", label: "Peta Jalan", desc: "Temukan mulai dari mana", href: "/persona" },
               { icon: "🏥", label: "Klinik Konsultasi", desc: "Tanya ahli, bayar per sesi", href: "/klinik-konsultasi" },
               { icon: "📄", label: "Bedah Dokumen", desc: "Analisis kontrak & RKS", href: "/bedah-dokumen" },
-              { icon: "🧠", label: "Brain Project", desc: "Partner pikir proyek Anda", href: "/brain-project" },
+              { icon: "🧠", label: "Brain Project", desc: "Jasa pendampingan berpikir proyek", href: "/brain-project" },
               { icon: "🛠️", label: "Ebook & Toolkit", desc: "Buku & alat siap pakai", href: "/ebook-toolkit" },
-              { icon: "🏗️", label: "Ruang Proyek", desc: "Kelola proyek berjalan", href: "/ruang-proyek" },
-              { icon: "📋", label: "Ruang Kelola", desc: "Pengingat legalitas & dokumen", href: "/ruang-kelola" },
+              { icon: "🏗️", label: "Ruang Proyek", desc: "Aplikasi kelola proyek berjalan", href: "/ruang-proyek" },
+              { icon: "📋", label: "Radar Legalitas", desc: "Pantau masa berlaku SBU · SKK · NIB", href: "/ruang-kelola" },
               { icon: "🎓", label: "Ekosistem Kompetensi", desc: "Sertifikasi SKK & bimtek SDM", href: "/kompetensi-hub" },
               { icon: "🧩", label: "Mini Apps", desc: "50+ aplikasi kerja di dashboard", href: "/dashboard" },
-              { icon: "🤖", label: "Produk", desc: "Katalog semua produk AI", href: "/produk" },
+              { icon: "✨", label: "Asisten AI", desc: "Produk AI andalan Gustafta", href: "/asisten-ai" },
+              { icon: "🤖", label: "Produk", desc: "Katalog semua produk & layanan", href: "/produk" },
             ].map((item) => (
               <Link key={item.label} href={item.href}>
                 <div className="bg-white/15 hover:bg-white/25 border border-white/30 rounded-xl px-4 py-3 cursor-pointer transition-colors text-left">
@@ -873,13 +874,13 @@ export default function Landing() {
             </p>
           </div>
 
-          {/* Ruang Kelola */}
+          {/* Radar Legalitas */}
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div className="bg-gradient-to-br from-blue-50 to-slate-50 dark:from-blue-950/30 dark:to-slate-900 border border-blue-100 dark:border-blue-900/50 rounded-3xl p-8">
               <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-blue-200 dark:shadow-blue-900/40">
                 <Bell className="h-6 w-6 text-white" />
               </div>
-              <p className="text-xs font-bold text-blue-500 uppercase tracking-widest mb-2">Ruang Kelola</p>
+              <p className="text-xs font-bold text-blue-500 uppercase tracking-widest mb-2">Radar Legalitas</p>
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-3 leading-snug">
                 Ingatan perusahaan<br />yang tidak pernah lupa.
               </h3>
@@ -889,7 +890,7 @@ export default function Landing() {
                 Dan dua bulan sebelum tanggal itu tiba, ia mengirim pesan ke WhatsApp Anda.
               </p>
               <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
-                Itulah Ruang Kelola. Bukan aplikasi untuk mengisi form — tapi sistem yang bekerja
+                Itulah Radar Legalitas. Bukan aplikasi untuk mengisi form — tapi sistem yang bekerja
                 diam-diam di belakang layar, menjaga Anda dari gugur tender karena hal yang seharusnya bisa dicegah.
               </p>
               <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 mb-5">
@@ -898,7 +899,7 @@ export default function Landing() {
               </div>
               <Link href="/ruang-kelola">
                 <button className="flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
-                  Kenali Ruang Kelola <ArrowRight className="h-4 w-4" />
+                  Kenali Radar Legalitas <ArrowRight className="h-4 w-4" />
                 </button>
               </Link>
             </div>

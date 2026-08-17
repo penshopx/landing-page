@@ -281,6 +281,7 @@ import VerifySertifikat from "@/pages/verify-sertifikat";
 import DiagnostikKompetensi from "@/pages/diagnostik-kompetensi";
 import MockAsesmen from "@/pages/mock-asesmen";
 import KompetensiHub from "@/pages/kompetensi-hub";
+import AsistenAiPage from "@/pages/asisten-ai";
 import PersiapanAsesmen from "@/pages/persiapan-asesmen";
 import CekKelayakanSKK from "@/pages/cek-kelayakan-skk";
 import GeneratorAPL02 from "@/pages/generator-apl02";
@@ -1801,6 +1802,7 @@ function Router() {
         <Route path="/diagnostik-kompetensi" component={DiagnostikKompetensi} />
         <Route path="/mock-asesmen" component={MockAsesmen} />
         <Route path="/kompetensi-hub" component={KompetensiHub} />
+        <Route path="/asisten-ai" component={AsistenAiPage} />
         <Route path="/persiapan-asesmen" component={PersiapanAsesmen} />
         <Route path="/cek-kelayakan-skk" component={CekKelayakanSKK} />
         <Route path="/generator-apl02" component={GeneratorAPL02} />

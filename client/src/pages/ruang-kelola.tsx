@@ -279,7 +279,7 @@ export default function RuangKelolaPage() {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <ClipboardList className="h-5 w-5 text-blue-400" />
-                <span className="text-blue-400 text-sm font-semibold uppercase tracking-widest">Ruang Kelola</span>
+                <span className="text-blue-400 text-sm font-semibold uppercase tracking-widest">Radar Legalitas</span>
               </div>
               {profile ? (
                 <>
@@ -318,7 +318,7 @@ export default function RuangKelolaPage() {
               <Building2 className="h-5 w-5 text-amber-300 shrink-0" />
               <div>
                 <p className="text-sm font-semibold text-white">Lengkapi profil perusahaan dulu</p>
-                <p className="text-xs text-blue-200">Tambahkan nama perusahaan, NIB, dan data lainnya agar Ruang Kelola siap digunakan.</p>
+                <p className="text-xs text-blue-200">Tambahkan nama perusahaan, NIB, dan data lainnya agar Radar Legalitas siap digunakan.</p>
               </div>
               <Button size="sm" variant="secondary" className="ml-auto shrink-0" onClick={() => setShowProfileForm(true)}>
                 Setup <ChevronRight className="h-3.5 w-3.5" />
@@ -1351,7 +1351,7 @@ function RuangKelolaLandingPage() {
           style={{ backgroundImage: "linear-gradient(rgba(59,130,246,.3) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.3) 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="relative max-w-5xl mx-auto px-4 py-20 text-center">
           <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-500/30 rounded-full px-4 py-1.5 text-blue-300 text-xs font-semibold mb-6">
-            <ClipboardList className="h-3.5 w-3.5" /> Ruang Kelola — Gratis untuk BUJK
+            <ClipboardList className="h-3.5 w-3.5" /> Radar Legalitas — Gratis untuk BUJK
           </div>
           <h1 className="text-3xl sm:text-5xl font-black leading-tight mb-4">
             Jangan sampai SBU/SKK expired<br />
@@ -1492,7 +1492,7 @@ function RuangKelolaLandingPage() {
           </div>
           <Link href="/masuk">
             <Button className="gap-2 bg-amber-600 hover:bg-amber-700 text-white">
-              <LogIn className="h-4 w-4" /> Coba Ruang Kelola — Gratis
+              <LogIn className="h-4 w-4" /> Coba Radar Legalitas — Gratis
             </Button>
           </Link>
         </div>
@@ -1504,11 +1504,11 @@ function RuangKelolaLandingPage() {
           <h2 className="text-center text-xl font-bold text-foreground mb-8">Pertanyaan Umum</h2>
           <div className="space-y-3">
             {[
-              { q: "Apakah Ruang Kelola benar-benar gratis?", a: "Ya, 100% gratis. Semua fitur dashboard — input dokumen, reminder, OCR scan, dan monitoring — tersedia tanpa biaya. Biro Jasa (pengurusan dokumen) berbayar sesuai layanan yang dipilih." },
+              { q: "Apakah Radar Legalitas benar-benar gratis?", a: "Ya, 100% gratis. Semua fitur dashboard — input dokumen, reminder, OCR scan, dan monitoring — tersedia tanpa biaya. Biro Jasa (pengurusan dokumen) berbayar sesuai layanan yang dipilih." },
               { q: "Bagaimana reminder WA bekerja?", a: "Sistem otomatis mengirim pesan WhatsApp ke nomor perusahaan yang Anda daftarkan — 30 hari dan 7 hari sebelum dokumen expired. Tidak perlu setting apapun." },
               { q: "Apakah data dokumen saya aman?", a: "Ya. Setiap dokumen hanya bisa diakses oleh pemilik akun. Sistem dilindungi 10 layer keamanan termasuk audit log, rate limiting, dan ownership check pada setiap operasi." },
               { q: "Bisakah saya scan dokumen fisik?", a: "Bisa. Fitur OCR menggunakan Gemini AI — foto dokumen SBU, SKK, atau NIB fisik, sistem otomatis membaca dan mengisi formulir tanpa ketik manual." },
-              { q: "Apa bedanya dengan spreadsheet Excel?", a: "Excel tidak mengirim reminder, tidak bisa scan dokumen, tidak terhubung ke fitur AI lain, dan tidak ada Biro Jasa. Ruang Kelola adalah sistem aktif yang bekerja untuk Anda." },
+              { q: "Apa bedanya dengan spreadsheet Excel?", a: "Excel tidak mengirim reminder, tidak bisa scan dokumen, tidak terhubung ke fitur AI lain, dan tidak ada Biro Jasa. Radar Legalitas adalah sistem aktif yang bekerja untuk Anda." },
             ].map(({ q, a }) => (
               <div key={q} className="bg-white dark:bg-card border border-border rounded-xl p-4">
                 <p className="font-semibold text-sm text-foreground mb-1.5">{q}</p>

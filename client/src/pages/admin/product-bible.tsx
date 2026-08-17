@@ -243,7 +243,7 @@ export default function ProductBible() {
                       {[
                         "Chatbot aktif milik pengguna",
                         "Ekosistem Kompetensi (semua tools)",
-                        "Ruang Kelola (manajemen chatbot)",
+                        "Radar Legalitas (manajemen chatbot)",
                         "Ruang Simpan (dokumen & output)",
                         "Klinik Konsultasi AI",
                         "Brain Project (manajemen proyek)",
@@ -272,11 +272,11 @@ export default function ProductBible() {
               </CardContent>
             </Card>
 
-            {/* 4. Ruang Kelola & Ruang Simpan */}
+            {/* 4. Radar Legalitas & Ruang Simpan */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <SectionTitle icon={ClipboardList} title="Ruang Kelola" subtitle="Manajemen chatbot aktif milik pengguna" />
+                  <SectionTitle icon={ClipboardList} title="Radar Legalitas" subtitle="Manajemen chatbot aktif milik pengguna" />
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {[
@@ -291,7 +291,7 @@ export default function ProductBible() {
                     </div>
                   ))}
                   <p className="text-[11px] text-muted-foreground">
-                    ⚠️ Akses Starter adalah <em>hak pelanggan</em>, bukan promosi. Framing: "Ruang Kelola Anda sudah aktif."
+                    ⚠️ Akses Starter adalah <em>hak pelanggan</em>, bukan promosi. Framing: "Radar Legalitas Anda sudah aktif."
                   </p>
                 </CardContent>
               </Card>
@@ -401,18 +401,18 @@ export default function ProductBible() {
                     pintu: "Pintu 0 — Belum Beli Apapun",
                     color: "border-l-gray-400",
                     bisa: ["Demo chatbot publik (/demo/[slug])", "Landing page & katalog produk", "Bedah Dokumen (terbatas)"],
-                    tidak: ["Workroom", "Ruang Kelola", "Ruang Simpan", "Ekosistem Kompetensi", "Dashboard"],
+                    tidak: ["Workroom", "Radar Legalitas", "Ruang Simpan", "Ekosistem Kompetensi", "Dashboard"],
                   },
                   {
                     pintu: "Pintu 1 — Beli ≥1 Produk Chatbot",
                     color: "border-l-emerald-400",
-                    bisa: ["Workroom Basic (1 proyek aktif)", "Ruang Kelola Starter (chatbot yang dibeli)", "Ruang Simpan 500 MB", "Dashboard pengguna"],
-                    tidak: ["Ekosistem Kompetensi (butuh langganan)", "Multi-proyek Workroom", "Ruang Kelola multi-chatbot advanced"],
+                    bisa: ["Workroom Basic (1 proyek aktif)", "Radar Legalitas Starter (chatbot yang dibeli)", "Ruang Simpan 500 MB", "Dashboard pengguna"],
+                    tidak: ["Ekosistem Kompetensi (butuh langganan)", "Multi-proyek Workroom", "Radar Legalitas multi-chatbot advanced"],
                   },
                   {
                     pintu: "Pintu 2 — Langganan Aktif (Starter/Profesional/Bisnis)",
                     color: "border-l-violet-400",
-                    bisa: ["Workroom Full", "Ekosistem Kompetensi lengkap", "Ruang Kelola sesuai tier", "Ruang Simpan sesuai tier", "Semua chatbot yang dimiliki aktif"],
+                    bisa: ["Workroom Full", "Ekosistem Kompetensi lengkap", "Radar Legalitas sesuai tier", "Ruang Simpan sesuai tier", "Semua chatbot yang dimiliki aktif"],
                     tidak: [],
                   },
                 ].map(p => (
@@ -463,7 +463,7 @@ export default function ProductBible() {
                         ["Demo Chatbot Publik", true, true, true, true],
                         ["Dashboard Pengguna", false, true, true, true],
                         ["Workroom Basic", false, true, true, true],
-                        ["Ruang Kelola Starter", false, true, true, true],
+                        ["Radar Legalitas Starter", false, true, true, true],
                         ["Ruang Simpan (500 MB)", false, true, true, true],
                         ["Ruang Simpan (5 GB)", false, false, true, true],
                         ["Ruang Simpan (25 GB)", false, false, false, true],
@@ -506,7 +506,7 @@ export default function ProductBible() {
                     judul: "Chatbot Spesialis + Berlangganan Hosting",
                     contoh: "Beli chatbot K3, Tender, SBU, ISO, dll dari /store",
                     model: "Lisensi sekali bayar + hosting recurring",
-                    buka: ["Ruang Kelola (slot aktif sesuai tier)", "Ruang Simpan (500 MB – 25 GB sesuai tier)"],
+                    buka: ["Radar Legalitas (slot aktif sesuai tier)", "Ruang Simpan (500 MB – 25 GB sesuai tier)"],
                     tidak: ["Ekosistem Kompetensi"],
                     color: "border-l-blue-400",
                     bg: "bg-blue-50/50 dark:bg-blue-950/20",
@@ -516,7 +516,7 @@ export default function ProductBible() {
                     judul: "Chatbot Premium + Berlangganan Hosting",
                     contoh: "Chatbot premium dikurasi Gustafta (premiumClass: private)",
                     model: "Lisensi premium sekali bayar + hosting recurring",
-                    buka: ["Ruang Kelola (slot aktif sesuai tier)", "Ruang Simpan (sesuai tier)", "Ekosistem Kompetensi (penuh, via Workroom)"],
+                    buka: ["Radar Legalitas (slot aktif sesuai tier)", "Ruang Simpan (sesuai tier)", "Ekosistem Kompetensi (penuh, via Workroom)"],
                     tidak: [],
                     color: "border-l-violet-400",
                     bg: "bg-violet-50/50 dark:bg-violet-950/20",
@@ -526,7 +526,7 @@ export default function ProductBible() {
                     judul: "Bedah Dokumen · Brain Project · Klinik Konsultasi",
                     contoh: "Produk tools yang dipakai berulang per proyek/sesi",
                     model: "Berlangganan sendiri (quota/bulan) — ATAU per sesi + bonus 30 hari akses platform",
-                    buka: ["Ruang Kelola (slot aktif sesuai tier)", "Ruang Simpan (sesuai tier)", "Ekosistem Kompetensi (selama berlangganan aktif)"],
+                    buka: ["Radar Legalitas (slot aktif sesuai tier)", "Ruang Simpan (sesuai tier)", "Ekosistem Kompetensi (selama berlangganan aktif)"],
                     tidak: [],
                     color: "border-l-emerald-400",
                     bg: "bg-emerald-50/50 dark:bg-emerald-950/20",
@@ -537,7 +537,7 @@ export default function ProductBible() {
                     judul: "Jasa Dokumen · Bimtek · Executive Summary · Jasa Keuangan",
                     contoh: "Jasa sekali selesai — ada deliverable nyata yang diserahkan",
                     model: "Bayar sekali → terima deliverable → bonus akses platform berbatas waktu",
-                    buka: ["Ruang Kelola (slot aktif sesuai tier, selama bonus aktif)", "Ruang Simpan (sesuai tier, selama bonus aktif)", "Ekosistem Kompetensi (selama bonus aktif)"],
+                    buka: ["Radar Legalitas (slot aktif sesuai tier, selama bonus aktif)", "Ruang Simpan (sesuai tier, selama bonus aktif)", "Ekosistem Kompetensi (selama bonus aktif)"],
                     tidak: [],
                     color: "border-l-amber-400",
                     bg: "bg-amber-50/50 dark:bg-amber-950/20",
@@ -577,10 +577,10 @@ export default function ProductBible() {
               </CardContent>
             </Card>
 
-            {/* Kapasitas Ruang Kelola — Slot Chatbot Aktif */}
+            {/* Kapasitas Radar Legalitas — Slot Chatbot Aktif */}
             <Card>
               <CardHeader className="pb-2">
-                <SectionTitle icon={LayoutGrid} title="Kapasitas Ruang Kelola — Slot Chatbot Aktif" subtitle="Analoginya: bisa BELI chatbot sebanyak apapun, tapi yang bisa JALAN bersamaan tergantung tier hosting" />
+                <SectionTitle icon={LayoutGrid} title="Kapasitas Radar Legalitas — Slot Chatbot Aktif" subtitle="Analoginya: bisa BELI chatbot sebanyak apapun, tapi yang bisa JALAN bersamaan tergantung tier hosting" />
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="overflow-x-auto">
@@ -819,7 +819,7 @@ export default function ProductBible() {
               </RuleCard>
 
               <RuleCard icon={CircleDollarSign} color="border-l-rose-400" title="Framing Harga yang Benar">
-                <p>"Ruang Kelola/Simpan Anda sudah aktif" (bukan "gratis bonus")</p>
+                <p>"Radar Legalitas/Simpan Anda sudah aktif" (bukan "gratis bonus")</p>
                 <p>"Sudah termasuk langganan Anda" (bukan "gratis kalau berlangganan")</p>
                 <p>"Ekosistem Kompetensi ada di Workroom Anda" (bukan "bisa akses gratis")</p>
                 <p className="text-amber-600 dark:text-amber-400">⚠️ Jangan tampilkan harga Rp 0 di mana pun tanpa konteks syarat</p>
@@ -919,10 +919,10 @@ export default function ProductBible() {
                   },
                   {
                     tanggal: "Juli 2026",
-                    judul: "Ruang Kelola & Simpan = Hak Pelanggan, Bukan Bonus Gratis",
-                    keputusan: "Starter Ruang Kelola (500 MB, 1 proyek) terbuka otomatis setelah beli ≥1 produk chatbot. Framing: 'Akun Anda sudah aktif' bukan 'gratis bonus'.",
+                    judul: "Radar Legalitas & Simpan = Hak Pelanggan, Bukan Bonus Gratis",
+                    keputusan: "Starter Radar Legalitas (500 MB, 1 proyek) terbuka otomatis setelah beli ≥1 produk chatbot. Framing: 'Akun Anda sudah aktif' bukan 'gratis bonus'.",
                     alasan: "Framing bonus gratis memperlemah posisi produk. Framing hak pelanggan = menghargai user yang sudah beli, mendorong pembelian pertama.",
-                    dampak: "Semua copy UI yang bilang 'gratis' untuk Ruang Kelola/Simpan perlu diubah ke framing hak pelanggan.",
+                    dampak: "Semua copy UI yang bilang 'gratis' untuk Radar Legalitas/Simpan perlu diubah ke framing hak pelanggan.",
                     status: "Diputuskan, belum diimplementasi perubahan copy",
                     statusColor: "text-amber-600",
                   },
@@ -947,7 +947,7 @@ export default function ProductBible() {
                   {
                     tanggal: "Juli 2026",
                     judul: "Kapasitas Tier-Based — Slot Chatbot Aktif, Bukan Fixed Minimum",
-                    keputusan: "Kapasitas Ruang Kelola (slot chatbot aktif bersamaan) mengikuti tier langganan: Starter=3, Profesional=10, Bisnis=25, Enterprise=unlimited. User bisa BELI chatbot sebanyak apapun — yang dibatasi hanya yang bisa JALAN bersamaan.",
+                    keputusan: "Kapasitas Radar Legalitas (slot chatbot aktif bersamaan) mengikuti tier langganan: Starter=3, Profesional=10, Bisnis=25, Enterprise=unlimited. User bisa BELI chatbot sebanyak apapun — yang dibatasi hanya yang bisa JALAN bersamaan.",
                     alasan: "Fixed minimum (misal '5 chatbot gratis') tidak memberi insentif upgrade. Tier-based menciptakan tekanan upsell alami: user beli 8 chatbot di plan Starter → upgrade sendiri ke Profesional.",
                     dampak: "Perlu implementasi slot enforcement di DB dan UI. Chatbot melebihi kuota → Dormant (tidak dihapus, tidak bisa diakses). Notifikasi dormant wajib ditampilkan.",
                     status: "Diputuskan, belum diimplementasi",
@@ -958,7 +958,7 @@ export default function ProductBible() {
                     judul: "Kebijakan Chatbot Dormant — Aman saat Downgrade",
                     keputusan: "Chatbot yang melebihi slot aktif → masuk Dormant (tidak bisa diakses tapi tidak dihapus). Upgrade plan → langsung aktif kembali tanpa setup ulang. Lisensi tetap milik user selamanya.",
                     alasan: "User takut downgrade karena khawatir kehilangan chatbot yang sudah dibeli. Kebijakan Dormant menghilangkan rasa takut itu → user lebih berani eksperimen plan, lebih mudah kembali upgrade.",
-                    dampak: "Perlu kolom status di tabel agents/subscriptions untuk state Dormant. UI Ruang Kelola harus tampilkan chatbot Dormant dengan badge dan CTA upgrade.",
+                    dampak: "Perlu kolom status di tabel agents/subscriptions untuk state Dormant. UI Radar Legalitas harus tampilkan chatbot Dormant dengan badge dan CTA upgrade.",
                     status: "Diputuskan, belum diimplementasi",
                     statusColor: "text-amber-600",
                   },
@@ -974,7 +974,7 @@ export default function ProductBible() {
                   {
                     tanggal: "Juli 2026",
                     judul: "Ekosistem Kompetensi: Butir 1 TIDAK dapat, Butir 2/3/4 dapat",
-                    keputusan: "Chatbot Spesialis (Butir 1) tidak membuka Ekosistem Kompetensi — hanya Ruang Kelola dan Ruang Simpan. Chatbot Premium (Butir 2), Butir 3, dan Butir 4 membuka Ekosistem Kompetensi (selama akses aktif).",
+                    keputusan: "Chatbot Spesialis (Butir 1) tidak membuka Ekosistem Kompetensi — hanya Radar Legalitas dan Ruang Simpan. Chatbot Premium (Butir 2), Butir 3, dan Butir 4 membuka Ekosistem Kompetensi (selama akses aktif).",
                     alasan: "Ekosistem Kompetensi adalah nilai tambah premium. Butir 1 sudah punya nilai dari chatbot spesialis itu sendiri. Diferensiasi ini mendorong upgrade ke chatbot premium atau langganan lebih tinggi.",
                     dampak: "Perlu flag di DB atau logic: jika user hanya punya chatbot spesialis → blokir Ekosistem Kompetensi. Jika punya ≥1 chatbot premium atau Butir 3/4 aktif → buka akses.",
                     status: "Diputuskan, belum diimplementasi gating di sistem",

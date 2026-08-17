@@ -112,7 +112,7 @@ export default function ExecutiveSummaryPage() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-xs font-semibold mb-6">
                 <Brain className="h-3.5 w-3.5" />
-                AI Penyusunan Executive Summary Profesional
+                PKB-PUB — Penyusunan Executive Summary Profesional
               </div>
               <h1 className="text-3xl md:text-5xl font-bold text-white mb-5 leading-tight">
                 Ringkasan Eksekutif<br />

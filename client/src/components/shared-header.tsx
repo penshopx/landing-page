@@ -11,7 +11,7 @@ import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
 import { useContactNumbers } from "@/lib/contact";
-import { Bot, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2, FolderKanban } from "lucide-react";
+import { Bot, Sparkles, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2, FolderKanban } from "lucide-react";
 
 
 const PLAN_BADGE_CONFIG: Record<string, { label: string; className: string }> = {
@@ -251,6 +251,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/klinik-konsultasi", label: "Klinik Konsultasi",   icon: Stethoscope },
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
+    { href: "/asisten-ai",        label: "Asisten AI",          icon: Sparkles },
     { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
     { href: "/ebook-toolkit",     label: "Ebook & Toolkit",     icon: Hammer },
     { href: "/mitra-biro-jasa",   label: "Mitra",               icon: HandshakeIcon },
@@ -266,12 +267,12 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
 
   // Baris 2 — tools & layanan spesifik
   const navRow2 = [
-    { href: "/ruang-kelola",           label: "Ruang Kelola",           icon: ClipboardList },
+    { href: "/ruang-kelola",           label: "Radar Legalitas",           icon: ClipboardList },
     { href: "/ruang-simpan",           label: "Ruang Simpan",           icon: HardDrive },
     { href: "/jasa-dokumen",           label: "Jasa Dokumen",           icon: FileCheck2 },
     { href: "/jasa-keuangan",          label: "Jasa Keuangan",          icon: TrendingUp },
     { href: "/klinik-uji-kompetensi",  label: "Bimtek SKK",       icon: GraduationCap },
-    { href: "/executive-summary",      label: "Exec. Summary",    icon: FileText },
+    { href: "/executive-summary",      label: "PKB-PUB",    icon: FileText },
     { href: "/produk",                 label: "Produk",           icon: Zap },
   ];
 

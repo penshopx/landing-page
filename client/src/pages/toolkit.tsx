@@ -49,7 +49,7 @@ const CATEGORIES: ToolCategory[] = [
       },
       {
         icon: FileText,
-        title: "Executive Summary",
+        title: "PKB-PUB",
         desc: "Generate ringkasan eksekutif untuk laporan proyek, hasil belajar, penugasan dinas, atau riset — 4 template siap pakai.",
         href: "/executive-summary",
       },
