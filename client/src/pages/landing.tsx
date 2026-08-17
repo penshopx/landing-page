@@ -841,6 +841,7 @@ export default function Landing() {
               { icon: "🎓", label: "Ekosistem Kompetensi", desc: "Sertifikasi SKK & bimtek SDM", href: "/kompetensi-hub" },
               { icon: "🧩", label: "Mini Apps", desc: "50+ aplikasi kerja di dashboard", href: "/dashboard" },
               { icon: "✨", label: "Asisten AI", desc: "Produk AI andalan Gustafta", href: "/asisten-ai" },
+              { icon: "📁", label: "Dokumen Proyek", desc: "Jasa dokumen · keuangan · sewa alat", href: "/dokumen-proyek" },
               { icon: "🤖", label: "Produk", desc: "Katalog semua produk & layanan", href: "/produk" },
             ].map((item) => (
               <Link key={item.label} href={item.href}>

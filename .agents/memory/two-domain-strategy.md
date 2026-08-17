@@ -29,3 +29,8 @@ description: Pembagian peran gustafta.my.id vs dokumenproyek.com yang sudah dise
 
 - Halaman /ebook-toolkit; sumber data tunggal client/src/data/digital-products.ts (harga tetap dari pricing.ts).
 - Ebook selalu 2 jenjang: tier "lead" (pancingan gratis, unduh langsung) + "premium" (berbayar, PDF terkunci password, dikirim ke pembeli — bukan file publik). Bos akan terus produksi ebook baru: cukup tambah entri data.
+
+## Hub "Dokumen Proyek" (Agu 2026)
+- Fitur payung layanan jasa manusia di gustafta.my.id: /dokumen-proyek — berisi Jasa Dokumen (/jasa-dokumen), Jasa Keuangan (/jasa-keuangan), dan Sewa Peralatan Konstruksi (perantara, CTA WA rotasi live, TANPA janji stok), plus link keluar ke https://dokumenproyek.com.
+- Nav header: item "Jasa Dokumen"+"Jasa Keuangan" digantikan satu item "Dokumen Proyek"; halaman lamanya tetap hidup sebagai sub-halaman.
+- "Mitra" dipindah dari nav header ke footer landing (kolom Ekosistem, bersama Peta Jalan).

@@ -103,6 +103,7 @@ import EbookToolkitPage from "@/pages/ebook-toolkit";
 import EtalaseProyekPage from "@/pages/etalase-proyek";
 import BiroJasaSbuPage from "@/pages/biro-jasa-sbu";
 import JasaDokumenPage from "@/pages/jasa-dokumen";
+import DokumenProyekPage from "@/pages/dokumen-proyek";
 import JasaKeuanganPage from "@/pages/jasa-keuangan";
 import BrainProjectPage from "@/pages/brain-project";
 import KonsultanKontrakPage from "@/pages/konsultan-kontrak";
@@ -607,6 +608,7 @@ function Router() {
       <Route path="/ebook" component={EbookToolkitPage} />
       <Route path="/etalase/:userId" component={EtalaseProyekPage} />
       <Route path="/biro-jasa-sbu" component={BiroJasaSbuPage} />
+      <Route path="/dokumen-proyek" component={DokumenProyekPage} />
       <Route path="/jasa-dokumen" component={JasaDokumenPage} />
       <Route path="/jasa-keuangan" component={JasaKeuanganPage} />
       <Route path="/brain-project" component={BrainProjectPage} />
