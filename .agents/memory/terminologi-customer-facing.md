@@ -27,3 +27,8 @@ description: Aturan penggantian kata "chatbot" di semua halaman yang dilihat pel
 **Why:** Positioning Gustafta = "Platform AI Specialist" bukan "platform chatbot". Kata "chatbot" membawa konotasi mainan/customer service sederhana, tidak mencerminkan kedalaman domain konstruksi.
 
 **How to apply:** Setiap kali menulis copy baru untuk halaman customer-facing, default ke "Asisten AI". Hanya gunakan "AI Specialist" ketika merujuk produk tertentu di Store atau Claw suite.
+
+## Nama fitur harus unik (keputusan pemilik, Agu 2026)
+- "Ekosistem Kompetensi" HANYA untuk domain publik sertifikasi SKK/BNSP & bimtek → /kompetensi-hub (route /ekosistem-kompetensi TIDAK ADA — jangan dipakai sebagai href).
+- Panel dashboard ekspor produk belajar dari chatbot (eBook/eCourse/Generator/Chaesa) bernama "Studio Belajar" (id internal tetap `ekosistem`).
+- **Why:** pemilik menolak dua fitur berbeda memakai nama sama ("jangan membuat fitur dengan nama berbeda tetapi sama" dan sebaliknya). Grid navigasi landing kini memberi 1 baris deskripsi pembeda per fitur + chip "Mini Apps" → /dashboard.

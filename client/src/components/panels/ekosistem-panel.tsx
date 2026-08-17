@@ -84,7 +84,7 @@ export function EkosistemPanel({ agent }: EkosistemPanelProps) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center gap-4">
         <Bot className="w-12 h-12 text-muted-foreground/40" />
-        <p className="text-muted-foreground">Pilih chatbot dari sidebar untuk melihat Ekosistem Kompetensi.</p>
+        <p className="text-muted-foreground">Pilih chatbot dari sidebar untuk membuka Studio Belajar.</p>
       </div>
     );
   }
@@ -298,7 +298,7 @@ export function EkosistemPanel({ agent }: EkosistemPanelProps) {
         <div className="relative z-10">
           <div className="flex items-center gap-2 text-xs font-semibold opacity-80 uppercase tracking-widest mb-3">
             <Zap className="w-3.5 h-3.5" />
-            Ekosistem Kompetensi Digital
+            Studio Belajar — Produk Digital dari Chatbot
           </div>
           <h1 className="text-2xl font-extrabold leading-tight mb-2">
             Dari Chatbot, Lahirkan<br />

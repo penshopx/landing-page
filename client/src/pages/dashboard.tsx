@@ -95,7 +95,7 @@ const navItems: { id: NavItem; label: string; shortLabel: string; icon: typeof B
   { id: "mini-apps", label: "Mini Apps", shortLabel: "Apps", icon: Blocks },
   { id: "deliverables", label: "Deliverables", shortLabel: "Output", icon: PackageCheck },
   { id: "studio", label: "Studio Kompetensi", shortLabel: "Studio", icon: Wand2 },
-  { id: "ekosistem", label: "Ekosistem Kompetensi", shortLabel: "Ekosistem", icon: Network },
+  { id: "ekosistem", label: "Studio Belajar", shortLabel: "Studio Belajar", icon: Network },
   { id: "integrations", label: "Integrations", shortLabel: "Integ", icon: Plug },
   { id: "widget", label: "Widget", shortLabel: "Widget", icon: Palette },
   { id: "broadcast", label: "Broadcast WA", shortLabel: "Broadcast", icon: Radio },

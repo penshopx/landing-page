@@ -830,20 +830,24 @@ export default function Landing() {
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto">
             {[
-              { icon: "🗺️", label: "Peta Jalan", href: "/persona" },
-              { icon: "🏥", label: "Klinik Konsultasi", href: "/klinik-konsultasi" },
-              { icon: "📄", label: "Bedah Dokumen", href: "/bedah-dokumen" },
-              { icon: "🧠", label: "Brain Project", href: "/brain-project" },
-              { icon: "🛠️", label: "Ebook & Toolkit", href: "/ebook-toolkit" },
-              { icon: "🏗️", label: "Ruang Proyek", href: "/ruang-proyek" },
-              { icon: "📋", label: "Ruang Kelola", href: "/ruang-kelola" },
-              { icon: "🎓", label: "Ekosistem Kompetensi", href: "/kompetensi-hub" },
-              { icon: "🤖", label: "Produk", href: "/produk" },
+              { icon: "🗺️", label: "Peta Jalan", desc: "Temukan mulai dari mana", href: "/persona" },
+              { icon: "🏥", label: "Klinik Konsultasi", desc: "Tanya ahli, bayar per sesi", href: "/klinik-konsultasi" },
+              { icon: "📄", label: "Bedah Dokumen", desc: "Analisis kontrak & RKS", href: "/bedah-dokumen" },
+              { icon: "🧠", label: "Brain Project", desc: "Partner pikir proyek Anda", href: "/brain-project" },
+              { icon: "🛠️", label: "Ebook & Toolkit", desc: "Buku & alat siap pakai", href: "/ebook-toolkit" },
+              { icon: "🏗️", label: "Ruang Proyek", desc: "Kelola proyek berjalan", href: "/ruang-proyek" },
+              { icon: "📋", label: "Ruang Kelola", desc: "Pengingat legalitas & dokumen", href: "/ruang-kelola" },
+              { icon: "🎓", label: "Ekosistem Kompetensi", desc: "Sertifikasi SKK & bimtek SDM", href: "/kompetensi-hub" },
+              { icon: "🧩", label: "Mini Apps", desc: "50+ aplikasi kerja di dashboard", href: "/dashboard" },
+              { icon: "🤖", label: "Produk", desc: "Katalog semua produk AI", href: "/produk" },
             ].map((item) => (
               <Link key={item.label} href={item.href}>
-                <div className="bg-white/15 hover:bg-white/25 border border-white/30 rounded-xl px-4 py-3 cursor-pointer transition-colors flex items-center gap-2 text-sm font-semibold">
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
+                <div className="bg-white/15 hover:bg-white/25 border border-white/30 rounded-xl px-4 py-3 cursor-pointer transition-colors text-left">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <span>{item.icon}</span>
+                    <span>{item.label}</span>
+                  </div>
+                  <p className="text-[11px] text-blue-100/80 mt-0.5 leading-snug">{item.desc}</p>
                 </div>
               </Link>
             ))}
@@ -1241,7 +1245,7 @@ export default function Landing() {
                 title: "Tingkatkan Kompetensi Tim — Terstruktur dan Terukur.",
                 desc: "Sertifikasi SKK, uji kompetensi, bimtek teknis — semua butuh persiapan matang. Ekosistem Kompetensi Gustafta menyediakan materi belajar, simulasi asesmen, dan pendampingan proses sertifikasi dari lembaga yang diakui.",
                 items: ["Simulasi uji kompetensi SKK/BNSP", "Materi bimtek teknis & K3", "Pendampingan proses sertifikasi", "Bank soal & latihan asesmen", "Akses materi 24/7 tanpa batas", "Sertifikat digital & portofolio digital"],
-                cta: "Lihat Ekosistem Kompetensi", href: "/ekosistem-kompetensi",
+                cta: "Lihat Ekosistem Kompetensi", href: "/kompetensi-hub",
               },
             ].map((stage, idx) => (
               <AccordionItem
