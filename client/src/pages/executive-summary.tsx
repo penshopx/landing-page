@@ -6,7 +6,7 @@ import { useTrialCTA } from "@/hooks/use-trial-cta";
 import {
   Check, ArrowRight, MessageCircle, Brain, FileText,
   Layers, Target, BarChart3, Star, Users, Zap,
-  GraduationCap, Building2, BookOpen, ClipboardList,
+  GraduationCap, Building2, BookOpen, ClipboardList, Globe,
 } from "lucide-react";
 
 import { trackLead } from "@/lib/meta-pixel";
@@ -263,6 +263,56 @@ export default function ExecutiveSummaryPage() {
                 <MessageCircle className="h-4 w-4" /> Konsultasi via WA
               </Button>
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Jaringan situs PKB-PUB */}
+      <section className="py-14 px-4 bg-gray-50 dark:bg-muted/20">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-2">Jaringan Situs</p>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">PKB-PUB Juga Hadir di Situs Berikut</h2>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {[
+              {
+                id: "exum",
+                label: "exum.dokumenproyek.com",
+                desc: "Portal khusus layanan penyusunan Executive Summary.",
+                href: "https://exum.dokumenproyek.com",
+              },
+              {
+                id: "dokumenproyek",
+                label: "dokumenproyek.com",
+                desc: "Etalase jasa dokumen, keuangan & sewa peralatan proyek.",
+                href: "https://dokumenproyek.com",
+              },
+              {
+                id: "diklatkerja",
+                label: "diklatkerja.com",
+                desc: "Pelatihan & pengembangan kompetensi tenaga kerja.",
+                href: "https://diklatkerja.com",
+              },
+            ].map((s) => (
+              <a
+                key={s.id}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid={`link-situs-${s.id}`}
+                className="group flex flex-col bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl p-5 hover:border-blue-400 hover:shadow-md transition-all"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300">{s.label}</span>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed flex-1">{s.desc}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                  Kunjungi Situs <ArrowRight className="h-3 w-3" />
+                </span>
+              </a>
+            ))}
           </div>
         </div>
       </section>
