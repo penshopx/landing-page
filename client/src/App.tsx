@@ -604,6 +604,7 @@ function Router() {
       <Route path="/cashflow-pbj" component={CashflowPbjPage} />
       <Route path="/ebook-kas-merah" component={EbookKasMerahPage} />
       <Route path="/ebook-toolkit" component={EbookToolkitPage} />
+      <Route path="/ebook" component={EbookToolkitPage} />
       <Route path="/etalase/:userId" component={EtalaseProyekPage} />
       <Route path="/biro-jasa-sbu" component={BiroJasaSbuPage} />
       <Route path="/jasa-dokumen" component={JasaDokumenPage} />

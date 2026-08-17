@@ -11,7 +11,7 @@ import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
 import { useContactNumbers } from "@/lib/contact";
-import { Bot, Sparkles, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Hammer, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2, FolderKanban } from "lucide-react";
+import { Bot, Sparkles, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, TrendingUp, HandshakeIcon, Briefcase, Building2, FolderKanban } from "lucide-react";
 
 
 const PLAN_BADGE_CONFIG: Record<string, { label: string; className: string }> = {
@@ -253,8 +253,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
     { href: "/asisten-ai",        label: "Asisten AI",          icon: Sparkles },
     { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
-    { href: "/ebook-toolkit",     label: "Ebook & Toolkit",     icon: Hammer },
-    { href: "/mitra-biro-jasa",   label: "Mitra",               icon: HandshakeIcon },
+    { href: "/ebook",             label: "Ebook",               icon: FileText },
   ];
 
   // Baris 1.5 — solusi per segmen
@@ -273,6 +272,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/jasa-keuangan",          label: "Jasa Keuangan",          icon: TrendingUp },
     { href: "/klinik-uji-kompetensi",  label: "Bimtek SKK",       icon: GraduationCap },
     { href: "/executive-summary",      label: "PKB-PUB",    icon: FileText },
+    { href: "/mitra-biro-jasa",        label: "Mitra",            icon: HandshakeIcon },
     { href: "/produk",                 label: "Produk",           icon: Zap },
   ];
 

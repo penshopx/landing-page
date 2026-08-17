@@ -2,11 +2,10 @@ import { Link } from "wouter";
 import { SharedHeader } from "@/components/shared-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, BookOpen, Download, Gift, Hammer, Lock } from "lucide-react";
+import { ArrowRight, BookOpen, Download, Gift, Hammer, Lock, TrendingUp } from "lucide-react";
 import { DIGITAL_PRODUCTS, type DigitalProduct } from "@/data/digital-products";
 
 function ProductCard({ p }: { p: DigitalProduct }) {
-  const isEbook = p.jenis === "ebook";
   const isHero = p.tier === "premium";
   return (
     <div
@@ -18,12 +17,8 @@ function ProductCard({ p }: { p: DigitalProduct }) {
       data-testid={`card-digital-${p.slug}`}
     >
       <div className="flex items-start justify-between mb-4">
-        <div
-          className={`w-11 h-11 rounded-2xl flex items-center justify-center shadow-md ${
-            isEbook ? "bg-orange-500 shadow-orange-200 dark:shadow-orange-900/40" : "bg-slate-700 shadow-slate-300 dark:shadow-slate-900/40"
-          }`}
-        >
-          {isEbook ? <BookOpen className="h-5 w-5 text-white" /> : <Hammer className="h-5 w-5 text-white" />}
+        <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md bg-orange-500 shadow-orange-200 dark:shadow-orange-900/40">
+          <BookOpen className="h-5 w-5 text-white" />
         </div>
         <div className="flex items-center gap-2">
           {p.tier === "lead" && (
@@ -82,7 +77,6 @@ function ProductCard({ p }: { p: DigitalProduct }) {
 
 export default function EbookToolkitPage() {
   const ebooks = DIGITAL_PRODUCTS.filter((p) => p.jenis === "ebook");
-  const toolkits = DIGITAL_PRODUCTS.filter((p) => p.jenis === "toolkit");
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -92,24 +86,24 @@ export default function EbookToolkitPage() {
       <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-orange-950 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <span className="inline-block text-xs font-bold text-orange-400 uppercase tracking-widest mb-4">
-            Rak Digital Gustafta
+            Rak Ebook Gustafta
           </span>
           <h1 className="text-3xl md:text-5xl font-black mb-4 leading-tight" data-testid="text-ebook-toolkit-title">
-            Ebook & Toolkit
+            Ebook
           </h1>
           <p className="text-slate-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            Ilmu praktik lapangan yang dibukukan, dan alat kerja yang siap dipakai hari ini.
-            Ditulis dari pengalaman proyek pemerintah yang sebenarnya — bukan teori kampus.
+            Ilmu praktik lapangan yang dibukukan — ditulis dari pengalaman proyek pemerintah
+            yang sebenarnya, bukan teori kampus. Rak ini akan terus bertambah.
           </p>
         </div>
       </section>
 
       <main className="max-w-5xl mx-auto px-4 py-14">
-        {/* Ebook */}
-        <div className="mb-14">
+        {/* Rak Ebook */}
+        <div className="mb-10">
           <div className="flex items-center gap-3 mb-6">
             <BookOpen className="h-5 w-5 text-orange-500" />
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white">Ebook</h2>
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white">Terbit Saat Ini</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             {ebooks.map((p) => (
@@ -118,16 +112,37 @@ export default function EbookToolkitPage() {
           </div>
         </div>
 
-        {/* Toolkit */}
-        <div className="mb-14">
-          <div className="flex items-center gap-3 mb-6">
-            <Hammer className="h-5 w-5 text-slate-600 dark:text-slate-300" />
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white">Toolkit</h2>
+        {/* Arah rak — sumber pengetahuan yang terus tumbuh */}
+        <div className="grid sm:grid-cols-2 gap-5 mb-10">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+            <BookOpen className="h-5 w-5 text-orange-500 mb-3" />
+            <h3 className="font-bold text-slate-900 dark:text-white mb-1.5">Turunan dari Fitur Gustafta</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              Setiap fitur — Radar Legalitas, Ruang Proyek, Bedah Dokumen, Ekosistem Kompetensi —
+              melahirkan ebook panduannya sendiri: cara kerja, studi kasus, dan praktik terbaiknya.
+            </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {toolkits.map((p) => (
-              <ProductCard key={p.slug} p={p} />
-            ))}
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6">
+            <TrendingUp className="h-5 w-5 text-orange-500 mb-3" />
+            <h3 className="font-bold text-slate-900 dark:text-white mb-1.5">Tren, Regulasi & Solusi Terkini</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              Ebook tematik yang mengikuti perkembangan: problem lapangan yang sedang hangat,
+              perubahan regulasi, dan solusi praktisnya — ditulis begitu perubahan terjadi.
+            </p>
+          </div>
+        </div>
+
+        {/* Rujukan ke Toolkit */}
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex items-start gap-4 mb-6">
+          <Hammer className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-slate-600 dark:text-slate-300 font-semibold mb-1">Mencari alat kerja, bukan bacaan?</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+              Kalkulator, template dokumen, dan checklist siap pakai kini punya rak sendiri.
+            </p>
+            <Button asChild variant="outline" size="sm" className="gap-1.5">
+              <Link href="/toolkit" data-testid="link-ke-toolkit">Buka Toolkit <ArrowRight className="h-3.5 w-3.5" /></Link>
+            </Button>
           </div>
         </div>
 
@@ -136,7 +151,7 @@ export default function EbookToolkitPage() {
           <Lock className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
           <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
             Ebook berbayar dikirim sebagai PDF terkunci password ke WhatsApp/email Anda setelah pembayaran.
-            Rak ini akan terus bertambah — ebook dan toolkit baru dari tim Gustafta dirilis bertahap.
+            Ebook baru dari tim Gustafta dirilis bertahap — pantau rak ini secara berkala.
           </p>
         </div>
       </main>

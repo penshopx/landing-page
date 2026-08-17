@@ -57,14 +57,14 @@ const KELOMPOK: Kelompok[] = [
   },
   {
     slug: "ebook",
-    nama: "Ebook & Toolkit",
+    nama: "Ebook",
     icon: BookOpen,
     warna: "text-orange-600 dark:text-orange-400",
     bg: "bg-orange-500",
     ringkas: `Ebook premium dari praktisi lapangan. Terbaru: ${CASHFLOW_EBOOK.judul} — ${CASHFLOW_EBOOK.subjudul.toLowerCase()}.`,
     hargaMulai: `Mulai ${CASHFLOW_EBOOK.hargaLabel}`,
-    href: "/ebook-toolkit",
-    cta: "Buka Rak Ebook & Toolkit",
+    href: "/ebook",
+    cta: "Buka Rak Ebook",
     badge: "Baru",
   },
   {
