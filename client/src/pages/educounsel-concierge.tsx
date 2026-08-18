@@ -96,6 +96,49 @@ export default function EducounselConciergePage() {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
 
+  // ── PWA: saat halaman ini aktif, pakai manifest & ikon EDUCOUNSEL sendiri ──
+  // sehingga "Add to Home Screen" menginstal aplikasi EDUCOUNSEL (bukan Gustafta).
+  useEffect(() => {
+    const manifest = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+    const prevManifest = manifest?.href ?? null;
+    if (manifest) manifest.href = "/educounsel-manifest.json";
+
+    const themeMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    const prevTheme = themeMeta?.content ?? null;
+    if (themeMeta) themeMeta.content = "#0f766e";
+
+    // iOS memakai apple-touch-icon + title, bukan manifest.
+    // Timpa ikon yang sudah ada di index.html (jika ada) agar tidak ganda.
+    const existingApple = document.querySelector<HTMLLinkElement>('link[rel="apple-touch-icon"]');
+    const prevAppleHref = existingApple?.getAttribute("href") ?? null;
+    let appleIcon: HTMLLinkElement;
+    if (existingApple) {
+      existingApple.href = "/educounsel-icon-192.png";
+      appleIcon = existingApple;
+    } else {
+      appleIcon = document.createElement("link");
+      appleIcon.rel = "apple-touch-icon";
+      appleIcon.href = "/educounsel-icon-192.png";
+      document.head.appendChild(appleIcon);
+    }
+    const appleTitle = document.createElement("meta");
+    appleTitle.name = "apple-mobile-web-app-title";
+    appleTitle.content = "EDUCOUNSEL";
+    document.head.appendChild(appleTitle);
+
+    const prevTitle = document.title;
+    document.title = "EDUCOUNSEL AI Concierge";
+
+    return () => {
+      if (manifest && prevManifest) manifest.href = prevManifest;
+      if (themeMeta && prevTheme) themeMeta.content = prevTheme;
+      if (prevAppleHref) appleIcon.setAttribute("href", prevAppleHref);
+      else appleIcon.remove();
+      appleTitle.remove();
+      document.title = prevTitle;
+    };
+  }, []);
+
   async function sendMessage(text: string) {
     if (!text.trim() || streaming || !agentId) return;
     setInput("");
