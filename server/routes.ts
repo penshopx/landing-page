@@ -16553,6 +16553,20 @@ Jika informasi tidak ditemukan, isi dengan string kosong "".
     }
   });
 
+  // GET /api/educounsel/concierge — EDUCOUNSEL AI Concierge (chatbot publik)
+  app.get("/api/educounsel/concierge", async (_req, res) => {
+    try {
+      const agent = await storage.getAgentBySlug("educounsel-concierge");
+      if (!agent || !(agent as any).isPublic) {
+        return res.status(404).json({ error: "EDUCOUNSEL Concierge belum diinisialisasi." });
+      }
+      const a: any = agent;
+      res.json({ id: String(a.id), name: a.name, tagline: a.tagline, avatar: a.avatar });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // GET /api/brain-project/orchestrator — Brain Project multi-agent orchestrator
   app.get("/api/brain-project/orchestrator", async (_req, res) => {
     try {

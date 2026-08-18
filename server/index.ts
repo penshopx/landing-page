@@ -101,6 +101,7 @@ import * as M_tenderAiAgents from "./seed-tender-ai-agents";
 import * as M_tenderaAgents from "./seed-tendera-agents";
 import * as M_brainProject from "./seed-brain-project";
 import * as M_educounsel from "./seed-educounsel";
+import * as M_educounselConcierge from "./seed-educounsel-concierge";
 import * as M_ibTu from "./seed-ib-tu";
 import * as M_konsultanPermenPu from "./seed-konsultan-permen-pu";
 import * as M_konsultanPermenPu2026 from "./seed-konsultan-permen-pu-2026";
@@ -2055,6 +2056,14 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
         await seedEducounselAgents();
       } catch (err) {
         log("[Seed EDUCOUNSEL] Error: " + (err as Error).message);
+      }
+
+      // Seed: EDUCOUNSEL AI Concierge — chatbot informasi publik (RAG 24 dok)
+      try {
+        const { seedEducounselConcierge } = M_educounselConcierge;
+        await seedEducounselConcierge();
+      } catch (err) {
+        log("[Seed EDUCOUNSEL Concierge] Error: " + (err as Error).message);
       }
 
       // Seed: IB-TU COORDINATOR — Tata Usaha IB Diploma Programme (7 sub-agents + 1 orchestrator)

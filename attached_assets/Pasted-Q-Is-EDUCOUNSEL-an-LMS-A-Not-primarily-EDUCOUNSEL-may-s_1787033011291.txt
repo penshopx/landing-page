@@ -1,0 +1,85 @@
+Q: Is EDUCOUNSEL an LMS?
+
+A:
+Not primarily.
+
+EDUCOUNSEL may support learning-related workflows, but its broader purpose is connecting student development, learning, wellbeing, career, portfolio, readiness and education pathways.
+
+---
+
+Q: Is EDUCOUNSEL an AI counselor?
+
+A:
+No.
+
+EDUCOUNSEL uses AI to support students and counselors, but professional counselors remain central to interpretation and decision-making.
+
+---
+
+Q: Is EDUCOUNSEL only for international schools?
+
+A:
+No.
+
+EDUCOUNSEL is designed for both national and international school environments.
+
+---
+
+Q: Can a national school use EDUCOUNSEL for international university preparation?
+
+A:
+Yes.
+
+A national-school student can use relevant EDUCOUNSEL capabilities to explore international education, subject to the school's implementation and the student's pathway.
+
+---
+
+Q: Can international schools use EDUCOUNSEL?
+
+A:
+Yes.
+
+Potential use cases include student development, career counseling, portfolio development, academic readiness, English readiness, standardized-test preparation and international education pathways.
+
+---
+
+Q: Does EDUCOUNSEL replace a career counselor?
+
+A:
+No.
+
+EDUCOUNSEL is designed to strengthen counselor work by providing structured context and AI-assisted support.
+
+---
+
+Q: Does EDUCOUNSEL guarantee university admission?
+
+A:
+No.
+
+EDUCOUNSEL can support preparation and pathway planning, but admission decisions remain with individual institutions.
+
+---
+
+Q: What is Education Memory?
+
+A:
+Education Memory is the contextual layer that allows relevant student-development information to be connected across the EDUCOUNSEL experience.
+
+---
+
+Q: What is Gustafta's role?
+
+A:
+Gustafta provides AI/intelligence infrastructure that supports EDUCOUNSEL's AI capabilities.
+
+EDUCOUNSEL remains the education product.
+
+---
+
+Q: What makes EDUCOUNSEL different?
+
+A:
+Its focus is not one isolated function.
+
+EDUCOUNSEL is designed to connect learning, wellbeing, learning support, career development, portfolio, readiness and education pathways into a more continuous student-development context.

@@ -214,6 +214,7 @@ import OssClawChat from "@/pages/oss-claw";
 import TerasLpjk1Chat from "@/pages/teras-lpjk1";
 import PanduanSBUChat from "@/pages/panduan-sbu";
 import EduCounselChat from "@/pages/edu-counsel-chat";
+import EducounselConciergePage from "@/pages/educounsel-concierge";
 import SkkCoachLanding from "@/pages/skk-coach-landing";
 import SkkCoachChat from "@/pages/skk-coach-chat";
 import AskomLanding from "@/pages/askom-landing";
@@ -1105,6 +1106,7 @@ function Router() {
             icon={<Brain className="h-12 w-12 text-cyan-400" />}
           ><BrainClawChat /></PremiumPageGuard>
         )} />
+        <Route path="/educounsel" component={EducounselConciergePage} />
         <Route path="/educounsel-claw" component={() => (
           <PremiumPageGuard
             feature="advanced_ai_tools" requiredPlan="profesional"
