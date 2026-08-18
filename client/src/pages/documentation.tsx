@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SharedHeader } from "@/components/shared-header";
 import { useGustaftaAssistant } from "@/hooks/use-agents";
-import { ChatPopup } from "@/components/chat-popup";
 import { 
   Bot, Lightbulb, Wrench, MessageSquare, BookOpen, 
   Sparkles, Globe, Settings, Shield, BarChart3, Zap, Code, 
@@ -1330,9 +1329,6 @@ export default function Documentation() {
         </div>
       </footer>
 
-      {gustaftaAssistant && (
-        <ChatPopup agent={gustaftaAssistant} />
-      )}
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useGustaftaAssistant } from "@/hooks/use-agents";
-import { ChatPopup } from "@/components/chat-popup";
 import { SharedHeader } from "@/components/shared-header";
 import { 
   Bot, Check, X, Zap, Crown, Building2, Sparkles, ArrowRight,
@@ -1051,9 +1050,6 @@ export default function Pricing() {
         </div>
       </footer>
 
-      {gustaftaAssistant && (
-        <ChatPopup agent={gustaftaAssistant} />
-      )}
     </div>
   );
 }

@@ -11,7 +11,7 @@ import { SharedHeader } from "@/components/shared-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowRight, Bot, BookOpen, Stethoscope, HardDrive, Check,
+  ArrowRight, Bot, BookOpen, Stethoscope, HardDrive, Check, Zap,
   Wrench, Users, ExternalLink, FolderKanban, GraduationCap, Brain,
   FileSearch, Presentation,
 } from "lucide-react";
@@ -183,6 +183,39 @@ const KELOMPOK: Kelompok[] = [
     hargaMulai: `Mulai ${SERVICE_TIERS[0].price}`,
     href: "/produk-builder",
     cta: "Lihat Paket & Jasa Custom",
+  },
+  {
+    slug: "dokumen-proyek",
+    nama: "Dokumen Proyek",
+    icon: Users,
+    warna: "text-blue-700 dark:text-blue-300",
+    bg: "bg-blue-700",
+    ringkas: "Satu pintu layanan jasa manusia: Jasa Dokumen (perijinan, sertifikasi, tender), Jasa Keuangan (pembukuan & cashflow), dan Sewa Peralatan Konstruksi (perantara via WA).",
+    hargaMulai: "Konsultasi dulu — via WhatsApp",
+    href: "/dokumen-proyek",
+    cta: "Buka Dokumen Proyek",
+  },
+  {
+    slug: "mini-apps",
+    nama: "Mini Apps",
+    icon: Zap,
+    warna: "text-violet-700 dark:text-violet-300",
+    bg: "bg-violet-700",
+    ringkas: "50+ aplikasi kerja praktis — kalkulator RAB, checklist tender, generator dokumen, tracker proyek — dibuatkan otomatis oleh AI untuk tiap asisten Anda.",
+    hargaMulai: "Termasuk dalam paket berlangganan",
+    href: "/mini-apps",
+    cta: "Lihat Mini Apps",
+  },
+  {
+    slug: "radar-legalitas",
+    nama: "Radar Legalitas",
+    icon: Bot,
+    warna: "text-emerald-700 dark:text-emerald-300",
+    bg: "bg-emerald-700",
+    ringkas: "Pantau masa berlaku SBU, SKK, dan NIB perusahaan Anda — dengan pengingat otomatis sebelum kedaluwarsa.",
+    hargaMulai: "Lihat detail di halamannya",
+    href: "/ruang-kelola",
+    cta: "Buka Radar Legalitas",
   },
   {
     slug: "jasa-manusia",

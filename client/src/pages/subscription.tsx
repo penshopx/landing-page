@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/use-auth";
 import { useUserSubscription, formatCurrency, formatDate, getDaysRemaining } from "@/hooks/use-subscription";
 import { useGustaftaAssistant } from "@/hooks/use-agents";
-import { ChatPopup } from "@/components/chat-popup";
 import { SharedHeader } from "@/components/shared-header";
 import { 
   Bot, Crown, Zap, Calendar, CreditCard, Clock, 
@@ -334,9 +333,6 @@ export default function Subscription() {
         </div>
       </footer>
 
-      {gustaftaAssistant && (
-        <ChatPopup agent={gustaftaAssistant} />
-      )}
     </div>
   );
 }

@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useAuth } from "@/hooks/use-auth";
 import { useGustaftaAssistant } from "@/hooks/use-agents";
-import { ChatPopup } from "@/components/chat-popup";
 import { SharedHeader } from "@/components/shared-header";
 import { getSectorContent, featuredSectors } from "@/lib/sector-content";
 import {
@@ -390,7 +389,6 @@ export default function SectorLanding() {
         </div>
       </footer>
 
-      {gustaftaAssistant && <ChatPopup agent={gustaftaAssistant} />}
     </div>
   );
 }

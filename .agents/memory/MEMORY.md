@@ -84,3 +84,4 @@
 - [Dedupe migration dependents](dedupe-migration-dependents.md) — never delete duplicate parent rows before window-rank-deduping CASCADE children and recomputing derived aggregates in the same tx.
 - [Strategi dua domain](two-domain-strategy.md) — gustafta.my.id = platform (semua produk+data); dokumenproyek.com = etalase tanpa DB pelanggan + jasa manusia; rak /ebook-toolkit data-driven, ebook = lead gratis + premium terkunci.
 - [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.
+- [Floating chatbot single owner](floating-chat-single-owner.md) — hanya ChaesaWidget global di App.tsx; jangan mount ChatPopup/DialogGustafta per halaman (bertindih).
