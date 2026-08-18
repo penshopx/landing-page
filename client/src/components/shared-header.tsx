@@ -271,7 +271,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/dokumen-proyek",         label: "Dokumen Proyek",         icon: FileCheck2 },
     { href: "/klinik-uji-kompetensi",  label: "Bimtek SKK",       icon: GraduationCap },
     { href: "/executive-summary",      label: "PKB-PUB",    icon: FileText },
-    { href: "/dashboard",              label: "Mini Apps",        icon: LayoutGrid },
+    { href: "/mini-apps",              label: "Mini Apps",        icon: LayoutGrid },
     { href: "/produk",                 label: "Produk",           icon: Zap },
   ];
 
