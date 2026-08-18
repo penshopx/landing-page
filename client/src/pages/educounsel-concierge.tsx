@@ -33,22 +33,52 @@ function getSessionId(): string {
   return sid;
 }
 
-const QUICK_START: { icon: JSX.Element; label: string; prompt: string }[] = [
-  { icon: <GraduationCap className="h-4 w-4" />, label: "🎓 What is EDUCOUNSEL?", prompt: "What is EDUCOUNSEL?" },
-  { icon: <UserRound className="h-4 w-4" />, label: "🧑‍🏫 I'm a Counselor", prompt: "I'm a counselor. How can EDUCOUNSEL support my counseling work?" },
-  { icon: <School className="h-4 w-4" />, label: "🏫 I'm from a School", prompt: "I'm from a school. How can EDUCOUNSEL work in our school?" },
-  { icon: <Globe2 className="h-4 w-4" />, label: "🌎 International Education", prompt: "How does EDUCOUNSEL support international education preparation?" },
-  { icon: <Flag className="h-4 w-4" />, label: "🇮🇩 National School", prompt: "Bagaimana EDUCOUNSEL bekerja untuk sekolah nasional di Indonesia?" },
-  { icon: <Compass className="h-4 w-4" />, label: "🧭 Career Counseling", prompt: "How does EDUCOUNSEL support career counseling?" },
-  { icon: <Brain className="h-4 w-4" />, label: "🧠 How does the AI work?", prompt: "How does the AI and Education Memory work in EDUCOUNSEL?" },
-  { icon: <Sparkles className="h-4 w-4" />, label: "💡 What makes EDUCOUNSEL different?", prompt: "What makes EDUCOUNSEL different from an LMS, AI tutor, or career assessment platform?" },
-  { icon: <Handshake className="h-4 w-4" />, label: "🤝 Partnership Opportunities", prompt: "What partnership opportunities does EDUCOUNSEL offer for counselors and schools?" },
+type Lang = "id" | "en";
+
+const QUICK_START: { icon: JSX.Element; label: Record<Lang, string>; prompt: Record<Lang, string> }[] = [
+  { icon: <GraduationCap className="h-4 w-4" />, label: { en: "🎓 What is EDUCOUNSEL?", id: "🎓 Apa itu EDUCOUNSEL?" }, prompt: { en: "What is EDUCOUNSEL?", id: "Apa itu EDUCOUNSEL?" } },
+  { icon: <UserRound className="h-4 w-4" />, label: { en: "🧑‍🏫 I'm a Counselor", id: "🧑‍🏫 Saya Konselor" }, prompt: { en: "I'm a counselor. How can EDUCOUNSEL support my counseling work?", id: "Saya konselor. Bagaimana EDUCOUNSEL mendukung pekerjaan konseling saya?" } },
+  { icon: <School className="h-4 w-4" />, label: { en: "🏫 I'm from a School", id: "🏫 Saya dari Sekolah" }, prompt: { en: "I'm from a school. How can EDUCOUNSEL work in our school?", id: "Saya dari sekolah. Bagaimana EDUCOUNSEL bisa diterapkan di sekolah kami?" } },
+  { icon: <Globe2 className="h-4 w-4" />, label: { en: "🌎 International Education", id: "🌎 Pendidikan Internasional" }, prompt: { en: "How does EDUCOUNSEL support international education preparation?", id: "Bagaimana EDUCOUNSEL mendukung persiapan pendidikan internasional?" } },
+  { icon: <Flag className="h-4 w-4" />, label: { en: "🇮🇩 National School", id: "🇮🇩 Sekolah Nasional" }, prompt: { en: "How does EDUCOUNSEL work for national schools?", id: "Bagaimana EDUCOUNSEL bekerja untuk sekolah nasional di Indonesia?" } },
+  { icon: <Compass className="h-4 w-4" />, label: { en: "🧭 Career Counseling", id: "🧭 Konseling Karier" }, prompt: { en: "How does EDUCOUNSEL support career counseling?", id: "Bagaimana EDUCOUNSEL mendukung konseling karier?" } },
+  { icon: <Brain className="h-4 w-4" />, label: { en: "🧠 How does the AI work?", id: "🧠 Bagaimana AI-nya bekerja?" }, prompt: { en: "How does the AI and Education Memory work in EDUCOUNSEL?", id: "Bagaimana AI dan Education Memory bekerja di EDUCOUNSEL?" } },
+  { icon: <Sparkles className="h-4 w-4" />, label: { en: "💡 What makes it different?", id: "💡 Apa bedanya EDUCOUNSEL?" }, prompt: { en: "What makes EDUCOUNSEL different from an LMS, AI tutor, or career assessment platform?", id: "Apa yang membedakan EDUCOUNSEL dari LMS, AI tutor, atau platform tes karier?" } },
+  { icon: <Handshake className="h-4 w-4" />, label: { en: "🤝 Partnership Opportunities", id: "🤝 Peluang Kemitraan" }, prompt: { en: "What partnership opportunities does EDUCOUNSEL offer for counselors and schools?", id: "Peluang kemitraan apa yang ditawarkan EDUCOUNSEL untuk konselor dan sekolah?" } },
 ];
+
+const UI: Record<Lang, { greeting: string; subtitle: string; explore: string; placeholder: string; preparing: string; footer: string; noAccess: string; retry: string; principle: string }> = {
+  id: {
+    greeting: "Hai, saya EDUCOUNSEL AI Concierge",
+    subtitle: "Saya membantu Anda memahami EDUCOUNSEL — platform Student Development, Career Guidance & Education Pathway untuk sekolah nasional dan internasional.",
+    explore: "Apa yang ingin Anda jelajahi?",
+    placeholder: "Tanya tentang EDUCOUNSEL…",
+    preparing: "Menyiapkan concierge…",
+    footer: "Chatbot informasi publik — tidak mengakses data produksi siswa dan tidak menggantikan penilaian konselor profesional.",
+    noAccess: "Tidak mengakses data siswa",
+    retry: "Maaf, koneksi terputus. Silakan coba kirim ulang pertanyaan Anda.",
+    principle: "AI mendukung. Konselor membimbing. Siswa berkembang dan mengambil keputusan.",
+  },
+  en: {
+    greeting: "Hi, I'm EDUCOUNSEL AI Concierge",
+    subtitle: "I help you understand EDUCOUNSEL — a Student Development, Career Guidance & Education Pathway platform for national and international schools.",
+    explore: "What would you like to explore?",
+    placeholder: "Ask about EDUCOUNSEL…",
+    preparing: "Preparing the concierge…",
+    footer: "Public information chatbot — it does not access student production data and does not replace professional counselor judgment.",
+    noAccess: "No student data access",
+    retry: "Sorry, the connection dropped. Please resend your question.",
+    principle: "AI supports. Counselors guide. Students develop and make decisions.",
+  },
+};
 
 export default function EducounselConciergePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const [lang, setLang] = useState<Lang>(() => (sessionStorage.getItem("educounsel_lang") as Lang) || "id");
+  const t = UI[lang];
+  function switchLang(l: Lang) { setLang(l); sessionStorage.setItem("educounsel_lang", l); }
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: agentData } = useQuery<{ id: string; name: string; tagline?: string; avatar?: string }>({
@@ -72,12 +102,13 @@ export default function EducounselConciergePage() {
     setStreaming(true);
     const history = messages.map((m) => ({ role: m.role, content: m.content }));
     setMessages((prev) => [...prev, { role: "user", content: text }, { role: "assistant", content: "", isStreaming: true }]);
+    const langInstruction = lang === "en" ? "[Reply in English] " : "[Balas dalam Bahasa Indonesia] ";
 
     try {
       const res = await fetch("/api/messages/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentId: String(agentId), role: "user", content: text, sessionId: getSessionId(), conversationHistory: history }),
+        body: JSON.stringify({ agentId: String(agentId), role: "user", content: langInstruction + text, sessionId: getSessionId(), conversationHistory: history }),
       });
       if (!res.body) throw new Error("No stream");
       const reader = res.body.getReader();
@@ -121,7 +152,7 @@ export default function EducounselConciergePage() {
         if (last.role === "assistant" && !last.content) {
           updated[updated.length - 1] = {
             role: "assistant",
-            content: "Maaf, koneksi terputus. Silakan coba kirim ulang pertanyaan Anda.",
+            content: t.retry,
           };
         }
         return updated;
@@ -150,9 +181,23 @@ export default function EducounselConciergePage() {
               Student Development · Career Guidance · Education Pathway — Powered by Gustafta
             </div>
           </div>
-          <div className="ml-auto hidden sm:flex items-center gap-1 text-[10px] text-white/40">
-            <ShieldCheck className="h-3.5 w-3.5 text-teal-400" />
-            Tidak mengakses data siswa
+          <div className="ml-auto flex items-center gap-3">
+            <div className="flex rounded-lg border border-white/15 overflow-hidden text-[11px] font-medium">
+              <button
+                onClick={() => switchLang("id")}
+                className={lang === "id" ? "px-2.5 py-1 bg-teal-600 text-white" : "px-2.5 py-1 text-white/50 hover:text-white"}
+                data-testid="button-lang-id"
+              >ID</button>
+              <button
+                onClick={() => switchLang("en")}
+                className={lang === "en" ? "px-2.5 py-1 bg-teal-600 text-white" : "px-2.5 py-1 text-white/50 hover:text-white"}
+                data-testid="button-lang-en"
+              >EN</button>
+            </div>
+            <div className="hidden sm:flex items-center gap-1 text-[10px] text-white/40">
+              <ShieldCheck className="h-3.5 w-3.5 text-teal-400" />
+              {t.noAccess}
+            </div>
           </div>
         </div>
       </header>
@@ -165,30 +210,25 @@ export default function EducounselConciergePage() {
               <div className="text-center mb-8">
                 <div className="text-4xl mb-3">👋</div>
                 <h1 className="text-2xl font-bold mb-2" data-testid="text-greeting">
-                  Hi, I'm EDUCOUNSEL AI Concierge
+                  {t.greeting} 👋
                 </h1>
-                <p className="text-white/60 text-sm max-w-md mx-auto">
-                  Saya membantu Anda memahami EDUCOUNSEL — platform Student Development,
-                  Career Guidance &amp; Education Pathway untuk sekolah nasional dan internasional.
-                </p>
-                <p className="text-teal-300/90 text-sm mt-4 font-medium">What would you like to explore?</p>
+                <p className="text-white/60 text-sm max-w-md mx-auto">{t.subtitle}</p>
+                <p className="text-teal-300/90 text-sm mt-4 font-medium">{t.explore}</p>
               </div>
               <div className="grid sm:grid-cols-3 gap-2.5">
                 {QUICK_START.map((q, i) => (
                   <button
                     key={i}
-                    onClick={() => sendMessage(q.prompt)}
+                    onClick={() => sendMessage(q.prompt[lang])}
                     disabled={!ready}
                     className="text-left rounded-xl border border-white/10 bg-white/5 hover:bg-teal-500/10 hover:border-teal-500/40 transition-colors px-3.5 py-3 text-sm disabled:opacity-50"
                     data-testid={`button-quickstart-${i}`}
                   >
-                    {q.label}
+                    {q.label[lang]}
                   </button>
                 ))}
               </div>
-              <p className="text-center text-[11px] text-white/30 mt-8">
-                AI supports. Counselors guide. Students develop and make decisions.
-              </p>
+              <p className="text-center text-[11px] text-white/30 mt-8">{t.principle}</p>
             </div>
           ) : (
             <div>
@@ -224,7 +264,7 @@ export default function EducounselConciergePage() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={ready ? "Tanya tentang EDUCOUNSEL… (Indonesia / English)" : "Menyiapkan concierge…"}
+              placeholder={ready ? t.placeholder : t.preparing}
               disabled={!ready || streaming}
               className="flex-1 rounded-xl bg-white/5 border border-white/10 px-4 py-2.5 text-sm outline-none focus:border-teal-500/60 placeholder:text-white/30"
               data-testid="input-concierge-message"
@@ -238,9 +278,7 @@ export default function EducounselConciergePage() {
               {streaming ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </form>
-          <p className="text-center text-[10px] text-white/25 mt-2">
-            Chatbot informasi publik — tidak mengakses data produksi siswa dan tidak menggantikan penilaian konselor profesional.
-          </p>
+          <p className="text-center text-[10px] text-white/25 mt-2">{t.footer}</p>
         </div>
       </div>
     </div>
