@@ -252,8 +252,8 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
     { href: "/asisten-ai",        label: "Asisten AI",          icon: Sparkles },
-    { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
     { href: "/ebook",             label: "Ebook",               icon: FileText },
+    { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
   ];
 
   // Baris 1.5 — solusi per segmen
