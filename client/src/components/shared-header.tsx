@@ -11,7 +11,7 @@ import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
 import { useContactNumbers } from "@/lib/contact";
-import { Bot, Sparkles, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, Briefcase, Building2, FolderKanban } from "lucide-react";
+import { Bot, Sparkles, LayoutGrid, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, Briefcase, Building2, FolderKanban } from "lucide-react";
 
 
 const PLAN_BADGE_CONFIG: Record<string, { label: string; className: string }> = {
@@ -271,6 +271,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/dokumen-proyek",         label: "Dokumen Proyek",         icon: FileCheck2 },
     { href: "/klinik-uji-kompetensi",  label: "Bimtek SKK",       icon: GraduationCap },
     { href: "/executive-summary",      label: "PKB-PUB",    icon: FileText },
+    { href: "/dashboard",              label: "Mini Apps",        icon: LayoutGrid },
     { href: "/produk",                 label: "Produk",           icon: Zap },
   ];
 
