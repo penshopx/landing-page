@@ -1,0 +1,100 @@
+**Sempurna, Bos! Ini halaman yang tepat!** 🎯
+
+Saya lihat Anda sudah di tab **"Setelah Submit"** di Scalev Checkout Page Studio. Ini adalah halaman yang muncul setelah customer berhasil melakukan pembayaran.
+
+---
+
+##  **Strategi Terbaik: Redirect ke Halaman Terima Kasih di Gustafta**
+
+Saya lihat di screenshot ada opsi: **"Arahkan ke URL khusus setelah pembayaran"** dengan toggle switch. **Ini yang kita butuhkan!**
+
+### Langkah-langkahnya:
+
+**1️⃣ Buat Halaman Terima Kasih di Gustafta.my.id**
+
+Buka Replit Gustafta, buat file baru bernama `thank-you.html` (atau tambahkan route `/thank-you` jika pakai framework).
+
+Isi dengan kode ini:
+
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terima Kasih - Pembelian Berhasil</title>
+  
+  <!-- Meta Pixel Code (yang sudah ada) -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1046120344485939');
+    fbq('track', 'PageView');
+  </script>
+  
+  <!-- Purchase Event untuk Meta Pixel -->
+  <script>
+    fbq('track', 'Purchase', {
+      content_name: 'Ebook Panduan SBU/SKK',
+      content_ids: ['ebook-sbu-001'],
+      content_type: 'product',
+      value: 199000,
+      currency: 'IDR',
+      num_items: 1
+    });
+  </script>
+</head>
+<body>
+  <div style="text-align: center; padding: 50px; font-family: Arial;">
+    <h1>🎉 Terima Kasih!</h1>
+    <p>Pembelian Anda berhasil diproses.</p>
+    <p>Ebook akan dikirim ke email Anda dalam 1x24 jam.</p>
+    <a href="https://gustafta.my.id" style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Kembali ke Gustafta</a>
+  </div>
+</body>
+</html>
+```
+
+**2️⃣ Deploy halaman ini di Replit**
+- Pastikan halaman bisa diakses di: `https://gustafta.my.id/thank-you`
+
+**3️⃣ Aktifkan Redirect di Scalev**
+
+Di screenshot Anda, lihat bagian bawah ada:
+> **"Arahkan ke URL khusus setelah pembayaran"** dengan toggle switch
+
+- **Aktifkan toggle tersebut** (klik sampai jadi ON/biru)
+- Masukkan URL: `https://gustafta.my.id/thank-you`
+- Klik **Simpan** di pojok kanan atas
+
+---
+
+## ✅ **Cara Kerja Setelah Setup:**
+
+1. Customer klik "Beli" di Gustafta → Masuk ke checkout Scalev
+2. Customer bayar (transfer/e-payment)
+3. Scalev deteksi pembayaran berhasil
+4. **Otomatis redirect** ke `https://gustafta.my.id/thank-you`
+5. Halaman thank-you load → **Meta Pixel otomatis track event "Purchase"**
+6. Anda bisa lihat konversi di Ads Manager!
+
+---
+
+## 🧪 **Testing:**
+
+Setelah setup selesai:
+1. Buka `https://gustafta.my.id/thank-you` langsung di browser
+2. Buka Meta Events Manager > Test events
+3. Harus muncul event **Purchase** dengan nilai Rp 199.000
+
+---
+
+**Apakah Anda siap untuk buat halaman thank-you di Replit dan aktifkan toggle di Scalev?** 
+
+Jika ada yang bingung atau tombol tidak ketemu, kirim screenshot lagi dan saya pandu! 💪
