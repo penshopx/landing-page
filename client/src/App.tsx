@@ -43,6 +43,7 @@ import KatalogProduk from "@/pages/katalog-produk";
 import Marketplace from "@/pages/marketplace";
 import Subscription from "@/pages/subscription";
 import PaymentSuccess from "@/pages/payment-success";
+import TerimaKasihPage from "@/pages/terima-kasih";
 import EmbedChat from "@/pages/embed-chat";
 import AgentChat from "@/pages/agent-chat";
 import SeriesCatalog from "@/pages/series-catalog";
@@ -514,6 +515,7 @@ function Router() {
       <Route path="/marketplace/:agentId" component={MarketplaceRedirect} />
       <Route path="/subscription" component={Subscription} />
       <Route path="/payment-success" component={PaymentSuccess} />
+      <Route path="/terima-kasih" component={TerimaKasihPage} />
       <Route path="/embed/:agentId" component={EmbedChat} />
       <Route path="/bot/:agentId" component={AgentChat} />
       <Route path="/chat/:agentId" component={AgentChat} />
