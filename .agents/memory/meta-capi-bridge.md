@@ -21,6 +21,13 @@ description: Server-side Purchase events to Meta from the Scalev webhook — why
 ## Browser pixel id comes from runtime endpoint, not build-time VITE var
 **Rule:** The browser pixel resolves its id at runtime from `GET /api/config/meta-pixel` (server `META_PIXEL_ID`), falling back to `VITE_META_PIXEL_ID`. **Why:** pixel id is public and checkout is OFF-SITE (Scalev `dialog.gustafta.my.id`), so relying on a build-time VITE var meant prod had the pixel INACTIVE whenever only the server secret was set. Runtime fetch keeps one source of truth.
 
+## Gustafta and DokumenProyek intentionally share one platform Pixel
+**Rule:** Keep the platform `META_PIXEL_ID` aligned across `gustafta.my.id` and `dokumenproyek.com`; do not paste a second hardcoded Pixel snippet into either app.
+
+**Why:** The owner wants one Meta advertising data set for both domains. Two simultaneously initialized Pixel IDs would split audiences and reporting, while duplicate initialization can double-count browser events.
+
+**How to apply:** Change only the runtime `META_PIXEL_ID`, restart or republish the affected app, and verify `GET /api/config/meta-pixel`. Keep product-specific tracking in event parameters or custom conversions rather than separate snippets.
+
 ## fbp/fbc bridge across the off-site Scalev checkout
 **Rule:** Landing-page checkout CTAs open the Scalev URL through `withMetaAttribution(url)` (appends `fbp`,`fbc`,`esu`); the webhook extracts those back and forwards to CAPI. **Why:** browser and server Purchase share `event_id=scalev_{orderId}` so Meta merges them — no double count, better match quality. **How to apply:** the bridge is best-effort — it only works if Scalev echoes the custom URL params into the webhook; CAPI still sends via hashed email/phone if fbp/fbc are absent, so never make fbp/fbc required.
 
