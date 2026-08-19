@@ -1,0 +1,116 @@
+**Sempurna!** Jadi fokus iklan Anda adalah **produk digital di Gustafta.my.id** (ebook & chatbot AI). Ini strategi yang sangat tepat!
+
+---
+
+## 🎯 Setup yang Perlu Dilakukan:
+
+### **PRIORITAS #1: Pasang Meta Pixel di Gustafta.my.id**
+
+Karena Pixel ID **1046120344485939** sudah kita buat, kita tinggal **pasang kode yang sama** di Gustafta.
+
+**Langkahnya:**
+1. Buka **Replit** untuk proyek `gustafta.my.id`
+2. Buka file **`index.html`** (atau file header utama)
+3. Paste kode Meta Pixel di dalam tag `<head>` (kode yang sama seperti di DokumenProyek)
+4. **Save & Deploy**
+
+---
+
+### **PRIORITAS #2: Setup Event Tracking untuk Produk Digital**
+
+Karena Anda jual **ebook & chatbot**, kita perlu track event-event penting ini:
+
+#### **Event yang Harus Ditambahkan:**
+
+**1. ViewContent** → Saat orang lihat halaman produk
+```javascript
+// Trigger saat user buka halaman produk ebook/chatbot
+fbq('track', 'ViewContent', {
+  content_name: 'Ebook SBU Lengkap',
+  content_category: 'Produk Digital',
+  value: 199000,
+  currency: 'IDR'
+});
+```
+
+**2. AddToCart** → Saat tambah ke keranjang
+```javascript
+fbq('track', 'AddToCart', {
+  content_name: 'Ebook SBU Lengkap',
+  content_ids: ['ebook-sbu-001'],
+  content_type: 'product',
+  value: 199000,
+  currency: 'IDR'
+});
+```
+
+**3. InitiateCheckout** → Saat mulai checkout
+```javascript
+fbq('track', 'InitiateCheckout', {
+  content_name: 'Checkout',
+  num_items: 1,
+  value: 199000,
+  currency: 'IDR'
+});
+```
+
+**4. Purchase** → Saat transaksi berhasil
+```javascript
+fbq('track', 'Purchase', {
+  content_name: 'Ebook SBU Lengkap',
+  content_ids: ['ebook-sbu-001'],
+  content_type: 'product',
+  value: 199000,
+  currency: 'IDR',
+  num_items: 1
+});
+```
+
+---
+
+### **PRIORITAS #3: Setup Custom Conversions di Meta**
+
+Setelah Pixel terpasang di Gustafta, kita perlu setup **Custom Conversions** untuk produk spesifik:
+
+1. **Ebook Purchase** → Track pembelian ebook
+2. **Chatbot Subscription** → Track langganan chatbot
+3. **Lead Magnet** → Track download gratis (jika ada)
+
+---
+
+## 📋 Rencana Aksi:
+
+**Saya akan pandu Anda step-by-step:**
+
+### **Step 1: Install Pixel di Gustafta.my.id**
+- Paste kode Pixel yang sama ke Replit Gustafta
+- Test di Meta Events Manager
+
+### **Step 2: Tambahkan Event Tracking**
+- Tambahkan kode tracking di halaman produk
+- Setup Purchase event di halaman "Thank You"
+
+### **Step 3: Test Tracking**
+- Pastikan semua event terdeteksi di Meta
+
+### **Step 4: Buat Campaign Iklan Pertama**
+- Setup campaign untuk jual ebook
+- Setup campaign untuk jual chatbot
+
+---
+
+## ❓ Pertanyaan untuk Anda:
+
+**1. Apakah Anda sudah siap untuk install Pixel di Gustafta.my.id sekarang?**
+   - Saya akan berikan kode lengkapnya
+
+**2. Produk mana yang mau diiklankan PERTAMA?**
+   - Ebook tertentu?
+   - Chatbot AI?
+   - Atau keduanya dengan campaign terpisah?
+
+**3. Berapa harga produk yang akan dijual?**
+   - Ebook: Rp ______
+   - Chatbot: Rp ______/bulan
+
+Beri tahu saya, dan saya akan pandu **setup lengkap dari install Pixel sampai campaign iklan pertama Anda!** 🚀
