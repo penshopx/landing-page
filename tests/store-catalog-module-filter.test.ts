@@ -158,7 +158,9 @@ before(async () => {
     name: `${RUN} Module A`,
     slug: `${RUN}-module-a`,
     type: "idea",
-    description: "Test module A",
+    // Carries a distinctive need-word (zephyrmodule) so we can assert that the
+    // resolved module DESCRIPTION participates in need-based search matching.
+    description: "Test module A zephyrmodule outcome",
     isActive: true,
   } as any).returning({ id: bigIdeasTable.id });
   moduleAId = biA.id;
@@ -184,8 +186,10 @@ before(async () => {
     name: `${RUN} Toolbox A`,
     slug: `${RUN}-toolbox-a`,
     isActive: true,
-    description: "",
-    purpose: "",
+    // Distinctive need-words on toolbox description + purpose to assert both take
+    // part in need-based search matching (zephyrtoolbox / zephyrpurpose).
+    description: "zephyrtoolbox helper",
+    purpose: "zephyrpurpose automation",
     capabilities: [],
     limitations: [],
     sortOrder: 0,
@@ -199,6 +203,8 @@ before(async () => {
   // Linked to a store product — will appear as type="product" in the catalog.
   const [ag1] = await db.insert(agentsTable).values({
     name: `${RUN} Agent DirectBI`,
+    tagline: "linkedtagzephyr solution",
+    productProblem: "linkedneedzephyr pain",
     bigIdeaId: moduleAId,
     toolboxId: null,
     isActive: true,
@@ -224,6 +230,16 @@ before(async () => {
     isListed: true,
     userId: "",
     premiumClass: "standard",
+    // Rich public product metadata for need-based search assertions. Each field
+    // carries a unique made-up token so a match can only come from that field.
+    tagline: "tagzephyr solution",
+    description: "descriptzephyr detail",
+    productSummary: "summaryzephyr overview",
+    productFeatures: ["featurezephyr one", "featurezephyr two"],
+    productUseCases: "usecasezephyr scenario",
+    productTargetUser: "targetzephyr persona",
+    productProblem: "problemzephyr pain",
+    subcategory: "subcatzephyr",
     agenticSubAgents: JSON.stringify([
       { agentId: 8011, role: "sub-1b", description: "sub" },
     ]),
@@ -683,8 +699,10 @@ test("G1: getStoreCatalogItems(cat, search) two-arg form still works", async () 
 
 test("G2: search filter via two-arg form finds our fixture agent by name", async () => {
   invalidateStoreCatalog();
-  const items = await getStoreCatalogItems("", `${RUN} Agent DirectBI`.toLowerCase());
-  const found = findAgent(items, agentDirectBigIdeaId);
+  // Use the UNLINKED agent: it surfaces as a standalone type="agent" item whose
+  // public item name is searchable.
+  const items = await getStoreCatalogItems("", `${RUN} Agent DirectBI Unlinked`.toLowerCase());
+  const found = findAgent(items, agentDirectBigIdeaUnlinkedId);
   assert.ok(found, "Two-arg search must find fixture agent by name");
 });
 
@@ -742,4 +760,231 @@ test("I2: CSV inventory neutralizes spreadsheet formulas in every user-controlle
   assert.ok(csv.includes(`'=IMPORTDATA`));
   assert.ok(csv.includes(`' \t+SUM`));
   assert.ok(csv.includes(`'@HYPERLINK`));
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// J. Need-based catalog search — q/search parity, safe metadata matching (incl.
+//    module & toolbox terms), ranking/pagination, cache separation, no sensitive
+//    fields. Task: need-based chatbot search.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function freshSearch(search: string, moduleSlug?: string): Promise<any[]> {
+  invalidateStoreCatalog();
+  return getStoreCatalogItems("", search, moduleSlug);
+}
+
+// J0. q/search parity — the route treats ?q and ?search as equivalent aliases.
+// The underlying getStoreCatalogItems takes one normalized string, so parity is
+// verified by asserting the same query string yields the SAME result set no
+// matter which alias produced it (both collapse to the same lowercased term).
+test("J0: q and search aliases normalize to the same term and yield identical results", async () => {
+  // Simulate what the route does: `search` wins, else `q`; both trimmed+lowercased.
+  const pick = (q?: string, search?: string) =>
+    String((search != null && String(search).trim() !== "" ? search : (q ?? "")) || "")
+      .trim()
+      .toLowerCase();
+
+  const viaQ = pick("descriptzephyr", undefined);
+  const viaSearch = pick(undefined, "DescriptZephyr  ");
+  assert.equal(viaQ, viaSearch, "q and search must normalize to the same term");
+
+  const a = await freshSearch(viaQ);
+  const b = await freshSearch(viaSearch);
+  const aIds = a.map((it) => it.id).sort();
+  const bIds = b.map((it) => it.id).sort();
+  assert.deepEqual(aIds, bIds, "q-derived and search-derived queries must return the same items");
+});
+
+// J1. Every public metadata field participates in matching.
+const NEED_FIELD_CASES: Array<[string, string]> = [
+  ["name token", "directbi"],
+  ["tagline token", "tagzephyr"],
+  ["description token", "descriptzephyr"],
+  ["summary token", "summaryzephyr"],
+  ["feature token", "featurezephyr"],
+  ["use-case token", "usecasezephyr"],
+  ["target-user token", "targetzephyr"],
+  ["problem token", "problemzephyr"],
+  ["subcategory token", "subcatzephyr"],
+  ["module description token", "zephyrmodule"],
+];
+
+for (const [label, term] of NEED_FIELD_CASES) {
+  test(`J1: search matches unlinked agent by ${label} ("${term}")`, async () => {
+    const items = await freshSearch(term);
+    const found = findAgent(items, agentDirectBigIdeaUnlinkedId);
+    assert.ok(found, `Agent must be discoverable by its ${label}`);
+  });
+}
+
+test("J2: search matches agent by resolved TOOLBOX description term", async () => {
+  const items = await freshSearch("zephyrtoolbox");
+  const found = findAgent(items, agentViaToolboxId);
+  assert.ok(found, "Agent (via toolbox) must be discoverable by toolbox description term");
+});
+
+test("J3: search matches agent by resolved TOOLBOX purpose term", async () => {
+  const items = await freshSearch("zephyrpurpose");
+  const found = findAgent(items, agentViaToolboxId);
+  assert.ok(found, "Agent (via toolbox) must be discoverable by toolbox purpose term");
+});
+
+test("J3b: linked store product is discoverable by its agent's public need metadata", async () => {
+  const items = await freshSearch("linkedneedzephyr");
+  const found = items.find((item) => item.productId === productLinkedAgentId);
+  assert.ok(found, "linked product must inherit its agent's public search metadata");
+  assert.equal(found.type, "product");
+  assert.equal(
+    items.some((item) => item.type === "agent" && item.agentId === agentDirectBigIdeaId),
+    false,
+    "linked agent must not be duplicated as a standalone catalog item",
+  );
+});
+
+test("J4: case-insensitive + whitespace-normalized query still matches", async () => {
+  const items = await freshSearch("   DESCRIPTZEPHYR   ");
+  const found = findAgent(items, agentDirectBigIdeaUnlinkedId);
+  assert.ok(found, "Query case/whitespace must be normalized before matching");
+});
+
+test("J4b: conversational filler does not block a meaningful need query", async () => {
+  const direct = await freshSearch("descriptzephyr");
+  const conversational = await freshSearch("saya butuh tolong descriptzephyr");
+  assert.deepEqual(
+    conversational.map((item) => item.id),
+    direct.map((item) => item.id),
+    "common Indonesian filler words should not change meaningful search results",
+  );
+});
+
+test("J5: multi-token query requires ALL tokens (narrows, not widens)", async () => {
+  // Both tokens live on the SAME agent → it matches.
+  const both = await freshSearch("descriptzephyr summaryzephyr");
+  assert.ok(findAgent(both, agentDirectBigIdeaUnlinkedId), "agent carrying both tokens must match");
+
+  // One token is real, the other appears on no fixture item → agent excluded.
+  const mixed = await freshSearch("descriptzephyr nonexistenttokenxyz");
+  assert.equal(
+    findAgent(mixed, agentDirectBigIdeaUnlinkedId),
+    undefined,
+    "an unmatched token must exclude the item (AND semantics)",
+  );
+});
+
+test("J6: unmatched query returns no fixture items (empty-ish result)", async () => {
+  const items = await freshSearch("totallyunrelatedqueryxyz123");
+  const ours = items.filter((it) =>
+    createdAgentIds.includes(it.agentId) || createdProductIds.includes(it.productId),
+  );
+  assert.equal(ours.length, 0, "no fixture item should match an unrelated query");
+});
+
+test("J7: exact/title match ranks ahead of a weaker body-only match", async () => {
+  // Insert a decoy whose only match for the shared token is in the BODY, and a
+  // title agent whose NAME is exactly the token. Title match must rank first.
+  const token = `rankzephyr${Date.now().toString(36)}`;
+  const [titleAgent] = await db.insert(agentsTable).values({
+    name: `${RUN} ${token}`,               // token in the TITLE (strong)
+    bigIdeaId: moduleAId,
+    isActive: true, isPublic: true, isListed: true, userId: "",
+    premiumClass: "standard",
+    agenticSubAgents: JSON.stringify([{ agentId: 8101, role: "s", description: "s" }]),
+  } as any).returning({ id: agentsTable.id });
+  createdAgentIds.push(titleAgent.id);
+  const [bodyAgent] = await db.insert(agentsTable).values({
+    name: `${RUN} Decoy Body`,
+    description: `some text ${token} deep in the body`, // token in BODY (weak)
+    bigIdeaId: moduleAId,
+    isActive: true, isPublic: true, isListed: true, userId: "",
+    premiumClass: "standard",
+    agenticSubAgents: JSON.stringify([{ agentId: 8102, role: "s", description: "s" }]),
+  } as any).returning({ id: agentsTable.id });
+  createdAgentIds.push(bodyAgent.id);
+
+  const items = await freshSearch(token);
+  const titleIdx = items.findIndex((it) => it.agentId === titleAgent.id);
+  const bodyIdx = items.findIndex((it) => it.agentId === bodyAgent.id);
+  assert.ok(titleIdx >= 0, "title-match agent must be present");
+  assert.ok(bodyIdx >= 0, "body-match agent must be present");
+  assert.ok(titleIdx < bodyIdx, "title match must rank ahead of body-only match");
+});
+
+test("J8: ranking is deterministic across repeated (invalidated) rebuilds", async () => {
+  const first = (await freshSearch("zephyr")).map((it) => it.id);
+  const second = (await freshSearch("zephyr")).map((it) => it.id);
+  assert.deepEqual(second, first, "same query must produce identical ordering every time");
+});
+
+test("J9: search runs BEFORE pagination — total reflects matches, not full catalog", async () => {
+  invalidateStoreCatalog();
+  const matches = await getStoreCatalogItems("", "zephyr");
+  invalidateStoreCatalog();
+  const all = await getStoreCatalogItems("", "");
+  assert.ok(matches.length > 0, "zephyr query must match at least one fixture item");
+  assert.ok(matches.length < all.length, "matched set must be a strict subset of the full catalog");
+  // Every returned item must actually be a match (no full-catalog bleed-through).
+  for (const it of matches) {
+    const blob = [
+      it.name, it.tagline, it.description, it.productSummary,
+      (it.productFeatures || []).join(" "), it.productUseCases, it.productTargetUser,
+      it.productProblem, it.category, it.subcategory, it.moduleName, it.moduleDescription,
+      it.toolboxName, it.toolboxDescription, it.toolboxPurpose,
+    ].join(" ").toLowerCase();
+    assert.ok(blob.includes("zephyr"), `returned item ${it.id} must genuinely contain the query token`);
+  }
+});
+
+test("J10: search combines with module filter (AND) and excludes other modules", async () => {
+  // descriptzephyr lives on a module-A agent; filtering by module B must drop it.
+  const inA = await freshSearch("descriptzephyr", moduleASlug);
+  assert.ok(findAgent(inA, agentDirectBigIdeaUnlinkedId), "search+moduleA must keep the module-A match");
+  const inB = await freshSearch("descriptzephyr", moduleBSlug);
+  assert.equal(
+    findAgent(inB, agentDirectBigIdeaUnlinkedId),
+    undefined,
+    "search+moduleB must exclude the module-A agent",
+  );
+});
+
+test("J11: legacy/no-module item stays discoverable by search when relevant", async () => {
+  // The legacy agent has no module; searching its unique name token must find it.
+  const items = await freshSearch("legacy");
+  const found = findAgent(items, agentLegacyId);
+  assert.ok(found, "legacy (no-module) agent must remain discoverable via search");
+  assert.equal(found.moduleId, null, "legacy match must still carry null module fields");
+});
+
+test("J12: searched and unsearched calls use SEPARATE cache entries (no bleed)", async () => {
+  invalidateStoreCatalog();
+  const all = await getStoreCatalogItems("", "");          // warms "||||"
+  const searched = await getStoreCatalogItems("", "zephyr"); // warms "||zephyr||"
+  assert.ok(all.length > searched.length, "searched set must differ from full set");
+
+  // Repeat WITHOUT invalidation — each key must serve its own stable cached value.
+  const allAgain = await getStoreCatalogItems("", "");
+  const searchedAgain = await getStoreCatalogItems("", "zephyr");
+  assert.equal(allAgain.length, all.length, "unsearched cache entry must be stable");
+  assert.equal(searchedAgain.length, searched.length, "searched cache entry must be stable");
+});
+
+test("J13: catalog items NEVER expose prompts/KB/credentials/config/policy/agentic JSON", async () => {
+  const items = await freshSearch("zephyr");
+  assert.ok(items.length > 0, "need at least one item to inspect");
+  const FORBIDDEN = [
+    "systemPrompt", "system_prompt", "prompt", "knowledgeBase", "knowledge_base",
+    "kb", "credentials", "apiKey", "api_key", "customApiKey", "customBaseUrl",
+    "agenticSubAgents", "agentic_sub_agents", "personality", "policy", "policies",
+    "accessToken", "access_token", "greetingMessage", "conversationStarters",
+  ];
+  for (const it of items) {
+    for (const key of FORBIDDEN) {
+      assert.ok(
+        !Object.prototype.hasOwnProperty.call(it, key),
+        `catalog item ${it.id} must NOT expose sensitive field "${key}"`,
+      );
+    }
+    // Defensive: no field's serialized value should look like a system prompt.
+    const serialized = JSON.stringify(it).toLowerCase();
+    assert.ok(!serialized.includes("you are an ai"), `item ${it.id} must not leak prompt text`);
+  }
 });

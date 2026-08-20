@@ -239,14 +239,159 @@ interface ModuleInfo {
   moduleId: number | null;
   moduleSlug: string | null;
   moduleName: string | null;
+  // Public module description — used for need-based search matching only.
+  moduleDescription: string | null;
   toolboxSlug: string | null;
   toolboxName: string | null;
+  // Public toolbox description/purpose — used for need-based search matching only.
+  toolboxDescription: string | null;
+  toolboxPurpose: string | null;
 }
 
 const EMPTY_MODULE_INFO: ModuleInfo = {
   moduleId: null, moduleSlug: null, moduleName: null,
+  moduleDescription: null,
   toolboxSlug: null, toolboxName: null,
+  toolboxDescription: null, toolboxPurpose: null,
 };
+
+// ── Need-based catalog search ─────────────────────────────────────────────────
+// Store shoppers find a chatbot by describing a desired outcome or need, not by
+// guessing an exact product name. Search runs in-memory over the fully-built
+// catalog item list (AFTER enrichment, BEFORE pagination) so it can rank across
+// ALL public metadata — item name/tagline/description/summary/features/use-cases/
+// target-user/problem, category/subcategory, and the resolved module + toolbox
+// name/description/purpose. It NEVER touches prompts, KB, credentials, agent
+// configuration, personality, policy or agentic JSON — none of those fields are
+// present on a catalog item to begin with, and we allow-list the fields we read.
+//
+// Because search is keyed into the catalog cache (cacheKey = category||search||
+// module), a given query's ranked result set is cached like any other view and
+// invalidated together with the rest of the catalog.
+
+// Normalize a query/field: lowercase, strip punctuation to spaces, collapse
+// whitespace. Keeps alphanumerics (incl. unicode letters) so multi-token,
+// natural-language needs ("urus sertifikat badan usaha") match cleanly.
+function normalizeSearchText(value: unknown): string {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+const SEARCH_STOP_WORDS = new Set([
+  "aku", "anda", "bantu", "bantuan", "bisa", "buat", "butuh", "cara", "cari", "dapat",
+  "dengan", "di", "ingin", "ke", "mau", "mohon", "perlu", "saya", "sebuah",
+  "membantu", "tolong", "untuk", "yang",
+]);
+
+function tokenizeSearch(value: unknown): string[] {
+  const norm = normalizeSearchText(value);
+  if (!norm) return [];
+  const meaningful = norm.split(" ").filter((token) => !SEARCH_STOP_WORDS.has(token));
+  // A query containing only conversational filler should not blank the catalog.
+  return meaningful.length > 0 ? meaningful : norm.split(" ");
+}
+
+// Public, allow-listed searchable fields for a catalog item. Weighted so exact/
+// title/function matches rank ahead of weaker body-text matches. Anything not
+// listed here (there are no sensitive fields on a catalog item anyway) is never
+// consulted for matching.
+function collectSearchFields(item: any): {
+  title: string;      // name — strongest signal
+  functionText: string; // tagline, category, subcategory, module/toolbox names
+  body: string;       // descriptions, summaries, features, use-cases, etc.
+} {
+  const features = Array.isArray(item?.productFeatures)
+    ? item.productFeatures.join(" ")
+    : "";
+  const title = normalizeSearchText(item?.name);
+  const functionText = [
+    item?.tagline,
+    item?.category,
+    item?.subcategory,
+    item?.moduleName,
+    item?.toolboxName,
+    item?.linkedAgentSearchFunction,
+  ].map(normalizeSearchText).filter(Boolean).join(" ");
+  const body = [
+    item?.description,
+    item?.productSummary,
+    features,
+    item?.productUseCases,
+    item?.productTargetUser,
+    item?.productProblem,
+    item?.moduleDescription,
+    item?.toolboxDescription,
+    item?.toolboxPurpose,
+    item?.linkedAgentSearchBody,
+  ].map(normalizeSearchText).filter(Boolean).join(" ");
+  return { title, functionText, body };
+}
+
+// Score one item against a normalized query + its tokens. Returns 0 when the
+// item does not match ALL query tokens (so a multi-token need narrows results
+// instead of widening them). Higher score = stronger/earlier match.
+function scoreCatalogItem(item: any, normalizedQuery: string, tokens: string[]): number {
+  if (tokens.length === 0) return 0;
+  const { title, functionText, body } = collectSearchFields(item);
+  const haystack = `${title} ${functionText} ${body}`;
+
+  // Every token must appear somewhere in the item's public metadata.
+  for (const tok of tokens) {
+    if (!haystack.includes(tok)) return 0;
+  }
+
+  let score = 0;
+  // Exact full-query hits — strongest.
+  if (title === normalizedQuery) score += 1000;
+  else if (title.includes(normalizedQuery)) score += 400;
+  if (functionText.includes(normalizedQuery)) score += 200;
+  if (body.includes(normalizedQuery)) score += 100;
+
+  // Per-token contribution: title/function matches outrank body matches.
+  for (const tok of tokens) {
+    if (title.includes(tok)) score += 40;
+    if (functionText.includes(tok)) score += 20;
+    if (body.includes(tok)) score += 8;
+  }
+
+  // Title word-boundary/prefix bonus so "sbu" ranks a product literally titled
+  // "SBU ..." above one that merely mentions it in a paragraph.
+  const titleWords = title.split(" ");
+  for (const tok of tokens) {
+    if (titleWords.some((w) => w === tok)) score += 30;
+    else if (titleWords.some((w) => w.startsWith(tok))) score += 12;
+  }
+
+  return score;
+}
+
+// Filter + rank the fully-built catalog item list against a search string.
+// Returns matched items in descending score, with a deterministic tie-break so
+// pagination is stable across requests (same query → same order).
+function applyCatalogSearch(items: any[], search: string): any[] {
+  const normalizedQuery = normalizeSearchText(search);
+  if (!normalizedQuery) return items;
+  const tokens = tokenizeSearch(search);
+  if (tokens.length === 0) return items;
+  const meaningfulQuery = tokens.join(" ");
+
+  const scored: Array<{ item: any; score: number; idx: number }> = [];
+  items.forEach((item, idx) => {
+    const score = scoreCatalogItem(item, meaningfulQuery, tokens);
+    if (score > 0) scored.push({ item, score, idx });
+  });
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    // Deterministic tie-break: preserve the pre-search ordering (stable).
+    return a.idx - b.idx;
+  });
+
+  return scored.map((s) => s.item);
+}
 
 // Build a per-agent ModuleInfo map for the given agent ids by joining through
 // toolboxes and big_ideas. Resilient to a missing toolboxes.slug column (the
@@ -273,12 +418,17 @@ async function buildAgentModuleMap(agentIds: number[]): Promise<Map<number, Modu
   // toolboxes.slug is added by a parallel schema change; reference it defensively
   // so this builder compiles/runs whether or not the column exists yet.
   const toolboxSlugCol = (toolboxesTable as any).slug;
-  const toolboxMap = new Map<number, { name: string | null; slug: string | null; bigIdeaId: number | null }>();
+  const toolboxMap = new Map<number, {
+    name: string | null; slug: string | null; bigIdeaId: number | null;
+    description: string | null; purpose: string | null;
+  }>();
   if (toolboxIds.length > 0) {
     const tbRows = await db.select({
       id: toolboxesTable.id,
       name: toolboxesTable.name,
       bigIdeaId: toolboxesTable.bigIdeaId,
+      description: toolboxesTable.description,
+      purpose: toolboxesTable.purpose,
       ...(toolboxSlugCol ? { slug: toolboxSlugCol } : {}),
     }).from(toolboxesTable).where(inArray(toolboxesTable.id, toolboxIds));
     for (const t of tbRows) {
@@ -286,6 +436,8 @@ async function buildAgentModuleMap(agentIds: number[]): Promise<Map<number, Modu
         name: t.name ?? null,
         slug: (t as any).slug ?? null,
         bigIdeaId: t.bigIdeaId ?? null,
+        description: (t as any).description ?? null,
+        purpose: (t as any).purpose ?? null,
       });
     }
   }
@@ -300,15 +452,16 @@ async function buildAgentModuleMap(agentIds: number[]): Promise<Map<number, Modu
     }
   }
 
-  const bigIdeaMap = new Map<number, { name: string | null; slug: string | null }>();
+  const bigIdeaMap = new Map<number, { name: string | null; slug: string | null; description: string | null }>();
   if (bigIdeaIds.size > 0) {
     const biRows = await db.select({
       id: bigIdeasTable.id,
       name: bigIdeasTable.name,
       slug: bigIdeasTable.slug,
+      description: bigIdeasTable.description,
     }).from(bigIdeasTable).where(inArray(bigIdeasTable.id, Array.from(bigIdeaIds)));
     for (const b of biRows) {
-      bigIdeaMap.set(b.id, { name: b.name ?? null, slug: b.slug ?? null });
+      bigIdeaMap.set(b.id, { name: b.name ?? null, slug: b.slug ?? null, description: (b as any).description ?? null });
     }
   }
 
@@ -323,8 +476,11 @@ async function buildAgentModuleMap(agentIds: number[]): Promise<Map<number, Modu
       moduleId: effectiveBigIdeaId,
       moduleSlug: bi?.slug ?? null,
       moduleName: bi?.name ?? null,
+      moduleDescription: bi?.description ?? null,
       toolboxSlug: tb?.slug ?? null,
       toolboxName: tb?.name ?? null,
+      toolboxDescription: tb?.description ?? null,
+      toolboxPurpose: tb?.purpose ?? null,
     });
   }
 
@@ -334,17 +490,16 @@ async function buildAgentModuleMap(agentIds: number[]): Promise<Map<number, Modu
 async function buildStoreCatalogItems(category: string, search: string, moduleSlug?: string): Promise<any[]> {
   const { db } = await import("./db");
   const { agents: agentsTable, storeProducts } = await import("@shared/schema");
-  const { and, eq, or, ilike, inArray, isNull, sql: sqlOp } = await import("drizzle-orm");
+  const { and, eq, or, inArray, isNull, sql: sqlOp } = await import("drizzle-orm");
 
   // 1. Fetch from store_products table (primary source)
+  // NOTE: `search` is intentionally NOT pushed into SQL here. Need-based search
+  // ranks across the FULL public metadata (summary, features, use-cases, module/
+  // toolbox text) which spans multiple tables, so it runs in-memory over the
+  // fully-enriched item list further below (still before pagination, still
+  // cache-keyed by search). SQL only applies the cheap category/module gates.
   const spConditions: any[] = [eq(storeProducts.isActive, true)];
   if (category && category !== "Semua") spConditions.push(eq(storeProducts.category, category));
-  if (search) {
-    spConditions.push(or(
-      ilike(storeProducts.name, `%${search}%`),
-      ilike(storeProducts.description, `%${search}%`),
-    )!);
-  }
   const spWhere = spConditions.length > 1 ? and(...spConditions) : spConditions[0];
   const spRows = await db.select().from(storeProducts).where(spWhere).orderBy(storeProducts.sortOrder, storeProducts.id);
 
@@ -358,20 +513,49 @@ async function buildStoreCatalogItems(category: string, search: string, moduleSl
   const spLinkedAgentIds = spRows.map(p => p.agentId).filter(Boolean) as number[];
   const agentSubMap = new Map<number, any>();
   const agentPaymentUrlMap = new Map<number, string>();
+  const linkedAgentSearchMap = new Map<number, {
+    functionText: string;
+    body: string;
+  }>();
   if (spLinkedAgentIds.length > 0) {
     const linkedAgentRows = await db.select({
       id: agentsTable.id,
       agenticSubAgents: agentsTable.agenticSubAgents,
       paymentUrl: agentsTable.paymentUrl,
+      name: agentsTable.name,
+      tagline: agentsTable.tagline,
+      description: agentsTable.description,
+      subcategory: agentsTable.subcategory,
+      productSummary: agentsTable.productSummary,
+      productFeatures: agentsTable.productFeatures,
+      productUseCases: agentsTable.productUseCases,
+      productTargetUser: agentsTable.productTargetUser,
+      productProblem: agentsTable.productProblem,
     }).from(agentsTable).where(inArray(agentsTable.id, spLinkedAgentIds));
     for (const r of linkedAgentRows) {
       agentSubMap.set(r.id, parseSubAgentsValue(r.agenticSubAgents));
       if (r.paymentUrl) agentPaymentUrlMap.set(r.id, r.paymentUrl);
+      linkedAgentSearchMap.set(r.id, {
+        functionText: [
+          r.name,
+          r.tagline,
+          r.subcategory,
+        ].filter(Boolean).join(" "),
+        body: [
+          r.description,
+          r.productSummary,
+          ...(Array.isArray(r.productFeatures) ? r.productFeatures : []),
+          r.productUseCases,
+          r.productTargetUser,
+          r.productProblem,
+        ].filter(Boolean).join(" "),
+      });
     }
   }
 
   const storeProductItems = spRows.map((p) => {
     const linkedSubAgents = p.agentId != null ? agentSubMap.get(p.agentId) : undefined;
+    const linkedSearch = p.agentId != null ? linkedAgentSearchMap.get(p.agentId) : undefined;
     const computedPrice = linkedSubAgents !== undefined ? calcStorePrice(linkedSubAgents) : p.price;
     const price = (p as any).priceOverride != null ? (p as any).priceOverride : computedPrice;
     const paymentUrl = (p as any).paymentUrl ||
@@ -386,6 +570,10 @@ async function buildStoreCatalogItems(category: string, search: string, moduleSl
       description: p.description || "",
       productSummary: p.description || "",
       productFeatures: (p.features as string[]) || [],
+      // Search-only projection of the linked agent's public marketing fields.
+      // These are stripped from the HTTP response after ranking/pagination.
+      linkedAgentSearchFunction: linkedSearch?.functionText ?? "",
+      linkedAgentSearchBody: linkedSearch?.body ?? "",
       emoji: p.emoji || "🤖",
       color: p.color || "#6366f1",
       price,
@@ -410,13 +598,8 @@ async function buildStoreCatalogItems(category: string, search: string, moduleSl
     eq(agentsTable.isListed, true),
   )!);
   if (category && category !== "Semua") agentConditions.push(eq(agentsTable.category, category));
-  if (search) {
-    agentConditions.push(or(
-      ilike(agentsTable.name, `%${search}%`),
-      ilike(agentsTable.tagline, `%${search}%`),
-      ilike(agentsTable.description, `%${search}%`),
-    )!);
-  }
+  // See note above: need-based search runs in-memory over the enriched list so
+  // it can rank across all public metadata; SQL only gates on category here.
   const agentWhere = agentConditions.length > 1 ? and(...agentConditions) : agentConditions[0];
   const agentRows = await db.select({
     id: agentsTable.id, name: agentsTable.name, category: agentsTable.category,
@@ -424,6 +607,12 @@ async function buildStoreCatalogItems(category: string, search: string, moduleSl
     avatar: agentsTable.avatar, widgetColor: agentsTable.widgetColor,
     isOrchestrator: agentsTable.isOrchestrator, monthlyPrice: agentsTable.monthlyPrice,
     productSummary: agentsTable.productSummary, productFeatures: agentsTable.productFeatures,
+    // Extra public product metadata — used for need-based search matching. These
+    // are creator-authored marketing fields, NOT prompts/KB/config/policy.
+    subcategory: agentsTable.subcategory,
+    productUseCases: agentsTable.productUseCases,
+    productTargetUser: agentsTable.productTargetUser,
+    productProblem: agentsTable.productProblem,
     agenticSubAgents: agentsTable.agenticSubAgents,
     parentAgentId: agentsTable.parentAgentId,
     userId: agentsTable.userId,
@@ -538,10 +727,15 @@ async function buildStoreCatalogItems(category: string, search: string, moduleSl
         agentId: a.id,
         name: a.name,
         category: a.category || "Konstruksi",
+        subcategory: (a as any).subcategory || "",
         tagline: a.tagline || "",
         description: a.description || "",
         productSummary: a.productSummary || "",
         productFeatures: (a.productFeatures as string[]) || [],
+        // Extra public product metadata — surfaced for need-based search.
+        productUseCases: (a as any).productUseCases || "",
+        productTargetUser: (a as any).productTargetUser || "",
+        productProblem: (a as any).productProblem || "",
         emoji: a.avatar && a.avatar.length <= 4 ? a.avatar : "🤖",
         color: a.widgetColor || "#6366f1",
         price,
@@ -562,24 +756,34 @@ async function buildStoreCatalogItems(category: string, search: string, moduleSl
         moduleId: mod.moduleId,
         moduleSlug: mod.moduleSlug,
         moduleName: mod.moduleName,
+        // Module/toolbox description + purpose — used for need-based search only.
+        moduleDescription: mod.moduleDescription,
         toolboxSlug: mod.toolboxSlug,
         toolboxName: mod.toolboxName,
+        toolboxDescription: mod.toolboxDescription,
+        toolboxPurpose: mod.toolboxPurpose,
         type: "agent",
       };
     });
 
-  const allItems = [...storeProductItemsFinal, ...agentItems];
+  let allItems = [...storeProductItemsFinal, ...agentItems];
 
   // Server-side module filter (applied BEFORE pagination in the route handler).
   // When a module slug is supplied, keep only items whose effective module slug
   // matches. Null-safe: legacy items without a module slug are excluded from a
-  // module-filtered view.
+  // module-filtered view. Category was already gated in SQL above.
   const wantModule = (moduleSlug ?? "").trim();
   if (wantModule) {
-    return allItems.filter((it) => it.moduleSlug === wantModule);
+    allItems = allItems.filter((it) => it.moduleSlug === wantModule);
   }
 
-  return allItems;
+  // Need-based search: rank across ALL public metadata (name/tagline/summary/
+  // features/use-cases/target-user/problem, category/subcategory, resolved
+  // module + toolbox name/description/purpose). Runs AFTER category/module gating
+  // but BEFORE pagination, so `total`/`pages` reflect the ranked matches. Legacy/
+  // no-module items stay discoverable because search does not require a module.
+  // The result is cached under the (category, search, module) cache key.
+  return applyCatalogSearch(allItems, search);
 }
 
 function refreshStoreCatalog(cacheKey: string, category: string, search: string, moduleSlug?: string): Promise<any[]> {
@@ -7677,7 +7881,14 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       // large limit is a cheap slice — needed by the client-side profesi filter,
       // which must see the whole result set, not one page.
       const limit = Math.min(1000, Math.max(12, parseInt(String(req.query.limit || "24"))));
-      const search = String(req.query.search || "").trim().toLowerCase();
+      // `search` and `q` are equivalent aliases so a shareable ?q=... URL and the
+      // in-app search box hit the same need-based search. `search` wins if both
+      // are present. Normalized (trim + lowercase) here so the cache key is stable
+      // regardless of the alias/casing the caller used.
+      const rawSearch = req.query.search != null && String(req.query.search).trim() !== ""
+        ? req.query.search
+        : (req.query.q ?? "");
+      const search = String(rawSearch || "").trim().toLowerCase();
       const category = String(req.query.category || "").trim();
       // Optional server-side module (Big Idea) filter. Applied BEFORE pagination
       // so `total`/`pages` reflect the filtered set, not the whole catalog.
@@ -7689,7 +7900,19 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
       const total = allItems.length;
       const offset = (page - 1) * limit;
-      const pageItems = allItems.slice(offset, offset + limit);
+      const pageItems = allItems.slice(offset, offset + limit).map((item) => {
+        // These fields enrich the internal search index but are not part of the
+        // established Store response contract. Keep the public payload minimal.
+        const {
+          moduleDescription: _moduleDescription,
+          toolboxDescription: _toolboxDescription,
+          toolboxPurpose: _toolboxPurpose,
+          linkedAgentSearchFunction: _linkedAgentSearchFunction,
+          linkedAgentSearchBody: _linkedAgentSearchBody,
+          ...publicItem
+        } = item;
+        return publicItem;
+      });
 
       // Public, non-personalized listing — safe for a short shared cache.
       res.set("Cache-Control", "public, max-age=30");

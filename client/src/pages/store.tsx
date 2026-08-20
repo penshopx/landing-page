@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { PAYMENT_BASE_URL } from "@/lib/payment-base";
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -147,21 +147,33 @@ export default function Store() {
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedModule, setSelectedModule] = useState(initialModule);
+  const initializedUrlSync = useRef(false);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchInput) params.set("q", searchInput);
+    const params = new URLSearchParams(window.location.search);
+    params.delete("q");
+    params.delete("cat");
+    params.delete("module");
+    if (search) params.set("q", search);
     if (selectedCategory) params.set("cat", selectedCategory);
     if (selectedModule) params.set("module", selectedModule);
     const basePath = window.location.pathname.startsWith("/store/katalog") ? "/store/katalog" : "/store";
     const newUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
-    window.history.replaceState(null, "", newUrl);
+    const currentUrl = `${window.location.pathname}${window.location.search}`;
+    if (newUrl !== currentUrl) {
+      if (initializedUrlSync.current) {
+        window.history.pushState(null, "", newUrl);
+      } else {
+        window.history.replaceState(null, "", newUrl);
+      }
+    }
+    initializedUrlSync.current = true;
     if (selectedCategory) {
       localStorage.setItem("store_last_category", selectedCategory);
     } else {
       localStorage.removeItem("store_last_category");
     }
-  }, [searchInput, selectedCategory, selectedModule]);
+  }, [search, selectedCategory, selectedModule]);
 
   // Sync state from the URL on back/forward navigation (popstate). Only the
   // filter params we own (q / cat / module) are mirrored so shareable URLs and
@@ -504,7 +516,7 @@ export default function Store() {
         <div className="flex gap-2 max-w-lg mx-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <Input placeholder="Cari AI Specialist..." value={searchInput}
+            <Input placeholder="Ceritakan kebutuhan Anda — mis. 'urus SBU', 'hitung RAB', 'audit K3'" value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="pl-9 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-violet-500 shadow-sm"
@@ -512,6 +524,9 @@ export default function Store() {
           </div>
           <Button onClick={handleSearch} className="bg-violet-600 hover:bg-violet-700 shadow-sm" data-testid="button-search">Cari</Button>
         </div>
+        <p className="text-xs text-gray-400 max-w-lg mx-auto mt-2" data-testid="search-hint">
+          Cari berdasarkan kebutuhan, tugas, atau hasil yang Anda inginkan — bukan hanya nama produk.
+        </p>
 
         {/* Profesi filter chips */}
         <div className="flex flex-wrap items-center justify-center gap-2 mt-5">
@@ -661,8 +676,8 @@ export default function Store() {
               <Bot className="h-16 w-16 mx-auto mb-4 opacity-20" />
               {search || selectedCategory || profesiFilter || selectedModule ? (
                 <>
-                  <p className="text-lg font-medium text-gray-500 mb-1">Tidak ada AI Specialist yang cocok</p>
-                  <p className="text-sm">Coba kata kunci, kategori, modul, atau profesi lain</p>
+                  <p className="text-lg font-medium text-gray-500 mb-1" data-testid="empty-search-title">Belum ada AI Specialist yang cocok dengan kebutuhan itu</p>
+                  <p className="text-sm" data-testid="empty-search-hint">Coba jelaskan kebutuhan atau hasil yang Anda inginkan dengan kata lain — mis. "buat surat penawaran" atau "cek kepatuhan izin" — atau ubah kategori, modul, dan profesi.</p>
                   <Button variant="outline" size="sm" className="mt-4"
                     onClick={() => { setSearch(""); setSearchInput(""); setSelectedCategory(""); setProfesiFilter(""); setSelectedModule(""); setPage(1); }}>
                     Reset Filter

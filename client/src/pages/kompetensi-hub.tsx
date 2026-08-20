@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RuangSimpanFlowHint } from "@/components/ruang-simpan-flow-hint";
 import { Award, Brain, Target, TrendingUp, ChevronRight, Sparkles, GraduationCap, Shield, BarChart3, Zap, BookOpen, Users, Building2, CheckCircle2, ClipboardList, Search, FileText, DollarSign, RefreshCw, MessageSquare, Briefcase, LayoutList, MapPin, Calculator, FileCheck, Layers, Monitor, CheckSquare, Building, ScrollText, FileBadge, HardHat, ArrowRightLeft, ShieldAlert, Clock, Gavel, BadgeCheck, FileSignature, FileEdit, ClipboardCheck, AlertOctagon, Umbrella, X, FileBarChart, Users2, ArrowUpFromLine, ClipboardSignature, Handshake, TrendingDown, ShieldCheck, Flame, AlertTriangle, Scale, Gauge, Activity, Calendar, Cylinder, Mic, Grid3x3, Layers2, Paintbrush, Globe, Recycle, FileBarChart2, Columns, ShoppingCart, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,254 @@ const WAVES = [
   },
 ];
 
-const TOOLS = [
+// ── Modul (dimensi navigasi utama) ─────────────────────────────────────────
+// Modul customer-facing dikelompokkan berdasarkan FUNGSI UTAMA tool, bukan
+// badge Gelombang (Gelombang = konteks roadmap sekunder). Setiap modul stabil
+// & bisa dibagikan lewat URL (?module=<id>).
+export const MODULES = [
+  {
+    id: "sertifikasi-asesmen",
+    name: "Sertifikasi & Asesmen SKK",
+    desc: "Persiapan uji kompetensi, diagnostik, simulasi asesmen, portofolio, LSP, RPL & sertifikat.",
+    icon: GraduationCap,
+    color: "text-blue-400",
+    borderColor: "border-blue-500/30",
+    bg: "bg-blue-500/5",
+  },
+  {
+    id: "legalitas-perizinan",
+    name: "Legalitas & Perizinan Usaha",
+    desc: "SBU, IUJK, PBG/SLF, OSS-RBA, TKDN & dokumen legalitas badan usaha konstruksi.",
+    icon: Building2,
+    color: "text-orange-400",
+    borderColor: "border-orange-500/30",
+    bg: "bg-orange-500/5",
+  },
+  {
+    id: "tender-kontrak",
+    name: "Tender & Kontrak",
+    desc: "Penawaran, kualifikasi tender, SPK, kontrak, klarifikasi & negosiasi harga.",
+    icon: Gavel,
+    color: "text-violet-400",
+    borderColor: "border-violet-500/30",
+    bg: "bg-violet-500/5",
+  },
+  {
+    id: "dokumen-pelaporan",
+    name: "Dokumen Proyek & Pelaporan",
+    desc: "RMK, RKS, method statement, laporan harian/mingguan, berita acara, notulensi & jadwal.",
+    icon: FileText,
+    color: "text-sky-400",
+    borderColor: "border-sky-500/30",
+    bg: "bg-sky-500/5",
+  },
+  {
+    id: "k3-keselamatan",
+    name: "K3 & Keselamatan Konstruksi",
+    desc: "CSMS, JSA, HIRADC, RKK/SMKK, laporan insiden, work permit & audit K3.",
+    icon: HardHat,
+    color: "text-red-400",
+    borderColor: "border-red-500/30",
+    bg: "bg-red-500/5",
+  },
+  {
+    id: "mutu-iso",
+    name: "Mutu & Sertifikasi ISO",
+    desc: "ISO 9001, audit mutu internal, ITP, NCR/CAR & manajemen risiko proyek.",
+    icon: ClipboardCheck,
+    color: "text-indigo-400",
+    borderColor: "border-indigo-500/30",
+    bg: "bg-indigo-500/5",
+  },
+  {
+    id: "estimasi-teknis",
+    name: "Estimasi & Kalkulasi Teknis",
+    desc: "AHSP, volume galian/timbunan, beton, tulangan, bekisting & produktivitas alat/tenaga.",
+    icon: Calculator,
+    color: "text-teal-400",
+    borderColor: "border-teal-500/30",
+    bg: "bg-teal-500/5",
+  },
+  {
+    id: "karir-biaya-sdm",
+    name: "Karir, Biaya & SDM",
+    desc: "ROI karir, upah, cashflow, BEP, kompensasi PHK, rekrutmen & perencanaan tim SKK.",
+    icon: Users,
+    color: "text-emerald-400",
+    borderColor: "border-emerald-500/30",
+    bg: "bg-emerald-500/5",
+  },
+] as const;
+
+export type ModuleId = (typeof MODULES)[number]["id"];
+
+// Modul fallback aman: tool yang belum terklasifikasi tidak boleh hilang.
+export const FALLBACK_MODULE_ID: ModuleId = "sertifikasi-asesmen";
+
+// Peta klasifikasi tool → modul, di-key oleh href (identitas tool).
+// Semua 138 tool wajib punya entry di sini; tambahkan entry baru saat menambah tool.
+export const TOOL_MODULE_MAP: Record<string, ModuleId> = {
+  // Sertifikasi & Asesmen SKK
+  "/sertifikat-digital": "sertifikasi-asesmen",
+  "/diagnostik-kompetensi": "sertifikasi-asesmen",
+  "/mock-asesmen": "sertifikasi-asesmen",
+  "/persiapan-asesmen": "sertifikasi-asesmen",
+  "/cek-kelayakan-skk": "sertifikasi-asesmen",
+  "/generator-apl02": "sertifikasi-asesmen",
+  "/validator-klaim-uk": "sertifikasi-asesmen",
+  "/generator-dokumen-skk": "sertifikasi-asesmen",
+  "/simulator-ujian-teori-skk": "sertifikasi-asesmen",
+  "/simulator-wawancara-skk": "sertifikasi-asesmen",
+  "/simulator-teknis-skk": "sertifikasi-asesmen",
+  "/simulator-tes-teori-skk": "sertifikasi-asesmen",
+  "/simulator-asesmen-skk": "sertifikasi-asesmen",
+  "/simulator-uji-kompetensi": "sertifikasi-asesmen",
+  "/simulator-wawancara": "sertifikasi-asesmen",
+  "/checker-kesiapan-asesmen": "sertifikasi-asesmen",
+  "/panduan-pemilihan-lsp": "sertifikasi-asesmen",
+  "/generator-portofolio-skk": "sertifikasi-asesmen",
+  "/generator-sertifikat-pengalaman": "sertifikasi-asesmen",
+  "/peta-unit-kompetensi": "sertifikasi-asesmen",
+  "/asisten-banding-skk": "sertifikasi-asesmen",
+  "/panduan-siki-skk": "sertifikasi-asesmen",
+  "/panduan-mutasi-skk": "sertifikasi-asesmen",
+  "/estimator-biaya-sertifikasi": "sertifikasi-asesmen",
+  "/panduan-fresh-graduate-skk": "sertifikasi-asesmen",
+  "/tracker-cpd-mandiri": "sertifikasi-asesmen",
+  "/panduan-skk-jasa-konsultansi": "sertifikasi-asesmen",
+  "/panduan-skk-pengadaan": "sertifikasi-asesmen",
+  "/kalkulator-rpl": "sertifikasi-asesmen",
+  "/panduan-pasca-asesmen": "sertifikasi-asesmen",
+  "/panduan-apl01": "sertifikasi-asesmen",
+  "/generator-cv-skk": "sertifikasi-asesmen",
+  "/materi-belajar-skk": "sertifikasi-asesmen",
+  "/kalkulator-cpd": "sertifikasi-asesmen",
+  "/evaluasi-portofolio": "sertifikasi-asesmen",
+  "/jalur-sertifikasi": "sertifikasi-asesmen",
+  "/analisis-skkni": "sertifikasi-asesmen",
+  "/tracker-skk": "sertifikasi-asesmen",
+  "/perpanjangan-skk": "sertifikasi-asesmen",
+  "/panduan-sertifikasi-migas": "sertifikasi-asesmen",
+  "/laporan-proyek-bnsp": "sertifikasi-asesmen",
+  "/analisis-proyek-skk": "sertifikasi-asesmen",
+
+  // Legalitas & Perizinan Usaha
+  "/panduan-iujk-sbu": "legalitas-perizinan",
+  "/panduan-pbg-slf": "legalitas-perizinan",
+  "/panduan-oss-perizinan": "legalitas-perizinan",
+  "/panduan-pbg-imb": "legalitas-perizinan",
+  "/panduan-tkdn": "legalitas-perizinan",
+  "/generator-pakta-integritas": "legalitas-perizinan",
+
+  // Tender & Kontrak
+  "/generator-surat-penawaran": "tender-kontrak",
+  "/panduan-tender-bujk": "tender-kontrak",
+  "/generator-spk": "tender-kontrak",
+  "/generator-spk-kontrak": "tender-kontrak",
+  "/simulator-klarifikasi-tender": "tender-kontrak",
+  "/simulator-negosiasi-harga": "tender-kontrak",
+  "/generator-kontrak-sederhana": "tender-kontrak",
+  "/panduan-kualifikasi-tender": "tender-kontrak",
+  "/simulator-negosiasi-kontrak": "tender-kontrak",
+  "/panduan-pbj-konstruksi": "tender-kontrak",
+  "/generator-surat-kuasa": "tender-kontrak",
+  "/generator-surat-teguran": "tender-kontrak",
+  "/kalkulator-eskalasi-harga": "tender-kontrak",
+
+  // Dokumen Proyek & Pelaporan
+  "/generator-bast-proyek": "dokumen-pelaporan",
+  "/generator-rmk": "dokumen-pelaporan",
+  "/generator-rks": "dokumen-pelaporan",
+  "/generator-berita-acara": "dokumen-pelaporan",
+  "/generator-jadwal-mobilisasi": "dokumen-pelaporan",
+  "/generator-risalah-rapat": "dokumen-pelaporan",
+  "/generator-kurva-s": "dokumen-pelaporan",
+  "/generator-method-statement": "dokumen-pelaporan",
+  "/generator-laporan-harian": "dokumen-pelaporan",
+  "/generator-sop-pekerjaan": "dokumen-pelaporan",
+  "/generator-laporan-kemajuan": "dokumen-pelaporan",
+  "/generator-jadwal-pelaksanaan": "dokumen-pelaporan",
+  "/generator-bast-konstruksi": "dokumen-pelaporan",
+  "/generator-checklist-serah-terima": "dokumen-pelaporan",
+  "/generator-notulensi": "dokumen-pelaporan",
+  "/generator-laporan-mingguan": "dokumen-pelaporan",
+  "/simulator-pcm": "dokumen-pelaporan",
+  "/generator-bapro": "dokumen-pelaporan",
+  "/generator-checklist-sta": "dokumen-pelaporan",
+  "/simulator-rapat-evaluasi": "dokumen-pelaporan",
+  "/generator-laporan-audit": "dokumen-pelaporan",
+
+  // K3 & Keselamatan Konstruksi
+  "/simulator-csms": "k3-keselamatan",
+  "/generator-laporan-insiden": "k3-keselamatan",
+  "/asisten-klaim-car": "k3-keselamatan",
+  "/panduan-csms-kontraktor": "k3-keselamatan",
+  "/simulator-foreman-k3": "k3-keselamatan",
+  "/generator-work-permit": "k3-keselamatan",
+  "/simulator-k3-konstruksi": "k3-keselamatan",
+  "/generator-rkk": "k3-keselamatan",
+  "/panduan-csms": "k3-keselamatan",
+  "/generator-hiradc": "k3-keselamatan",
+  "/panduan-limbah-konstruksi": "k3-keselamatan",
+  "/panduan-smk3-perusahaan": "k3-keselamatan",
+  "/generator-laporan-audit-k3": "k3-keselamatan",
+  "/generator-laporan-hse": "k3-keselamatan",
+  "/simulator-sidang-k3": "k3-keselamatan",
+  "/panduan-smkk": "k3-keselamatan",
+  "/generator-jsa": "k3-keselamatan",
+  "/panduan-k3-ketinggian": "k3-keselamatan",
+  "/kalkulator-jam-kerja-proyek": "k3-keselamatan",
+  "/generator-sop-k3-proyek": "k3-keselamatan",
+  "/k3-vision": "k3-keselamatan",
+
+  // Mutu & Sertifikasi ISO
+  "/panduan-audit-mutu-iso": "mutu-iso",
+  "/panduan-iso-9001": "mutu-iso",
+  "/simulator-ncr-handling": "mutu-iso",
+  "/generator-itp": "mutu-iso",
+  "/simulator-audit-iso": "mutu-iso",
+  "/generator-ncr-report": "mutu-iso",
+  "/panduan-manajemen-risiko": "mutu-iso",
+
+  // Estimasi & Kalkulasi Teknis
+  "/kalkulator-ahsp": "estimasi-teknis",
+  "/kalkulator-volume-galian": "estimasi-teknis",
+  "/kalkulator-beton-readymix": "estimasi-teknis",
+  "/kalkulator-tulangan": "estimasi-teknis",
+  "/kalkulator-bekisting": "estimasi-teknis",
+  "/kalkulator-cat-bangunan": "estimasi-teknis",
+  "/kalkulator-beban-struktur": "estimasi-teknis",
+  "/kalkulator-cut-fill": "estimasi-teknis",
+  "/kalkulator-dimensi-kolom-balok": "estimasi-teknis",
+  "/kalkulator-kebutuhan-beton": "estimasi-teknis",
+  "/kalkulator-produktivitas-alat": "estimasi-teknis",
+  "/kalkulator-material-beton": "estimasi-teknis",
+  "/kalkulator-produktivitas-tk": "estimasi-teknis",
+  "/rab-kalkulator": "estimasi-teknis",
+
+  // Karir, Biaya & SDM
+  "/roi-karir-skk": "karir-biaya-sdm",
+  "/syarat-personel-bujk": "karir-biaya-sdm",
+  "/kalkulator-cashflow-proyek": "karir-biaya-sdm",
+  "/kalkulator-bep-proyek": "karir-biaya-sdm",
+  "/kalkulator-depresiasi-alat": "karir-biaya-sdm",
+  "/kalkulator-kompensasi-phk": "karir-biaya-sdm",
+  "/kalkulator-manfaat-skk-bujk": "karir-biaya-sdm",
+  "/kalkulator-upah-skk": "karir-biaya-sdm",
+  "/rencana-karir-skk": "karir-biaya-sdm",
+  "/panduan-rekrutmen-skk": "karir-biaya-sdm",
+  "/planner-skk-bujk": "karir-biaya-sdm",
+  "/checker-skk-proyek": "karir-biaya-sdm",
+  "/biaya-tim-skk": "karir-biaya-sdm",
+  "/pkb-builder": "karir-biaya-sdm",
+};
+
+/** Resolve modul untuk sebuah href secara deterministik, dengan fallback aman. */
+export function resolveModuleId(href: string): ModuleId {
+  return TOOL_MODULE_MAP[href] ?? FALLBACK_MODULE_ID;
+}
+
+export const TOOLS = [
   {
     href: "/sertifikat-digital",
     icon: Award,
@@ -1840,18 +2087,139 @@ const STATS = [
   { label: "Pasar Konstruksi 2034", value: "$226B", icon: TrendingUp, color: "text-violet-400" },
 ];
 
-export default function KompetensiHub() {
-  const [search, setSearch] = useState("");
-  const [filterWave, setFilterWave] = useState("Semua");
+// Modul → metadata (untuk lookup cepat & label yang bisa dicari).
+export const MODULE_BY_ID: Record<string, (typeof MODULES)[number]> = Object.fromEntries(
+  MODULES.map((m) => [m.id, m]),
+);
 
-  const waves = ["Semua", ...Array.from(new Set(TOOLS.map(t => t.badge)))];
+export type KompetensiTool = (typeof TOOLS)[number];
 
-  const filtered = TOOLS.filter(t => {
-    const matchWave = filterWave === "Semua" || t.badge === filterWave;
-    const q = search.toLowerCase();
-    const matchSearch = !q || t.label.toLowerCase().includes(q) || t.sublabel.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q);
-    return matchWave && matchSearch;
+/** Setiap tool + modul yang sudah diresolve. Tidak ada tool yang boleh hilang. */
+export const TOOLS_WITH_MODULE = TOOLS.map((t) => ({
+  ...t,
+  moduleId: resolveModuleId(t.href),
+}));
+
+export interface ToolFilterState {
+  /** Query pencarian bebas (toleran huruf besar/kecil & spasi). */
+  q?: string;
+  /** Modul terpilih; kosong / "all" = semua modul. */
+  module?: string;
+}
+
+/** Normalisasi teks pencarian: lowercase + rapikan whitespace. */
+function normalize(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const SEARCH_STOP_WORDS = new Set([
+  "aku", "anda", "bantu", "bantuan", "bisa", "buat", "butuh", "cara", "cari", "dapat",
+  "dengan", "di", "ingin", "ke", "mau", "mohon", "perlu", "saya", "sebuah",
+  "membantu", "tolong", "untuk", "yang",
+]);
+
+function searchTokens(query: string): string[] {
+  const normalized = normalize(query);
+  if (!normalized) return [];
+  const meaningful = normalized.split(" ").filter((token) => !SEARCH_STOP_WORDS.has(token));
+  return meaningful.length > 0 ? meaningful : normalized.split(" ");
+}
+
+/**
+ * Filter tool berdasarkan MODUL (dimensi utama) + pencarian teks.
+ * Pencarian mencakup metadata publik tool (label, sublabel, desc, badge, href)
+ * PLUS nama & deskripsi modul. Fungsi murni → mudah diuji.
+ */
+export function filterTools(
+  tools: typeof TOOLS_WITH_MODULE,
+  { q = "", module = "" }: ToolFilterState,
+): typeof TOOLS_WITH_MODULE {
+  const tokens = searchTokens(q);
+  const mod = module && module !== "all" ? module : "";
+  return tools.filter((t) => {
+    if (mod && t.moduleId !== mod) return false;
+    if (tokens.length === 0) return true;
+    const m = MODULE_BY_ID[t.moduleId];
+    const haystack = normalize(
+      [
+        t.label,
+        t.sublabel,
+        t.desc,
+        t.badge,
+        t.href,
+        m?.name ?? "",
+        m?.desc ?? "",
+      ].join(" "),
+    );
+    return tokens.every((token) => haystack.includes(token));
   });
+}
+
+export default function KompetensiHub() {
+  const readParams = () =>
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search)
+      : new URLSearchParams();
+
+  const initialParams = readParams();
+  const [search, setSearch] = useState(initialParams.get("q") ?? "");
+  const initialModule = initialParams.get("module") ?? "";
+  const [selectedModule, setSelectedModule] = useState(
+    MODULE_BY_ID[initialModule] ? initialModule : "",
+  );
+
+  const writeDiscoveryUrl = (
+    nextSearch: string,
+    nextModule: string,
+    mode: "push" | "replace",
+  ) => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    params.delete("q");
+    params.delete("module");
+    if (nextSearch) params.set("q", nextSearch);
+    if (nextModule && MODULE_BY_ID[nextModule]) params.set("module", nextModule);
+    const base = window.location.pathname;
+    const next = params.toString() ? `${base}?${params.toString()}` : base;
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (next !== current) {
+      window.history[mode === "push" ? "pushState" : "replaceState"](null, "", next);
+    }
+  };
+
+  // Sinkron dari URL pada navigasi back/forward (popstate).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onPop = () => {
+      const params = new URLSearchParams(window.location.search);
+      setSearch(params.get("q") ?? "");
+      const moduleParam = params.get("module") ?? "";
+      setSelectedModule(MODULE_BY_ID[moduleParam] ? moduleParam : "");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  const filtered = filterTools(TOOLS_WITH_MODULE, { q: search, module: selectedModule });
+
+  // Hasil dikelompokkan per modul (dimensi utama), urutan mengikuti MODULES.
+  const grouped = MODULES.map((m) => ({
+    module: m,
+    tools: filtered.filter((t) => t.moduleId === m.id),
+  })).filter((g) => g.tools.length > 0);
+
+  const resetFilters = () => {
+    setSearch("");
+    setSelectedModule("");
+    writeDiscoveryUrl("", "", "push");
+  };
+
+  const hasActiveFilter = Boolean(search) || Boolean(selectedModule);
+  const activeModule = selectedModule ? MODULE_BY_ID[selectedModule] : undefined;
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -1898,89 +2266,157 @@ export default function KompetensiHub() {
         </div>
       </div>
 
-      {/* Tools Grid */}
+      {/* Jelajah per Modul (dimensi navigasi utama) */}
       <div className="max-w-4xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-bold text-white">Tools Kompetensi</h2>
-            <p className="text-slate-400 text-sm">{TOOLS.length} tools tersedia · gratis digunakan</p>
+            <h2 className="text-xl font-bold text-white">Jelajahi per Modul</h2>
+            <p className="text-slate-400 text-sm">{TOOLS.length} tools · {MODULES.length} modul · gratis digunakan</p>
           </div>
           <Button asChild variant="ghost" size="sm" className="text-slate-400 hover:text-white text-xs">
             <Link href="/ai-tools">Lihat Semua AI Tools <ChevronRight className="h-3.5 w-3.5 ml-1" /></Link>
           </Button>
         </div>
 
-        {/* Search + Filter */}
-        <div className="space-y-3 mb-6">
+        {/* Search + Module Filter (utama) */}
+        <div className="space-y-3 mb-8" data-testid="module-discovery">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
             <input
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Cari tools... (cth: JSA, SKK, ISO, tender, K3)"
+              onChange={e => {
+                const nextSearch = e.target.value;
+                setSearch(nextSearch);
+                writeDiscoveryUrl(nextSearch, selectedModule, "replace");
+              }}
+              placeholder="Ceritakan kebutuhan atau cari Modul... (cth: persiapan SKK, audit K3, hitung volume)"
               className="w-full rounded-xl border border-white/10 bg-white/3 pl-10 pr-9 py-2.5 text-sm text-white placeholder:text-slate-600 focus:outline-none focus:border-blue-500/40"
+              data-testid="input-search"
             />
             {search && (
-              <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white">
+              <button
+                onClick={() => {
+                  setSearch("");
+                  writeDiscoveryUrl("", selectedModule, "push");
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white"
+                data-testid="button-clear-search"
+              >
                 <X className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
           <div className="flex gap-1.5 flex-wrap">
-            {waves.map(w => (
-              <button key={w} onClick={() => setFilterWave(w)}
-                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all border ${
-                  filterWave === w
-                    ? "bg-blue-600 border-blue-500 text-white"
-                    : "border-white/10 text-slate-400 hover:text-white bg-white/3"
-                }`}>
-                {w === "Semua" ? `Semua (${TOOLS.length})` : w}
-              </button>
-            ))}
+            <button
+              onClick={() => {
+                setSelectedModule("");
+                writeDiscoveryUrl(search, "", "push");
+              }}
+              data-testid="module-filter-all"
+              aria-pressed={!selectedModule}
+              className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all border ${
+                !selectedModule
+                  ? "bg-blue-600 border-blue-500 text-white"
+                  : "border-white/10 text-slate-400 hover:text-white bg-white/3"
+              }`}
+            >
+              Semua Modul ({TOOLS.length})
+            </button>
+            {MODULES.map((m) => {
+              const total = TOOLS_WITH_MODULE.filter((t) => t.moduleId === m.id).length;
+              const active = selectedModule === m.id;
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => {
+                    setSelectedModule(m.id);
+                    writeDiscoveryUrl(search, m.id, "push");
+                  }}
+                  data-testid={`module-filter-${m.id}`}
+                  aria-pressed={active}
+                  className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all border ${
+                    active
+                      ? "bg-blue-600 border-blue-500 text-white"
+                      : "border-white/10 text-slate-400 hover:text-white bg-white/3"
+                  }`}
+                >
+                  {m.name} ({total})
+                </button>
+              );
+            })}
           </div>
-          {(search || filterWave !== "Semua") && (
-            <p className="text-xs text-slate-500">
-              {filtered.length === 0 ? "Tidak ada tools yang cocok" : `${filtered.length} tools ditemukan`}
-              {(search || filterWave !== "Semua") && (
-                <button onClick={() => { setSearch(""); setFilterWave("Semua"); }} className="ml-2 text-blue-400 hover:text-blue-300">Reset filter</button>
-              )}
+          {hasActiveFilter && (
+            <p className="text-xs text-slate-500" data-testid="filter-summary">
+              {filtered.length === 0
+                ? "Tidak ada tools yang cocok"
+                : `${filtered.length} tools ditemukan`}
+              {activeModule ? ` · Modul: ${activeModule.name}` : ""}
+              <button
+                onClick={resetFilters}
+                className="ml-2 text-blue-400 hover:text-blue-300"
+                data-testid="button-reset-filter"
+              >
+                Reset filter
+              </button>
             </p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-          {filtered.map((t, i) => (
-            <Link key={i} href={t.href}>
-              <div className={`group rounded-2xl border ${t.borderColor} ${t.bg} p-5 hover:bg-white/5 transition-all cursor-pointer h-full`}>
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <div className={`rounded-xl p-2.5 bg-white/5 border border-white/10`}>
-                    <t.icon className={`h-5 w-5 ${t.color}`} />
-                  </div>
-                  <Badge variant="outline" className={`text-xs ${t.badgeColor}`}>{t.badge}</Badge>
+        {/* Hasil dikelompokkan per modul */}
+        <div className="space-y-10 mb-12">
+          {grouped.map(({ module: m, tools }) => (
+            <section key={m.id} data-testid={`module-group-${m.id}`}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`rounded-xl p-2.5 border ${m.borderColor} ${m.bg}`}>
+                  <m.icon className={`h-5 w-5 ${m.color}`} />
                 </div>
-                <h3 className="text-white font-semibold text-sm mb-0.5">{t.label}</h3>
-                <p className={`text-xs ${t.color} mb-2`}>{t.sublabel}</p>
-                <p className="text-slate-400 text-xs leading-relaxed">{t.desc}</p>
-                <div className={`mt-3 flex items-center gap-1 text-xs ${t.color} opacity-0 group-hover:opacity-100 transition-opacity`}>
-                  Buka <ChevronRight className="h-3 w-3" />
+                <div>
+                  <h3 className="text-white font-bold text-base flex items-center gap-2">
+                    {m.name}
+                    <span className="text-slate-500 text-xs font-normal" data-testid={`module-count-${m.id}`}>
+                      ({tools.length})
+                    </span>
+                  </h3>
+                  <p className="text-slate-500 text-xs">{m.desc}</p>
                 </div>
               </div>
-            </Link>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {tools.map((t) => (
+                  <Link key={t.href} href={t.href} data-testid={`tool-card-${t.href}`}>
+                    <div className={`group rounded-2xl border ${t.borderColor} ${t.bg} p-5 hover:bg-white/5 transition-all cursor-pointer h-full`}>
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className={`rounded-xl p-2.5 bg-white/5 border border-white/10`}>
+                          <t.icon className={`h-5 w-5 ${t.color}`} />
+                        </div>
+                        <Badge variant="outline" className={`text-xs ${t.badgeColor}`}>{t.badge}</Badge>
+                      </div>
+                      <h3 className="text-white font-semibold text-sm mb-0.5">{t.label}</h3>
+                      <p className={`text-xs ${t.color} mb-2`}>{t.sublabel}</p>
+                      <p className="text-slate-400 text-xs leading-relaxed">{t.desc}</p>
+                      <div className={`mt-3 flex items-center gap-1 text-xs ${t.color} opacity-0 group-hover:opacity-100 transition-opacity`}>
+                        Buka <ChevronRight className="h-3 w-3" />
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
           ))}
           {filtered.length === 0 && (
-            <div className="col-span-3 rounded-2xl border border-dashed border-white/10 p-10 text-center">
+            <div className="rounded-2xl border border-dashed border-white/10 p-10 text-center" data-testid="empty-state">
               <Search className="h-8 w-8 text-slate-700 mx-auto mb-2" />
-              <p className="text-slate-400 text-sm">Tidak ada tools yang cocok dengan pencarian</p>
-              <button onClick={() => { setSearch(""); setFilterWave("Semua"); }} className="text-blue-400 text-xs mt-2 hover:text-blue-300">Reset filter</button>
+              <p className="text-slate-400 text-sm">Tidak ada tools yang cocok dengan pencarian atau modul yang dipilih.</p>
+              <button onClick={resetFilters} className="text-blue-400 text-xs mt-2 hover:text-blue-300" data-testid="button-reset-empty">Reset filter</button>
             </div>
           )}
         </div>
 
-        {/* Roadmap 2026-2030 */}
-        <div className="mb-12">
+        {/* Roadmap 2026-2030 — konteks sekunder (BUKAN navigasi utama) */}
+        <div className="mb-12 border-t border-white/10 pt-10" data-testid="roadmap-gelombang">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white mb-1">Roadmap Produk 2026–2030</h2>
-            <p className="text-slate-400 text-sm">Tiga gelombang pertumbuhan Ekosistem Kompetensi Indonesia</p>
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Konteks Roadmap</span>
+            <h2 className="text-xl font-bold text-white mb-1 mt-1">Roadmap Produk 2026–2030</h2>
+            <p className="text-slate-400 text-sm">Tiga gelombang pertumbuhan Ekosistem Kompetensi Indonesia. Gelombang adalah konteks kapan sebuah tool dirilis — jelajahi tetap gunakan Modul di atas.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {WAVES.map((w, i) => (

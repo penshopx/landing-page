@@ -219,3 +219,87 @@ describe("Store — filter modul", () => {
     expect(screen.queryByTestId("module-name-prod-1")).not.toBeInTheDocument();
   });
 });
+
+describe("Store — pencarian berbasis kebutuhan", () => {
+  let originalFetch: typeof global.fetch;
+
+  beforeEach(() => {
+    cleanup();
+    originalFetch = global.fetch;
+    window.localStorage.clear();
+    window.history.replaceState({}, "", "/store");
+  });
+
+  afterEach(() => {
+    cleanup();
+    global.fetch = originalFetch;
+    vi.restoreAllMocks();
+  });
+
+  it("menampilkan copy pencarian berbasis kebutuhan (placeholder + petunjuk)", async () => {
+    renderStore(makeProduct());
+    const input = await screen.findByTestId("input-search-store");
+    // Placeholder mengajak mengetik kebutuhan/hasil, bukan sekadar nama produk.
+    expect((input as HTMLInputElement).placeholder.toLowerCase()).toContain("kebutuhan");
+    expect(await screen.findByTestId("search-hint")).toBeInTheDocument();
+  });
+
+  it("mengetik kebutuhan lalu Cari → request katalog menyertakan ?search=<kebutuhan>", async () => {
+    const calls = renderStore(makeProduct());
+    const pushState = vi.spyOn(window.history, "pushState");
+    const input = await screen.findByTestId("input-search-store");
+    fireEvent.change(input, { target: { value: "urus sbu" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    await waitFor(() => {
+      expect(calls.some((u) => /[?&]search=urus(\+|%20)sbu/.test(u))).toBe(true);
+      expect(pushState).toHaveBeenCalled();
+    });
+  });
+
+  it("membaca q dari URL yang dibagikan → mengisi search box & mengirim ke katalog (paritas q/search)", async () => {
+    // Shareable URL uses ?q=...; the client seeds the search from q and issues a
+    // catalog request carrying that same term (server treats q & search alike).
+    window.history.replaceState({}, "", "/store?q=hitung%20rab");
+    const calls = renderStore(makeProduct());
+
+    const input = await screen.findByTestId("input-search-store");
+    expect((input as HTMLInputElement).value).toBe("hitung rab");
+    await waitFor(() => {
+      expect(calls.some((u) => /[?&]search=hitung(\+|%20)rab/.test(u))).toBe(true);
+    });
+    // Shareable q URL is preserved after mount.
+    expect(window.location.search).toContain("q=hitung");
+  });
+
+  it("hasil kosong menampilkan pesan yang mengajak mendeskripsikan kebutuhan", async () => {
+    // Serve an empty catalog for a query so the need-based empty state renders.
+    window.history.replaceState({}, "", "/store?q=xyztidakada");
+    const calls: string[] = [];
+    const queryClient = makeQueryClient();
+    (global as any).fetch = vi.fn((url: string | URL | Request): Promise<Response> => {
+      const urlStr =
+        typeof url === "string" ? url : url instanceof URL ? url.href : (url as Request).url;
+      if (urlStr.includes("/api/store/catalog/categories")) return Promise.resolve(jsonResponse([]));
+      if (urlStr.includes("/api/store/catalog/modules")) return Promise.resolve(jsonResponse(MODULES));
+      if (urlStr.includes("/api/store/catalog")) {
+        calls.push(urlStr);
+        return Promise.resolve(jsonResponse({ items: [], total: 0, page: 1, limit: 18, pages: 0 }));
+      }
+      if (urlStr.includes("/api/subscriptions/status"))
+        return Promise.resolve(jsonResponse({ clientKey: "", paymentConfigured: false, isSandbox: true }));
+      if (urlStr.includes("/api/config/contact")) return Promise.resolve(jsonResponse(CONTACT_RESPONSE));
+      return Promise.resolve(new Response(JSON.stringify({ error: "not found" }), { status: 404 }));
+    });
+    render(
+      <QueryClientProvider client={queryClient}>
+        <Store />
+      </QueryClientProvider>
+    );
+
+    const title = await screen.findByTestId("empty-search-title");
+    expect(title.textContent?.toLowerCase()).toContain("kebutuhan");
+    const hint = await screen.findByTestId("empty-search-hint");
+    expect(hint.textContent?.toLowerCase()).toContain("kebutuhan");
+  });
+});
