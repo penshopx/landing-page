@@ -3000,3 +3000,103 @@ export type RuangKelolaProfile = typeof ruangKelolaProfiles.$inferSelect;
 export type RuangKelolaDocument = typeof ruangKelolaDocuments.$inferSelect;
 export type RuangKelolaAuditLog = typeof ruangKelolaAuditLog.$inferSelect;
 export type RuangKelolaBiroRequest = typeof ruangKelolaBiroRequests.$inferSelect;
+
+// ─── SALES LADDER (Task #390) ────────────────────────────────────────────────
+// Directed graph: Ladder → Nodes (products/packages/triggers/placeholders) → Edges.
+// No price or name columns stored here — resolved live from product_registry /
+// package_registry using allow-listed fields.
+
+export const LADDER_STATUSES = ["DRAFT", "ACTIVE", "ARCHIVED"] as const;
+export type LadderStatus = typeof LADDER_STATUSES[number];
+
+export const LADDER_STAGES = ["L0", "L1", "L2", "L3", "L4", "L5"] as const;
+export type LadderStage = typeof LADDER_STAGES[number];
+
+export const NODE_TYPES = ["TRIGGER", "PRODUCT", "PACKAGE", "PLACEHOLDER"] as const;
+export type NodeType = typeof NODE_TYPES[number];
+
+export const RELATION_TYPES = ["NEXT_STEP", "BONUS", "UPSELL", "CROSS_SELL", "BUNDLE", "RECURRING"] as const;
+export type RelationType = typeof RELATION_TYPES[number];
+
+export const COVERAGE_STATUSES = ["MAPPED", "INDEPENDENT", "UNDECIDED"] as const;
+export type CoverageStatus = typeof COVERAGE_STATUSES[number];
+
+// ── Sales Ladders ─────────────────────────────────────────────────────────────
+export const salesLadders = pgTable("sales_ladders", {
+  id:          serial("id").primaryKey(),
+  slug:        text("slug").notNull(),
+  name:        text("name").notNull(),
+  description: text("description"),
+  status:      text("status").notNull().default("DRAFT"), // DRAFT | ACTIVE | ARCHIVED
+  createdAt:   timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:   timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("uq_sales_ladder_slug").on(table.slug),
+]);
+
+// ── Sales Ladder Nodes ────────────────────────────────────────────────────────
+// nodeType PRODUCT requires productRegistryId (product_registry.product_id, e.g. GST-XXX-001).
+// nodeType PACKAGE requires packageRegistryId (package_registry.package_id).
+// nodeType TRIGGER | PLACEHOLDER require label and no registry IDs.
+// Product may appear in multiple ladders (only one node per ladder).
+// FK RESTRICT: registry rows cannot be deleted while referenced by a ladder node.
+export const salesLadderNodes = pgTable("sales_ladder_nodes", {
+  id:                 serial("id").primaryKey(),
+  ladderId:           integer("ladder_id").notNull().references(() => salesLadders.id, { onDelete: "cascade" }),
+  stage:              text("stage").notNull(),     // L0..L5
+  nodeType:           text("node_type").notNull(), // TRIGGER|PRODUCT|PACKAGE|PLACEHOLDER
+  productRegistryId:  varchar("product_registry_id", { length: 40 })
+                        .references(() => productRegistry.productId, { onDelete: "restrict" }),
+  packageRegistryId:  varchar("package_registry_id", { length: 60 })
+                        .references(() => packageRegistry.packageId, { onDelete: "restrict" }),
+  label:              text("label"),               // required for TRIGGER/PLACEHOLDER, optional for PRODUCT/PACKAGE
+  description:        text("description"),
+  sortOrder:          integer("sort_order").notNull().default(0),
+  isActive:           boolean("is_active").notNull().default(true),
+  createdAt:          timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:          timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  // One product per ladder (same product can appear in a different ladder)
+  uniqueIndex("uq_node_product_per_ladder").on(table.ladderId, table.productRegistryId),
+  // One package per ladder
+  uniqueIndex("uq_node_package_per_ladder").on(table.ladderId, table.packageRegistryId),
+  index("idx_sales_ladder_nodes_ladder").on(table.ladderId),
+]);
+
+// ── Sales Ladder Edges ─────────────────────────────────────────────────────────
+export const salesLadderEdges = pgTable("sales_ladder_edges", {
+  id:           serial("id").primaryKey(),
+  ladderId:     integer("ladder_id").notNull().references(() => salesLadders.id, { onDelete: "cascade" }),
+  fromNodeId:   integer("from_node_id").notNull().references(() => salesLadderNodes.id, { onDelete: "cascade" }),
+  toNodeId:     integer("to_node_id").notNull().references(() => salesLadderNodes.id, { onDelete: "cascade" }),
+  relationType: text("relation_type").notNull(), // NEXT_STEP|BONUS|UPSELL|CROSS_SELL|BUNDLE|RECURRING
+  ruleText:     text("rule_text"),
+  sortOrder:    integer("sort_order").notNull().default(0),
+  isActive:     boolean("is_active").notNull().default(true),
+  createdAt:    timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:    timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  // The same commercial relationship must not be duplicated.
+  uniqueIndex("uq_ladder_edge").on(table.ladderId, table.fromNodeId, table.toNodeId, table.relationType),
+  index("idx_sales_ladder_edges_ladder").on(table.ladderId),
+]);
+
+// ── Product Coverage Override ──────────────────────────────────────────────────
+// MAPPED is computed (product appears in non-ARCHIVED ladder node).
+// Only INDEPENDENT / UNDECIDED are stored here explicitly.
+// FK RESTRICT: registry row cannot be deleted while referenced by a coverage override.
+export const salesLadderCoverage = pgTable("sales_ladder_coverage", {
+  id:               serial("id").primaryKey(),
+  productRegistryId: varchar("product_registry_id", { length: 40 }).notNull()
+                      .references(() => productRegistry.productId, { onDelete: "restrict" }),
+  coverageStatus:   text("coverage_status").notNull().default("UNDECIDED"), // INDEPENDENT | UNDECIDED
+  note:             text("note"),
+  updatedAt:        timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("uq_coverage_product").on(table.productRegistryId),
+]);
+
+export type SalesLadderRow = typeof salesLadders.$inferSelect;
+export type SalesLadderNodeRow = typeof salesLadderNodes.$inferSelect;
+export type SalesLadderEdgeRow = typeof salesLadderEdges.$inferSelect;
+export type SalesLadderCoverageRow = typeof salesLadderCoverage.$inferSelect;

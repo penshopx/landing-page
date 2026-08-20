@@ -14,7 +14,7 @@ import {
   CheckCircle2, XCircle, Shield, ArrowLeft, Copy,
   UserCheck, AlertCircle, RefreshCw, Crown, UserCog, Wrench, Scale, Database,
   ShoppingBag, Plus, ExternalLink, Package, Trash2, Pencil, MessageCircle, Loader2,
-  Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical
+  Link2, Zap, Globe, BookOpen, GraduationCap, Gift, Activity, Cpu, GripVertical, Layers3
 } from "lucide-react";
 import { useContactNumbers } from "@/lib/contact";
 import { syncOrderedProducts, nextFormSortOrderOnToggle } from "@/lib/store-sort-order";
@@ -1466,6 +1466,14 @@ export default function AdminPage() {
                 <Button variant="outline" size="sm" className="gap-1.5 text-xs hidden sm:flex border-cyan-500/40 text-cyan-600 hover:bg-cyan-500/10" data-testid="button-product-registry">
                   <FileText className="h-3.5 w-3.5" />
                   Product Registry
+                </Button>
+              </Link>
+            )}
+            {isSuperAdmin && (
+              <Link href="/admin/sales-ladder">
+                <Button variant="outline" size="sm" className="gap-1.5 text-xs hidden sm:flex border-amber-500/40 text-amber-700 dark:text-amber-400 hover:bg-amber-500/10" data-testid="button-sales-ladder">
+                  <Layers3 className="h-3.5 w-3.5" />
+                  Sales Ladder
                 </Button>
               </Link>
             )}

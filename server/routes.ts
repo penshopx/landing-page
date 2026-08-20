@@ -91,6 +91,8 @@ import { registerCatalogApiRoutes, clearCatalogCache } from "./catalog-api";
 import { registerGaiaSiapAiRoutes } from "./gaia-siap-api";
 import { registerOrderApiRoutes } from "./order-api";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
+import { registerSalesLadderRoutes } from "./sales-ladder";
+import { seedContractorLadder } from "./sales-ladder-seed";
 
 const _require = createRequire(import.meta.url);
 const { PDFParse: _PDFParse, VerbosityLevel: _VerbosityLevel } = _require("pdf-parse") as {
@@ -23237,6 +23239,14 @@ Min 300 kata. Bahasa Indonesia profesional. Sitasi regulasi spesifik domain ini.
 
   // Unified Order API (Fase B) — aditif, Bearer ORDER_API_KEY, fail-closed.
   registerOrderApiRoutes(app);
+
+  // Sales Ladder (Task #390) — superadmin only
+  registerSalesLadderRoutes(app, { isAuthenticated, getDbRole });
+  // Seed contractor-sbu-readiness ladder (idempotent — never overwrites).
+  // Awaited so a seed failure surfaces explicitly rather than hiding behind
+  // a false-clean boot. If the seed table does not yet exist this will throw
+  // and the caller (server/index.ts) must handle it via its top-level catch.
+  await seedContractorLadder();
 
   // ── Admin Agent System Endpoints ──────────────────────────────────────────
 
