@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Loader2, Bot, ShoppingCart, Smartphone, Search,
   ChevronLeft, ChevronRight, Layers, CheckCircle2, Info, X, MessageCircle,
-  Wrench, Sparkles, ShieldAlert, ShieldCheck, FileText, Plus, Phone,
+  Wrench, Sparkles, ShieldAlert, ShieldCheck, FileText, Plus, Phone, Download,
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { trackLead, trackViewContent, trackInitiateCheckout } from "@/lib/meta-pixel";
@@ -66,6 +66,12 @@ interface AgentProduct {
   paymentUrl?: string | null;
   scalevVariantId?: number | null;
   type?: string;
+  moduleId?: number | null;
+  moduleSlug?: string | null;
+  moduleName?: string | null;
+  toolboxSlug?: string | null;
+  toolboxName?: string | null;
+  premiumClass?: "standard" | "private" | number | null;
 }
 
 interface CatalogResponse {
@@ -79,6 +85,27 @@ interface CatalogResponse {
 interface CategoryCount {
   category: string;
   count: number;
+}
+
+interface ModuleOption {
+  id: number;
+  slug: string;
+  name: string;
+  count: number;
+  standardCount: number;
+  premiumCount: number;
+}
+
+// Derive the "Biasa / Premium" tier from premiumClass on catalog items.
+// "private" is the canonical Premium class. Numeric values remain supported for
+// old cached payloads; absent/unknown values are treated as Biasa.
+function premiumTier(
+  premiumClass?: "standard" | "private" | number | null,
+): { label: string; isPremium: boolean } {
+  const isPremium =
+    premiumClass === "private" ||
+    (typeof premiumClass === "number" && premiumClass > 0);
+  return { label: isPremium ? "Premium" : "Biasa", isPremium };
 }
 
 interface BuyFormData {
@@ -115,14 +142,17 @@ export default function Store() {
   const initialSearch = initialParams.get("q") ?? "";
   const initialCategory = initialParams.get("cat")
     ?? (typeof window !== "undefined" ? localStorage.getItem("store_last_category") ?? "" : "");
+  const initialModule = initialParams.get("module") ?? "";
   const [search, setSearch] = useState(initialSearch);
   const [searchInput, setSearchInput] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedModule, setSelectedModule] = useState(initialModule);
 
   useEffect(() => {
     const params = new URLSearchParams();
     if (searchInput) params.set("q", searchInput);
     if (selectedCategory) params.set("cat", selectedCategory);
+    if (selectedModule) params.set("module", selectedModule);
     const basePath = window.location.pathname.startsWith("/store/katalog") ? "/store/katalog" : "/store";
     const newUrl = params.toString() ? `${basePath}?${params.toString()}` : basePath;
     window.history.replaceState(null, "", newUrl);
@@ -131,7 +161,26 @@ export default function Store() {
     } else {
       localStorage.removeItem("store_last_category");
     }
-  }, [searchInput, selectedCategory]);
+  }, [searchInput, selectedCategory, selectedModule]);
+
+  // Sync state from the URL on back/forward navigation (popstate). Only the
+  // filter params we own (q / cat / module) are mirrored so shareable URLs and
+  // browser history behave predictably.
+  useEffect(() => {
+    const onPopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("q") ?? "";
+      const cat = params.get("cat") ?? "";
+      const mod = params.get("module") ?? "";
+      setSearch(q);
+      setSearchInput(q);
+      setSelectedCategory(cat);
+      setSelectedModule(mod);
+      setPage(1);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
   const [profesiFilter, setProfesiFilter] = useState<string>("");
   const [page, setPage] = useState(1);
   const [, navigate] = useLocation();
@@ -153,10 +202,11 @@ export default function Store() {
     limit: profesiFilter ? "1000" : String(LIMIT),
     ...(search ? { search } : {}),
     ...(selectedCategory ? { category: selectedCategory } : {}),
+    ...(selectedModule ? { module: selectedModule } : {}),
   }).toString();
 
   const { data: catalog, isLoading } = useQuery<CatalogResponse>({
-    queryKey: ["/api/store/catalog", page, search, selectedCategory, profesiFilter],
+    queryKey: ["/api/store/catalog", page, search, selectedCategory, selectedModule, profesiFilter],
     queryFn: async () => { const res = await fetch(`/api/store/catalog?${catalogParams}`); return res.json(); },
   });
 
@@ -164,6 +214,14 @@ export default function Store() {
     queryKey: ["/api/store/catalog/categories"],
     queryFn: async () => { const res = await fetch("/api/store/catalog/categories"); return res.json(); },
   });
+
+  const { data: modulesData } = useQuery<ModuleOption[]>({
+    queryKey: ["/api/store/catalog/modules"],
+    queryFn: async () => { const res = await fetch("/api/store/catalog/modules"); return res.json(); },
+  });
+  const modules = Array.isArray(modulesData) ? modulesData : [];
+
+  const activeModule = modules.find((m) => m.slug === selectedModule);
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: { agentId?: number | null; productId?: number } & BuyFormData) => {
@@ -189,6 +247,11 @@ export default function Store() {
 
   const handleSearch = useCallback(() => { setSearch(searchInput); setPage(1); }, [searchInput]);
   const handleCategoryChange = (cat: string) => { setSelectedCategory(cat); setPage(1); };
+  const handleModuleChange = (slug: string) => {
+    setSelectedModule((prev) => (prev === slug ? "" : slug));
+    setProfesiFilter("");
+    setPage(1);
+  };
 
   const handleAddToCart = (agent: AgentProduct) => {
     trackViewContent({ content_name: agent.name, content_category: agent.category ?? "chatbot" });
@@ -481,6 +544,60 @@ export default function Store() {
             </button>
           )}
         </div>
+
+        {/* Module filter — primary, responsive */}
+        {modules.length > 0 && (
+          <div className="mt-6 max-w-3xl mx-auto" data-testid="module-filter">
+            <p className="text-xs text-gray-400 font-medium mb-2">Berdasarkan modul:</p>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <button
+                onClick={() => handleModuleChange("")}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                  selectedModule === ""
+                    ? "bg-violet-600 text-white border-violet-600 shadow-sm"
+                    : "bg-white text-gray-600 border-gray-300 hover:border-violet-400 hover:text-violet-700"
+                }`}
+                data-testid="module-filter-all">
+                Semua Modul
+              </button>
+              {modules.map((m) => (
+                <button
+                  key={m.slug}
+                  onClick={() => handleModuleChange(m.slug)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                    selectedModule === m.slug
+                      ? "bg-violet-600 text-white border-violet-600 shadow-sm"
+                      : "bg-white text-gray-600 border-gray-300 hover:border-violet-400 hover:text-violet-700"
+                  }`}
+                  title={`${m.name} · ${m.count} produk`}
+                  data-testid={`module-filter-${m.slug}`}>
+                  <Layers className="h-3 w-3" />
+                  {m.name}
+                  <span className="opacity-60">({m.count})</span>
+                </button>
+              ))}
+              {selectedModule && (
+                <button
+                  onClick={() => handleModuleChange("")}
+                  className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 ml-1"
+                  data-testid="module-filter-reset">
+                  Tampilkan semua
+                </button>
+              )}
+            </div>
+            <div className="mt-3 flex justify-center">
+              <Button asChild variant="ghost" size="sm" className="h-8 text-xs text-violet-700">
+                <a
+                  href="/api/store/catalog/module-inventory.csv"
+                  download="inventaris-chatbot-modul.csv"
+                  data-testid="download-module-inventory">
+                  <Download className="h-3.5 w-3.5 mr-1.5" />
+                  Unduh inventaris Modul
+                </a>
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6 bg-gray-50 rounded-none">
@@ -527,6 +644,7 @@ export default function Store() {
             <p className="text-sm text-gray-500">
               {isLoading ? "Memuat..." : `${total.toLocaleString("id-ID")} AI Specialist`}
               {profesiFilter ? ` · Paket ${PROFESI_BUNDLES[profesiFilter]?.label}` : selectedCategory ? ` · ${CATEGORY_LABELS[selectedCategory] || selectedCategory}` : ""}
+              {selectedModule ? ` · Modul ${activeModule?.name ?? selectedModule}` : ""}
               {search ? ` · "${search}"` : ""}
             </p>
             <p className="text-xs text-gray-400">Hal. {page} / {pages}</p>
@@ -541,12 +659,12 @@ export default function Store() {
           ) : pageItems.length === 0 ? (
             <div className="text-center py-20 text-gray-400">
               <Bot className="h-16 w-16 mx-auto mb-4 opacity-20" />
-              {search || selectedCategory || profesiFilter ? (
+              {search || selectedCategory || profesiFilter || selectedModule ? (
                 <>
                   <p className="text-lg font-medium text-gray-500 mb-1">Tidak ada AI Specialist yang cocok</p>
-                  <p className="text-sm">Coba kata kunci, kategori, atau profesi lain</p>
+                  <p className="text-sm">Coba kata kunci, kategori, modul, atau profesi lain</p>
                   <Button variant="outline" size="sm" className="mt-4"
-                    onClick={() => { setSearch(""); setSearchInput(""); setSelectedCategory(""); setProfesiFilter(""); setPage(1); }}>
+                    onClick={() => { setSearch(""); setSearchInput(""); setSelectedCategory(""); setProfesiFilter(""); setSelectedModule(""); setPage(1); }}>
                     Reset Filter
                   </Button>
                 </>
@@ -566,7 +684,7 @@ export default function Store() {
               {pageItems.map((agent) => (
                 <AgentCard key={agent.id} agent={agent} onBuy={handleBuyNow} onAddToCart={handleAddToCart} onDetail={handleDetail} />
               ))}
-              {page === 1 && !search && !selectedCategory && !profesiFilter && <CustomChatbotCard />}
+              {page === 1 && !search && !selectedCategory && !profesiFilter && !selectedModule && <CustomChatbotCard />}
             </div>
           )}
 
@@ -636,6 +754,29 @@ export default function Store() {
                       {detailAgent.isOrchestrator && (
                         <Badge className="bg-amber-100 text-amber-700 border-amber-200 text-xs px-2 py-0 flex items-center gap-1">
                           <Layers className="h-2.5 w-2.5" />Multi-Agent
+                        </Badge>
+                      )}
+                      {(() => {
+                        const dp = premiumTier(detailAgent.premiumClass);
+                        return (
+                          <Badge
+                            className={`text-xs px-2 py-0 flex items-center gap-1 border ${
+                              dp.isPremium
+                                ? "bg-amber-100 text-amber-700 border-amber-200"
+                                : "bg-gray-100 text-gray-600 border-gray-200"
+                            }`}
+                            data-testid={`badge-detail-tier-${detailAgent.id}`}
+                            title={dp.isPremium ? "Produk premium" : "Produk biasa (standar)"}>
+                            {dp.isPremium && <Sparkles className="h-2.5 w-2.5" />}
+                            {dp.label}
+                          </Badge>
+                        );
+                      })()}
+                      {detailAgent.moduleName && (
+                        <Badge className="bg-violet-100 text-violet-700 border-violet-200 text-xs px-2 py-0 flex items-center gap-1"
+                          data-testid={`badge-detail-module-${detailAgent.id}`}
+                          title={`Modul: ${detailAgent.moduleName}`}>
+                          <Layers className="h-2.5 w-2.5" />{detailAgent.moduleName}
                         </Badge>
                       )}
                       {detailAgent.isGustafta ? (
@@ -939,6 +1080,7 @@ function AgentCard({
   const categoryLabel = CATEGORY_LABELS[agent.category] || agent.category;
   const hasDetail = !!(agent.productSummary || agent.description || (agent.productFeatures ?? []).length > 0);
   const tier = getChatbotTier(agent.agentCount);
+  const premium = premiumTier(agent.premiumClass);
 
   return (
     <Card className="bg-white border-gray-200 hover:border-violet-400 hover:shadow-md transition-all group flex flex-col"
@@ -976,8 +1118,28 @@ function AgentCard({
                 <Sparkles className="h-2.5 w-2.5" />Kelas Premium {agent.licenseClass}
               </Badge>
             ) : null}
+            <Badge
+              className={`text-xs px-2 py-0 border flex items-center gap-1 ${
+                premium.isPremium
+                  ? "bg-amber-100 text-amber-700 border-amber-200"
+                  : "bg-gray-100 text-gray-600 border-gray-200"
+              }`}
+              data-testid={`badge-tier-${agent.id}`}
+              title={premium.isPremium ? "Produk premium" : "Produk biasa (standar)"}>
+              {premium.isPremium && <Sparkles className="h-2.5 w-2.5" />}
+              {premium.label}
+            </Badge>
           </div>
         </div>
+
+        {agent.moduleName && (
+          <div className="flex items-center gap-1 mb-1">
+            <Layers className="h-3 w-3 text-violet-400 shrink-0" />
+            <span className="text-[10px] text-violet-600 font-medium" data-testid={`module-name-${agent.id}`}>
+              {agent.moduleName}
+            </span>
+          </div>
+        )}
 
         <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-1 group-hover:text-violet-700 transition-colors line-clamp-2">
           {agent.name}

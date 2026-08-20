@@ -188,7 +188,150 @@ export function invalidateStoreCatalog(): void {
   storeCatalogInflight.clear();
 }
 
-async function buildStoreCatalogItems(category: string, search: string): Promise<any[]> {
+// Effective premiumClass for a catalog item: only "standard" | "private".
+// Legacy rows may have null/blank/invalid values — those normalize to "standard"
+// (the default distribution model) so downstream consumers can rely on the field.
+function normalizePremiumClass(v: unknown): "standard" | "private" {
+  return v === "private" ? "private" : "standard";
+}
+
+export function buildStoreModuleInventoryCsv(items: any[]): string {
+  const escapeCell = (value: unknown): string => {
+    let text = String(value ?? "");
+    // Prevent spreadsheet formula injection when creator/admin-controlled
+    // names are opened in Excel or Google Sheets. Leading whitespace does not
+    // make formula-like input safe because spreadsheet parsers may trim it.
+    if (/^\s*[=+\-@]/.test(text)) text = `'${text}`;
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  };
+  const rows = items
+    .filter((item) => item?.agentId && item?.moduleId && item?.moduleSlug)
+    .sort((a, b) =>
+      String(a.moduleName ?? "").localeCompare(String(b.moduleName ?? ""), "id")
+      || String(a.toolboxName ?? "").localeCompare(String(b.toolboxName ?? ""), "id")
+      || String(a.name ?? "").localeCompare(String(b.name ?? ""), "id"),
+    )
+    .map((item) => [
+      item.moduleName,
+      item.moduleSlug,
+      item.toolboxName || "Tanpa toolbox",
+      item.name,
+      normalizePremiumClass(item.premiumClass) === "private" ? "Premium" : "Biasa",
+      item.agentId,
+    ].map(escapeCell).join(","));
+
+  return [
+    ["Modul", "Slug Modul", "Toolbox", "Produk / AI Specialist", "Kelas", "Agent ID"]
+      .map(escapeCell)
+      .join(","),
+    ...rows,
+  ].join("\r\n");
+}
+
+// ── Module (Big Idea) resolution for the store catalog ────────────────────────
+// A store item's "module" is the Big Idea it belongs to. For an agent it comes
+// from agents.bigIdeaId directly, or — when null — from the agent's toolbox's
+// bigIdeaId (agents.toolboxId → toolboxes.bigIdeaId). For a store_product it is
+// derived from its linked agent (store_products.agentId) using the same rule.
+// The toolbox (name + slug) is also surfaced when the agent links to one.
+// All fields are optional/null-safe: legacy rows without a module resolve to null.
+interface ModuleInfo {
+  moduleId: number | null;
+  moduleSlug: string | null;
+  moduleName: string | null;
+  toolboxSlug: string | null;
+  toolboxName: string | null;
+}
+
+const EMPTY_MODULE_INFO: ModuleInfo = {
+  moduleId: null, moduleSlug: null, moduleName: null,
+  toolboxSlug: null, toolboxName: null,
+};
+
+// Build a per-agent ModuleInfo map for the given agent ids by joining through
+// toolboxes and big_ideas. Resilient to a missing toolboxes.slug column (the
+// parallel schema change may not have landed yet) — slug falls back to null.
+async function buildAgentModuleMap(agentIds: number[]): Promise<Map<number, ModuleInfo>> {
+  const map = new Map<number, ModuleInfo>();
+  const ids = Array.from(new Set(agentIds.filter((id): id is number => typeof id === "number")));
+  if (ids.length === 0) return map;
+
+  const { db } = await import("./db");
+  const { agents: agentsTable, toolboxes: toolboxesTable, bigIdeas: bigIdeasTable } = await import("@shared/schema");
+  const { inArray } = await import("drizzle-orm");
+
+  const agentRows = await db.select({
+    id: agentsTable.id,
+    bigIdeaId: agentsTable.bigIdeaId,
+    toolboxId: agentsTable.toolboxId,
+  }).from(agentsTable).where(inArray(agentsTable.id, ids));
+
+  const toolboxIds = Array.from(new Set(
+    agentRows.map(a => a.toolboxId).filter((v): v is number => typeof v === "number"),
+  ));
+
+  // toolboxes.slug is added by a parallel schema change; reference it defensively
+  // so this builder compiles/runs whether or not the column exists yet.
+  const toolboxSlugCol = (toolboxesTable as any).slug;
+  const toolboxMap = new Map<number, { name: string | null; slug: string | null; bigIdeaId: number | null }>();
+  if (toolboxIds.length > 0) {
+    const tbRows = await db.select({
+      id: toolboxesTable.id,
+      name: toolboxesTable.name,
+      bigIdeaId: toolboxesTable.bigIdeaId,
+      ...(toolboxSlugCol ? { slug: toolboxSlugCol } : {}),
+    }).from(toolboxesTable).where(inArray(toolboxesTable.id, toolboxIds));
+    for (const t of tbRows) {
+      toolboxMap.set(t.id, {
+        name: t.name ?? null,
+        slug: (t as any).slug ?? null,
+        bigIdeaId: t.bigIdeaId ?? null,
+      });
+    }
+  }
+
+  // Collect every big_idea id we need (direct agent link + via toolbox).
+  const bigIdeaIds = new Set<number>();
+  for (const a of agentRows) {
+    if (typeof a.bigIdeaId === "number") bigIdeaIds.add(a.bigIdeaId);
+    else if (typeof a.toolboxId === "number") {
+      const tb = toolboxMap.get(a.toolboxId);
+      if (tb && typeof tb.bigIdeaId === "number") bigIdeaIds.add(tb.bigIdeaId);
+    }
+  }
+
+  const bigIdeaMap = new Map<number, { name: string | null; slug: string | null }>();
+  if (bigIdeaIds.size > 0) {
+    const biRows = await db.select({
+      id: bigIdeasTable.id,
+      name: bigIdeasTable.name,
+      slug: bigIdeasTable.slug,
+    }).from(bigIdeasTable).where(inArray(bigIdeasTable.id, Array.from(bigIdeaIds)));
+    for (const b of biRows) {
+      bigIdeaMap.set(b.id, { name: b.name ?? null, slug: b.slug ?? null });
+    }
+  }
+
+  for (const a of agentRows) {
+    const tb = typeof a.toolboxId === "number" ? toolboxMap.get(a.toolboxId) : undefined;
+    // Effective module: direct agent link wins; otherwise the toolbox's big idea.
+    const effectiveBigIdeaId = typeof a.bigIdeaId === "number"
+      ? a.bigIdeaId
+      : (tb && typeof tb.bigIdeaId === "number" ? tb.bigIdeaId : null);
+    const bi = effectiveBigIdeaId != null ? bigIdeaMap.get(effectiveBigIdeaId) : undefined;
+    map.set(a.id, {
+      moduleId: effectiveBigIdeaId,
+      moduleSlug: bi?.slug ?? null,
+      moduleName: bi?.name ?? null,
+      toolboxSlug: tb?.slug ?? null,
+      toolboxName: tb?.name ?? null,
+    });
+  }
+
+  return map;
+}
+
+async function buildStoreCatalogItems(category: string, search: string, moduleSlug?: string): Promise<any[]> {
   const { db } = await import("./db");
   const { agents: agentsTable, storeProducts } = await import("@shared/schema");
   const { and, eq, or, ilike, inArray, isNull, sql: sqlOp } = await import("drizzle-orm");
@@ -290,6 +433,9 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
     licenseClass: agentsTable.licenseClass,
     licensePrice: agentsTable.licensePrice,
     paymentUrl: agentsTable.paymentUrl,
+    premiumClass: agentsTable.premiumClass,
+    bigIdeaId: agentsTable.bigIdeaId,
+    toolboxId: agentsTable.toolboxId,
   }).from(agentsTable).where(agentWhere).orderBy(agentsTable.id);
 
   // Count direct child agents per parent for accurate team-size pricing
@@ -322,20 +468,45 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
     }
   }
 
+  // Module (Big Idea) + toolbox resolution for every agent referenced by the
+  // catalog — both agents linked from store_products and stand-alone agents.
+  // premiumClass for store-product items is derived from the linked agent.
+  const moduleAgentIds = [
+    ...spLinkedAgentIds,
+    ...agentRows.map(a => a.id),
+  ];
+  const moduleMap = await buildAgentModuleMap(moduleAgentIds);
+  const linkedAgentPremiumMap = new Map<number, "standard" | "private">();
+  if (spLinkedAgentIds.length > 0) {
+    const premRows = await db.select({
+      id: agentsTable.id,
+      premiumClass: agentsTable.premiumClass,
+    }).from(agentsTable).where(inArray(agentsTable.id, spLinkedAgentIds));
+    for (const r of premRows) {
+      linkedAgentPremiumMap.set(r.id, normalizePremiumClass(r.premiumClass));
+    }
+  }
+
   // Re-compute store product prices with updated child counts.
   // priceOverride always wins — only update price when no override is set.
   const storeProductItemsFinal = storeProductItems.map(p => {
+    const mod = p.agentId != null ? (moduleMap.get(p.agentId) ?? EMPTY_MODULE_INFO) : EMPTY_MODULE_INFO;
+    // premiumClass comes from the linked agent; unlinked products default standard.
+    const premiumClass = p.agentId != null
+      ? (linkedAgentPremiumMap.get(p.agentId) ?? "standard")
+      : "standard";
+    const enriched = { ...p, ...mod, premiumClass };
     if (p.agentId != null) {
       // Find the original store row to check for override
       const spRow = spRows.find(r => r.id === p.productId);
       if (spRow && (spRow as any).priceOverride != null) {
         // Admin-set override takes precedence — never overwrite it
-        return p;
+        return enriched;
       }
       const linkedSub = agentSubMap.get(p.agentId);
-      return { ...p, price: linkedSub !== undefined ? calcStorePrice(linkedSub) : p.price };
+      return { ...enriched, price: linkedSub !== undefined ? calcStorePrice(linkedSub) : p.price };
     }
-    return p;
+    return enriched;
   });
 
   const agentItems = agentRows
@@ -361,6 +532,7 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
       const effectiveTotal = 1 + Math.max(subCount, childCount);
       // Harga lisensi efektif: band kelas (berkelas) atau harga bebas / DEFAULT (non-kelas).
       const price = resolveLicensePrice(a.licenseClass, (a as any).licensePrice);
+      const mod = moduleMap.get(a.id) ?? EMPTY_MODULE_INFO;
       return {
         id: `ag-${a.id}`,
         agentId: a.id,
@@ -384,17 +556,36 @@ async function buildStoreCatalogItems(category: string, search: string): Promise
         isCertified: a.isCertified === true,
         licenseClass: isPremiumClass(a.licenseClass) ? a.licenseClass : null,
         paymentUrl: (a as any).paymentUrl || null,
+        // Distribusi ("standard"/"private") — null-safe untuk baris legacy.
+        premiumClass: normalizePremiumClass((a as any).premiumClass),
+        // Modul (Big Idea) efektif + toolbox. Semua field optional/null-safe.
+        moduleId: mod.moduleId,
+        moduleSlug: mod.moduleSlug,
+        moduleName: mod.moduleName,
+        toolboxSlug: mod.toolboxSlug,
+        toolboxName: mod.toolboxName,
         type: "agent",
       };
     });
 
-  return [...storeProductItemsFinal, ...agentItems];
+  const allItems = [...storeProductItemsFinal, ...agentItems];
+
+  // Server-side module filter (applied BEFORE pagination in the route handler).
+  // When a module slug is supplied, keep only items whose effective module slug
+  // matches. Null-safe: legacy items without a module slug are excluded from a
+  // module-filtered view.
+  const wantModule = (moduleSlug ?? "").trim();
+  if (wantModule) {
+    return allItems.filter((it) => it.moduleSlug === wantModule);
+  }
+
+  return allItems;
 }
 
-function refreshStoreCatalog(cacheKey: string, category: string, search: string): Promise<any[]> {
+function refreshStoreCatalog(cacheKey: string, category: string, search: string, moduleSlug?: string): Promise<any[]> {
   let inflight = storeCatalogInflight.get(cacheKey);
   if (inflight) return inflight;
-  inflight = buildStoreCatalogItems(category, search)
+  inflight = buildStoreCatalogItems(category, search, moduleSlug)
     .then((items) => {
       // Evict expired/oldest entries to keep the cache bounded (search terms are
       // user-supplied and could otherwise grow the map unbounded).
@@ -418,8 +609,12 @@ function refreshStoreCatalog(cacheKey: string, category: string, search: string)
   return inflight;
 }
 
-export async function getStoreCatalogItems(category: string, search: string): Promise<any[]> {
-  const cacheKey = `${category}||${search}`;
+export async function getStoreCatalogItems(category: string, search: string, moduleSlug?: string): Promise<any[]> {
+  // Module slug is part of the cache identity so a module-filtered view never
+  // collides with the unfiltered (or a differently-filtered) result. Two-arg
+  // callers keep the exact same key they had before (empty module segment).
+  const mod = (moduleSlug ?? "").trim();
+  const cacheKey = `${category}||${search}||${mod}`;
   const cached = storeCatalogCache.get(cacheKey);
   if (cached) {
     const age = Date.now() - cached.ts;
@@ -428,12 +623,12 @@ export async function getStoreCatalogItems(category: string, search: string): Pr
       // Stale-while-revalidate: serve the stale copy instantly, refresh in the
       // background. Requests never block on a rebuild once warmed. Catalog data is
       // non-critical and a few extra seconds of staleness is acceptable.
-      void refreshStoreCatalog(cacheKey, category, search).catch(() => {});
+      void refreshStoreCatalog(cacheKey, category, search, mod).catch(() => {});
       return cached.items;
     }
   }
   // Cold (never built or fully expired): must block on a single-flight build.
-  return refreshStoreCatalog(cacheKey, category, search);
+  return refreshStoreCatalog(cacheKey, category, search, mod);
 }
 
 // Pre-warm the default listing (no filters) so the very first burst of traffic
@@ -1634,6 +1829,7 @@ export async function registerRoutes(
       }
       console.log("[BigIdea] Parsed data:", JSON.stringify(parsed.data));
       const bigIdea = await storage.createBigIdea(parsed.data);
+      invalidateStoreCatalog();
       console.log("[BigIdea] Created:", JSON.stringify(bigIdea));
       res.status(201).json(bigIdea);
     } catch (error: any) {
@@ -1663,6 +1859,7 @@ export async function registerRoutes(
           console.error("Failed to cascade seriesId to toolboxes:", cascadeErr);
         }
       }
+      invalidateStoreCatalog();
       res.json(bigIdea);
     } catch (error) {
       res.status(500).json({ error: "Failed to update big idea" });
@@ -1676,6 +1873,7 @@ export async function registerRoutes(
       if (!bigIdea) {
         return res.status(404).json({ error: "Big idea not found" });
       }
+      invalidateStoreCatalog();
       res.json(bigIdea);
     } catch (error) {
       res.status(500).json({ error: "Failed to activate big idea" });
@@ -1689,6 +1887,7 @@ export async function registerRoutes(
       if (!deleted) {
         return res.status(404).json({ error: "Big idea not found" });
       }
+      invalidateStoreCatalog();
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete big idea" });
@@ -1781,6 +1980,7 @@ export async function registerRoutes(
           throw dbError;
         }
       }
+      invalidateStoreCatalog();
       res.status(201).json(toolbox);
     } catch (error: any) {
       console.error("Failed to create toolbox:", error);
@@ -1795,6 +1995,7 @@ export async function registerRoutes(
       if (!toolbox) {
         return res.status(404).json({ error: "Toolbox not found" });
       }
+      invalidateStoreCatalog();
       res.json(toolbox);
     } catch (error) {
       res.status(500).json({ error: "Failed to update toolbox" });
@@ -1808,6 +2009,7 @@ export async function registerRoutes(
       if (!toolbox) {
         return res.status(404).json({ error: "Toolbox not found" });
       }
+      invalidateStoreCatalog();
       res.json(toolbox);
     } catch (error) {
       res.status(500).json({ error: "Failed to activate toolbox" });
@@ -1821,6 +2023,7 @@ export async function registerRoutes(
       if (!deleted) {
         return res.status(404).json({ error: "Toolbox not found" });
       }
+      invalidateStoreCatalog();
       res.status(204).send();
     } catch (error) {
       res.status(500).json({ error: "Failed to delete toolbox" });
@@ -7476,10 +7679,13 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       const limit = Math.min(1000, Math.max(12, parseInt(String(req.query.limit || "24"))));
       const search = String(req.query.search || "").trim().toLowerCase();
       const category = String(req.query.category || "").trim();
+      // Optional server-side module (Big Idea) filter. Applied BEFORE pagination
+      // so `total`/`pages` reflect the filtered set, not the whole catalog.
+      const moduleSlug = String(req.query.module || "").trim();
 
-      // Fully-computed, cached item list per (category, search). Pagination stays
-      // per-request. See buildStoreCatalogItems/getStoreCatalogItems above.
-      const allItems = await getStoreCatalogItems(category, search);
+      // Fully-computed, cached item list per (category, search, module). Pagination
+      // stays per-request. See buildStoreCatalogItems/getStoreCatalogItems above.
+      const allItems = await getStoreCatalogItems(category, search, moduleSlug);
 
       const total = allItems.length;
       const offset = (page - 1) * limit;
@@ -7497,6 +7703,61 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     } catch (error) {
       console.error("Store catalog error:", error);
       res.status(500).json({ error: "Failed to fetch catalog" });
+    }
+  });
+
+  // Human-readable inventory of every promotable chatbot/product that already
+  // belongs to a canonical Module. Uses only public Store metadata.
+  app.get("/api/store/catalog/module-inventory.csv", async (_req, res) => {
+    try {
+      const items = await getStoreCatalogItems("", "");
+      const csv = buildStoreModuleInventoryCsv(items);
+      res.set("Cache-Control", "public, max-age=30");
+      res.set("Content-Type", "text/csv; charset=utf-8");
+      res.set("Content-Disposition", 'attachment; filename="inventaris-chatbot-modul.csv"');
+      res.send(`\uFEFF${csv}`);
+    } catch (error) {
+      console.error("Store module inventory error:", error);
+      res.status(500).json({ error: "Failed to build module inventory" });
+    }
+  });
+
+  // GET /api/store/catalog/modules — modules (Big Ideas) actually represented in
+  // the promotable catalog, each with total/standard/private counts, sorted by
+  // name. Derived from the SAME unfiltered catalog the /catalog endpoint serves
+  // (no module filter), so a module only appears when it has at least one live
+  // item. Never exposes prompts — only the module/count metadata.
+  app.get("/api/store/catalog/modules", async (_req, res) => {
+    try {
+      // Unfiltered promotable catalog (no category/search/module filter).
+      const items = await getStoreCatalogItems("", "");
+
+      const agg = new Map<number, {
+        id: number; slug: string | null; name: string | null;
+        count: number; standardCount: number; premiumCount: number;
+      }>();
+      for (const it of items) {
+        const id = it?.moduleId;
+        if (typeof id !== "number") continue; // legacy/no-module items are skipped
+        let entry = agg.get(id);
+        if (!entry) {
+          entry = { id, slug: it.moduleSlug ?? null, name: it.moduleName ?? null, count: 0, standardCount: 0, premiumCount: 0 };
+          agg.set(id, entry);
+        }
+        entry.count += 1;
+        if (it.premiumClass === "private") entry.premiumCount += 1;
+        else entry.standardCount += 1;
+      }
+
+      const modules = Array.from(agg.values()).sort((a, b) =>
+        String(a.name ?? "").localeCompare(String(b.name ?? "")),
+      );
+
+      res.set("Cache-Control", "public, max-age=30");
+      res.json(modules);
+    } catch (error) {
+      console.error("Store catalog modules error:", error);
+      res.status(500).json({ error: "Failed to fetch modules" });
     }
   });
 
@@ -11607,27 +11868,26 @@ Balas dengan JSON dengan struktur PERSIS ini:
 
   app.get("/api/public/modul/:bigIdeaId", async (req, res) => {
     try {
-      // Resolve slug to numeric ID if needed
-      let resolvedId = req.params.bigIdeaId;
-      if (!/^\d+$/.test(resolvedId)) {
-        const mapped = MODUL_SLUG_MAP[resolvedId.toLowerCase()];
-        if (mapped) {
-          resolvedId = mapped;
-        } else {
-          // Try name-based lookup in DB
-          const all = await storage.getBigIdeas();
-          const match = all.find(b => {
-            const normalized = b.name.toLowerCase().replace(/[^a-z0-9]+/g, "");
-            const query = resolvedId.toLowerCase().replace(/[^a-z0-9]+/g, "");
-            return normalized.includes(query) || query.includes(normalized.substring(0, 6));
-          });
-          if (match) resolvedId = String(match.id);
-        }
+      const requestedIdOrSlug = req.params.bigIdeaId;
+      // Canonical path: DatabaseStorage resolves a numeric id OR the exact
+      // big_ideas.slug. Legacy aliases and name matching are fallback-only.
+      let bigIdea = await storage.getBigIdea(requestedIdOrSlug);
+      if (!bigIdea && !/^\d+$/.test(requestedIdOrSlug)) {
+        const mapped = MODUL_SLUG_MAP[requestedIdOrSlug.toLowerCase()];
+        if (mapped) bigIdea = await storage.getBigIdea(mapped);
       }
-      const bigIdea = await storage.getBigIdea(resolvedId);
+      if (!bigIdea && !/^\d+$/.test(requestedIdOrSlug)) {
+        const all = await storage.getBigIdeas();
+        const query = requestedIdOrSlug.toLowerCase().replace(/[^a-z0-9]+/g, "");
+        bigIdea = all.find((candidate) => {
+          const normalized = candidate.name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+          return normalized.includes(query) || query.includes(normalized.substring(0, 6));
+        });
+      }
       if (!bigIdea || !bigIdea.isActive) {
         return res.status(404).json({ error: "Modul not found" });
       }
+      const resolvedId = String(bigIdea.id);
 
       if (bigIdea.seriesId) {
         const parentSeries = await storage.getSeriesById(String(bigIdea.seriesId));
@@ -11659,7 +11919,7 @@ Balas dengan JSON dengan struktur PERSIS ini:
             subcategory: agent.subcategory || "",
             toolboxName: toolbox.name,
             toolboxId: toolbox.id,
-            slug: "",
+            slug: (agent as any).slug || "",
           });
         }
       }

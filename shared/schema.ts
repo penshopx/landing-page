@@ -73,13 +73,18 @@ export const bigIdeas = pgTable("big_ideas", {
   trialDays: integer("trial_days").default(7),
   requireRegistration: boolean("require_registration").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  slugUnique: uniqueIndex("big_ideas_slug_unique")
+    .on(table.slug)
+    .where(sql`${table.slug} IS NOT NULL AND btrim(${table.slug}) <> ''`),
+}));
 
 // Toolboxes Table
 export const toolboxes = pgTable("toolboxes", {
   id: serial("id").primaryKey(),
   bigIdeaId: integer("big_idea_id"),
   seriesId: integer("series_id"),
+  slug: text("slug"),
   isOrchestrator: boolean("is_orchestrator").default(false),
   name: text("name").notNull(),
   description: text("description").default(""),
@@ -89,7 +94,11 @@ export const toolboxes = pgTable("toolboxes", {
   sortOrder: integer("sort_order").default(0),
   isActive: boolean("is_active").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  bigIdeaSlugUnique: uniqueIndex("toolboxes_big_idea_slug_unique")
+    .on(table.bigIdeaId, table.slug)
+    .where(sql`${table.slug} IS NOT NULL`),
+}));
 
 // Agents/Chatbots Table
 export const agents = pgTable("agents", {
@@ -282,6 +291,9 @@ export const agents = pgTable("agents", {
   archivedAt: timestamp("archived_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => [
+  uniqueIndex("agents_slug_unique")
+    .on(table.slug)
+    .where(sql`${table.slug} IS NOT NULL AND btrim(${table.slug}) <> ''`),
   // Premium Privat: jamin maksimal SATU salinan per (master, pemilik). Race-safe
   // di level DB — dua webhook/login bersamaan tak bisa membuat clone ganda.
   // Partial: hanya berlaku untuk baris salinan (cloned_from_agent_id NOT NULL),
@@ -796,6 +808,7 @@ export type BigIdea = InsertBigIdea & {
 export const insertToolboxSchema = z.object({
   bigIdeaId: z.string().optional(),
   seriesId: z.string().optional(),
+  slug: z.string().nullable().optional(),
   isOrchestrator: z.boolean().optional().default(false),
   name: z.string().min(1, "Name is required"),
   description: z.string().optional().default(""),
@@ -808,6 +821,7 @@ export const insertToolboxSchema = z.object({
 export type InsertToolbox = z.infer<typeof insertToolboxSchema>;
 export type Toolbox = InsertToolbox & {
   id: string;
+  slug?: string | null;
   isActive: boolean;
   isOrchestrator: boolean;
   createdAt: string;

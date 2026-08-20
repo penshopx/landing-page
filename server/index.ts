@@ -12,7 +12,7 @@ process.on("uncaughtException", (err) => {
 
 import express, { type Request, Response, NextFunction } from "express";
 
-import { registerRoutes } from "./routes";
+import { invalidateStoreCatalog, registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
@@ -2497,6 +2497,22 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
 
       // ── Store Products — produk unggulan di katalog marketplace ──────────
       try { await seedStoreProducts(); } catch (err) { log("[Seed StoreProducts] Error: " + (err as Error).message); }
+
+      // Kelompokkan hanya agent promotable yang belum punya Modul efektif.
+      // Reconciler tidak mengubah prompt, harga, model, visibilitas, atau kelas premium.
+      try {
+        const { reconcileChatbotModules } = await import("./reconcile-chatbot-modules");
+        const result = await reconcileChatbotModules();
+        invalidateStoreCatalog();
+        log(
+          `[Chatbot Modules] ✅ ${result.agentsAssigned} assigned, ` +
+          `${result.alreadyAssigned} unchanged, ${result.conflicts.length} conflicts, ` +
+          `${result.missingAgents.length + result.missingModules.length} missing, ` +
+          `${result.duplicateAgentSlugs.length + result.duplicateModuleSlugs.length} duplicate slugs`,
+        );
+      } catch (err) {
+        log("[Chatbot Modules] Error: " + (err as Error).message);
+      }
 
       // ── SMART MODEL UPGRADE — SEMUA chatbot/agen wajib model cerdas ──────────
       // Kualitas jawaban ditentukan tier model, bukan KB. Seed MELEWATI agen yang

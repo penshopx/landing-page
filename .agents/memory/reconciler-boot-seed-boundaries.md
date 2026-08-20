@@ -1,0 +1,10 @@
+---
+name: Reconciler vs boot seed boundaries
+description: Cara membuktikan reconciler sempit tidak mengubah atribut agent yang dikelola seed boot lain.
+---
+
+Untuk reconciler yang hanya boleh mengubah relasi tertentu, ambil snapshot atribut terlarang tepat sebelum dan sesudah transaksi reconciler, lalu lakukan audit kedua setelah seluruh boot selesai.
+
+**Why:** Boot aplikasi menjalankan beberapa seed dan repair independen secara berurutan. Snapshot pasca-boot saja dapat menuduh reconciler atas perubahan prompt, model, atau visibilitas yang sebenarnya dibuat seed lain setelah transaksi reconciler selesai.
+
+**How to apply:** Bandingkan snapshot per slug di batas transaksi untuk membuktikan ruang lingkup mutasi. Setelah restart, verifikasi lagi keadaan operasional akhir dan baca urutan log untuk mengatribusikan perbedaan secara benar.

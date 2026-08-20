@@ -86,3 +86,4 @@
 - [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.
 - [Public anonymous chat sessionId](public-anon-chat-sessionid.md) — public-agent chat pages MUST send per-visitor sessionId to /api/messages/stream, else agent-wide history (PII) leaks antar pengunjung.
 - [Floating chatbot single owner](floating-chat-single-owner.md) — hanya ChaesaWidget global di App.tsx; jangan mount ChatPopup/DialogGustafta per halaman (bertindih).
+- [Reconciler vs boot seeds](reconciler-boot-seed-boundaries.md) — audit mutasi reconciler tepat di batas transaksinya; seed boot lain dapat mengubah field yang sama setelahnya.

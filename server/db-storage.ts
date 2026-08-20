@@ -666,14 +666,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getBigIdea(id: string): Promise<BigIdea | undefined> {
-    const numId = parseInt(id);
-    if (!isNaN(numId)) {
+    if (/^\d+$/.test(id)) {
+      const numId = Number(id);
       const result = await db.select().from(bigIdeas).where(eq(bigIdeas.id, numId)).limit(1);
       if (result.length > 0) return this.mapBigIdeaRow(result[0]);
     }
-    // Fallback: slug lookup
-    const bySlug = await db.select().from(bigIdeas).where(eq(bigIdeas.slug, id)).limit(1);
-    if (bySlug.length > 0) return this.mapBigIdeaRow(bySlug[0]);
+    // Canonical slug lookup. Fail closed on legacy duplicate slugs instead of
+    // returning an arbitrary module.
+    const bySlug = await db.select().from(bigIdeas).where(eq(bigIdeas.slug, id)).limit(2);
+    if (bySlug.length === 1) return this.mapBigIdeaRow(bySlug[0]);
+    if (bySlug.length > 1) {
+      console.error(`[BigIdea] Ambiguous duplicate slug rejected: ${id}`);
+    }
     return undefined;
   }
 
@@ -759,6 +763,7 @@ export class DatabaseStorage implements IStorage {
       id: String(row.id),
       bigIdeaId: row.bigIdeaId ? String(row.bigIdeaId) : undefined,
       seriesId: row.seriesId ? String(row.seriesId) : undefined,
+      slug: row.slug,
       isOrchestrator: row.isOrchestrator || false,
       name: row.name,
       description: row.description || "",
@@ -779,6 +784,7 @@ export class DatabaseStorage implements IStorage {
       id: String(row.id),
       bigIdeaId: row.bigIdeaId ? String(row.bigIdeaId) : undefined,
       seriesId: row.seriesId ? String(row.seriesId) : undefined,
+      slug: row.slug,
       isOrchestrator: row.isOrchestrator || false,
       name: row.name,
       description: row.description || "",
@@ -799,6 +805,7 @@ export class DatabaseStorage implements IStorage {
       id: String(row.id),
       bigIdeaId: row.bigIdeaId ? String(row.bigIdeaId) : undefined,
       seriesId: row.seriesId ? String(row.seriesId) : undefined,
+      slug: row.slug,
       isOrchestrator: row.isOrchestrator || false,
       name: row.name,
       description: row.description || "",
@@ -815,6 +822,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db.insert(toolboxes).values({
       bigIdeaId: insertToolbox.bigIdeaId ? parseInt(insertToolbox.bigIdeaId) : null,
       seriesId: insertToolbox.seriesId ? parseInt(insertToolbox.seriesId) : null,
+      slug: insertToolbox.slug || null,
       isOrchestrator: insertToolbox.isOrchestrator || false,
       name: insertToolbox.name,
       description: insertToolbox.description || "",
@@ -829,6 +837,7 @@ export class DatabaseStorage implements IStorage {
       id: String(row.id),
       bigIdeaId: row.bigIdeaId ? String(row.bigIdeaId) : undefined,
       seriesId: row.seriesId ? String(row.seriesId) : undefined,
+      slug: row.slug,
       isOrchestrator: row.isOrchestrator || false,
       name: row.name,
       description: row.description || "",
@@ -843,6 +852,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateToolbox(id: string, data: Partial<InsertToolbox>): Promise<Toolbox | undefined> {
     const updateData: Record<string, unknown> = {};
+    if (data.slug !== undefined) updateData.slug = data.slug || null;
     if (data.name !== undefined) updateData.name = data.name;
     if (data.description !== undefined) updateData.description = data.description;
     if (data.purpose !== undefined) updateData.purpose = data.purpose;
@@ -872,6 +882,7 @@ export class DatabaseStorage implements IStorage {
       id: String(row.id),
       bigIdeaId: row.bigIdeaId ? String(row.bigIdeaId) : undefined,
       seriesId: row.seriesId ? String(row.seriesId) : undefined,
+      slug: row.slug,
       isOrchestrator: row.isOrchestrator || false,
       name: row.name,
       description: row.description || "",

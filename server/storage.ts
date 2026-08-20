@@ -707,7 +707,10 @@ export class MemStorage implements IStorage {
   }
 
   async getBigIdea(id: string): Promise<BigIdea | undefined> {
-    return this.bigIdeas.get(id);
+    const byId = this.bigIdeas.get(id);
+    if (byId) return byId;
+    const bySlug = Array.from(this.bigIdeas.values()).filter((item) => item.slug === id);
+    return bySlug.length === 1 ? bySlug[0] : undefined;
   }
 
   async getActiveBigIdea(): Promise<BigIdea | null> {
@@ -831,6 +834,7 @@ export class MemStorage implements IStorage {
       id,
       bigIdeaId: insertToolbox.bigIdeaId,
       seriesId: insertToolbox.seriesId,
+      slug: insertToolbox.slug || null,
       isOrchestrator: insertToolbox.isOrchestrator || false,
       name: insertToolbox.name,
       description: insertToolbox.description || "",
@@ -852,6 +856,7 @@ export class MemStorage implements IStorage {
 
     const updated: Toolbox = {
       ...toolbox,
+      slug: data.slug !== undefined ? (data.slug || null) : toolbox.slug,
       name: data.name !== undefined ? data.name : toolbox.name,
       description: data.description !== undefined ? data.description : toolbox.description,
       purpose: data.purpose !== undefined ? data.purpose : toolbox.purpose,

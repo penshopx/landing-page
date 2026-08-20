@@ -35,6 +35,12 @@ const files = [
   // Integration + cache: confirms clearing a product's paymentUrl falls back to
   // the agent URL (or null) immediately after invalidation — without a redeploy.
   resolve(__dirname, "store-catalog-payment-link-fallback.test.ts"),
+  // DB integration: module metadata/filter/cache and premiumClass preservation
+  // for direct agents plus linked Store products.
+  resolve(__dirname, "store-catalog-module-filter.test.ts"),
+  // DB integration: idempotent module reconciliation never overwrites an
+  // existing module, prompt, or premiumClass.
+  resolve(__dirname, "chatbot-module-reconcile.test.ts"),
   // DB integration: confirms superadmin bootstrap guard survives server restarts.
   // Skipped automatically (process.exit 0) when DATABASE_URL is absent.
   resolve(__dirname, "bootstrap-superadmin-db.test.ts"),
