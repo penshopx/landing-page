@@ -1,0 +1,635 @@
+Ya. Setelah saya **baca ulang isi aktual kedua ebook**, gambarnya sekarang jauh lebih jelas. Dan saya perlu mengoreksi analisis sebelumnya:
+
+> **KONTRAKTOR AMNESIA bukan sekadar ebook “hook”.**
+> Ia adalah **ebook strategic/vision** yang memang sudah membawa pembaca menuju **Business Memory, Brain Project, Coach, Claw, Mini Apps, Ekosistem Kompetensi, dan Gustafta**.
+
+Sedangkan:
+
+> **SBU & SKK Tanpa Bingung adalah ebook operational/regulatory** yang membawa pembaca dari perubahan regulasi → gap → checklist → transisi → kesiapan tender.
+
+Jadi keduanya **tidak saling bertabrakan**. Justru bisa menjadi dua pintu yang berbeda menuju ekosistem Gustafta.
+
+---
+
+# 1. Peta sebenarnya kedua ebook
+
+## 📕 KONTRAKTOR AMNESIA
+
+Setelah membaca file aktualnya, buku ini jauh lebih luas daripada SBU.
+
+Core problem-nya adalah:
+
+> **Organizational Amnesia / Knowledge Debt / Key-Man Dependency / Monolog Dokumen.**
+
+Di prolog, buku mendefinisikan tiga output proyek:
+
+1. Bangunan
+2. Uang
+3. **Pengetahuan**
+
+dan justru output ketiga yang sering hilang ketika proyek selesai atau orang penting resign. 
+
+Kemudian buku menunjukkan lima wajah masalah:
+
+* tender gagal karena SKK kedaluwarsa
+* proyek mengulang kesalahan lama
+* biro jasa kehilangan klien karena respons lambat
+* keputusan teknis salah karena preseden tidak terdokumentasi
+* direktur tidak punya data untuk keputusan strategis. 
+
+Lalu buku memberikan **Business Memory sebagai solusi**, bukan sekadar storage. Business Memory diposisikan sebagai “otak kedua” perusahaan yang menangkap pengetahuan, pengalaman proyek, regulasi, dan SOP lalu menghidupkannya menjadi AI Assistant. 
+
+Dan setelah itu masuk ke:
+
+* Business Memory
+* Brain Project
+* Hierarki pengetahuan
+* Coach
+* Claw
+* OpenClaw
+* Mini Apps
+* Ekosistem Kompetensi
+* Marketing Suite
+* deployment tanpa coding. 
+
+Jadi **Kontraktor Amnesia sebenarnya adalah “WHY + VISION + BLUEPRINT”.**
+
+---
+
+# 2. Sedangkan SBU & SKK Tanpa Bingung adalah WHAT-TO-DO
+
+Ini sangat berbeda.
+
+Buku SBU langsung masuk ke:
+
+> **PP 5/2021 → PP 28/2025**
+> **Permen PUPR 6/2021 → Permen PU 6/2025**
+
+dan menjelaskan apa yang berubah serta apa dampaknya bagi perusahaan. 
+
+Kemudian:
+
+### SBU
+
+Membahas:
+
+* jenis usaha
+* klasifikasi
+* subklasifikasi
+* kualifikasi
+* KBLI
+* keuangan
+* SKK
+* PJT/PJB
+* peralatan
+* SMK3/SMKK
+* SMAP
+* masa berlaku
+* pengajuan
+* verifikasi
+* kesalahan yang menyebabkan penolakan. 
+
+### SKK
+
+Membahas:
+
+* jabatan kerja
+* kodefikasi
+* mekanisme uji kompetensi
+* portofolio
+* LSP
+* TUK
+* masa berlaku
+* PJT/PJB
+* kesalahan umum SKK. 
+
+### Gap & Transisi
+
+Ada:
+
+* PETA-4T
+* gap analysis
+* roadmap 90 hari
+* skenario kondisional
+* checklist SBU
+* checklist SKK
+* template surat
+* daftar tenaga ahli
+* studi kasus
+* FAQ. 
+
+Jadi:
+
+> **SBU & SKK Tanpa Bingung = HOW-TO OPERATIONAL.**
+
+---
+
+# 3. Maka positioning kedua ebook menjadi sangat bagus
+
+Saya akan membuatnya seperti ini:
+
+| Produk                      | Peran                      | Pertanyaan pembaca                                        |
+| --------------------------- | -------------------------- | --------------------------------------------------------- |
+| **KONTRAKTOR AMNESIA**      | Strategic / Vision         | **“Kenapa perusahaan saya harus berubah?”**               |
+| **SBU & SKK TANPA BINGUNG** | Operational / Regulatory   | **“Apa yang harus saya lakukan sekarang?”**               |
+| **Gustafta**                | Execution / Infrastructure | **“Bagaimana saya menjalankannya secara terus-menerus?”** |
+
+Ini jauh lebih kuat daripada menjadikan Kontraktor Amnesia sekadar iklan.
+
+---
+
+# 4. Sekarang kita petakan ke produk Gustafta
+
+Ada satu insight yang menurut saya sangat penting setelah membaca Amnesia:
+
+**Buku Kontraktor Amnesia sebenarnya sudah menjual konsep Gustafta secara tidak langsung.**
+
+Buku tersebut bahkan menyebut bahwa Gustafta sudah mempunyai use case seperti **SKK Coach, SBU Claw, TenderBot, dan Brain Project AI**. 
+
+Dan buku juga menjelaskan bahwa:
+
+> Coach = AI spesialis tunggal
+
+sedangkan:
+
+> Claw = tim AI multi-agen.
+
+Coach SBU misalnya diberi knowledge regulasi dan SOP internal perusahaan. 
+
+Jadi kita tidak perlu menciptakan konsep baru.
+
+---
+
+# 5. PRODUCT LADDER YANG SAYA SARANKAN
+
+Sekarang saya akan mengubah tangga penjualan menjadi:
+
+```text
+                 KONTRAKTOR
+                   AMNESIA
+                      │
+          ┌───────────┴───────────┐
+          │                       │
+     VISION BUYER           REGULATION BUYER
+          │                       │
+          ↓                       ↓
+   Gustafta / BM          SBU & SKK Tanpa Bingung
+                                  │
+                                  ↓
+                              SBU Claw
+                                  │
+                                  ↓
+                             Tender Claw
+                                  │
+                                  ↓
+                         Tender Readiness
+                                  │
+                                  ↓
+                       BUSINESS MEMORY
+                                  │
+                  ┌───────────────┼───────────────┐
+                  ↓               ↓               ↓
+             Brain Project   Mini Apps      Competency
+```
+
+Tapi ada penyempurnaan penting:
+
+**Kontraktor Amnesia dan SBU tidak harus selalu berurutan.**
+
+Mereka bisa menjadi **dua acquisition product**.
+
+---
+
+# 6. JALUR A — CUSTOMER YANG MASUK DARI KONTRAKTOR AMNESIA
+
+Orang membeli:
+
+### 📕 KONTRAKTOR AMNESIA
+
+Dia mulai memahami:
+
+> “Masalah perusahaan saya ternyata bukan sekadar dokumen. Masalah saya adalah pengetahuan perusahaan tidak menjadi aset.”
+
+Kemudian dia tertarik pada:
+
+### 🧠 BUSINESS MEMORY
+
+Karena memang itulah jawaban utama buku.
+
+Di sini upsell yang cocok:
+
+**Business Memory Starter**
+
+atau:
+
+**Gustafta Business Memory**
+
+Karena intent pembelinya sudah tinggi.
+
+---
+
+# 7. JALUR B — CUSTOMER YANG MASUK DARI SBU
+
+Orang melihat Meta Ads:
+
+> **“SBU Anda masih berlaku. Tetapi apakah perusahaan Anda sudah sesuai dengan aturan terbaru?”**
+
+Membeli:
+
+### 📘 SBU & SKK TANPA BINGUNG
+
+Dia mendapatkan:
+
+* ebook
+* checklist
+* gap analysis
+* roadmap
+* template
+* bonus Gustafta terpilih.
+
+Kemudian muncul kebutuhan:
+
+> “Saya ingin mengecek kondisi SBU perusahaan saya secara lebih spesifik.”
+
+### → SBU Claw
+
+---
+
+# 8. SBU CLAW
+
+Di sini saya akan memperjelas posisi SBU Claw.
+
+**SBU Claw bukan Business Memory.**
+
+Ia adalah:
+
+> **AI Specialist / AI Task Force untuk SBU–SKK.**
+
+Claw memang secara konsep merupakan paket multi-agent spesifik bidang. 
+
+Contoh tugas:
+
+### SBU Claw
+
+**Input:**
+
+> Data perusahaan + SBU + SKK + pertanyaan.
+
+**Output:**
+
+* analisis
+* persyaratan
+* gap
+* prioritas
+* rekomendasi
+* checklist tindakan.
+
+Jadi:
+
+**SBU ebook = pengetahuan umum**
+
+**SBU Claw = analisis spesifik perusahaan**
+
+---
+
+# 9. LALU TENDER CLAW
+
+Setelah SBU selesai, muncul kebutuhan berikut:
+
+> “Saya sudah tahu perusahaan saya. Tapi apakah saya cocok dengan tender ini?”
+
+Maka:
+
+### Tender Claw
+
+Input:
+
+* dokumen tender
+* RKS
+* KAK
+* persyaratan
+* dokumen perusahaan
+
+Kemudian:
+
+> **Tender Requirement ↔ Company Capability**
+
+yang menghasilkan:
+
+* Match
+* Gap
+* Missing Documents
+* Risk
+* Recommended Action.
+
+Ini sebenarnya sudah sangat konsisten dengan contoh dalam Kontraktor Amnesia, ketika Tender Claw menggunakan Business Memory untuk menganalisis persoalan tender/kontrak secara multi-aspek. 
+
+---
+
+# 10. Nah, di sinilah Business Memory masuk
+
+Ini bagian yang paling penting.
+
+**Business Memory jangan ditempatkan sebagai “Claw berikutnya”.**
+
+Karena:
+
+> **Claw = pekerja.**
+
+> **Business Memory = ingatan yang dipakai para pekerja.**
+
+Konsep ini sudah sangat eksplisit di Kontraktor Amnesia.
+
+Buku menggambarkan Business Memory sebagai otak organisasi, sementara Brain Project sebagai sistem saraf dan Coach/Claw sebagai eksekutor. 
+
+Maka:
+
+```text
+                BUSINESS MEMORY
+                       │
+          ┌────────────┼────────────┐
+          │            │            │
+       SBU Claw    Tender Claw   Other Claw
+          │            │            │
+          └────────────┼────────────┘
+                       │
+                COMPANY KNOWLEDGE
+```
+
+---
+
+# 11. Apa yang disimpan Business Memory?
+
+Bukan hanya SBU.
+
+Ini yang membedakan.
+
+### COMPANY MEMORY
+
+**Legalitas**
+
+* NIB
+* Akta
+* KBLI
+* sertifikat
+
+**SBU/SKK**
+
+* SBU
+* SKK
+* PJT/PJB
+* tenaga ahli
+* masa berlaku
+
+**Tender**
+
+* RKS
+* KAK
+* dokumen pemilihan
+* addendum
+* pengalaman tender
+
+**Project Memory**
+
+* proyek
+* lesson learned
+* metode kerja
+* masalah
+* solusi
+* biaya
+* keputusan
+
+**Regulatory Memory**
+
+* UU
+* PP
+* Permen
+* SE
+* SOP
+* kebijakan internal
+
+**Knowledge People**
+
+* expertise
+* pengalaman
+* role
+* kompetensi
+
+Karena buku Amnesia sendiri menekankan bahwa Business Memory harus menangkap **pengetahuan kolektif, pengalaman proyek, regulasi, dan SOP**. 
+
+---
+
+# 12. Lalu Brain Project bukan Business Memory
+
+Ini juga harus kita bedakan.
+
+### Business Memory
+
+> **“Apa yang kita tahu?”**
+
+### Brain Project
+
+> **“Apa yang sedang terjadi dan apa yang harus kita waspadai?”**
+
+Misalnya:
+
+**Business Memory tahu:**
+
+> SKK Budi habis 20 November.
+
+**Brain Project memberi warning:**
+
+> ⚠️ SKK Budi akan habis 90 hari lagi.
+
+Ini persis arah yang dibangun di Kontraktor Amnesia: Brain Project berfungsi seperti sistem saraf/early warning system. 
+
+---
+
+# 13. Sekarang soal 3 BONUS dari Gustafta
+
+Setelah membaca kedua buku, saya justru **tidak akan memberikan SBU Claw sebagai bonus**.
+
+Kenapa?
+
+Karena **SBU Claw adalah upsell utama**.
+
+Kalau diberikan gratis, kita merusak tangga.
+
+Saya akan mengambil bonus dari **existing Gustafta yang berada di bawah level Claw**, terutama Mini Apps dan Ekosistem Kompetensi.
+
+Kontraktor Amnesia sendiri menjelaskan Ekosistem Kompetensi sebagai:
+
+* eBook Kompetensi
+* eCourse
+* Generator Dokumen
+* Bridge ke AI Studio. 
+
+Dan Mini Apps memang diposisikan sebagai alat yang mengubah dialog menjadi karya nyata. 
+
+---
+
+# 14. Tiga bonus yang paling strategis
+
+Saya pilih berdasarkan **fungsi**, bukan sekadar harga.
+
+### 🎁 BONUS 1 — Document/Checklist Mini App
+
+Karena langsung nyambung dengan ebook SBU.
+
+Pembeli bisa mengalami:
+
+> **“Saya tidak cuma membaca checklist. Saya bisa menggunakannya.”**
+
+---
+
+### 🎁 BONUS 2 — Competency Product
+
+Dari Ekosistem Kompetensi.
+
+Karena SBU → SKK → **kompetensi tenaga kerja** merupakan perjalanan yang sangat natural.
+
+Bisa berupa akses terbatas ke:
+
+* competency mapping
+* competency assessment
+* competency learning/eCourse
+* atau produk kompetensi existing yang paling relevan.
+
+---
+
+### 🎁 BONUS 3 — Mini App yang menghasilkan karya
+
+Misalnya dari kategori yang sudah ada:
+
+* Metode Pelaksanaan
+* RAB & Estimasi
+* Executive Summary
+* HSE Plan
+* PQP
+* Notulen
+* Drafter Kontrak/SPK
+
+Kontraktor Amnesia sendiri memberi contoh Mini Apps untuk **RAB, BAST, Executive Summary**, serta Metode Pelaksanaan yang dapat menggunakan konteks dari Otak Proyek.  
+
+**Namun saya tidak akan menentukan tiga nama final sebelum mencocokkannya dengan katalog Mini Apps Anda yang benar-benar aktif**, karena kita ingin bonus berasal dari produk existing, bukan produk yang hanya ada dalam konsep ebook.
+
+---
+
+# 15. Jadi jangan berikan bonus berdasarkan “produk paling mahal”
+
+Gunakan formula:
+
+### Bonus harus menjawab:
+
+**SBU Ebook**
+→ “Saya tahu apa yang harus dipenuhi.”
+
+**Bonus Mini App**
+→ “Saya bisa mulai mengerjakannya.”
+
+**Bonus Competency**
+→ “Saya bisa memetakan SDM/SKK.”
+
+**Bonus AI Mini Experience**
+→ “Ternyata AI Gustafta bisa membantu pekerjaan saya.”
+
+Kemudian:
+
+### SBU Claw
+
+> **“Sekarang AI bisa membantu menganalisis kasus SBU perusahaan saya.”**
+
+Lalu:
+
+### Tender Claw
+
+> **“Sekarang AI bisa membantu menilai peluang tender saya.”**
+
+Lalu:
+
+### Business Memory
+
+> **“Sekarang semua pengetahuan perusahaan saya bisa menjadi aset yang terus digunakan.”**
+
+---
+
+# 16. Inilah tangga penjualan final yang menurut saya paling sehat
+
+| Level              | Produk                                      | Peran                                        |
+| ------------------ | ------------------------------------------- | -------------------------------------------- |
+| **Trigger**        | **Kontraktor Amnesia**                      | Strategic awareness / Business Memory vision |
+| **Entry**          | **SBU & SKK Tanpa Bingung**                 | Regulatory implementation                    |
+| **Bonus**          | 3 existing Gustafta products                | Product sampling                             |
+| **Upsell 1**       | **SBU Claw**                                | SBU/SKK AI specialist                        |
+| **Upsell 2**       | **Tender Claw**                             | Tender AI specialist                         |
+| **Upsell 3**       | **Tender Readiness / Contractor Readiness** | Decision & compliance                        |
+| **Recurring Core** | **Gustafta Business Memory**                | Company knowledge infrastructure             |
+| **Expansion**      | **Brain Project**                           | Monitoring / early warning                   |
+| **Expansion**      | **Mini Apps**                               | Execution                                    |
+| **Expansion**      | **Competency Ecosystem**                    | Learning + knowledge monetization            |
+| **Enterprise**     | **MultiClaw / Business Memory Pro**         | Multi-agent company workspace                |
+
+---
+
+# 17. Dan ada insight yang menurut saya sangat penting
+
+**Kontraktor Amnesia sebenarnya tidak boleh berhenti sebagai ebook.**
+
+Karena buku itu sendiri sudah menjelaskan:
+
+> **Business Memory → Brain Project → Coach/Claw → Mini Apps → Ekosistem Kompetensi → Marketing Suite.**
+
+Artinya buku tersebut adalah **manifesto / blueprint Gustafta untuk kontraktor**.
+
+Sedangkan SBU ebook adalah **entry point problem-specific**.
+
+Maka saya akan membangun dua funnel:
+
+```text
+FUNNEL A — STRATEGIC
+KONTRAKTOR AMNESIA
+        ↓
+Business Memory
+        ↓
+Brain Project
+        ↓
+Coach / Claw
+        ↓
+Mini Apps
+        ↓
+Gustafta
+```
+
+dan:
+
+```text
+FUNNEL B — COMMERCIAL
+SBU & SKK TANPA BINGUNG
+        ↓
+3 BONUS GUSTAFTA
+        ↓
+SBU CLAW
+        ↓
+TENDER CLAW
+        ↓
+TENDER READINESS
+        ↓
+BUSINESS MEMORY
+        ↓
+BRAIN PROJECT + MINI APPS
+```
+
+### Dan keduanya akhirnya bertemu di:
+
+# **GUSTAFTA BUSINESS MEMORY**
+
+Itulah menurut saya arsitektur yang paling tepat setelah melihat **isi aktual** kedua ebook, bukan hanya judulnya.
+
+**Kontraktor Amnesia menjual perubahan cara berpikir.**
+**SBU & SKK menjual solusi regulasi yang bisa langsung dikerjakan.**
+**Bonus menjual pengalaman Gustafta.**
+**SBU Claw menjual bantuan spesifik.**
+**Tender Claw menjual keputusan tender.**
+**Business Memory menjual aset pengetahuan perusahaan.**
+
+Dan ini membuat setiap produk **punya pekerjaan yang berbeda**, sehingga tidak saling memakan penjualan.

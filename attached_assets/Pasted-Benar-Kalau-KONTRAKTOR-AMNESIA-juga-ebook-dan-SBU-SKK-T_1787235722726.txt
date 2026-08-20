@@ -1,0 +1,258 @@
+Benar. Kalau **KONTRAKTOR AMNESIA juga ebook** dan **SBU & SKK Tanpa Bingung juga ebook**, maka arsitekturnya perlu kita rapikan. Jangan sampai keduanya diposisikan sebagai dua produk yang saling berebut fungsi.
+
+Menurut saya justru **dua ebook ini bisa dibuat menjadi dua tahap dalam funnel yang sama**.
+
+## 1. Bedakan fungsi kedua ebook
+
+### 📕 KONTRAKTOR AMNESIA
+
+**= Trigger / awareness ebook**
+
+Fungsinya membangunkan rasa:
+
+> **“Jangan-jangan perusahaan saya masih menggunakan cara lama?”**
+
+Ini ebook yang menjual **masalah dan urgensi**.
+
+Materinya bisa mengangkat:
+
+* perubahan regulasi
+* kesalahan umum kontraktor
+* risiko salah membaca regulasi
+* kasus-kasus “amnesia”
+* SBU/SKK/Tender
+* pertanyaan yang membuat kontraktor melakukan self-check
+
+Jadi **KONTRAKTOR AMNESIA tidak perlu menjadi manual teknis paling lengkap.**
+
+---
+
+### 📘 SBU & SKK TANPA BINGUNG
+
+**= Solution / implementation ebook**
+
+Setelah pembaca sadar:
+
+> “Wah, ternyata ada yang harus saya cek.”
+
+Mereka masuk ke:
+
+> **SBU & SKK Tanpa Bingung**
+
+Ini menjawab:
+
+> **“Oke. Sekarang saya harus melakukan apa?”**
+
+Isinya:
+
+* pemahaman regulasi
+* pemetaan persyaratan
+* gap analysis
+* checklist
+* persiapan SBU
+* persiapan SKK
+* kaitan dengan tender
+* action plan
+
+Jadi:
+
+**KONTRAKTOR AMNESIA = WHY**
+
+**SBU & SKK TANPA BINGUNG = HOW**
+
+---
+
+# 2. Maka jangan menjual dua ebook sekaligus di iklan pertama
+
+Saya justru akan membuat:
+
+### Meta Ads
+
+**Hook:**
+
+> **KONTRAKTOR AMNESIA**
+> “SBU Anda masih berlaku. Tapi apakah perusahaan Anda masih siap menghadapi aturan terbaru?”
+
+↓
+
+### Landing page
+
+Kemudian tawarkan:
+
+## 📕 KONTRAKTOR AMNESIA
+
+Misalnya harga entry:
+
+**Rp49K–99K**
+
+Ini menjadi **tripwire**.
+
+Lalu di dalam ebook / setelah pembelian:
+
+> **“Sudah tahu masalahnya? Sekarang lakukan pengecekan.”**
+
+↓
+
+## 📘 SBU & SKK TANPA BINGUNG
+
+**Rp149K**
+
+Ini menjadi **core paid ebook**.
+
+---
+
+# 3. Atau kalau Anda ingin hanya satu produk berbayar dari awal
+
+Ini juga bisa.
+
+Saya malah melihat ada dua strategi yang layak:
+
+### MODEL A — One-Step
+
+**Meta Ads**
+
+KONTRAKTOR AMNESIA *(creative/hook)*
+
+↓
+
+**SBU & SKK TANPA BINGUNG — Rp149K**
+
+KONTRAKTOR AMNESIA **bukan dijual**, tetapi menjadi angle iklan.
+
+Ini paling sederhana.
+
+---
+
+### MODEL B — Two-Step
+
+**Meta Ads**
+
+↓
+
+**KONTRAKTOR AMNESIA — Rp49K/99K**
+
+↓
+
+**SBU & SKK TANPA BINGUNG — Rp149K**
+
+↓
+
+**SBU Claw**
+
+↓
+
+**Tender Claw**
+
+↓
+
+**Business Memory**
+
+Model ini lebih panjang tetapi berpotensi menaikkan **LTV**.
+
+---
+
+# 4. Kalau cashflow menjadi pertimbangan utama
+
+Saya cenderung memilih **MODEL B**, tetapi jangan buru-buru membuat Kontraktor Amnesia menjadi produk murah yang berdiri sendiri kalau isinya terlalu dekat dengan ebook SBU.
+
+Buat pembagian yang sangat jelas:
+
+### KONTRAKTOR AMNESIA
+
+> **“Apa yang mungkin Anda lewatkan?”**
+
+### SBU & SKK TANPA BINGUNG
+
+> **“Bagaimana cara mengeceknya dan mempersiapkannya?”**
+
+Sehingga orang punya alasan membeli keduanya.
+
+---
+
+# 5. Bonus Gustafta masuk setelah ebook SBU
+
+Nah, ini menjawab pertanyaan Anda sebelumnya.
+
+Misalnya:
+
+### 📘 SBU & SKK TANPA BINGUNG
+
+**Rp149K**
+
+**Bonus 3 akses Gustafta:**
+
+🎁 **Mini App — SBU Readiness**
+
+🎁 **Competency Toolkit**
+
+🎁 **AI Assistant Lite**
+
+Kemudian:
+
+### Upsell 1
+
+**SBU Claw**
+
+### Upsell 2
+
+**Tender Claw**
+
+### Upsell 3
+
+**Gustafta Business Memory**
+
+---
+
+# 6. Jadi keseluruhan ecosystem-nya
+
+Saya akan menguncinya seperti ini:
+
+```text
+                    META ADS
+                       ↓
+             KONTRAKTOR AMNESIA
+                 (HOOK / WHY)
+                       ↓
+          ┌────────────────────────┐
+          │ SBU & SKK TANPA BINGUNG│
+          │       Rp149K           │
+          │       (HOW)            │
+          └───────────┬────────────┘
+                      │
+                3 BONUS GUSTAFTA
+                      │
+          ┌───────────┼───────────┐
+          ↓           ↓           ↓
+       Mini App   Kompetensi   AI Lite
+                      │
+                      ↓
+                  SBU CLAW
+                      ↓
+                 TENDER CLAW
+                      ↓
+             TENDER READINESS
+                      ↓
+          BUSINESS MEMORY GUSTAFTA
+```
+
+### Jadi peran masing-masing:
+
+**KONTRAKTOR AMNESIA**
+→ membuat kontraktor **merasa perlu mengecek**
+
+**SBU & SKK TANPA BINGUNG**
+→ membuat kontraktor **tahu apa yang harus dilakukan**
+
+**Bonus Gustafta**
+→ membuat kontraktor **merasakan ekosistem**
+
+**SBU Claw**
+→ membuat kontraktor **mulai menggunakan AI**
+
+**Tender Claw**
+→ membuat AI masuk ke **aktivitas yang menghasilkan proyek**
+
+**Business Memory**
+→ membuat Gustafta menjadi **infrastruktur perusahaan**
+
+Menurut saya ini jauh lebih kuat daripada menjadikan **KONTRAKTOR AMNESIA sebagai produk utama dan SBU sebagai bonus**, karena nilai teknis SBU & SKK Tanpa Bingung lebih cocok sebagai **core implementation product**.

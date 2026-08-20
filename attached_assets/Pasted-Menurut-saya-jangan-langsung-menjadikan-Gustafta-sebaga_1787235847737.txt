@@ -1,0 +1,151 @@
+Menurut saya **jangan langsung menjadikan Gustafta sebagai upsell berbayar utama**. Untuk produk `SBU & SKK Tanpa Bingung`, yang paling kuat justru **hybrid: Gustafta diberikan sebagai bonus terbatas, lalu diarahkan ke versi berbayar/upgrade**.
+
+### Struktur yang saya rekomendasikan
+
+**Produk utama:**
+**SBU & SKK Tanpa Bingung** — Rp149K
+
+↓
+
+**BONUS — Gustafta Mini Access**
+Misalnya:
+
+> **BONUS: SBU–SKK Knowledge Assistant**
+> Akses Gustafta untuk membantu mencari, memahami, dan menavigasi materi SBU–SKK yang ada di ebook.
+
+↓
+
+Setelah user merasakan manfaatnya:
+
+**UPSELL:**
+
+### Gustafta Pro / Knowledge Workspace
+
+Dengan positioning:
+
+> **“Kalau ebook membantu Anda memahami regulasi, Gustafta membantu Anda menggunakannya berulang kali.”**
+
+Ini menurut saya jauh lebih powerful daripada langsung mengatakan:
+
+> “Beli Gustafta juga.”
+
+---
+
+## Kenapa bonus dulu?
+
+Karena karakter pembelinya berbeda.
+
+Orang yang melihat iklan:
+
+> **“SBU Anda masih berlaku. Tapi apakah masih sesuai aturan terbaru?”**
+
+belum tentu sedang mencari AI.
+
+Kalau langsung:
+
+**Ebook Rp149K + Gustafta Rp499K**
+
+maka otaknya langsung masuk mode **“jualan software.”**
+
+Padahal kita ingin membangun:
+
+**Problem → Trust → Experience → Dependency → Upgrade**
+
+Jadi Gustafta harus **dirasakan dulu**, bukan dijelaskan panjang.
+
+---
+
+# Bonusnya jangan Gustafta full
+
+Ini penting.
+
+Saya justru **tidak menyarankan memberikan akses Gustafta terlalu besar secara gratis**.
+
+Buat:
+
+### 🎁 BONUS: SBU–SKK Assistant
+
+Misalnya akses terbatas:
+
+* pencarian materi regulasi
+* tanya jawab seputar isi ebook
+* checklist SBU/SKK
+* identifikasi gap sederhana
+* akses selama 7–14 hari
+* jumlah pertanyaan terbatas
+
+Sehingga user mengalami:
+
+> “Oh... ternyata saya bisa tanya regulasi ini.”
+
+Baru kemudian muncul:
+
+### Upgrade Gustafta
+
+> **Ingin menyimpan dokumen perusahaan, regulasi, SOP, tender, dan pengetahuan perusahaan Anda sendiri lalu bisa ditanyakan kapan saja?**
+
+**Itulah Gustafta.**
+
+---
+
+# Bahkan saya akan membuat trigger upsell-nya seperti ini
+
+User membeli ebook.
+
+Kemudian menemukan bagian:
+
+> **CHECKLIST KESIAPAN SBU–SKK**
+
+Lalu ada tombol:
+
+### **[Cek dengan Gustafta]**
+
+User masuk ke assistant.
+
+Misalnya user bertanya:
+
+> “Perusahaan saya K2 dan mau ikut tender Rp10 miliar. Apa yang harus saya cek?”
+
+Gustafta memberikan analisis berdasarkan knowledge base.
+
+Di akhir:
+
+> **“Analisis lebih lanjut menggunakan dokumen perusahaan Anda?”**
+
+### → Upgrade Gustafta
+
+Ini jauh lebih natural.
+
+Karena **upsell terjadi karena kebutuhan**, bukan karena iklan.
+
+---
+
+## Jadi saya pilih model ini
+
+| Tahap            | Produk                               | Fungsi              |
+| ---------------- | ------------------------------------ | ------------------- |
+| 🔴 Ads           | **KONTRAKTOR AMNESIA**               | Trigger             |
+| 🟠 Core          | **SBU & SKK Tanpa Bingung**          | Monetisasi pertama  |
+| 🟡 Bonus         | **Gustafta SBU–SKK Assistant**       | Experience          |
+| 🟢 Upsell        | **Gustafta**                         | Recurring product   |
+| 🔵 Higher ticket | **Tender Readiness / Bedah Dokumen** | Monetisasi lanjutan |
+
+### Formula sederhananya:
+
+**Rp149K ebook → GRATIS merasakan Gustafta → merasa terbantu → upgrade Gustafta**
+
+Bukan:
+
+**Rp149K ebook → “Mau beli software Rp499K?”**
+
+---
+
+Dan ada keuntungan strategis yang lebih besar:
+
+**Gustafta tidak lagi dipersepsikan sebagai AI chatbot.**
+
+Ia menjadi:
+
+> **“Teman kerja untuk membaca dan menggunakan pengetahuan perusahaan.”**
+
+Untuk pasar kontraktor, itu jauh lebih mudah dijual.

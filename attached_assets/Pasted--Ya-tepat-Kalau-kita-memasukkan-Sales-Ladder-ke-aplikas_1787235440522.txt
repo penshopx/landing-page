@@ -1,0 +1,154 @@
+**Ya, tepat.** Kalau kita memasukkan **Sales Ladder** ke aplikasi Gustafta, saya sarankan **khusus untuk Admin/Owner/Marketing**, bukan fitur yang terlihat oleh customer.
+
+Namun ada satu nuance penting:
+
+> **Customer tidak melihat “Sales Ladder”-nya, tetapi sistem Gustafta menggunakan Sales Ladder di belakang layar untuk menentukan produk/upsell yang ditawarkan kepada customer.**
+
+### Arsitekturnya:
+
+```text
+                    ADMIN
+                      │
+                SALES LADDER
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+       SBU         CASHFLOW         SMAP
+        │             │             │
+        ▼             ▼             ▼
+     SBU Claw      Finance AI     SMAP Claw
+        │             │             │
+        └─────────────┼─────────────┘
+                      ▼
+                TENDER / READINESS
+                      │
+                      ▼
+              BUSINESS MEMORY
+```
+
+## Di Admin Gustafta
+
+Kita bisa membuat menu:
+
+### **Sales Ladder**
+
+Admin bisa melihat:
+
+* Trigger
+* Entry Product
+* Bonus
+* Upsell
+* Cross-sell
+* Bundle
+* Recurring destination
+* Harga
+* Urutan upgrade
+* Status ACTIVE/DRAFT
+* Upgrade rules
+
+Contoh:
+
+**SBU Starter**
+
+→ Bonus: Mini App A, Competency B, Mini App C
+→ Upsell: SBU Claw
+→ Cross-sell: Tender Claw
+→ Next: Contractor Readiness
+→ Destination: Business Memory
+
+---
+
+## Sedangkan customer melihat apa?
+
+Customer **tidak melihat**:
+
+> L1 → L2 → L3 → L4 → L5
+
+Mereka melihat sesuatu yang natural:
+
+### Setelah membeli SBU:
+
+> **SBU Anda sudah dipahami. Mau kami bantu mengecek kondisi perusahaan Anda?**
+
+**[Coba SBU Claw]**
+
+Kemudian setelah menggunakan SBU Claw:
+
+> **Sudah tahu kondisi SBU Anda? Sekarang cek apakah perusahaan Anda memenuhi persyaratan tender.**
+
+**[Cek Tender]**
+
+Kemudian:
+
+> **Simpan seluruh pengetahuan perusahaan Anda di Business Memory.**
+
+**[Mulai Business Memory]**
+
+---
+
+# Bahkan saya sarankan 2 layer
+
+### 🔐 ADMIN LAYER
+
+**Sales Ladder Manager**
+
+Untuk mengatur strategi.
+
+### ⚙️ SYSTEM LAYER
+
+**Recommendation / Upsell Engine**
+
+Untuk menjalankan strategi tersebut secara otomatis.
+
+### 👤 CUSTOMER LAYER
+
+Customer hanya melihat:
+
+**Next Best Action / Recommended Product**
+
+bukan Sales Ladder.
+
+---
+
+## Contoh praktis
+
+Admin mengatur:
+
+```text
+SBU Starter
+   ↓
+SBU Claw
+   ↓
+Tender Claw
+   ↓
+Business Memory
+```
+
+Customer membeli SBU Starter.
+
+Gustafta otomatis mengetahui:
+
+> `customer purchased = SBU_STARTER`
+
+Kemudian sistem mencari:
+
+> `next_product = SBU_CLAW`
+
+dan menampilkan:
+
+### **Rekomendasi untuk Anda**
+
+> **SBU Claw**
+> Gunakan AI untuk menganalisis kondisi SBU/SKK perusahaan Anda.
+
+**[Pelajari SBU Claw]**
+
+Jadi **Sales Ladder adalah otak komersial di belakang layar**, sedangkan customer hanya menerima rekomendasi yang relevan.
+
+### Kesimpulan
+
+**Ya — buat di Gustafta sebagai Admin-only.**
+
+Tetapi jangan berhenti di dashboard visual. Idealnya Sales Ladder menjadi **configuration layer** yang nantinya bisa digunakan oleh sistem untuk menjalankan **upsell/recommendation otomatis**.
+
+Dan menurut saya **ini belum perlu dibangun sebagai fitur besar sekarang**. Kita bisa mulai dengan **Admin → Sales Ladder → konfigurasi produk & hubungan antarproduk**, lalu recommendation engine dibangun setelah catalog/checkout Gustafta stabil.

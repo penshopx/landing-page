@@ -1,0 +1,84 @@
+Betul — **tidak semuanya menjadi trigger yang sama seperti SBU.** Justru lebih baik kita bedakan antara **trigger market**, **entry product**, dan **upsell destination**.
+
+### Arsitektur finalnya:
+
+| Produk                        | Peran                                             |
+| ----------------------------- | ------------------------------------------------- |
+| **SBU & SKK Tanpa Bingung**   | 🔥 **Trigger utama saat ini**                     |
+| **Kas Merah, RAB Hijau**      | 🔥 Trigger untuk **segmen cashflow/keuangan**     |
+| **Panduan Praktis SMAP**      | 🔥 Trigger untuk **segmen compliance/integritas** |
+| **SBU Claw**                  | Upsell SBU                                        |
+| **Finance/Cashflow AI**       | Upsell Cashflow                                   |
+| **SMAP & PanCEK / SMAP Claw** | Upsell SMAP                                       |
+| **Tender Claw**               | Cross-sell/upsell lintas kebutuhan                |
+| **Business Memory**           | 🧠 **Recurring destination**                      |
+
+Jadi sebenarnya ada **3 trigger vertical**:
+
+```text
+                    KONTRAKTOR / BUJK
+                           │
+          ┌────────────────┼────────────────┐
+          │                │                │
+          ▼                ▼                ▼
+        SBU             CASHFLOW           SMAP
+          │                │                │
+     SBU Claw         Finance AI        SMAP Claw
+          │                │                │
+          └──────────┬─────┴──────┬─────────┘
+                     ▼            ▼
+                  TENDER / COMPLIANCE
+                         │
+                         ▼
+                BUSINESS MEMORY
+```
+
+### Jadi SBU bukan satu-satunya trigger secara bisnis.
+
+Yang saya maksud sebelumnya adalah:
+
+> **Untuk campaign yang sedang kita kerjakan sekarang, SBU adalah trigger pertama yang paling siap dijalankan.**
+
+Karena sudah punya:
+
+* pain yang jelas,
+* regulasi baru sebagai urgency,
+* ebook,
+* bonus,
+* SBU Claw,
+* Tender Claw,
+* dan jalur yang sangat natural menuju Business Memory.
+
+Sedangkan **Cashflow** dan **SMAP** kita siapkan sebagai **trigger vertical berikutnya**.
+
+---
+
+## Dan ini malah bagus untuk Meta Ads
+
+Jangan satu iklan berkata:
+
+> “Gustafta punya SBU, Cashflow, SMAP, Tender, AI, Business Memory...”
+
+Itu akan membingungkan.
+
+Lebih baik:
+
+### Campaign A — SBU
+
+**Masalah SBU/SKK → Ebook → SBU Claw → Tender → Business Memory**
+
+### Campaign B — Cashflow
+
+**Kas proyek → Ebook Cashflow → Finance AI → Project Brain → Business Memory**
+
+### Campaign C — SMAP
+
+**Risiko penyuapan/compliance → Ebook SMAP → PanCEK → SMAP Claw → Business Memory**
+
+Jadi **customer masuk melalui masalah yang paling mereka rasakan**, bukan melalui Gustafta.
+
+Dan akhirnya:
+
+> **Apa pun pintunya, customer dapat berakhir di Business Memory.**
+
+Itulah yang membuat Gustafta punya **multi-entry funnel + single recurring destination**.

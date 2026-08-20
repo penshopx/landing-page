@@ -1,0 +1,237 @@
+Bisa, **tetapi tidak semuanya perlu dimasukkan ke aplikasi sekarang**.
+
+Saya justru menyarankan kita memisahkan:
+
+1. **Product/Sales Architecture** → cukup menjadi *business logic/dokumen*
+2. **Funnel & Upsell Engine** → sebagian masuk ke Replit
+3. **Produk Gustafta** → baru masuk aplikasi ketika memang sudah siap dijual/digunakan
+
+### Yang perlu masuk Replit sekarang
+
+Karena kita sudah punya beberapa produk, Replit sebaiknya mengetahui struktur:
+
+```text
+TRIGGER PRODUCT
+│
+├── SBU & SKK
+│     ├── Bonus
+│     ├── SBU Claw
+│     └── Tender Claw
+│
+├── CASHFLOW
+│     ├── Bonus
+│     ├── Finance AI
+│     └── Project Brain
+│
+└── SMAP
+      ├── Bonus
+      ├── PanCEK
+      └── SMAP Claw
+
+             ↓
+
+      BUSINESS MEMORY
+       (Recurring Core)
+```
+
+Tetapi **jangan hard-code seluruh tangga penjualan di banyak tempat**.
+
+Lebih baik dibuat sebagai **Product/Funnel Configuration**.
+
+Contohnya secara konsep:
+
+```text
+Trigger:
+SBU_SKk
+
+Entry Product:
+SBU_SKk_EBOOK
+
+Bonuses:
+- MINI_APP_X
+- COMPETENCY_X
+- MINI_APP_Y
+
+Upsells:
+1. SBU_CLAW
+2. TENDER_CLAW
+3. CONTRACTOR_READINESS
+
+Destination:
+BUSINESS_MEMORY
+```
+
+Kemudian:
+
+```text
+Trigger:
+CASHFLOW
+
+Entry:
+CASHFLOW_EBOOK
+
+Upsells:
+- FINANCE_AI
+- PROJECT_BRAIN
+
+Destination:
+BUSINESS_MEMORY
+```
+
+dan:
+
+```text
+Trigger:
+SMAP
+
+Entry:
+SMAP_EBOOK
+
+Upsells:
+- PANCEK
+- SMAP_CLAW
+- COMPLIANCE_READINESS
+
+Destination:
+BUSINESS_MEMORY
+```
+
+### Kenapa saya sarankan begini?
+
+Karena nanti Anda **tidak perlu meminta developer mengubah kode setiap kali strategi marketing berubah**.
+
+Misalnya besok:
+
+> SBU Claw tidak lagi Rp249K, tetapi Rp299K.
+
+atau:
+
+> Bonus SBU diganti dari Mini App A menjadi Mini App B.
+
+atau:
+
+> Tender Claw dimasukkan ke bundle.
+
+Maka cukup mengubah **catalog/funnel configuration**, bukan membongkar logic aplikasi.
+
+---
+
+# Yang TIDAK perlu dimasukkan sekarang
+
+Jangan dulu memasukkan seluruh:
+
+* strategi Meta Ads,
+* copywriting iklan,
+* positioning,
+* psikologi customer,
+* alasan kenapa produk menjadi trigger,
+* seluruh teori sales ladder.
+
+Itu sebaiknya berada di **Product Strategy / Marketing Playbook**.
+
+Replit cukup mengetahui:
+
+> **Produk apa → trigger apa → bonus apa → upsell apa → destination apa.**
+
+---
+
+# Bahkan saya sarankan ada satu konsep baru di aplikasi
+
+## `Product Journey`
+
+Setiap produk mempunyai:
+
+```text
+entry_product
+trigger_category
+bonus_products
+upsell_products
+cross_sell_products
+recurring_destination
+```
+
+Contohnya:
+
+### SBU
+
+```text
+SBU & SKK Ebook
+      ↓
+3 Bonus
+      ↓
+SBU Claw
+      ↓
+Tender Claw
+      ↓
+Business Memory
+```
+
+### Cashflow
+
+```text
+Cashflow Ebook
+      ↓
+3 Bonus
+      ↓
+Finance AI
+      ↓
+Project Brain
+      ↓
+Business Memory
+```
+
+### SMAP
+
+```text
+SMAP Ebook
+      ↓
+3 Bonus
+      ↓
+PanCEK
+      ↓
+SMAP Claw
+      ↓
+Business Memory
+```
+
+---
+
+## Yang paling penting: jangan over-engineer
+
+Kalau aplikasi Gustafta saat ini sedang dalam fase **catalog + checkout + GAIA**, saya **tidak akan membangun fitur "Sales Ladder Engine" besar-besaran sekarang**.
+
+Cukup siapkan **data model/catalog metadata-nya** terlebih dahulu.
+
+Misalnya produk sudah mempunyai:
+
+> `category = SBU`
+
+> `product_type = ebook`
+
+> `funnel_role = entry`
+
+> `upsell_ids = [...]`
+
+> `bonus_ids = [...]`
+
+> `recurring_destination = BUSINESS_MEMORY`
+
+Itu sudah cukup untuk tahap sekarang.
+
+Nanti ketika kebutuhan marketing sudah terbukti, baru kita bangun UI:
+
+> **“Setelah membeli produk ini, rekomendasikan X.”**
+
+---
+
+### Jadi keputusan saya:
+
+**Ya, formulasi ini sebaiknya masuk ke Replit — tetapi sebagai *Product Journey / Funnel Metadata*, bukan sebagai aplikasi sales funnel yang kompleks.**
+
+Dan **Business Memory harus ditandai sebagai `recurring_destination`**, karena itulah pola yang ingin kita bangun dari berbagai vertical:
+
+**SBU → Business Memory**
+**Cashflow → Business Memory**
+**SMAP → Business Memory**
+
+Dengan begitu arsitektur produk di Gustafta sudah siap menerima banyak vertical tanpa kita harus mengubah struktur aplikasi setiap kali menambah ebook atau Claw baru.

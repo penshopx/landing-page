@@ -1,0 +1,491 @@
+Bisa. Bahkan menurut saya **sebaiknya kita buat pemaketan resmi**. Tetapi jangan menjualnya sebagai “tangga penjualan”. Itu adalah **arsitektur internal**; yang dilihat customer adalah paket yang terasa logis dan semakin bernilai.
+
+Saya akan formulakan menjadi **Product Ladder Gustafta** seperti ini.
+
+# 1. Struktur dasar
+
+```text
+                    ENTRY / EBOOK
+                         │
+              ┌──────────┼──────────┐
+              │          │          │
+             SBU      CASHFLOW      SMAP
+              │          │          │
+              ▼          ▼          ▼
+            CLAW       AI/CLAW      CLAW
+              │          │          │
+              └──────────┼──────────┘
+                         ▼
+                   TENDER / READINESS
+                         │
+                         ▼
+                BUSINESS MEMORY
+                         │
+                         ▼
+                  BUSINESS PRO
+```
+
+Jadi **bukan satu paket besar dari awal**.
+
+Customer naik berdasarkan kebutuhannya.
+
+---
+
+# 2. PAKET LEVEL 1 — ENTRY
+
+## 📘 SBU & SKK STARTER
+
+**Rp149.000**
+
+Isi:
+
+* Ebook SBU & SKK Tanpa Bingung
+* Bonus 1 Mini App
+* Bonus 1 produk Kompetensi
+* Bonus 1 Mini App/AI experience
+
+### Positioning
+
+> **Pahami regulasi. Temukan gap. Mulai siapkan perusahaan.**
+
+**Tujuan:** acquisition.
+
+---
+
+## 📕 CASHFLOW STARTER
+
+**Rp149.000**
+
+Isi:
+
+* Ebook **Kas Merah, RAB Hijau**
+* Bonus Finance Mini App
+* Bonus RAB/Estimasi Mini App
+* Bonus Project Mini App
+
+### Positioning
+
+> **Jangan sampai proyek untung di atas kertas tetapi kehabisan kas.**
+
+---
+
+## 📕 SMAP STARTER
+
+**Rp149.000**
+
+Isi:
+
+* Ebook **Panduan Praktis SMAP**
+* Bonus Self-Assessment Mini App
+* Bonus Compliance/Document Mini App
+* Bonus Competency product
+
+### Positioning
+
+> **Pahami risiko. Cek kesiapan. Bangun sistem anti-penyuapan.**
+
+---
+
+# 3. LEVEL 2 — SPECIALIST
+
+Di sini customer mulai membeli **kemampuan AI**, bukan lagi buku.
+
+## 🟢 SBU CLAW
+
+**Rp249K–299K**
+
+Untuk:
+
+* SBU
+* SKK
+* klasifikasi
+* gap
+* compliance
+* readiness.
+
+---
+
+## 🔵 FINANCE / CASHFLOW AI
+
+**Rp249K–399K**
+
+Untuk:
+
+* cashflow
+* RAB
+* proyeksi
+* analisis keuangan
+* early warning.
+
+---
+
+## 🟠 SMAP CLAW
+
+**Rp249K–399K**
+
+Untuk:
+
+* SMAP
+* anti-bribery
+* risk
+* compliance
+* self-assessment
+* evidence.
+
+---
+
+# 4. LEVEL 3 — BUSINESS / PROJECT
+
+Di sini kita mulai menjual **hasil**, bukan AI.
+
+## 🟣 TENDER CLAW
+
+**Rp399K–499K**
+
+Untuk:
+
+> **“Apakah perusahaan saya siap mengikuti tender ini?”**
+
+---
+
+## 🟣 CONTRACTOR READINESS
+
+**Rp699K–999K**
+
+Bundle:
+
+* SBU Claw
+* SKK assistance
+* Tender Claw
+* Tender Readiness
+* Document analysis
+* Company capability matching
+
+Positioning:
+
+> **Satu workspace untuk mempersiapkan perusahaan menghadapi peluang tender.**
+
+Ini bisa menjadi **high-ticket one-time package** sebelum recurring.
+
+---
+
+# 5. LEVEL 4 — BUSINESS MEMORY
+
+Ini bukan sekadar paket lebih mahal.
+
+Ini **perubahan model bisnis**.
+
+# 🧠 GUSTAFTA BUSINESS MEMORY
+
+Misalnya:
+
+### Starter
+
+**Rp499K/bulan**
+
+* Company Memory
+* Document Memory
+* Basic AI
+* 1–2 specialist assistant
+
+### Professional
+
+**Rp999K/bulan**
+
+* Business Memory
+* SBU Claw
+* Tender Claw
+* Finance/SMAP capability
+* lebih banyak knowledge
+* project memory
+
+### Business
+
+**Rp1,99 juta/bulan**
+
+* Business Memory
+* MultiClaw
+* Brain Project
+* multiple departments
+* advanced automation
+* larger knowledge base
+
+**Harga ini nantinya perlu disesuaikan dengan pricing architecture Gustafta yang sudah berjalan**, jadi angka di atas saya anggap **struktur awal**, bukan final pricing.
+
+---
+
+# 6. LEVEL 5 — BUSINESS MEMORY + BRAIN PROJECT
+
+Untuk customer yang sudah mature.
+
+### 🧠 Business Memory Pro
+
+Gabungan:
+
+**Business Memory**
+
+*
+
+**Brain Project**
+
+*
+
+**Claw**
+
+*
+
+**Mini Apps**
+
+Sehingga:
+
+```text
+MEMORY
+  ↓
+UNDERSTAND
+  ↓
+ANALYZE
+  ↓
+WARN
+  ↓
+ACT
+```
+
+Ini sudah bukan “AI assistant”.
+
+Ini menjadi:
+
+> **Digital operating layer perusahaan.**
+
+---
+
+# 7. Tetapi saya tidak menyarankan semua paket dijual di halaman yang sama
+
+Ini penting.
+
+Kalau landing page SBU menampilkan:
+
+> Ebook → SBU Claw → Tender Claw → Business Memory → Brain Project → MultiClaw...
+
+customer bisa bingung.
+
+Lebih baik:
+
+### Landing Page SBU
+
+```text
+SBU Starter
+   ↓
+SBU Claw
+   ↓
+Tender Claw
+   ↓
+Contractor Readiness
+```
+
+Kemudian setelah customer sudah masuk:
+
+> **“Bangun Memori Digital Perusahaan Anda.”**
+
+→ Business Memory.
+
+---
+
+### Landing Page Cashflow
+
+```text
+Cashflow Starter
+   ↓
+Finance AI
+   ↓
+Project Analysis
+   ↓
+Brain Project
+```
+
+→ Business Memory.
+
+---
+
+### Landing Page SMAP
+
+```text
+SMAP Starter
+   ↓
+PanCEK
+   ↓
+SMAP Claw
+   ↓
+Compliance Readiness
+```
+
+→ Business Memory.
+
+---
+
+# 8. Ini yang membuat pemaketan menjadi sangat kuat
+
+Kita sebenarnya punya:
+
+## **3 Vertical Packages**
+
+### 🟢 COMPLIANCE
+
+**SBU → SKK → Tender**
+
+### 🔵 FINANCE
+
+**Cashflow → RAB → Project Finance**
+
+### 🟠 INTEGRITY
+
+**SMAP → Risk → Compliance**
+
+Kemudian semuanya bisa naik ke:
+
+# **GUSTAFTA BUSINESS MEMORY**
+
+---
+
+# 9. Bahkan bisa dibuat "Upgrade Path"
+
+Customer tidak perlu membeli ulang dari nol.
+
+Contoh:
+
+### Customer beli
+
+**SBU Starter — Rp149K**
+
+↓
+
+Upgrade:
+
+**SBU Claw**
+
+> bayar selisih / harga upgrade khusus
+
+↓
+
+Upgrade:
+
+**Contractor Readiness**
+
+> bayar selisih
+
+↓
+
+Upgrade:
+
+**Business Memory**
+
+> migrasi knowledge otomatis
+
+Ini sangat menarik.
+
+Customer merasa:
+
+> **“Saya tidak kehilangan uang dari pembelian sebelumnya.”**
+
+Pembelian sebelumnya menjadi **credit menuju level berikutnya**.
+
+---
+
+# 10. Ini yang saya sarankan sebagai aturan pricing
+
+Kita gunakan konsep:
+
+### **Buy → Credit → Upgrade**
+
+Misalnya:
+
+**SBU Starter Rp149K**
+
+Jika dalam 14 hari upgrade ke SBU Claw:
+
+> **Rp149K dianggap sebagai upgrade credit.**
+
+Customer tidak merasa membeli dua kali.
+
+Kemudian:
+
+**SBU Claw → Contractor Readiness**
+
+sebagian nilai sebelumnya dapat menjadi credit.
+
+Kemudian:
+
+**Contractor Readiness → Business Memory**
+
+setup/knowledge onboarding bisa menjadi bagian dari upgrade.
+
+Ini sangat bagus untuk meningkatkan conversion.
+
+---
+
+# 11. FINAL PRODUCT LADDER
+
+Saya akan kunci seperti ini:
+
+| Level  | Paket                        | Model                 |
+| ------ | ---------------------------- | --------------------- |
+| **L1** | SBU Starter                  | One-time              |
+| **L1** | Cashflow Starter             | One-time              |
+| **L1** | SMAP Starter                 | One-time              |
+| **L2** | SBU Claw                     | One-time/subscription |
+| **L2** | Finance AI                   | One-time/subscription |
+| **L2** | SMAP Claw                    | One-time/subscription |
+| **L3** | Tender Claw                  | One-time/subscription |
+| **L3** | Contractor Readiness         | Bundle                |
+| **L4** | Business Memory Starter      | Recurring             |
+| **L4** | Business Memory Professional | Recurring             |
+| **L5** | Business Memory Business     | Recurring             |
+| **L5** | Brain Project / MultiClaw    | Expansion             |
+
+---
+
+## Dan satu hal yang saya anggap sangat penting:
+
+**KONTRAKTOR AMNESIA jangan dipaksa masuk sebagai Level 1 yang sejajar dengan SBU, Cashflow, dan SMAP.**
+
+Ia mempunyai fungsi yang berbeda.
+
+Saya akan posisikan:
+
+# 📕 KONTRAKTOR AMNESIA
+
+### **Strategic Product / Thought Leadership**
+
+sebagai produk yang bisa:
+
+* dijual sendiri,
+* menjadi bundle dengan Business Memory,
+* menjadi upsell kepada customer yang sudah matang,
+* atau menjadi campaign/awareness asset.
+
+Karena isinya memang berbicara tentang **perubahan paradigma dari dokumen menjadi Business Memory**, bukan sekadar satu problem operasional.
+
+---
+
+### Jadi arsitektur akhirnya:
+
+**3 pintu masuk komersial:**
+
+> **SBU | CASHFLOW | SMAP**
+
+**3 jalur specialist:**
+
+> **SBU Claw | Finance AI | SMAP Claw**
+
+**1 jalur project/revenue:**
+
+> **Tender Claw / Contractor Readiness**
+
+**1 recurring core:**
+
+> **GUSTAFTA BUSINESS MEMORY**
+
+**1 strategic narrative:**
+
+> **KONTRAKTOR AMNESIA**
+
+Ini sudah cukup kuat untuk diformalkan ke **catalog produk Gustafta dan kemudian dibuat konfigurasi upgrade/upsell di Replit**.

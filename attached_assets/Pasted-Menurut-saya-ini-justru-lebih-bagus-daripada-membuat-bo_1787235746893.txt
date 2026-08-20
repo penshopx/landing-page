@@ -1,0 +1,307 @@
+Menurut saya **ini justru lebih bagus** daripada membuat bonus khusus yang kemudian harus Anda bangun dari nol.
+
+Strateginya: **ebook tetap menjadi produk berbayar utama**, sedangkan bonus mengambil **3 produk existing Gustafta** yang nilai perceived value-nya tinggi tetapi biaya marginal untuk Anda rendah.
+
+Yang perlu dijaga: bonus **jangan sampai membuat produk Gustafta utama terlihat gratis**. Bonus harus terasa sebagai *starter pack*, bukan versi lengkap produk.
+
+## Struktur yang saya sarankan
+
+### Produk utama
+
+**SBU & SKK Tanpa Bingung — Rp149.000**
+
+Isi nilai utama:
+
+* Ebook
+* update/regulatory reference yang relevan
+* worksheet/checklist dari ebook
+
+Lalu:
+
+### 🎁 BONUS 1 — Mini App
+
+Pilih satu Mini App yang **langsung membantu pekerjaan SBU/SKK**.
+
+Contohnya kalau di katalog Anda ada:
+
+* Document Checker
+* Checklist Generator
+* Form Generator
+* Document Analyzer
+* atau Mini App sejenis.
+
+**Fungsinya:** membuat pembeli langsung mengalami Gustafta.
+
+---
+
+### 🎁 BONUS 2 — Kompetensi
+
+Ambil **satu produk kecil dari Ekosistem Kompetensi**, bukan paket besarnya.
+
+Misalnya produk yang berhubungan dengan:
+
+> **Pemetaan Kompetensi / Skill Gap / Competency Checker**
+
+Ini sangat nyambung dengan SKK.
+
+Pesan yang ingin kita bangun:
+
+> **“Bukan hanya tahu persyaratan SKK, tetapi mulai memetakan kesiapan kompetensi tenaga kerja Anda.”**
+
+Jadi bonus kedua memperluas value ebook dari **SBU → SKK → kompetensi**.
+
+---
+
+### 🎁 BONUS 3 — Mini App / AI Assistant
+
+Ini yang saya jadikan **teaser langsung menuju Gustafta**.
+
+Misalnya:
+
+> **SBU–SKK Assistant / Regulatory Assistant**
+
+Akses terbatas.
+
+Bukan full SBU Claw berbayar.
+
+Tujuannya agar pembeli mengalami:
+
+> “Oh, ternyata Gustafta bisa saya pakai untuk bertanya tentang pekerjaan saya.”
+
+Kemudian setelah akses bonus habis:
+
+### **Upgrade → SBU Claw**
+
+---
+
+# Jadi bonusnya punya 3 fungsi berbeda
+
+Jangan memberikan tiga bonus yang semuanya sama-sama “template”.
+
+Saya akan membuat:
+
+| Bonus | Produk existing              | Fungsi                   |
+| ----- | ---------------------------- | ------------------------ |
+| 🎁 #1 | **Mini App**                 | Menyelesaikan pekerjaan  |
+| 🎁 #2 | **Kompetensi**               | Memperluas kebutuhan SKK |
+| 🎁 #3 | **AI Assistant / Claw Lite** | Mengenalkan Gustafta     |
+
+Ini jauh lebih strategis.
+
+---
+
+# Kenapa saya suka model ini?
+
+Karena Anda sebenarnya sedang melakukan **product sampling**.
+
+Customer membayar:
+
+> **Rp149K untuk ebook.**
+
+Tetapi mendapatkan pengalaman dari **3 bagian ekosistem Gustafta**.
+
+Mereka kemudian melihat:
+
+> “Ternyata Gustafta bukan cuma ebook.”
+
+Dan kita tidak perlu mengatakan itu secara agresif.
+
+Customer sendiri yang menemukan.
+
+---
+
+# Yang lebih menarik: bonus jangan disebut "bonus Gustafta"
+
+Saya justru akan membuat packaging:
+
+### **BONUS DIGITAL senilai RpXXX.XXX**
+
+**01 — SBU/SKK Readiness Mini App**
+Untuk membantu melakukan pengecekan awal.
+
+**02 — Competency Toolkit**
+Untuk membantu memetakan kesiapan kompetensi.
+
+**03 — AI Regulatory Assistant**
+Untuk bertanya dan mengeksplorasi isu SBU/SKK.
+
+Kemudian kecil di bawahnya:
+
+> **Seluruh bonus diakses melalui ekosistem Gustafta.**
+
+Ini membuat **Gustafta menjadi infrastructure brand**, bukan sesuatu yang terasa sedang dijual.
+
+---
+
+# Tapi ada satu aturan penting
+
+**Jangan berikan produk flagship secara penuh sebagai bonus.**
+
+Misalnya:
+
+❌ Ebook Rp149K
+
+* SBU Claw full
+* Mini Apps full
+* Kompetensi full
+
+Itu akan menghancurkan tangga harga.
+
+Lebih baik:
+
+**Ebook = full value**
+
+**Bonus = selected access**
+
+**Gustafta product = full value**
+
+Contohnya:
+
+> SBU Claw harga normal Rp249K
+> Pembeli ebook mendapat **akses Lite 7 hari / sejumlah query tertentu**.
+
+Kemudian:
+
+> **“Ingin terus menggunakan SBU Claw?”**
+
+→ Upgrade Rp249K.
+
+Dengan begitu bonus **menghasilkan upsell**, bukan menggantikan upsell.
+
+---
+
+# Saya bahkan akan membuat "Bonus Stack"
+
+Misalnya:
+
+## SBU & SKK TANPA BINGUNG
+
+### Rp149.000
+
+**Anda mendapatkan:**
+
+📘 **Ebook utama**
+*SBU & SKK Tanpa Bingung*
+
+*
+
+🎁 **BONUS #1**
+**SBU Readiness Mini App**
+
+*
+
+🎁 **BONUS #2**
+**Competency Mapping Toolkit**
+
+*
+
+🎁 **BONUS #3**
+**AI Regulatory Assistant — Limited Access**
+
+### Nilai normal ekosistem: RpXXX.XXX
+
+**Hari ini cukup Rp149.000.**
+
+---
+
+## Setelah pembelian
+
+Baru kita mulai sequence upsell:
+
+### Day 0
+
+**Ebook + 3 bonus**
+
+### Day 1–3
+
+User mencoba Mini App.
+
+↓
+
+### Day 3–5
+
+User mencoba AI Assistant.
+
+↓
+
+### Trigger:
+
+> **“Anda sudah menggunakan SBU Assistant. Ingin mendapatkan akses penuh?”**
+
+→ **SBU Claw**
+
+↓
+
+Setelah SBU Claw digunakan:
+
+> **“Sekarang cek apakah perusahaan Anda siap mengikuti tender.”**
+
+→ **Tender Claw**
+
+↓
+
+Setelah beberapa dokumen digunakan:
+
+> **“Simpan seluruh knowledge perusahaan Anda agar tidak perlu upload dan menjelaskan ulang.”**
+
+→ **Gustafta Business Memory**
+
+---
+
+# Ini membuat funnel kita menjadi sangat cantik
+
+```text
+                  META ADS
+                     ↓
+             KONTRAKTOR AMNESIA
+                     ↓
+        ┌─────────────────────────┐
+        │ SBU & SKK TANPA BINGUNG │
+        │       Rp149.000         │
+        └────────────┬────────────┘
+                     │
+              ┌──────┴──────┐
+              │   BONUS     │
+              │             │
+        Mini App       Kompetensi
+              │             │
+              └──────┬──────┘
+                     │
+             AI Assistant Lite
+                     ↓
+                  SBU CLAW
+                     ↓
+                TENDER CLAW
+                     ↓
+          CONTRACTOR READINESS
+                     ↓
+        GUSTAFTA BUSINESS MEMORY
+                     ↓
+          BUSINESS MEMORY PRO
+```
+
+Dan ini juga menyelesaikan masalah yang sebelumnya kita bicarakan:
+
+**Gustafta tidak perlu dijual keras di Meta Ads.**
+
+Meta Ads menjual **masalah SBU/SKK**.
+
+Ebook menjual **solusi regulasi**.
+
+Bonus memperkenalkan **ekosistem Gustafta**.
+
+Claw menjual **AI assistance**.
+
+Business Memory menjual **infrastruktur pengetahuan perusahaan**.
+
+---
+
+### Saya akan pilih 3 bonus berdasarkan satu kriteria
+
+Bukan berdasarkan produk mana yang paling mahal.
+
+Tetapi:
+
+> **“Mana 3 produk existing yang paling membuat pembeli ebook berkata: *Wah, ternyata ini berguna.*?”**
+
+Kalau Anda berikan **daftar produk yang sekarang ada di Ekosistem Kompetensi dan Mini Apps Gustafta**, saya bisa bantu pilih **tepat 3 bonus terbaik**, sekaligus menentukan **mana yang menjadi bonus #1, #2, #3 dan mana yang jangan diberikan karena lebih baik dijadikan upsell berbayar**.

@@ -1,0 +1,244 @@
+Ya. **Itu sudah merupakan pola Product/Sales Ladder**, tetapi saya akan sedikit memperbaiki istilah dan strukturnya supaya benar-benar menjadi **formula sales ladder**, bukan hanya daftar produk berdasarkan level harga.
+
+Yang paling penting:
+
+> **Sales ladder bukan “produk makin mahal”.**
+>
+> Sales ladder adalah **perjalanan customer dari masalah kecil → kebutuhan lebih besar → solusi lebih dalam → recurring relationship.**
+
+Jadi tabel Anda **sudah 80–90% benar**, tetapi perlu diberi *logic* di belakang setiap level.
+
+---
+
+# Formula Sales Ladder Gustafta
+
+Saya sarankan formula resminya:
+
+> **TRIGGER → ENTRY → SPECIALIST → OUTCOME → PLATFORM → EXPANSION**
+
+Kemudian diterapkan ke produk.
+
+| Level  | Formula        | Produk                             | Fungsi                    |
+| ------ | -------------- | ---------------------------------- | ------------------------- |
+| **L1** | **ENTRY**      | SBU / Cashflow / SMAP Starter      | Mendapatkan customer      |
+| **L2** | **SPECIALIST** | SBU Claw / Finance AI / SMAP Claw  | Membantu masalah spesifik |
+| **L3** | **OUTCOME**    | Tender Claw / Contractor Readiness | Menjual hasil bisnis      |
+| **L4** | **PLATFORM**   | Business Memory                    | Recurring relationship    |
+| **L5** | **EXPANSION**  | Brain Project / MultiClaw          | Memperluas penggunaan     |
+
+Itu **formula sebenarnya**.
+
+---
+
+# Kenapa ini lebih tepat?
+
+Karena lihat perjalanan customer SBU.
+
+### L1 — ENTRY
+
+**SBU & SKK Tanpa Bingung**
+
+Customer berkata:
+
+> “Saya ingin memahami dan mengecek SBU/SKK.”
+
+↓
+
+### L2 — SPECIALIST
+
+**SBU Claw**
+
+Customer berkata:
+
+> “Saya ingin AI membantu kasus perusahaan saya.”
+
+↓
+
+### L3 — OUTCOME
+
+**Tender Claw / Contractor Readiness**
+
+Customer berkata:
+
+> “Saya ingin tahu apakah perusahaan saya siap mendapatkan proyek.”
+
+↓
+
+### L4 — PLATFORM
+
+**Business Memory**
+
+Customer berkata:
+
+> “Saya ingin semua pengetahuan perusahaan saya tersimpan dan bisa digunakan.”
+
+↓
+
+### L5 — EXPANSION
+
+**Brain Project / MultiClaw**
+
+Customer berkata:
+
+> “Saya ingin sistem ini terus memantau dan membantu menjalankan bisnis.”
+
+Itulah sales ladder.
+
+---
+
+# Jadi tabel Anda saya finalkan sedikit
+
+## GUSTAFTA — MASTER SALES LADDER
+
+| Level  | Role           | Produk                       | Model                   |
+| ------ | -------------- | ---------------------------- | ----------------------- |
+| **L0** | **Trigger**    | Meta Ads / Content / Problem | Acquisition             |
+| **L1** | **Entry**      | SBU Starter                  | One-time                |
+|        |                | Cashflow Starter             | One-time                |
+|        |                | SMAP Starter                 | One-time                |
+| **L2** | **Specialist** | SBU Claw                     | One-time / Subscription |
+|        |                | Finance AI                   | One-time / Subscription |
+|        |                | SMAP Claw                    | One-time / Subscription |
+| **L3** | **Outcome**    | Tender Claw                  | One-time / Subscription |
+|        |                | Contractor Readiness         | Bundle                  |
+| **L4** | **Platform**   | Business Memory Starter      | Recurring               |
+|        |                | Business Memory Professional | Recurring               |
+|        |                | Business Memory Business     | Recurring               |
+| **L5** | **Expansion**  | Brain Project                | Expansion               |
+|        |                | MultiClaw                    | Expansion               |
+
+### Dan:
+
+**Kontraktor Amnesia**
+
+tidak perlu dipaksa masuk L1–L5.
+
+Saya akan beri label:
+
+> **Strategic / Thought Leadership Product**
+
+Karena fungsinya berbeda.
+
+---
+
+# Formula per vertical
+
+Ini yang membuat sistemnya scalable.
+
+## 🟢 SBU
+
+```text
+SBU Starter
+    ↓
+SBU Claw
+    ↓
+Tender Claw
+    ↓
+Contractor Readiness
+    ↓
+Business Memory
+    ↓
+Brain Project / MultiClaw
+```
+
+---
+
+## 🔵 CASHFLOW
+
+```text
+Cashflow Starter
+    ↓
+Finance AI
+    ↓
+Project Financial Analysis
+    ↓
+Project Brain
+    ↓
+Business Memory
+    ↓
+MultiClaw
+```
+
+---
+
+## 🟠 SMAP
+
+```text
+SMAP Starter
+    ↓
+SMAP / PanCEK
+    ↓
+SMAP Claw
+    ↓
+Compliance Readiness
+    ↓
+Business Memory
+    ↓
+Brain Project / MultiClaw
+```
+
+---
+
+# Dan ada satu aturan penting
+
+**Tidak semua customer harus naik secara vertikal.**
+
+Misalnya:
+
+Customer SBU:
+
+> SBU Starter → SBU Claw → Tender Claw → Business Memory.
+
+Tetapi customer Cashflow bisa:
+
+> Cashflow Starter → Finance AI → Business Memory.
+
+Tidak wajib membeli SBU Claw.
+
+Sedangkan customer SMAP:
+
+> SMAP Starter → PanCEK → SMAP Claw → Business Memory.
+
+Jadi Business Memory adalah **common destination**, bukan semua produk harus dilewati.
+
+---
+
+# Rumus matematikanya bahkan bisa kita sederhanakan
+
+Secara bisnis:
+
+> **L1 = Customer Acquisition**
+
+> **L2 = Problem Expansion**
+
+> **L3 = Outcome Monetization**
+
+> **L4 = Recurring Monetization**
+
+> **L5 = Account Expansion**
+
+Ini sangat penting.
+
+Karena berarti kita tidak sekadar bertanya:
+
+> “Produk apa lagi yang bisa kita jual?”
+
+Tetapi:
+
+> **“Apa kebutuhan berikutnya setelah customer mendapatkan produk ini?”**
+
+Itulah yang membuat Gustafta bisa membangun **LTV**, bukan hanya menjual ebook satu kali.
+
+---
+
+## Jadi jawabannya: **YA.**
+
+Tabel yang Anda tunjuk itu memang **Sales Ladder**, tetapi formula yang sebaiknya kita jadikan standar Gustafta adalah:
+
+# **TRIGGER → ENTRY → SPECIALIST → OUTCOME → PLATFORM → EXPANSION**
+
+Dan seluruh product catalog Gustafta nantinya bisa kita **petakan ke formula ini**.
+
+Dengan demikian ketika nanti ada produk baru—misalnya Legalitas, SKK, Procurement, Finance, HR, atau lainnya—kita tidak perlu membuat strategi dari nol. Tinggal menentukan:
+
+**Produk ini masuk L1, L2, L3, L4, atau L5?**

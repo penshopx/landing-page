@@ -1,0 +1,471 @@
+# FINAL — Arsitektur Produk & Sales Ladder Gustafta
+
+Kita kunci strategi ini sebagai **arsitektur final**.
+
+## 1. ENTRY PRODUCT — SBU & SKK TANPA BINGUNG
+
+### 📘 Produk utama
+
+**SBU & SKK Tanpa Bingung**
+*Panduan Pemenuhan SBU, SKK & Kesiapan Tender di Era Regulasi Baru*
+
+**Harga:** Rp149.000
+
+Fungsi:
+
+> **Entry point + cash generator + acquisition product.**
+
+Yang dibeli customer adalah **kepastian dan panduan tindakan**, bukan sekadar ebook.
+
+### Bonus maksimal 3 produk existing Gustafta
+
+Bukan bonus yang harus kita bangun baru.
+
+Format:
+
+1. 🎁 **Mini App yang relevan dengan SBU/dokumen**
+2. 🎁 **Produk Ekosistem Kompetensi yang relevan dengan SKK/SDM**
+3. 🎁 **Mini App/AI experience yang memperkenalkan kemampuan Gustafta**
+
+**SBU Claw tidak menjadi bonus.**
+Ia tetap menjadi produk upsell.
+
+---
+
+# 2. UPSELL #1 — SBU CLAW
+
+Setelah customer membaca ebook:
+
+> **“Saya sudah memahami aturannya. Sekarang bagaimana dengan kondisi perusahaan saya?”**
+
+### SBU Claw
+
+AI specialist untuk:
+
+* SBU
+* SKK
+* klasifikasi/subklasifikasi
+* KBLI
+* PJT/PJB
+* gap analysis
+* persyaratan
+* checklist
+* kesiapan perusahaan
+
+**Positioning:**
+
+> **Ebook memberi Anda pengetahuan. SBU Claw membantu Anda menerapkannya pada kasus perusahaan Anda.**
+
+Harga dapat dimulai sekitar **Rp149–249K**, kemudian kita optimalkan berdasarkan usage.
+
+---
+
+# 3. UPSELL #2 — TENDER CLAW
+
+Setelah kebutuhan SBU/SKK:
+
+> **“Perusahaan saya sudah tahu kondisinya. Sekarang apakah saya memenuhi syarat untuk tender ini?”**
+
+### Tender Claw
+
+Input:
+
+* RKS
+* KAK
+* dokumen pemilihan
+* persyaratan tender
+* addendum
+* dokumen perusahaan
+
+Output:
+
+**Tender Requirement → Company Matching**
+
+Misalnya:
+
+| Komponen             | Status |
+| -------------------- | ------ |
+| SBU                  | ✅      |
+| SKK                  | ✅      |
+| Pengalaman           | ⚠️     |
+| Tenaga ahli          | ❌      |
+| Dokumen administrasi | ⚠️     |
+
+Kemudian:
+
+> **Tender Readiness Score + Gap + Action Plan**
+
+Harga indikatif **Rp249–499K**.
+
+---
+
+# 4. UPSELL #3 — CONTRACTOR READINESS
+
+Setelah SBU Claw + Tender Claw mulai digunakan, kita bisa menggabungkannya.
+
+### Contractor Readiness Suite
+
+Isi:
+
+* SBU Claw
+* SKK assistance
+* Tender Claw
+* Tender Readiness
+* checklist
+* document analysis
+* company capability matching
+
+Fungsinya:
+
+> **Dari sekadar memahami regulasi menjadi mempersiapkan perusahaan untuk peluang proyek.**
+
+Ini menjadi **bundle/AOV booster**, bukan produk wajib untuk semua orang.
+
+---
+
+# 5. STRATEGIC PRODUCT — KONTRAKTOR AMNESIA
+
+Di sinilah posisi **Kontraktor Amnesia** kita kunci.
+
+### 📕 KONTRAKTOR AMNESIA
+
+Bukan produk pertama dari funnel SBU.
+
+Bukan pula sekadar iklan.
+
+Ia adalah:
+
+> **Strategic / Vision Product**
+
+Tema besarnya:
+
+**Knowledge Debt → Organizational Amnesia → Business Memory**
+
+Ia menjelaskan kenapa perusahaan harus berubah dari:
+
+> Dokumen → Knowledge → Business Memory → AI Workforce.
+
+Dan membawa konsep:
+
+* Business Memory
+* Brain Project
+* Coach
+* Claw
+* Mini Apps
+* Ekosistem Kompetensi
+* Gustafta.
+
+### Perannya:
+
+**SBU ebook menjawab:**
+
+> “Apa yang harus saya lakukan sekarang?”
+
+**Kontraktor Amnesia menjawab:**
+
+> “Bagaimana perusahaan saya berhenti kehilangan pengetahuan?”
+
+---
+
+# 6. CORE RECURRING PRODUCT — GUSTAFTA BUSINESS MEMORY
+
+Ini **tujuan jangka panjang funnel**.
+
+### 🧠 Gustafta Business Memory
+
+Positioning:
+
+> **Memori digital perusahaan Anda.**
+
+Bukan:
+
+> “AI chatbot dengan upload PDF.”
+
+Tetapi:
+
+> **Satu tempat untuk menyimpan, memahami, menghubungkan, dan menggunakan kembali pengetahuan perusahaan.**
+
+Memory dapat mencakup:
+
+### Company Memory
+
+* profil
+* legalitas
+* KBLI
+* struktur
+* SDM
+
+### SBU/SKK Memory
+
+* SBU
+* SKK
+* PJT/PJB
+* kompetensi
+* masa berlaku
+
+### Tender Memory
+
+* RKS
+* KAK
+* tender
+* addendum
+* hasil evaluasi
+
+### Project Memory
+
+* pengalaman proyek
+* lesson learned
+* masalah
+* solusi
+* keputusan
+
+### Regulatory Memory
+
+* UU
+* PP
+* Permen
+* pedoman
+* SOP
+
+### Document Memory
+
+* surat
+* kontrak
+* laporan
+* template
+* dokumen operasional.
+
+---
+
+# 7. HUBUNGAN BUSINESS MEMORY DENGAN CLAW
+
+Ini harus kita kunci secara arsitektur:
+
+> **Business Memory = Memory Layer**
+
+> **Claw = Worker/AI Specialist**
+
+Sehingga:
+
+```text
+                 GUSTAFTA
+             BUSINESS MEMORY
+                    │
+        ┌───────────┼───────────┐
+        │           │           │
+     SBU Claw   Tender Claw   Other Claw
+        │           │           │
+        └───────────┼───────────┘
+                    │
+              COMPANY KNOWLEDGE
+```
+
+SBU Claw menggunakan Business Memory.
+
+Tender Claw menggunakan Business Memory.
+
+Nantinya:
+
+* Legal Claw
+* Finance Claw
+* Project Claw
+* Procurement Claw
+* HR/Competency Claw
+
+juga menggunakan **memory yang sama**.
+
+---
+
+# 8. SETELAH BUSINESS MEMORY
+
+Baru kita lakukan **expansion selling**.
+
+### Brain Project
+
+> **Apa yang sedang terjadi dan apa yang harus saya waspadai?**
+
+Contoh:
+
+> ⚠️ SKK akan habis 60 hari lagi.
+
+> ⚠️ Dokumen tender belum lengkap.
+
+> ⚠️ Ada perubahan regulasi yang berdampak pada perusahaan.
+
+---
+
+### Mini Apps
+
+> **Apa yang harus saya kerjakan?**
+
+Misalnya:
+
+* RAB
+* Metode Pelaksanaan
+* Executive Summary
+* BAST
+* surat
+* laporan
+* dokumen tender.
+
+---
+
+### Ekosistem Kompetensi
+
+> **Bagaimana meningkatkan kemampuan orang di perusahaan?**
+
+* competency mapping
+* assessment
+* learning
+* SKK preparation
+* competency development.
+
+---
+
+# 9. FINAL SALES LADDER
+
+Ini yang kita jadikan **arsitektur resmi**:
+
+```text
+                         META ADS
+                            │
+                            ▼
+                  SBU / SKK / TENDER
+                     PAIN & TRIGGER
+                            │
+                            ▼
+              ┌─────────────────────────┐
+              │ SBU & SKK TANPA BINGUNG │
+              │         Rp149K          │
+              └────────────┬────────────┘
+                           │
+                     3 BONUS EXISTING
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+          Mini App    Kompetensi     AI/Mini App
+                           │
+                           ▼
+                       SBU CLAW
+                           │
+                           ▼
+                      TENDER CLAW
+                           │
+                           ▼
+                 CONTRACTOR READINESS
+                           │
+                           ▼
+                 KONTRAKTOR AMNESIA
+                 Strategic / Vision
+                           │
+                           ▼
+              GUSTAFTA BUSINESS MEMORY
+                    RECURRING CORE
+                           │
+             ┌─────────────┼─────────────┐
+             ▼             ▼             ▼
+        Brain Project   Mini Apps   Competency
+             │
+             ▼
+          MultiClaw
+```
+
+**Catatan:** Kontraktor Amnesia tidak harus selalu dibeli sebelum Business Memory. Ia adalah **strategic bridge/product** yang dapat ditawarkan kepada customer yang sudah menunjukkan ketertarikan pada transformasi knowledge perusahaan.
+
+---
+
+# 10. LOGIKA CUSTOMER JOURNEY
+
+Semuanya akhirnya mengikuti perjalanan natural kontraktor:
+
+### **1. “Apa yang berubah?”**
+
+→ **SBU & SKK Tanpa Bingung**
+
+### **2. “Apa kondisi perusahaan saya?”**
+
+→ **SBU Claw**
+
+### **3. “Apakah saya cocok ikut tender ini?”**
+
+→ **Tender Claw**
+
+### **4. “Bagaimana saya memastikan perusahaan siap?”**
+
+→ **Contractor Readiness**
+
+### **5. “Kenapa semua pengetahuan perusahaan selalu tercecer?”**
+
+→ **Kontraktor Amnesia**
+
+### **6. “Bagaimana menyimpan dan menggunakan pengetahuan itu?”**
+
+→ **Gustafta Business Memory**
+
+### **7. “Bagaimana membuatnya aktif bekerja?”**
+
+→ **Brain Project + Claw + Mini Apps**
+
+---
+
+# 11. POSITIONING AKHIR
+
+Saya akan mengunci empat kalimat ini:
+
+### SBU & SKK Tanpa Bingung
+
+> **Pahami aturan. Temukan gap. Siapkan perusahaan.**
+
+### SBU Claw
+
+> **Jangan hanya membaca regulasi. Tanyakan kondisi perusahaan Anda.**
+
+### Tender Claw
+
+> **Jangan hanya menemukan tender. Cek apakah perusahaan Anda siap.**
+
+### Gustafta Business Memory
+
+> **Jangan biarkan pengetahuan perusahaan hilang ketika dokumen, proyek, atau orang berganti.**
+
+Dan:
+
+### Kontraktor Amnesia
+
+> **Perusahaan Anda menghasilkan bangunan dan uang. Jangan biarkan pengetahuannya ikut hilang.**
+
+---
+
+## Jadi keputusan finalnya
+
+**Produk yang kita dorong sekarang:**
+
+### 🥇 **SBU & SKK Tanpa Bingung — Rp149K**
+
+**Bonus:** maksimal 3 produk existing Gustafta.
+
+↓
+
+### 🥈 **SBU Claw**
+
+↓
+
+### 🥉 **Tender Claw**
+
+↓
+
+### **Contractor Readiness**
+
+↓
+
+### **Gustafta Business Memory — recurring**
+
+↓
+
+### **Brain Project + Claw + Mini Apps + Ekosistem Kompetensi**
+
+Sedangkan **KONTRAKTOR AMNESIA tetap dipertahankan sebagai strategic ebook**, karena isinya sebenarnya merupakan **jembatan naratif yang sangat kuat dari masalah knowledge perusahaan menuju konsep Business Memory Gustafta**.
+
+Dengan struktur ini, kita tidak menjual enam produk secara acak. Kita menjual **satu perjalanan bisnis:**
+
+> **Regulasi → Kesiapan → Tender → Knowledge → Business Memory → AI Workforce.**

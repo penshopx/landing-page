@@ -1,0 +1,72 @@
+Ya, judulnya bisa **Sales Ladder** — bukan *Saler Ladder*.
+
+## Apa itu Sales Ladder?
+
+**Sales Ladder** secara sederhana berarti:
+
+> **Tangga penjualan — yaitu rancangan perjalanan customer dari pembelian pertama yang sederhana menuju produk yang lebih bernilai, lebih lengkap, dan akhirnya menjadi customer recurring.**
+
+Jadi bukan sekadar daftar produk.
+
+### Dalam konteks Gustafta:
+
+```text
+Masalah kecil
+     ↓
+Produk entry
+     ↓
+Solusi spesifik
+     ↓
+Solusi bisnis
+     ↓
+Platform recurring
+     ↓
+Expansion
+```
+
+Contohnya:
+
+**SBU & SKK Tanpa Bingung**
+→ **SBU Claw**
+→ **Tender Claw**
+→ **Contractor Readiness**
+→ **Business Memory**
+→ **Brain Project / MultiClaw**
+
+Customer **tidak dipaksa membeli semuanya**. Setiap anak tangga muncul karena kebutuhan customer berkembang.
+
+---
+
+## Definisi yang saya sarankan untuk dokumen Gustafta
+
+> ### **GUSTAFTA SALES LADDER**
+>
+> **Sales Ladder adalah arsitektur perjalanan komersial yang memetakan bagaimana customer bergerak dari produk entry berharga rendah menuju solusi yang lebih spesifik, bernilai tinggi, dan recurring, berdasarkan perkembangan kebutuhan bisnis mereka.**
+
+Formula Gustafta:
+
+> **TRIGGER → ENTRY → SPECIALIST → OUTCOME → PLATFORM → EXPANSION**
+
+Dengan demikian, **Sales Ladder menjadi kerangka untuk menentukan packaging, pricing, upsell, cross-sell, dan recurring revenue Gustafta.**
+
+---
+
+### Bedakan dengan istilah lain
+
+| Istilah             | Artinya                                                                                   |
+| ------------------- | ----------------------------------------------------------------------------------------- |
+| **Product Catalog** | Daftar semua produk                                                                       |
+| **Product Ladder**  | Urutan produk berdasarkan nilai/level                                                     |
+| **Sales Funnel**    | Perjalanan dari calon customer → pembeli                                                  |
+| **Sales Ladder**    | Perjalanan customer **naik dari pembelian awal → kebutuhan yang lebih besar → recurring** |
+| **Upsell**          | Menawarkan solusi yang lebih tinggi setelah pembelian                                     |
+| **Cross-sell**      | Menawarkan solusi lain yang relevan                                                       |
+| **Business Memory** | Recurring destination/core platform Gustafta                                              |
+
+Jadi untuk dokumentasi internal, saya akan menggunakan judul:
+
+# **GUSTAFTA SALES LADDER**
+
+### *Customer Journey, Product Packaging & Upsell Architecture*
+
+Itu lebih tepat daripada hanya **“Product Ladder”**, karena yang sedang kita bangun bukan cuma hierarki produk, tetapi **mekanisme bagaimana produk-produk tersebut dijual secara bertahap kepada customer**.

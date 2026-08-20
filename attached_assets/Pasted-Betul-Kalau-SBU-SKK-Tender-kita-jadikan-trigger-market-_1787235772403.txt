@@ -1,0 +1,687 @@
+Betul. Kalau **SBU–SKK–Tender** kita jadikan *trigger market*, maka jangan membuat upsell sebagai produk-produk yang berdiri sendiri. Kita bangun **sales ladder berdasarkan perjalanan kebutuhan kontraktor**.
+
+Intinya:
+
+> **Masuk karena SBU → membutuhkan SKK → ingin ikut Tender → perlu mengecek dokumen → perlu menyimpan knowledge → akhirnya membutuhkan Business Memory.**
+
+Jadi setiap upsell terasa seperti **jawaban alami dari masalah sebelumnya**, bukan dipaksa membeli produk lain.
+
+---
+
+# 1. BIG PICTURE — SALES LADDER
+
+Saya akan membangun seperti ini:
+
+```text
+                         GUSTAFTA
+                    BUSINESS MEMORY
+                           ▲
+                           │
+                  ┌────────┴────────┐
+                  │                 │
+            PROJECT MEMORY     COMPANY MEMORY
+                  │                 │
+             TENDER CLAW       BUSINESS CLAW
+                  ▲
+                  │
+             TENDER READINESS
+                  ▲
+                  │
+              TENDER CLAW
+                  ▲
+                  │
+              SBU / SKK CLAW
+                  ▲
+                  │
+        SBU & SKK TANPA BINGUNG
+                  ▲
+                  │
+          KONTRAKTOR AMNESIA
+                  ▲
+                  │
+                META ADS
+```
+
+Tetapi secara komersial, saya akan membaginya menjadi **5 lapisan**.
+
+---
+
+# 2. LAPISAN 1 — TRIGGER PRODUCT
+
+## SBU & SKK Tanpa Bingung
+
+**Harga:** ± Rp149K
+
+Ini bukan produk untuk menghasilkan recurring revenue.
+
+Fungsinya:
+
+### Acquire customer
+
+Target:
+
+* kontraktor kecil–menengah
+* BUJK
+* pemilik perusahaan konstruksi
+* admin/legal perusahaan
+* tenaga yang mengurus SBU/SKK
+* orang yang sedang persiapan tender
+
+### Yang dibeli sebenarnya:
+
+Bukan ebook.
+
+Mereka membeli:
+
+> **“Saya ingin tahu apakah perusahaan saya sudah sesuai dengan aturan terbaru.”**
+
+---
+
+## Bonus
+
+Agar perceived value tinggi:
+
+### BONUS TOOLKIT
+
+* Radar SBU
+* Checklist SBU
+* Checklist SKK
+* Formulir pemetaan perusahaan
+* Template dokumen
+* Worksheet gap analysis
+* timeline pemenuhan
+
+Ini membuat produk terasa seperti:
+
+> **Regulatory Readiness Kit**
+
+bukan sekadar PDF.
+
+---
+
+# 3. LAPISAN 2 — FIRST UPSELL
+
+## SBU Claw
+
+Ini adalah **first digital/AI upsell**.
+
+Harga bisa:
+
+**Rp149K–249K**
+
+atau dibuat:
+
+> **Upgrade dari ebook: Rp99K**
+
+supaya conversion tinggi.
+
+---
+
+## Kenapa SBU Claw?
+
+Karena setelah membaca ebook, pertanyaan berikutnya adalah:
+
+> “Kalau kondisi perusahaan saya seperti ini, bagaimana?”
+
+Ebook bersifat **general knowledge**.
+
+SBU Claw memberikan **personalized assistance**.
+
+Contoh:
+
+> “Perusahaan saya memiliki SBU X dan SKK Y. Apa yang perlu saya perbaiki?”
+
+> “Apakah klasifikasi ini sesuai dengan pekerjaan kami?”
+
+> “Dokumen apa yang perlu saya siapkan?”
+
+> “Apa gap perusahaan saya?”
+
+Jadi:
+
+**Ebook = Learn**
+
+**SBU Claw = Ask**
+
+---
+
+# 4. LAPISAN 3 — SECOND UPSELL
+
+Setelah SBU selesai, kebutuhan berikutnya hampir otomatis:
+
+> **“Oke, SBU saya sudah beres. Sekarang saya mau ikut tender.”**
+
+Maka muncul:
+
+# TENDER CLAW
+
+Harga:
+
+**Rp249K–499K**
+
+---
+
+## Fungsi
+
+User memasukkan:
+
+* RKS
+* KAK
+* dokumen pemilihan
+* persyaratan tender
+* BOQ
+* addendum
+
+Kemudian Tender Claw membantu:
+
+### 1. Requirement Extraction
+
+Mengambil seluruh persyaratan tender.
+
+### 2. Compliance Check
+
+Mengecek:
+
+> Apakah perusahaan memenuhi?
+
+### 3. Gap Analysis
+
+Misalnya:
+
+| Requirement | Status |
+| ----------- | ------ |
+| SBU         | ✅      |
+| NIB         | ✅      |
+| SKK         | ⚠️     |
+| Pengalaman  | ❌      |
+| Tenaga ahli | ⚠️     |
+| Peralatan   | ✅      |
+
+### 4. Tender Readiness Score
+
+Misalnya:
+
+> **Tender Readiness: 78/100**
+
+### 5. Action Plan
+
+> 3 dokumen harus dilengkapi.
+
+Ini sudah jauh lebih dekat dengan **uang/proyek** daripada sekadar regulasi.
+
+---
+
+# 5. LAPISAN 4 — PRODUCT BUNDLE
+
+Setelah user memiliki SBU Claw + Tender Claw, jangan terus menjual produk satuan.
+
+Buat:
+
+# CONTRACTOR READINESS SUITE
+
+Misalnya:
+
+**Rp499K–799K**
+
+Isi:
+
+### SBU Claw
+
+*
+
+### SKK Assistant
+
+*
+
+### Tender Claw
+
+*
+
+### Tender Readiness
+
+*
+
+### Document Checklist
+
+*
+
+### Company Profile Checker
+
+Positioning:
+
+> **“Satu toolkit digital untuk mempersiapkan perusahaan sebelum masuk tender.”**
+
+Ini menjadi **upsell dari pembelian individual menjadi bundle**.
+
+---
+
+# 6. LAPISAN 5 — GUSTAFTA BUSINESS MEMORY
+
+Nah.
+
+**Di sinilah Gustafta mulai naik kelas.**
+
+Jangan menjual:
+
+> “AI chatbot + upload PDF.”
+
+Jual:
+
+# **MEMORI DIGITAL PERUSAHAAN**
+
+Setelah kontraktor menggunakan SBU Claw dan Tender Claw, mereka akan mengalami masalah:
+
+> “Saya harus upload dokumen lagi.”
+
+> “Data perusahaan saya ada di mana?”
+
+> “Pengalaman proyek kami yang mana?”
+
+> “SBU dan SKK terbaru yang mana?”
+
+> “Dokumen tender sebelumnya ada di folder mana?”
+
+Di sinilah Gustafta masuk.
+
+---
+
+# 7. BUSINESS MEMORY MENJADI JAWABAN DARI MASALAH REPEAT WORK
+
+Misalnya user sudah punya:
+
+**SBU**
+
+**SKK**
+
+**NIB**
+
+**Company Profile**
+
+**Pengalaman proyek**
+
+**Dokumen tenaga ahli**
+
+**Dokumen tender**
+
+**SOP**
+
+**template**
+
+Semua dimasukkan ke:
+
+# GUSTAFTA BUSINESS MEMORY
+
+Kemudian:
+
+> **SBU Claw membaca Business Memory.**
+
+> **Tender Claw membaca Business Memory.**
+
+> **Legal Claw membaca Business Memory.**
+
+> **Project Claw membaca Business Memory.**
+
+Jadi Business Memory bukan sekadar produk ke-5.
+
+**Ia menjadi infrastructure layer.**
+
+---
+
+# 8. INILAH YANG SAYA ANGGAP PALING STRATEGIS
+
+Jangan membuat:
+
+```text
+SBU Claw
+Tender Claw
+Gustafta
+```
+
+sebagai tiga produk yang tidak berhubungan.
+
+Buat:
+
+```text
+                BUSINESS MEMORY
+                      │
+          ┌───────────┼───────────┐
+          │           │           │
+       SBU CLAW   TENDER CLAW   LEGAL CLAW
+          │           │           │
+          └───────────┼───────────┘
+                      │
+                COMPANY DATA
+```
+
+**Claw = Worker**
+
+**Business Memory = Brain/Memory**
+
+Ini akan membuat Gustafta mempunyai moat yang jauh lebih kuat.
+
+---
+
+# 9. SETELAH BUSINESS MEMORY — UPSell BERUBAH MENJADI BUSINESS WORKFLOW
+
+Begitu perusahaan sudah menyimpan datanya di Gustafta, jangan berhenti.
+
+Kita bisa membuat vertical Claw lain.
+
+### Legalitas Claw
+
+> “Apakah dokumen legalitas kami masih lengkap?”
+
+### Finance Claw
+
+> “Berapa posisi cashflow proyek ini?”
+
+### Project Claw
+
+> “Apa status proyek X?”
+
+### Procurement Claw
+
+> “Dokumen pembelian apa yang belum lengkap?”
+
+### HR/Competency Claw
+
+> “SKK siapa yang akan habis?”
+
+### Document Claw
+
+> “Cari surat pengalaman proyek tahun 2024.”
+
+### Management Claw
+
+> “Berikan ringkasan kondisi perusahaan bulan ini.”
+
+Jadi **SBU adalah pintu masuk**, bukan batas pasar Gustafta.
+
+---
+
+# 10. SALES LADDER YANG LEBIH MATANG
+
+Saya akan membaginya menjadi:
+
+## LEVEL 0 — ATTENTION
+
+### KONTRAKTOR AMNESIA
+
+Gratis / campaign / lead magnet.
+
+Tujuannya:
+
+**Attention**
+
+---
+
+## LEVEL 1 — LOW TICKET
+
+### SBU & SKK TANPA BINGUNG
+
+**Rp149K**
+
+Tujuan:
+
+**Customer acquisition**
+
+Bonus:
+
+**SBU Readiness Toolkit**
+
+---
+
+## LEVEL 2 — AI MICRO PRODUCT
+
+### SBU CLAW
+
+**Rp149–249K**
+
+Tujuan:
+
+**First AI experience**
+
+---
+
+## LEVEL 3 — PROJECT MONEY
+
+### TENDER CLAW
+
+**Rp249–499K**
+
+Tujuan:
+
+**Move from compliance → revenue**
+
+---
+
+## LEVEL 4 — BUNDLE
+
+### CONTRACTOR READINESS SUITE
+
+**Rp499–799K**
+
+Tujuan:
+
+**Increase AOV**
+
+---
+
+## LEVEL 5 — RECURRING
+
+### GUSTAFTA BUSINESS MEMORY
+
+**Rp499K–999K/month**
+
+Tujuan:
+
+**Recurring Revenue**
+
+---
+
+## LEVEL 6 — BUSINESS
+
+### BUSINESS MEMORY PRO / BUSINESS
+
+**Rp999K–1.99M+/month**
+
+Tujuan:
+
+**Account expansion**
+
+---
+
+# 11. JANGAN SEMUA ORANG DI-UPSELL KE LEVEL BERIKUTNYA
+
+Ini penting.
+
+Kita gunakan **behavior-based upsell**.
+
+Contohnya:
+
+### User A
+
+Membeli ebook → hanya membaca.
+
+Tidak perlu ditawari Tender Claw.
+
+---
+
+### User B
+
+Membeli ebook → membuka banyak halaman SBU.
+
+Tawarkan:
+
+> **SBU Claw**
+
+---
+
+### User C
+
+Menggunakan SBU Claw → bertanya tentang tender.
+
+Tawarkan:
+
+> **Tender Claw**
+
+---
+
+### User D
+
+Sudah menggunakan Tender Claw → upload banyak dokumen.
+
+Tawarkan:
+
+> **Business Memory**
+
+---
+
+### User E
+
+Sudah menyimpan banyak knowledge perusahaan.
+
+Tawarkan:
+
+> **Business Memory Professional**
+
+---
+
+Ini jauh lebih efisien daripada:
+
+> “Setiap customer ditawarkan semua produk.”
+
+---
+
+# 12. TRIGGER UPSELL-NYA
+
+Kita bahkan bisa menentukan trigger otomatis.
+
+### Trigger #1
+
+**User selesai membaca ebook**
+
+→
+
+> “Butuh jawaban spesifik untuk kondisi perusahaan Anda?”
+
+**SBU Claw**
+
+---
+
+### Trigger #2
+
+User bertanya:
+
+> “Apakah perusahaan saya bisa mengikuti tender X?”
+
+→
+
+**Tender Claw**
+
+---
+
+### Trigger #3
+
+User upload dokumen tender.
+
+→
+
+> “Cocokkan dokumen tender ini dengan data perusahaan Anda.”
+
+**Tender Readiness**
+
+---
+
+### Trigger #4
+
+User upload 5–10 dokumen perusahaan.
+
+→
+
+> “Jadikan dokumen-dokumen ini sebagai Memory perusahaan Anda.”
+
+**Business Memory**
+
+---
+
+### Trigger #5
+
+User sudah memiliki beberapa Claw.
+
+→
+
+> “Gabungkan semua knowledge dan assistant perusahaan Anda dalam satu workspace.”
+
+**Gustafta Business Memory**
+
+---
+
+# 13. INI YANG AKHIRNYA MEMBUAT GUSTAFTA BERBEDA
+
+Kita tidak menjual:
+
+> **AI**
+
+Kita menjual **progression**:
+
+### Tahap 1
+
+**Saya ingin tahu.**
+
+→ Ebook
+
+### Tahap 2
+
+**Saya ingin bertanya.**
+
+→ SBU Claw
+
+### Tahap 3
+
+**Saya ingin mengecek peluang tender.**
+
+→ Tender Claw
+
+### Tahap 4
+
+**Saya ingin memastikan perusahaan saya siap.**
+
+→ Contractor Readiness Suite
+
+### Tahap 5
+
+**Saya tidak ingin mengulang pekerjaan yang sama.**
+
+→ Business Memory
+
+### Tahap 6
+
+**Saya ingin AI bekerja menggunakan knowledge perusahaan saya.**
+
+→ Gustafta Business Memory Pro
+
+---
+
+# 14. Bahkan positioning funnel-nya bisa dibuat sangat sederhana
+
+> ### **PAHAMI → TANYAKAN → CEK → SIAPKAN → SIMPAN → OTOMATISKAN**
+
+| Perjalanan      | Produk                       |
+| --------------- | ---------------------------- |
+| **PAHAMI**      | SBU & SKK Tanpa Bingung      |
+| **TANYAKAN**    | SBU Claw                     |
+| **CEK**         | Tender Claw                  |
+| **SIAPKAN**     | Contractor Readiness         |
+| **SIMPAN**      | Business Memory              |
+| **OTOMATISKAN** | Gustafta Business Memory Pro |
+
+**Ini menurut saya adalah sales architecture yang paling kuat untuk Gustafta dari trigger SBU–SKK–Tender.**
+
+Dan yang paling penting: **kita tidak perlu membangun semuanya sekaligus.**
+
+Untuk sprint sekarang saya akan fokus hanya pada **3 produk pertama**:
+
+**① Ebook SBU & SKK** → **② SBU Claw** → **③ Tender Claw**
+
+Sedangkan **Business Memory dibangun sebagai tujuan akhir funnel**, sambil memastikan sejak awal SBU Claw dan Tender Claw memang dirancang agar nantinya bisa menggunakan Business Memory sebagai memory layer. Dengan begitu pembangunan produk sekarang tidak menjadi *throwaway work*.
