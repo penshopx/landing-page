@@ -2501,8 +2501,12 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
       // Kelompokkan hanya agent promotable yang belum punya Modul efektif.
       // Reconciler tidak mengubah prompt, harga, model, visibilitas, atau kelas premium.
       try {
-        const { reconcileChatbotModules } = await import("./reconcile-chatbot-modules");
+        const {
+          assertChatbotModuleReconcileHealthy,
+          reconcileChatbotModules,
+        } = await import("./reconcile-chatbot-modules");
         const result = await reconcileChatbotModules();
+        assertChatbotModuleReconcileHealthy(result);
         invalidateStoreCatalog();
         log(
           `[Chatbot Modules] ✅ ${result.agentsAssigned} assigned, ` +

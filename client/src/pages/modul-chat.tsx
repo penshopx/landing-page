@@ -23,7 +23,7 @@ interface UploadedFile {
 }
 
 interface ChatbotInfo {
-  agentId: string;
+  agentId: string | number;
   name: string;
   avatar: string;
   description: string;
@@ -34,12 +34,18 @@ interface ChatbotInfo {
   category: string;
   subcategory: string;
   toolboxName: string;
-  toolboxId: string;
+  toolboxId: string | number | null;
+  toolboxSlug?: string | null;
   slug: string;
+  moduleId: string | number;
+  moduleSlug: string | null;
+  moduleName: string;
+  premiumClass: "standard" | "private";
 }
 
 interface ModulData {
   id: string;
+  slug?: string | null;
   name: string;
   description: string;
   purpose: string;
@@ -717,7 +723,7 @@ export default function ModulChat() {
                       <Lock className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
                       <h3 className="text-lg font-semibold mb-2">Akses Premium</h3>
                       <p className="text-muted-foreground text-sm">
-                        Langganan bundle untuk mengakses semua {modul.chatbots.length} chatbot dalam Modul ini.
+                        Langganan bundle untuk mengakses semua {modul.chatbots.length} AI Specialist dalam Modul ini.
                       </p>
                     </div>
                     <div className="text-center mb-6">
@@ -805,8 +811,8 @@ export default function ModulChat() {
                 <Card>
                   <CardContent className="p-8 text-center">
                     <Bot className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-medium mb-1">Belum Ada Chatbot</h3>
-                    <p className="text-muted-foreground text-sm">Modul ini belum memiliki chatbot aktif.</p>
+                    <h3 className="text-lg font-medium mb-1">Belum Ada AI Specialist</h3>
+                    <p className="text-muted-foreground text-sm">Modul ini belum memiliki AI Specialist aktif.</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -831,6 +837,13 @@ export default function ModulChat() {
                               <h3 className="font-semibold truncate" data-testid={`text-bot-name-${bot.agentId}`}>
                                 {bot.name}
                               </h3>
+                              <Badge
+                                variant={bot.premiumClass === "private" ? "default" : "outline"}
+                                className="text-xs"
+                                data-testid={`badge-bot-tier-${bot.agentId}`}
+                              >
+                                {bot.premiumClass === "private" ? "Premium" : "Biasa"}
+                              </Badge>
                               {bot.category && (
                                 <Badge variant="secondary" className="text-xs">
                                   {bot.category}

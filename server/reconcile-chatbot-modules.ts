@@ -26,6 +26,32 @@ export interface ChatbotModuleReconcileResult {
   conflicts: Array<{ agentSlug: string; currentModuleId: number; targetModuleId: number }>;
 }
 
+export function assertChatbotModuleReconcileHealthy(
+  result: ChatbotModuleReconcileResult,
+): void {
+  const issues = [
+    result.missingAgents.length > 0
+      ? `${result.missingAgents.length} agent tidak ditemukan`
+      : "",
+    result.missingModules.length > 0
+      ? `${result.missingModules.length} Modul tidak ditemukan`
+      : "",
+    result.duplicateAgentSlugs.length > 0
+      ? `${result.duplicateAgentSlugs.length} slug agent duplikat`
+      : "",
+    result.duplicateModuleSlugs.length > 0
+      ? `${result.duplicateModuleSlugs.length} slug Modul duplikat`
+      : "",
+    result.conflicts.length > 0
+      ? `${result.conflicts.length} konflik kepemilikan Modul`
+      : "",
+  ].filter(Boolean);
+
+  if (issues.length > 0) {
+    throw new Error(`Cakupan pemetaan chatbot per Modul tidak lengkap: ${issues.join(", ")}`);
+  }
+}
+
 interface ReconcileOptions {
   assignments?: readonly ChatbotModuleAssignment[];
   newModules?: readonly PromotionalModuleDefinition[];
@@ -208,7 +234,27 @@ export async function reconcileChatbotModules(
         continue;
       }
 
-      const currentModuleId = row.agent.bigIdeaId ?? row.toolboxModuleId;
+      const directModuleId = row.agent.bigIdeaId;
+      const toolboxModuleId = row.toolboxModuleId;
+
+      // Dua pointer ke Modul berbeda adalah kepemilikan ambigu walaupun aturan
+      // baca memilih bigIdeaId langsung. Jangan menutupinya sebagai "already
+      // assigned": laporkan konflik agar audit otomatis gagal dan data dapat
+      // diperbaiki tanpa memindahkan agent secara diam-diam.
+      if (
+        directModuleId !== null
+        && toolboxModuleId !== null
+        && directModuleId !== toolboxModuleId
+      ) {
+        result.conflicts.push({
+          agentSlug,
+          currentModuleId: directModuleId === module.id ? toolboxModuleId : directModuleId,
+          targetModuleId: module.id,
+        });
+        continue;
+      }
+
+      const currentModuleId = directModuleId ?? toolboxModuleId;
       if (currentModuleId !== null && currentModuleId !== module.id) {
         result.conflicts.push({
           agentSlug,

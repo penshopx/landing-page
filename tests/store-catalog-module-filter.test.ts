@@ -40,6 +40,7 @@ import { eq, inArray, like, or } from "drizzle-orm";
 import { DatabaseStorage } from "../server/db-storage";
 import {
   buildStoreModuleInventoryCsv,
+  getPublicModuleChatbots,
   getStoreCatalogItems,
   invalidateStoreCatalog,
 } from "../server/routes";
@@ -133,6 +134,13 @@ let agentViaToolboxId: number;
 let agentModuleBId: number;
 // Agent 4: no bigIdeaId / no toolboxId → legacy, no module.
 let agentLegacyId: number;
+// Agent 5: direct module B + toolbox under A. Direct ownership must win and the
+// cross-module toolbox must never be advertised as belonging to B.
+let agentBothId: number;
+// Agent 6: linked to an active Store product but intentionally private. Store
+// can advertise the product, but the public runnable Module page must not leak
+// or offer the private agent.
+let agentPrivateId: number;
 
 // Store product linked to Agent 1 (for linked-product module metadata test).
 let productLinkedAgentId: number;
@@ -298,6 +306,36 @@ before(async () => {
   agentLegacyId = ag4.id;
   createdAgentIds.push(agentLegacyId);
 
+  const [agBoth] = await db.insert(agentsTable).values({
+    name: `${RUN} Agent BothLinks`,
+    bigIdeaId: moduleBId,
+    toolboxId: toolboxAId,
+    isActive: true,
+    isPublic: true,
+    isListed: true,
+    userId: "",
+    premiumClass: "standard",
+    agenticSubAgents: JSON.stringify([
+      { agentId: 8005, role: "s", description: "s" },
+    ]),
+  } as any).returning({ id: agentsTable.id });
+  agentBothId = agBoth.id;
+  createdAgentIds.push(agentBothId);
+
+  const [agPrivate] = await db.insert(agentsTable).values({
+    name: `${RUN} Agent Private Linked`,
+    bigIdeaId: moduleAId,
+    toolboxId: null,
+    isActive: true,
+    isPublic: false,
+    isListed: true,
+    userId: "",
+    premiumClass: "private",
+    greetingMessage: `PRIVATE-GREETING-${RUN}`,
+  } as any).returning({ id: agentsTable.id });
+  agentPrivateId = agPrivate.id;
+  createdAgentIds.push(agentPrivateId);
+
   // Store product linked to Agent 1.
   const [sp1] = await db.insert(storeProducts).values({
     name: `${RUN} Product LinkedAgent`,
@@ -310,6 +348,17 @@ before(async () => {
   } as any).returning({ id: storeProducts.id });
   productLinkedAgentId = sp1.id;
   createdProductIds.push(productLinkedAgentId);
+
+  const [privateProduct] = await db.insert(storeProducts).values({
+    name: `${RUN} Product LinkedPrivateAgent`,
+    description: "active product whose linked agent is private",
+    price: 299_000,
+    agentId: agentPrivateId,
+    isActive: true,
+    isGustafta: false,
+    sortOrder: 1000,
+  } as any).returning({ id: storeProducts.id });
+  createdProductIds.push(privateProduct.id);
 
   // Clear any warm cache so every test starts with fresh DB data.
   invalidateStoreCatalog();
@@ -711,29 +760,17 @@ test("G2: search filter via two-arg form finds our fixture agent by name", async
 // ═══════════════════════════════════════════════════════════════════════════════
 
 test("H1: when agent has both bigIdeaId and toolboxId, bigIdeaId wins for module resolution", async () => {
-  // Insert a temporary agent with BOTH bigIdeaId (module B) and toolboxId (toolbox A → module A).
-  // bigIdeaId should win → module B.
-  const [agBoth] = await db.insert(agentsTable).values({
-    name: `${RUN} Agent BothLinks`,
-    bigIdeaId: moduleBId,      // direct → module B
-    toolboxId: toolboxAId,     // via toolbox → module A (should lose)
-    isActive: true,
-    isPublic: true,
-    isListed: true,
-    userId: "",
-    premiumClass: "standard",
-    agenticSubAgents: JSON.stringify([{ agentId: 8005, role: "s", description: "s" }]),
-  } as any).returning({ id: agentsTable.id });
-  createdAgentIds.push(agBoth.id);
-
   invalidateStoreCatalog();
   const items = await getStoreCatalogItems("", "");
-  const item = findAgent(items, agBoth.id);
+  const item = findAgent(items, agentBothId);
   assert.ok(item, "Agent with both links must appear in catalog");
   assert.equal(item.moduleId, moduleBId, "bigIdeaId must take priority over toolbox.bigIdeaId");
   assert.equal(item.moduleSlug, moduleBSlug, "moduleSlug must come from direct bigIdeaId");
-  // toolbox fields should still reflect the toolboxId link.
-  assert.equal(item.toolboxName, toolboxAName, "toolboxName should still reflect the toolboxId");
+  assert.equal(
+    item.toolboxName,
+    null,
+    "a toolbox owned by another module must not be advertised under the direct module",
+  );
 });
 
 test("I1: human-readable CSV inventory uses canonical module, toolbox, and tier labels", async () => {
@@ -986,5 +1023,109 @@ test("J13: catalog items NEVER expose prompts/KB/credentials/config/policy/agent
     // Defensive: no field's serialized value should look like a system prompt.
     const serialized = JSON.stringify(it).toLowerCase();
     assert.ok(!serialized.includes("you are an ai"), `item ${it.id} must not leak prompt text`);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// K. Store ↔ public Module-page membership parity
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test("K1: public Module members include direct and toolbox-derived promotable agents", async () => {
+  invalidateStoreCatalog();
+  const members = await getPublicModuleChatbots({
+    id: moduleAId,
+    slug: moduleASlug,
+    name: moduleAName,
+  });
+  const ids = members.map((member) => member.agentId);
+
+  assert.ok(ids.includes(agentDirectBigIdeaId), "linked product's agent must open from its Module");
+  assert.ok(ids.includes(agentDirectBigIdeaUnlinkedId), "direct bigIdeaId agent must be included");
+  assert.ok(ids.includes(agentViaToolboxId), "toolbox-derived agent must be included");
+});
+
+test("K2: public Module members exclude other modules, legacy rows, and duplicate agents", async () => {
+  invalidateStoreCatalog();
+  const members = await getPublicModuleChatbots({
+    id: moduleAId,
+    slug: moduleASlug,
+    name: moduleAName,
+  });
+  const ids = members.map((member) => member.agentId);
+
+  assert.equal(ids.includes(agentModuleBId), false, "module B agent must not leak into module A");
+  assert.equal(ids.includes(agentBothId), false, "direct module B ownership must beat toolbox A");
+  assert.equal(ids.includes(agentLegacyId), false, "no-module legacy agent must not appear");
+  assert.equal(
+    ids.includes(agentPrivateId),
+    false,
+    "an active product must not expose its private linked agent on the public Module page",
+  );
+  assert.equal(new Set(ids).size, ids.length, "each agent must appear exactly once");
+});
+
+test("K3: public Module payload preserves canonical module, toolbox, and Biasa/Premium class", async () => {
+  invalidateStoreCatalog();
+  const members = await getPublicModuleChatbots({
+    id: moduleAId,
+    slug: moduleASlug,
+    name: moduleAName,
+  });
+  const direct = members.find((member) => member.agentId === agentDirectBigIdeaUnlinkedId);
+  const viaToolbox = members.find((member) => member.agentId === agentViaToolboxId);
+
+  assert.ok(direct);
+  assert.equal(direct.moduleId, moduleAId);
+  assert.equal(direct.moduleSlug, moduleASlug);
+  assert.equal(direct.moduleName, moduleAName);
+  assert.equal(direct.toolboxName, "Tanpa toolbox");
+  assert.equal(direct.premiumClass, "standard");
+
+  assert.ok(viaToolbox);
+  assert.equal(viaToolbox.moduleId, moduleAId);
+  assert.equal(viaToolbox.toolboxName, toolboxAName);
+  assert.equal(viaToolbox.toolboxSlug, toolboxASlug);
+  assert.equal(viaToolbox.premiumClass, "private");
+});
+
+test("K4: public Module uses direct ownership and suppresses a cross-module toolbox", async () => {
+  invalidateStoreCatalog();
+  const members = await getPublicModuleChatbots({
+    id: moduleBId,
+    slug: moduleBSlug,
+    name: `${RUN} Module B`,
+  });
+  const conflicted = members.find((member) => member.agentId === agentBothId);
+
+  assert.ok(conflicted, "agent must appear under its direct module B");
+  assert.equal(conflicted.moduleId, moduleBId);
+  assert.equal(conflicted.toolboxId, null);
+  assert.equal(conflicted.toolboxName, "Tanpa toolbox");
+});
+
+test("K5: public Module payload never exposes prompt, KB, credential, or agentic configuration", async () => {
+  invalidateStoreCatalog();
+  const members = await getPublicModuleChatbots({
+    id: moduleAId,
+    slug: moduleASlug,
+    name: moduleAName,
+  });
+  const forbidden = [
+    "systemPrompt",
+    "knowledgeBase",
+    "customApiKey",
+    "customBaseUrl",
+    "agenticSubAgents",
+    "personality",
+    "accessToken",
+  ];
+  for (const member of members) {
+    for (const key of forbidden) {
+      assert.equal(
+        Object.prototype.hasOwnProperty.call(member, key),
+        false,
+        `public Module member must not expose ${key}`,
+      );
+    }
   }
 });

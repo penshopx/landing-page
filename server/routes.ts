@@ -472,15 +472,19 @@ async function buildAgentModuleMap(agentIds: number[]): Promise<Map<number, Modu
       ? a.bigIdeaId
       : (tb && typeof tb.bigIdeaId === "number" ? tb.bigIdeaId : null);
     const bi = effectiveBigIdeaId != null ? bigIdeaMap.get(effectiveBigIdeaId) : undefined;
+    // A toolbox under another module is a malformed second ownership pointer.
+    // Keep the direct module as canonical but never advertise the alien toolbox
+    // as though it belonged to that module.
+    const effectiveToolbox = tb?.bigIdeaId === effectiveBigIdeaId ? tb : undefined;
     map.set(a.id, {
       moduleId: effectiveBigIdeaId,
       moduleSlug: bi?.slug ?? null,
       moduleName: bi?.name ?? null,
       moduleDescription: bi?.description ?? null,
-      toolboxSlug: tb?.slug ?? null,
-      toolboxName: tb?.name ?? null,
-      toolboxDescription: tb?.description ?? null,
-      toolboxPurpose: tb?.purpose ?? null,
+      toolboxSlug: effectiveToolbox?.slug ?? null,
+      toolboxName: effectiveToolbox?.name ?? null,
+      toolboxDescription: effectiveToolbox?.description ?? null,
+      toolboxPurpose: effectiveToolbox?.purpose ?? null,
     });
   }
 
@@ -833,6 +837,100 @@ export async function getStoreCatalogItems(category: string, search: string, mod
   }
   // Cold (never built or fully expired): must block on a single-flight build.
   return refreshStoreCatalog(cacheKey, category, search, mod);
+}
+
+export interface PublicModuleIdentity {
+  id: number | string;
+  slug?: string | null;
+  name: string;
+}
+
+/**
+ * Build the public Module member list from the same promotable catalog used by
+ * Store. This keeps Store filtering and the opened Module page in lockstep:
+ * direct bigIdeaId wins, toolbox membership is only a fallback, linked products
+ * resolve to their agent once, and internal child agents never surface.
+ */
+export async function getPublicModuleChatbots(module: PublicModuleIdentity): Promise<any[]> {
+  const moduleId = Number(module.id);
+  if (!Number.isInteger(moduleId) || moduleId <= 0) return [];
+
+  const moduleSlug = String(module.slug ?? "").trim();
+  const catalogItems = await getStoreCatalogItems("", "", moduleSlug || undefined);
+  const agentIds = Array.from(new Set(
+    catalogItems
+      .filter((item) =>
+        item?.moduleId === moduleId
+        && typeof item?.agentId === "number",
+      )
+      .map((item) => item.agentId as number),
+  ));
+  if (agentIds.length === 0) return [];
+
+  const { db } = await import("./db");
+  const { agents: agentsTable } = await import("@shared/schema");
+  const { and, eq, inArray, isNull } = await import("drizzle-orm");
+  const rows = await db
+    .select({
+      id: agentsTable.id,
+      name: agentsTable.name,
+      slug: agentsTable.slug,
+      avatar: agentsTable.avatar,
+      description: agentsTable.description,
+      tagline: agentsTable.tagline,
+      greetingMessage: agentsTable.greetingMessage,
+      conversationStarters: agentsTable.conversationStarters,
+      widgetColor: agentsTable.widgetColor,
+      category: agentsTable.category,
+      subcategory: agentsTable.subcategory,
+      toolboxId: agentsTable.toolboxId,
+      premiumClass: agentsTable.premiumClass,
+    })
+    .from(agentsTable)
+    .where(and(
+      inArray(agentsTable.id, agentIds),
+      eq(agentsTable.isActive, true),
+      // A Store product can be active while its linked agent remains private.
+      // The public Module page is a runnable chat surface, so never advertise
+      // that private agent or expose its greeting/starters here.
+      eq(agentsTable.isPublic, true),
+      isNull(agentsTable.parentAgentId),
+    ));
+
+  const moduleMap = await buildAgentModuleMap(rows.map((row) => row.id));
+  return rows
+    .flatMap((agent) => {
+      const resolved = moduleMap.get(agent.id) ?? EMPTY_MODULE_INFO;
+      if (resolved.moduleId !== moduleId) return [];
+
+      return [{
+        agentId: agent.id,
+        name: agent.name,
+        avatar: agent.avatar || "",
+        description: agent.description || "",
+        tagline: agent.tagline || "",
+        greetingMessage: agent.greetingMessage || "Halo! Ada yang bisa saya bantu?",
+        conversationStarters: Array.isArray(agent.conversationStarters)
+          ? agent.conversationStarters
+          : [],
+        color: agent.widgetColor || "#6366f1",
+        category: agent.category || "",
+        subcategory: agent.subcategory || "",
+        toolboxName: resolved.toolboxName || "Tanpa toolbox",
+        toolboxId: resolved.toolboxName ? agent.toolboxId : null,
+        toolboxSlug: resolved.toolboxSlug,
+        slug: agent.slug || "",
+        moduleId,
+        moduleSlug: resolved.moduleSlug ?? (moduleSlug || null),
+        moduleName: resolved.moduleName ?? module.name,
+        premiumClass: normalizePremiumClass(agent.premiumClass),
+      }];
+    })
+    .sort((a, b) =>
+      String(a.toolboxName).localeCompare(String(b.toolboxName), "id")
+      || String(a.name).localeCompare(String(b.name), "id")
+      || Number(a.agentId) - Number(b.agentId),
+    );
 }
 
 // Pre-warm the default listing (no filters) so the very first burst of traffic
@@ -12119,33 +12217,13 @@ Balas dengan JSON dengan struktur PERSIS ini:
         }
       }
 
-      const allToolboxes = await storage.getToolboxes(resolvedId);
-      const activeToolboxes = allToolboxes.filter(t => t.isActive);
-
-      const chatbots: any[] = [];
-      for (const toolbox of activeToolboxes) {
-        const toolboxAgents = await storage.getAgents(toolbox.id);
-        // Modul access is already gated by series.isPublic above.
-        // Show all active agents regardless of their individual isPublic flag.
-        const publicAgents = toolboxAgents.filter(a => a.isActive !== false);
-        for (const agent of publicAgents) {
-          chatbots.push({
-            agentId: agent.id,
-            name: agent.name,
-            avatar: agent.avatar || "",
-            description: agent.description || "",
-            tagline: agent.tagline || "",
-            greetingMessage: agent.greetingMessage || "Halo! Ada yang bisa saya bantu?",
-            conversationStarters: agent.conversationStarters || [],
-            color: agent.widgetColor || "#6366f1",
-            category: agent.category || "",
-            subcategory: agent.subcategory || "",
-            toolboxName: toolbox.name,
-            toolboxId: toolbox.id,
-            slug: (agent as any).slug || "",
-          });
-        }
-      }
+      // Membership comes from the exact same effective-module and promotability
+      // rules as Store, not from a toolbox-only traversal.
+      const chatbots = await getPublicModuleChatbots({
+        id: bigIdea.id,
+        slug: (bigIdea as any).slug || null,
+        name: bigIdea.name,
+      });
 
       let series = null;
       if (bigIdea.seriesId) {

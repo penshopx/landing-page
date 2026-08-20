@@ -67,7 +67,13 @@ export const NEW_PROMOTIONAL_MODULES: PromotionalModuleDefinition[] = [
   },
 ];
 
-/** [agentSlug, moduleSlug, preferredExistingToolboxName?] */
+/**
+ * Inventaris kurasi resmi untuk AI Specialist existing yang layak dipromosikan.
+ * Satu slug agent hanya boleh muncul sekali: tuple ini menetapkan tepat satu
+ * Modul utama berdasarkan fungsi dominan, bukan kategori Store atau paket Claw.
+ *
+ * [agentSlug, moduleSlug, preferredExistingToolboxName?]
+ */
 export const CHATBOT_MODULE_ASSIGNMENTS = [
   ["agen-keputusan-orchestrator", "conflict-resolver-data-needs-review", "Conflict Resolver — IT006/IT007, AT007 & GT/ST"],
   ["akta-jaminan-fidusia-claw", "hukum-bisnis-korporasi-pajak", "AGENT-KORPORASI — Hukum Korporasi"],

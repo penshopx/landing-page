@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
 import { and, eq, like } from "drizzle-orm";
 import { db } from "../server/db";
-import { reconcileChatbotModules } from "../server/reconcile-chatbot-modules";
+import {
+  assertChatbotModuleReconcileHealthy,
+  reconcileChatbotModules,
+} from "../server/reconcile-chatbot-modules";
+import { CHATBOT_MODULE_ASSIGNMENTS } from "../server/chatbot-module-map";
 import { agents, bigIdeas, systemConfig, toolboxes } from "../shared/schema";
 
 const RUN = `${Date.now()}-${process.pid}`;
@@ -90,6 +94,21 @@ before(async () => {
   });
 });
 
+test("official promotable inventory assigns each agent slug to exactly one primary module", () => {
+  const seen = new Map<string, string>();
+  for (const [agentSlug, moduleSlug] of CHATBOT_MODULE_ASSIGNMENTS) {
+    assert.ok(agentSlug.trim(), "agent slug must not be blank");
+    assert.ok(moduleSlug.trim(), `module slug for ${agentSlug} must not be blank`);
+    assert.equal(
+      seen.has(agentSlug),
+      false,
+      `${agentSlug} must not be duplicated across primary modules`,
+    );
+    seen.set(agentSlug, moduleSlug);
+  }
+  assert.equal(seen.size, CHATBOT_MODULE_ASSIGNMENTS.length);
+});
+
 after(async () => {
   const recovery: RecoveryRecord = {
     agentSlug: AGENT_SLUG,
@@ -111,6 +130,7 @@ test("reconciler assigns once without changing prompt or premium class", async (
   assert.deepEqual(first.missingAgents, []);
   assert.deepEqual(first.missingModules, []);
   assert.deepEqual(first.conflicts, []);
+  assert.doesNotThrow(() => assertChatbotModuleReconcileHealthy(first));
 
   const [assigned] = await db
     .select({
@@ -135,6 +155,7 @@ test("reconciler assigns once without changing prompt or premium class", async (
   assert.equal(second.toolboxesCreated, 0);
   assert.equal(second.agentsAssigned, 0);
   assert.equal(second.alreadyAssigned, 1);
+  assert.doesNotThrow(() => assertChatbotModuleReconcileHealthy(second));
 
   const moduleRows = await db
     .select()
@@ -149,6 +170,12 @@ test("reconciler assigns once without changing prompt or premium class", async (
     ));
   assert.equal(moduleRows.length, 1);
   assert.equal(toolboxRows.length, 1);
+
+  const agentRows = await db
+    .select({ id: agents.id })
+    .from(agents)
+    .where(eq(agents.slug, AGENT_SLUG));
+  assert.equal(agentRows.length, 1, "reconciliation must never create a duplicate agent");
 });
 
 test("reconciler reports a conflict instead of moving an already-mapped agent", async () => {
@@ -182,6 +209,10 @@ test("reconciler reports a conflict instead of moving an already-mapped agent", 
   });
   assert.equal(result.agentsAssigned, 0);
   assert.equal(result.conflicts.length, 1);
+  assert.throws(
+    () => assertChatbotModuleReconcileHealthy(result),
+    /konflik kepemilikan Modul/,
+  );
 
   const [unchanged] = await db
     .select({
@@ -192,6 +223,62 @@ test("reconciler reports a conflict instead of moving an already-mapped agent", 
     .from(agents)
     .where(eq(agents.slug, AGENT_SLUG));
   assert.equal(unchanged.bigIdeaId, conflictModule.id);
+  assert.equal(unchanged.premiumClass, "private");
+  assert.equal(unchanged.systemPrompt, ORIGINAL_PROMPT);
+});
+
+test("reconciler reports direct-module and toolbox-module disagreement as ambiguous ownership", async () => {
+  const [targetModule] = await db
+    .select()
+    .from(bigIdeas)
+    .where(eq(bigIdeas.slug, MODULE_SLUG));
+  const [otherModule] = await db
+    .select()
+    .from(bigIdeas)
+    .where(eq(bigIdeas.slug, CONFLICT_MODULE_SLUG));
+  assert.ok(targetModule);
+  assert.ok(otherModule);
+
+  const [otherToolbox] = await db
+    .insert(toolboxes)
+    .values({
+      bigIdeaId: otherModule.id,
+      slug: `${CONFLICT_MODULE_SLUG}-toolbox`,
+      name: `Conflict Toolbox ${RUN}`,
+      isActive: true,
+    })
+    .returning();
+
+  await db
+    .update(agents)
+    .set({ bigIdeaId: targetModule.id, toolboxId: otherToolbox.id })
+    .where(eq(agents.slug, AGENT_SLUG));
+
+  const result = await reconcileChatbotModules({
+    assignments: [[AGENT_SLUG, MODULE_SLUG]],
+    newModules: [moduleDefinition],
+  });
+  assert.equal(result.agentsAssigned, 0);
+  assert.equal(result.alreadyAssigned, 0);
+  assert.equal(result.conflicts.length, 1);
+  assert.equal(result.conflicts[0].currentModuleId, otherModule.id);
+  assert.equal(result.conflicts[0].targetModuleId, targetModule.id);
+  assert.throws(
+    () => assertChatbotModuleReconcileHealthy(result),
+    /konflik kepemilikan Modul/,
+  );
+
+  const [unchanged] = await db
+    .select({
+      bigIdeaId: agents.bigIdeaId,
+      toolboxId: agents.toolboxId,
+      premiumClass: agents.premiumClass,
+      systemPrompt: agents.systemPrompt,
+    })
+    .from(agents)
+    .where(eq(agents.slug, AGENT_SLUG));
+  assert.equal(unchanged.bigIdeaId, targetModule.id);
+  assert.equal(unchanged.toolboxId, otherToolbox.id);
   assert.equal(unchanged.premiumClass, "private");
   assert.equal(unchanged.systemPrompt, ORIGINAL_PROMPT);
 });
