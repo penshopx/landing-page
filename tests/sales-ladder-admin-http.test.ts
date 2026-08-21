@@ -37,10 +37,11 @@ if (!process.env.DATABASE_URL) {
 const { db, pool }            = await import("../server/db");
 const { registerSalesLadderRoutes } = await import("../server/sales-ladder");
 const { seedContractorLadder, CONTRACTOR_LADDER_SLUG } = await import("../server/sales-ladder-seed");
+const { reconcileContractorL1Ebooks } = await import("../server/sales-ladder-reconcile");
 const schema = await import("../shared/schema");
 const {
   salesLadders, salesLadderNodes, salesLadderEdges, salesLadderCoverage,
-  productRegistry,
+  productRegistry, packageRegistry,
 } = schema;
 
 // ── Unique run prefix ─────────────────────────────────────────────────────────
@@ -53,6 +54,16 @@ const MIGRATION_SQL = readFileSync(
 // Isolated seed slug: never touches the canonical contractor-sbu-readiness ladder
 const TEST_SEED_SLUG = `${RUN}-contractor-sbu`;
 const TEST_SEED_NAME = `${RUN} Contractor SBU Readiness`;
+const TEST_RECONCILE_SLUG = `${RUN}-legacy-reconcile`;
+const TEST_CUSTOM_RECONCILE_SLUG = `${RUN}-custom-reconcile`;
+
+const EXPECTED_L1_EBOOK_TITLES = [
+  "Panduan Praktis Sistem Manajemen Anti Penyuapan (SMAP) SNI ISO 37001:2016 dari Regulasi ke Implementasi",
+  "Revolusi Penyusunan Dokumen SMAP, Memanfaatkan AI ChatGPT, Untuk Efisiensi dan Kemudahan",
+  "Kontraktor Anti Amnesia, BluePrint Membangun Business Memory Berbasis AI Untuk Industri Konstruksi",
+  "Trilogi Gustafta dari Dialog ke Monolog, Peluang Baru Membangun Tutor AI, Virtual Assistant, dan Tim Multi Agent, untuk Belajar, Bekerja, dan Berkarya",
+  "SBU & SKK Tanpa Bingung: Panduan Lengkap Pemenuhan Persyaratan Sertifikasi Konstruksi di Era Regulasi Baru PP 28/2025 dan Permen PU 06 Tahun 2025",
+] as const;
 
 const SUPERADMIN_ID = `${RUN}-superadmin`;
 const ADMIN_ID      = `${RUN}-admin`;
@@ -142,6 +153,284 @@ let nodeBId  = 0; // PLACEHOLDER node
 let edgeId   = 0;
 let coverageTransitionProductId = "";
 let coverageTransitionNodeId = 0;
+
+async function createLegacyContractorL1Fixture(slug: string) {
+  const [ladder] = await db.insert(salesLadders).values({
+    slug,
+    name: "Contractor SBU Readiness",
+    description: "Jalur penjualan kontraktor — dari pain Meta Ads hingga ekosistem bisnis lengkap",
+    status: "DRAFT",
+  }).returning();
+  createdLadderIds.push(ladder.id);
+
+  const activeProducts = await db.select({
+    productId: productRegistry.productId,
+    name: productRegistry.name,
+  }).from(productRegistry).where(eq(productRegistry.status, "ACTIVE"));
+  const aliasId = (exactName: string) => {
+    const target = exactName.trim().toLowerCase();
+    const matches = activeProducts.filter(product =>
+      product.name.trim().toLowerCase() === target
+    );
+    return matches.length === 1 ? matches[0].productId : null;
+  };
+  const productOrPlaceholder = (
+    productId: string | null,
+    stage: string,
+    resolvedDescription: string,
+    placeholderLabel: string,
+    placeholderDescription: string,
+    sortOrder: number,
+  ) => productId
+    ? {
+        ladderId: ladder.id,
+        stage,
+        nodeType: "PRODUCT" as const,
+        productRegistryId: productId,
+        packageRegistryId: null,
+        label: null,
+        description: resolvedDescription,
+        sortOrder,
+        isActive: true,
+      }
+    : {
+        ladderId: ladder.id,
+        stage,
+        nodeType: "PLACEHOLDER" as const,
+        productRegistryId: null,
+        packageRegistryId: null,
+        label: placeholderLabel,
+        description: placeholderDescription,
+        sortOrder,
+        isActive: true,
+      };
+
+  const nodes = await db.insert(salesLadderNodes).values([
+    {
+      ladderId: ladder.id,
+      stage: "L0",
+      nodeType: "TRIGGER",
+      label: "Meta Ads Pain Touchpoint",
+      description: "Calon kontraktor menemukan pain melalui iklan Meta Ads",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      stage: "L1",
+      nodeType: "PLACEHOLDER",
+      label: "SBU & SKK Tanpa Bingung",
+      description: "E-book panduan pengurus SBU & SKK untuk kontraktor pemula",
+      sortOrder: 0,
+      isActive: true,
+    },
+    ...[1, 2, 3].map(index => ({
+      ladderId: ladder.id,
+      stage: "L1" as const,
+      nodeType: "PLACEHOLDER" as const,
+      label: `Bonus Produk Pendukung ${index}`,
+      description: "Produk bonus pelengkap bagi pembeli SBU & SKK ebook",
+      sortOrder: index,
+      isActive: true,
+    })),
+    {
+      ladderId: ladder.id,
+      stage: "L2",
+      nodeType: "PLACEHOLDER",
+      label: "SBU Claw",
+      description: "AI specialist yang menganalisis kualifikasi SBU spesifik perusahaan kontraktor",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      stage: "L3",
+      nodeType: "PLACEHOLDER",
+      label: "Tender Claw",
+      description: "Alat analisis kesesuaian dokumen tender dengan kapabilitas dan SBU perusahaan",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      stage: "L3",
+      nodeType: "PLACEHOLDER",
+      label: "Contractor Readiness",
+      description: "Suite opsional kesiapan bisnis kontraktor menuju tender korporat",
+      sortOrder: 1,
+      isActive: true,
+    },
+    productOrPlaceholder(
+      aliasId("Ruang Simpan"),
+      "L4",
+      "Sistem memori operasional bisnis kontraktor yang berkelanjutan",
+      "Gustafta Business Memory",
+      "Sistem memori operasional bisnis kontraktor (Ruang Simpan)",
+      0,
+    ),
+    productOrPlaceholder(
+      aliasId("Brain Project"),
+      "L5",
+      "Platform manajemen proyek kontraktor berbasis AI",
+      "Brain Project",
+      "Platform manajemen proyek kontraktor berbasis AI",
+      0,
+    ),
+    {
+      ladderId: ladder.id,
+      stage: "L5",
+      nodeType: "PLACEHOLDER",
+      label: "Mini Apps",
+      description: "Ekosistem mini aplikasi produktivitas khusus bisnis kontraktor",
+      sortOrder: 1,
+      isActive: true,
+    },
+    productOrPlaceholder(
+      aliasId("Ekosistem Kompetensi"),
+      "L5",
+      "Ekosistem pengembangan kompetensi tim kontraktor",
+      "Competency Ecosystem",
+      "Ekosistem pengembangan kompetensi tim kontraktor (Ekosistem Kompetensi)",
+      2,
+    ),
+    {
+      ladderId: ladder.id,
+      stage: "L5",
+      nodeType: "PLACEHOLDER",
+      label: "MultiClaw",
+      description: "Sistem manajemen ekspansi multi-tender lanjutan",
+      sortOrder: 3,
+      isActive: true,
+    },
+  ]).returning();
+
+  const [
+    trigger,
+    legacySbu,
+    bonus1,
+    bonus2,
+    bonus3,
+    sbuClaw,
+    tenderClaw,
+    contractorReadiness,
+    businessMemory,
+    brainProject,
+    miniApps,
+    competencyEcosystem,
+    multiClaw,
+  ] = nodes;
+  await db.insert(salesLadderEdges).values([
+    {
+      ladderId: ladder.id,
+      fromNodeId: trigger.id,
+      toNodeId: legacySbu.id,
+      relationType: "NEXT_STEP",
+      sortOrder: 0,
+      isActive: true,
+    },
+    ...[bonus1, bonus2, bonus3].map((bonus, index) => ({
+      ladderId: ladder.id,
+      fromNodeId: legacySbu.id,
+      toNodeId: bonus.id,
+      relationType: "BONUS" as const,
+      ruleText: "Bonus gratis disertakan bersama pembelian SBU & SKK Tanpa Bingung",
+      sortOrder: index,
+      isActive: true,
+    })),
+    {
+      ladderId: ladder.id,
+      fromNodeId: legacySbu.id,
+      toNodeId: sbuClaw.id,
+      relationType: "UPSELL",
+      ruleText: "Upgrade ke analisis AI spesifik SBU perusahaan Anda",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: sbuClaw.id,
+      toNodeId: tenderClaw.id,
+      relationType: "UPSELL",
+      ruleText: "Analisis kesesuaian tender dengan SBU dan kapabilitas perusahaan",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: tenderClaw.id,
+      toNodeId: contractorReadiness.id,
+      relationType: "BUNDLE",
+      ruleText: "Suite kesiapan kontraktor sebagai paket bundel opsional",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: contractorReadiness.id,
+      toNodeId: businessMemory.id,
+      relationType: "RECURRING",
+      ruleText: "Sistem memori bisnis yang digunakan secara berkelanjutan setelah readiness",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: businessMemory.id,
+      toNodeId: brainProject.id,
+      relationType: "CROSS_SELL",
+      ruleText: "Manajemen proyek AI untuk portofolio tender yang sedang berjalan",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: businessMemory.id,
+      toNodeId: miniApps.id,
+      relationType: "CROSS_SELL",
+      ruleText: "Mini Apps produktivitas operasional harian kontraktor",
+      sortOrder: 1,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: businessMemory.id,
+      toNodeId: competencyEcosystem.id,
+      relationType: "CROSS_SELL",
+      ruleText: "Pengembangan kompetensi tim untuk skala bisnis",
+      sortOrder: 2,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: brainProject.id,
+      toNodeId: multiClaw.id,
+      relationType: "UPSELL",
+      ruleText: "Ekspansi ke manajemen multi-tender skala besar",
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: miniApps.id,
+      toNodeId: multiClaw.id,
+      relationType: "UPSELL",
+      ruleText: "Ekspansi dari Mini Apps ke orkestrasi MultiClaw",
+      sortOrder: 1,
+      isActive: true,
+    },
+    {
+      ladderId: ladder.id,
+      fromNodeId: competencyEcosystem.id,
+      toNodeId: multiClaw.id,
+      relationType: "UPSELL",
+      ruleText: "Ekspansi tim kompeten ke orkestrasi MultiClaw",
+      sortOrder: 2,
+      isActive: true,
+    },
+  ]);
+
+  return { ladder, trigger, legacySbu, sbuClaw, tenderClaw };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 0) Schema static assertion: FK columns must be varchar (not plain text)
@@ -787,6 +1076,11 @@ test("seed: isolated run creates ladder with correct edge semantics", async () =
     )).catch(() => {});
   await db.delete(salesLadders).where(eq(salesLadders.slug, TEST_SEED_SLUG)).catch(() => {});
 
+  const registryBefore = await db.select().from(productRegistry)
+    .orderBy(asc(productRegistry.productId));
+  const packageRegistryBefore = await db.select().from(packageRegistry)
+    .orderBy(asc(packageRegistry.packageId));
+
   await seedContractorLadder({ slug: TEST_SEED_SLUG, name: TEST_SEED_NAME });
 
   const [row] = await db.select({ id: salesLadders.id, status: salesLadders.status })
@@ -795,29 +1089,55 @@ test("seed: isolated run creates ladder with correct edge semantics", async () =
   assert.equal(row.status, "DRAFT");
   testSeedLadderId = row.id;
 
-  // Verify node count: 13 nodes total
+  // Verify node count: 14 nodes total
   const nodes = await db.select().from(salesLadderNodes)
     .where(eq(salesLadderNodes.ladderId, row.id));
-  assert.equal(nodes.length, 13, `Expected 13 nodes, got ${nodes.length}`);
+  assert.equal(nodes.length, 14, `Expected 14 nodes, got ${nodes.length}`);
+
+  const l1Nodes = nodes
+    .filter(node => node.stage === "L1")
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+  assert.deepEqual(
+    l1Nodes.map(node => node.label),
+    [...EXPECTED_L1_EBOOK_TITLES],
+    "L1 must contain exactly the five approved ebook titles in order",
+  );
+  for (const node of l1Nodes) {
+    assert.equal(node.nodeType, "PLACEHOLDER");
+    assert.equal(node.isActive, true);
+    assert.equal(node.productRegistryId, null);
+    assert.equal(node.packageRegistryId, null);
+  }
 
   // Verify edge semantics
   const edges = await db.select().from(salesLadderEdges)
     .where(eq(salesLadderEdges.ladderId, row.id));
 
   // L1 (ebook, idx 1) → L2 (SBU Claw, idx 5): UPSELL
-  const l0ToL1 = edges.find(e => {
+  const l0ToL1 = edges.filter(e => {
     const from = nodes.find(n => n.id === e.fromNodeId);
     const to   = nodes.find(n => n.id === e.toNodeId);
     return from?.stage === "L0" && to?.stage === "L1" && e.relationType === "NEXT_STEP";
   });
-  assert.ok(l0ToL1, "L0→L1 NEXT_STEP edge must exist");
+  assert.equal(l0ToL1.length, 5, "L0 must offer all five ebooks as NEXT_STEP choices");
+  assert.deepEqual(
+    l0ToL1.sort((a, b) => a.sortOrder - b.sortOrder).map(edge =>
+      nodes.find(node => node.id === edge.toNodeId)?.label
+    ),
+    [...EXPECTED_L1_EBOOK_TITLES],
+  );
 
-  const l1ToL2Upsell = edges.find(e => {
+  const l1ToL2Upsells = edges.filter(e => {
     const from = nodes.find(n => n.id === e.fromNodeId);
     const to   = nodes.find(n => n.id === e.toNodeId);
     return from?.stage === "L1" && to?.stage === "L2" && e.relationType === "UPSELL";
   });
-  assert.ok(l1ToL2Upsell, "L1→L2 UPSELL edge must exist (ebook → SBU Claw)");
+  assert.equal(l1ToL2Upsells.length, 1, "Only one L1 ebook may continue to SBU Claw");
+  assert.equal(
+    nodes.find(node => node.id === l1ToL2Upsells[0].fromNodeId)?.label,
+    EXPECTED_L1_EBOOK_TITLES[4],
+    "The SBU & SKK ebook must be the only L1 source for the SBU Claw upsell",
+  );
 
   const l2ToL3Upsell = edges.find(e => {
     const from = nodes.find(n => n.id === e.fromNodeId);
@@ -859,9 +1179,20 @@ test("seed: isolated run creates ladder with correct edge semantics", async () =
     "Brain Project, Mini Apps, and Competency Ecosystem must each upsell to MultiClaw",
   );
 
-  // Verify bonus edges from L1 ebook
+  // Generic legacy bonus relationships must be gone.
   const bonusEdges = edges.filter(e => e.relationType === "BONUS");
-  assert.equal(bonusEdges.length, 3, `Expected 3 BONUS edges, got ${bonusEdges.length}`);
+  assert.equal(bonusEdges.length, 0, `Expected no BONUS edges, got ${bonusEdges.length}`);
+
+  assert.deepEqual(
+    await db.select().from(productRegistry).orderBy(asc(productRegistry.productId)),
+    registryBefore,
+    "seed must not mutate Product Registry",
+  );
+  assert.deepEqual(
+    await db.select().from(packageRegistry).orderBy(asc(packageRegistry.packageId)),
+    packageRegistryBefore,
+    "seed must not mutate Package Registry",
+  );
 });
 
 test("seed: idempotent — second call does not create another ladder", async () => {
@@ -873,6 +1204,115 @@ test("seed: idempotent — second call does not create another ladder", async ()
     .from(salesLadders).where(eq(salesLadders.slug, TEST_SEED_SLUG));
   assert.equal(rows.length, 1, "Idempotent seed must not create duplicate ladders");
   assert.equal(rows[0].id, testSeedLadderId, "Same ladder id must be returned");
+});
+
+test("reconcile: exact legacy L1 becomes five ebook placeholders and is idempotent", async () => {
+  const productRegistryBefore = await db.select().from(productRegistry)
+    .orderBy(asc(productRegistry.productId));
+  const packageRegistryBefore = await db.select().from(packageRegistry)
+    .orderBy(asc(packageRegistry.packageId));
+  const { ladder, trigger, sbuClaw } = await createLegacyContractorL1Fixture(TEST_RECONCILE_SLUG);
+
+  assert.equal(
+    await reconcileContractorL1Ebooks({ slug: TEST_RECONCILE_SLUG }),
+    "UPDATED",
+  );
+
+  const nodes = await db.select().from(salesLadderNodes)
+    .where(eq(salesLadderNodes.ladderId, ladder.id));
+  const l1Nodes = nodes
+    .filter(node => node.stage === "L1")
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+  assert.deepEqual(l1Nodes.map(node => node.label), [...EXPECTED_L1_EBOOK_TITLES]);
+  assert.ok(l1Nodes.every(node =>
+    node.nodeType === "PLACEHOLDER"
+    && node.productRegistryId === null
+    && node.packageRegistryId === null
+    && node.isActive
+  ));
+
+  const edges = await db.select().from(salesLadderEdges)
+    .where(eq(salesLadderEdges.ladderId, ladder.id));
+  const nextSteps = edges
+    .filter(edge => edge.fromNodeId === trigger.id && edge.relationType === "NEXT_STEP")
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+  assert.equal(nextSteps.length, 5);
+  assert.deepEqual(
+    nextSteps.map(edge => l1Nodes.find(node => node.id === edge.toNodeId)?.label),
+    [...EXPECTED_L1_EBOOK_TITLES],
+  );
+  assert.equal(edges.filter(edge => edge.relationType === "BONUS").length, 0);
+
+  const l1ToSbuClaw = edges.filter(edge =>
+    edge.toNodeId === sbuClaw.id
+    && edge.relationType === "UPSELL"
+    && l1Nodes.some(node => node.id === edge.fromNodeId)
+  );
+  assert.equal(l1ToSbuClaw.length, 1);
+  assert.equal(
+    l1Nodes.find(node => node.id === l1ToSbuClaw[0].fromNodeId)?.label,
+    EXPECTED_L1_EBOOK_TITLES[4],
+  );
+
+  assert.equal(
+    await reconcileContractorL1Ebooks({ slug: TEST_RECONCILE_SLUG }),
+    "ALREADY_CURRENT",
+    "second reconciliation must not create duplicate nodes or edges",
+  );
+  assert.equal(
+    (await db.select().from(salesLadderNodes)
+      .where(eq(salesLadderNodes.ladderId, ladder.id))).length,
+    nodes.length,
+  );
+  assert.equal(
+    (await db.select().from(salesLadderEdges)
+      .where(eq(salesLadderEdges.ladderId, ladder.id))).length,
+    edges.length,
+  );
+
+  assert.deepEqual(
+    await db.select().from(productRegistry).orderBy(asc(productRegistry.productId)),
+    productRegistryBefore,
+    "reconciliation must not mutate Product Registry",
+  );
+  assert.deepEqual(
+    await db.select().from(packageRegistry).orderBy(asc(packageRegistry.packageId)),
+    packageRegistryBefore,
+    "reconciliation must not mutate Package Registry",
+  );
+});
+
+test("reconcile: a downstream Super Admin edit makes the legacy ladder fail closed", async () => {
+  const { ladder, tenderClaw } = await createLegacyContractorL1Fixture(TEST_CUSTOM_RECONCILE_SLUG);
+  await db.update(salesLadderNodes)
+    .set({ description: "Keputusan Super Admin yang harus dipertahankan" })
+    .where(eq(salesLadderNodes.id, tenderClaw.id));
+
+  const nodesBefore = await db.select().from(salesLadderNodes)
+    .where(eq(salesLadderNodes.ladderId, ladder.id))
+    .orderBy(asc(salesLadderNodes.id));
+  const edgesBefore = await db.select().from(salesLadderEdges)
+    .where(eq(salesLadderEdges.ladderId, ladder.id))
+    .orderBy(asc(salesLadderEdges.id));
+
+  assert.equal(
+    await reconcileContractorL1Ebooks({ slug: TEST_CUSTOM_RECONCILE_SLUG }),
+    "SKIPPED_CUSTOMIZED",
+  );
+  assert.deepEqual(
+    await db.select().from(salesLadderNodes)
+      .where(eq(salesLadderNodes.ladderId, ladder.id))
+      .orderBy(asc(salesLadderNodes.id)),
+    nodesBefore,
+    "customized nodes must remain byte-for-byte unchanged",
+  );
+  assert.deepEqual(
+    await db.select().from(salesLadderEdges)
+      .where(eq(salesLadderEdges.ladderId, ladder.id))
+      .orderBy(asc(salesLadderEdges.id)),
+    edgesBefore,
+    "customized ladder edges must remain unchanged",
+  );
 });
 
 test("seed: canonical contractor-sbu-readiness is NOT deleted or modified by test", async () => {

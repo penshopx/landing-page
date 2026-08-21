@@ -93,6 +93,7 @@ import { registerOrderApiRoutes } from "./order-api";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 import { registerSalesLadderRoutes } from "./sales-ladder";
 import { seedContractorLadder } from "./sales-ladder-seed";
+import { reconcileContractorL1Ebooks } from "./sales-ladder-reconcile";
 
 const _require = createRequire(import.meta.url);
 const { PDFParse: _PDFParse, VerbosityLevel: _VerbosityLevel } = _require("pdf-parse") as {
@@ -23247,6 +23248,7 @@ Min 300 kata. Bahasa Indonesia profesional. Sitasi regulasi spesifik domain ini.
   // a false-clean boot. If the seed table does not yet exist this will throw
   // and the caller (server/index.ts) must handle it via its top-level catch.
   await seedContractorLadder();
+  await reconcileContractorL1Ebooks();
 
   // ── Admin Agent System Endpoints ──────────────────────────────────────────
 

@@ -15,9 +15,8 @@
 //   "Brain Project"        → exact name
 //
 // Edge semantics (locked discussion):
-//   L0 trigger → L1 ebook         NEXT_STEP
-//   L1 ebook → L1 bonus(x3)       BONUS
-//   L1 ebook → L2 SBU Claw        UPSELL        (company-specific AI specialist analysis)
+//   L0 trigger → five L1 ebooks    NEXT_STEP
+//   L1 SBU & SKK → L2 SBU Claw    UPSELL        (company-specific AI specialist analysis)
 //   L2 SBU Claw → L3 Tender Claw  UPSELL        (tender doc analysis vs company readiness)
 //   L3 Tender → L3 Contractor     BUNDLE        (optional suite/bundle)
 //   L3 Contractor → L4 Biz Memory RECURRING     (ongoing operational tool)
@@ -29,6 +28,12 @@ import { db } from "./db";
 import {
   salesLadders, salesLadderNodes, salesLadderEdges, productRegistry,
 } from "@shared/schema";
+import {
+  CONTRACTOR_L1_EBOOKS,
+  CONTRACTOR_SBU_CLAW,
+  CONTRACTOR_SBU_UPSELL_RULE,
+  CONTRACTOR_TRIGGER,
+} from "./sales-ladder-blueprint";
 
 export const CONTRACTOR_LADDER_SLUG = "contractor-sbu-readiness";
 
@@ -112,75 +117,54 @@ export async function seedContractorLadder(
     // 4. Build node list
     // Node index mapping (used to wire edges):
     //  0 = L0 Trigger (Meta Ads)
-    //  1 = L1 SBU & SKK Tanpa Bingung (ebook)
-    //  2 = L1 Bonus placeholder 1
-    //  3 = L1 Bonus placeholder 2
-    //  4 = L1 Bonus placeholder 3
-    //  5 = L2 SBU Claw          (AI specialist analysis — company-specific)
-    //  6 = L3 Tender Claw       (tender doc analysis vs company readiness)
-    //  7 = L3 Contractor Readiness (optional bundle/suite)
-    //  8 = L4 Business Memory   (alias Ruang Simpan → recurring operational)
-    //  9 = L5 Brain Project     (exact name)
-    // 10 = L5 Mini Apps
-    // 11 = L5 Competency Ecosystem (alias Ekosistem Kompetensi)
-    // 12 = L5 MultiClaw
+    //  1–5 = five L1 ebook placeholders (SBU & SKK is index 5)
+    //  6 = L2 SBU Claw          (AI specialist analysis — company-specific)
+    //  7 = L3 Tender Claw       (tender doc analysis vs company readiness)
+    //  8 = L3 Contractor Readiness (optional bundle/suite)
+    //  9 = L4 Business Memory   (alias Ruang Simpan → recurring operational)
+    // 10 = L5 Brain Project     (exact name)
+    // 11 = L5 Mini Apps
+    // 12 = L5 Competency Ecosystem (alias Ekosistem Kompetensi)
+    // 13 = L5 MultiClaw
 
     const nodeSpecs: NodeSpec[] = [
       // 0: L0 Trigger
       {
         stage: "L0", nodeType: "TRIGGER",
-        label:       "Meta Ads Pain Touchpoint",
-        description: "Calon kontraktor menemukan pain melalui iklan Meta Ads",
+        label:       CONTRACTOR_TRIGGER.label,
+        description: CONTRACTOR_TRIGGER.description,
         sortOrder: 0, isActive: true,
       },
-      // 1: L1 SBU & SKK ebook
-      {
+      // 1–5: five L1 ebook placeholders
+      ...CONTRACTOR_L1_EBOOKS.map((ebook, sortOrder) => ({
         stage: "L1", nodeType: "PLACEHOLDER",
-        label:       "SBU & SKK Tanpa Bingung",
-        description: "E-book panduan pengurus SBU & SKK untuk kontraktor pemula",
-        sortOrder: 0, isActive: true,
-      },
-      // 2–4: L1 Bonus placeholders
-      {
-        stage: "L1", nodeType: "PLACEHOLDER",
-        label:       "Bonus Produk Pendukung 1",
-        description: "Produk bonus pelengkap bagi pembeli SBU & SKK ebook",
-        sortOrder: 1, isActive: true,
-      },
-      {
-        stage: "L1", nodeType: "PLACEHOLDER",
-        label:       "Bonus Produk Pendukung 2",
-        description: "Produk bonus pelengkap bagi pembeli SBU & SKK ebook",
-        sortOrder: 2, isActive: true,
-      },
-      {
-        stage: "L1", nodeType: "PLACEHOLDER",
-        label:       "Bonus Produk Pendukung 3",
-        description: "Produk bonus pelengkap bagi pembeli SBU & SKK ebook",
-        sortOrder: 3, isActive: true,
-      },
-      // 5: L2 SBU Claw — AI specialist analysis tool for company SBU classification
+        label: ebook.label,
+        description: ebook.description,
+        sortOrder,
+        isActive: true,
+      })),
+      // 6: L2 SBU Claw — AI specialist analysis tool for company SBU classification
       {
         stage: "L2", nodeType: "PLACEHOLDER",
-        label:       "SBU Claw",
-        description: "AI specialist yang menganalisis kualifikasi SBU spesifik perusahaan kontraktor",
+        label:       CONTRACTOR_SBU_CLAW.label,
+        description: CONTRACTOR_SBU_CLAW.description,
         sortOrder: 0, isActive: true,
       },
-      // 6: L3 Tender Claw — analyzes tender documents vs company readiness
+      // 7: L3 Tender Claw — analyzes tender documents vs company readiness
       {
         stage: "L3", nodeType: "PLACEHOLDER",
         label:       "Tender Claw",
         description: "Alat analisis kesesuaian dokumen tender dengan kapabilitas dan SBU perusahaan",
         sortOrder: 0, isActive: true,
       },
-      // 7: L3 Contractor Readiness — optional suite/bundle
+      // 8: L3 Contractor Readiness — optional suite/bundle
       {
         stage: "L3", nodeType: "PLACEHOLDER",
         label:       "Contractor Readiness",
         description: "Suite opsional kesiapan bisnis kontraktor menuju tender korporat",
         sortOrder: 1, isActive: true,
       },
-      // 8: L4 Business Memory — alias Ruang Simpan (recurring operational memory)
+      // 9: L4 Business Memory — alias Ruang Simpan (recurring operational memory)
       ...(businessMemoryId
         ? [{
             stage: "L4" as const, nodeType: "PRODUCT" as const,
@@ -195,7 +179,7 @@ export async function seedContractorLadder(
             sortOrder: 0, isActive: true,
           }]
       ),
-      // 9: L5 Brain Project
+      // 10: L5 Brain Project
       ...(brainProjectId
         ? [{
             stage: "L5" as const, nodeType: "PRODUCT" as const,
@@ -210,14 +194,14 @@ export async function seedContractorLadder(
             sortOrder: 0, isActive: true,
           }]
       ),
-      // 10: L5 Mini Apps
+      // 11: L5 Mini Apps
       {
         stage: "L5", nodeType: "PLACEHOLDER",
         label:       "Mini Apps",
         description: "Ekosistem mini aplikasi produktivitas khusus bisnis kontraktor",
         sortOrder: 1, isActive: true,
       },
-      // 11: L5 Competency Ecosystem
+      // 12: L5 Competency Ecosystem
       ...(competencyEcoId
         ? [{
             stage: "L5" as const, nodeType: "PRODUCT" as const,
@@ -232,7 +216,7 @@ export async function seedContractorLadder(
             sortOrder: 2, isActive: true,
           }]
       ),
-      // 12: L5 MultiClaw
+      // 13: L5 MultiClaw
       {
         stage: "L5", nodeType: "PLACEHOLDER",
         label:       "MultiClaw",
@@ -268,47 +252,44 @@ export async function seedContractorLadder(
 
     // 7. Wire edges per locked discussion semantics
     const edgeSpecs: EdgeSpec[] = [
-      // L0 → L1 (trigger → entry product)
-      { fromIdx:  0, toIdx:  1, relationType: "NEXT_STEP",  sortOrder: 0 },
+      // L0 → five L1 ebook choices
+      ...CONTRACTOR_L1_EBOOKS.map((_, index) => ({
+        fromIdx: 0,
+        toIdx: index + 1,
+        relationType: "NEXT_STEP",
+        sortOrder: index,
+      })),
 
-      // L1 → L1 bonus (3 bonus items alongside ebook)
-      { fromIdx:  1, toIdx:  2, relationType: "BONUS",      sortOrder: 0,
-        ruleText: "Bonus gratis disertakan bersama pembelian SBU & SKK Tanpa Bingung" },
-      { fromIdx:  1, toIdx:  3, relationType: "BONUS",      sortOrder: 1,
-        ruleText: "Bonus gratis disertakan bersama pembelian SBU & SKK Tanpa Bingung" },
-      { fromIdx:  1, toIdx:  4, relationType: "BONUS",      sortOrder: 2,
-        ruleText: "Bonus gratis disertakan bersama pembelian SBU & SKK Tanpa Bingung" },
-
-      // L1 → L2 UPSELL (ebook → SBU Claw AI analysis)
-      { fromIdx:  1, toIdx:  5, relationType: "UPSELL",     sortOrder: 0,
-        ruleText: "Upgrade ke analisis AI spesifik SBU perusahaan Anda" },
+      // Only SBU & SKK ebook → L2 SBU Claw
+      { fromIdx:  5, toIdx:  6, relationType: "UPSELL",     sortOrder: 0,
+        ruleText: CONTRACTOR_SBU_UPSELL_RULE },
 
       // L2 → L3 UPSELL (SBU Claw → Tender Claw)
-      { fromIdx:  5, toIdx:  6, relationType: "UPSELL",     sortOrder: 0,
+      { fromIdx:  6, toIdx:  7, relationType: "UPSELL",     sortOrder: 0,
         ruleText: "Analisis kesesuaian tender dengan SBU dan kapabilitas perusahaan" },
 
       // L3 Tender → L3 Contractor Readiness BUNDLE (optional parallel suite)
-      { fromIdx:  6, toIdx:  7, relationType: "BUNDLE",     sortOrder: 0,
+      { fromIdx:  7, toIdx:  8, relationType: "BUNDLE",     sortOrder: 0,
         ruleText: "Suite kesiapan kontraktor sebagai paket bundel opsional" },
 
       // L3 Contractor Readiness → L4 Business Memory RECURRING (ongoing operational tool)
-      { fromIdx:  7, toIdx:  8, relationType: "RECURRING",  sortOrder: 0,
+      { fromIdx:  8, toIdx:  9, relationType: "RECURRING",  sortOrder: 0,
         ruleText: "Sistem memori bisnis yang digunakan secara berkelanjutan setelah readiness" },
 
       // L4 Business Memory → L5 nodes CROSS_SELL
-      { fromIdx:  8, toIdx:  9, relationType: "CROSS_SELL", sortOrder: 0,
+      { fromIdx:  9, toIdx: 10, relationType: "CROSS_SELL", sortOrder: 0,
         ruleText: "Manajemen proyek AI untuk portofolio tender yang sedang berjalan" },
-      { fromIdx:  8, toIdx: 10, relationType: "CROSS_SELL", sortOrder: 1,
+      { fromIdx:  9, toIdx: 11, relationType: "CROSS_SELL", sortOrder: 1,
         ruleText: "Mini Apps produktivitas operasional harian kontraktor" },
-      { fromIdx:  8, toIdx: 11, relationType: "CROSS_SELL", sortOrder: 2,
+      { fromIdx:  9, toIdx: 12, relationType: "CROSS_SELL", sortOrder: 2,
         ruleText: "Pengembangan kompetensi tim untuk skala bisnis" },
 
       // L5 expansion → MultiClaw UPSELL
-      { fromIdx:  9, toIdx: 12, relationType: "UPSELL",     sortOrder: 0,
+      { fromIdx: 10, toIdx: 13, relationType: "UPSELL",     sortOrder: 0,
         ruleText: "Ekspansi ke manajemen multi-tender skala besar" },
-      { fromIdx: 10, toIdx: 12, relationType: "UPSELL",     sortOrder: 1,
+      { fromIdx: 11, toIdx: 13, relationType: "UPSELL",     sortOrder: 1,
         ruleText: "Ekspansi dari Mini Apps ke orkestrasi MultiClaw" },
-      { fromIdx: 11, toIdx: 12, relationType: "UPSELL",     sortOrder: 2,
+      { fromIdx: 12, toIdx: 13, relationType: "UPSELL",     sortOrder: 2,
         ruleText: "Ekspansi tim kompeten ke orkestrasi MultiClaw" },
     ];
 
