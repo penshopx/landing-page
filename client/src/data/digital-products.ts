@@ -6,6 +6,8 @@
 // ambil dari client/src/data/pricing.ts bila berbayar.
 // ============================================================
 import { CASHFLOW_EBOOK } from "@/data/pricing";
+import { SBU_SKK_EBOOK } from "@/data/pricing";
+import sbuSkkCover from "@assets/0_cover_Ebook_SBU-SKK_1787296306789.png";
 
 export type DigitalProduct = {
   slug: string;
@@ -31,9 +33,26 @@ export type DigitalProduct = {
   ctaLabel?: string;
   /** Kalimat pengantar di atas judul (mis. "Belum siap membeli?") */
   preNote?: string;
+  /** Official cover artwork, when a product has one. */
+  cover?: string;
 };
 
 export const DIGITAL_PRODUCTS: DigitalProduct[] = [
+  {
+    slug: SBU_SKK_EBOOK.slug,
+    jenis: "ebook",
+    judul: SBU_SKK_EBOOK.title,
+    subjudul: SBU_SKK_EBOOK.subtitle,
+    deskripsi: "Panduan praktis 265 halaman untuk membaca perubahan, menata persyaratan, dan bekerja lebih tertib dalam transisi SBU-SKK.",
+    hargaLabel: SBU_SKK_EBOOK.priceLabel,
+    gratis: false,
+    tier: "premium",
+    href: "/ebook-sbu-skk",
+    lini: "REGULASI KONSTRUKSI",
+    badge: "Panduan terbaru",
+    ctaLabel: "Lihat panduan",
+    cover: sbuSkkCover,
+  },
   {
     slug: "ebook-kas-merah",
     jenis: "ebook",

@@ -1,6 +1,6 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
-import { rm, readFile } from "fs/promises";
+import { copyFile, mkdir, rm, readFile } from "fs/promises";
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
@@ -40,6 +40,15 @@ async function buildAll() {
 
   console.log("building client...");
   await viteBuild();
+
+  // Private fulfillment asset: included in the server deployment bundle but
+  // deliberately kept outside dist/public so Express can never serve it
+  // without the paid-order token gate.
+  await mkdir("dist/private-assets", { recursive: true });
+  await copyFile(
+    "attached_assets/0_Ebook_SBU-SKK-final_1787296226294.pdf",
+    "dist/private-assets/sbu-skk-tanpa-bingung-v1.0.0.pdf",
+  );
 
   console.log("building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));

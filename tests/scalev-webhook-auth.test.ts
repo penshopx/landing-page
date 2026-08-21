@@ -11,11 +11,11 @@ function reset() {
   delete process.env.SCALEV_SIGNATURE_STRICT;
 }
 
-test("no secrets configured → accept (legacy, non-breaking)", () => {
+test("no secrets configured → reject fail-closed", () => {
   reset();
   const r = verifyScalevWebhookAuth(RAW, {}, {});
-  assert.equal(r.authorized, true);
-  assert.equal(r.method, "none-configured");
+  assert.equal(r.authorized, false);
+  assert.equal(r.method, "rejected");
 });
 
 test("shared secret: valid via query & header accepted; wrong/missing rejected", () => {
@@ -49,19 +49,28 @@ test("signing secret only + valid HMAC base64 with sha256= prefix → accept", (
   reset();
 });
 
-test("signing secret only + wrong signature → observe (accept + flag), NOT drop", () => {
+test("signing secret only + wrong signature → reject fail-closed", () => {
   reset();
   process.env.SCALEV_SIGNING_SECRET = "signkey";
   const r = verifyScalevWebhookAuth(RAW, { "x-signature": "deadbeef" }, {});
-  assert.equal(r.authorized, true);
-  assert.equal(r.method, "observe");
+  assert.equal(r.authorized, false);
+  assert.equal(r.method, "rejected");
   reset();
 });
 
-test("signing secret only + STRICT + wrong signature → reject", () => {
+test("signing secret only + missing signature → reject fail-closed", () => {
   reset();
   process.env.SCALEV_SIGNING_SECRET = "signkey";
-  process.env.SCALEV_SIGNATURE_STRICT = "true";
+  const r = verifyScalevWebhookAuth(RAW, {}, {});
+  assert.equal(r.authorized, false);
+  assert.equal(r.method, "rejected");
+  reset();
+});
+
+test("SCALEV_SIGNATURE_STRICT=false cannot downgrade signing-secret auth", () => {
+  reset();
+  process.env.SCALEV_SIGNING_SECRET = "signkey";
+  process.env.SCALEV_SIGNATURE_STRICT = "false";
   const r = verifyScalevWebhookAuth(RAW, { "x-signature": "deadbeef" }, {});
   assert.equal(r.authorized, false);
   assert.equal(r.method, "rejected");

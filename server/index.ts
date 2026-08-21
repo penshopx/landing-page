@@ -184,6 +184,8 @@ import * as M_persiapanProyekMulticlaw from "./seed-persiapan-proyek-multiclaw";
 import { seedClawCatalog } from "./lib/claw-factory";
 import { CLAW_CATALOG } from "./claw-catalog";
 import { seedStoreProducts } from "./seed-store-products";
+import { seedSbuSkkEbook } from "./seed-sbu-skk-ebook";
+import { startDigitalDeliveryOutboxWorker } from "./lib/digital-delivery-outbox";
 
 const seedModuleRegistry: Record<string, any> = {
   "./seed-knowledge-base": M_knowledgeBase,
@@ -749,6 +751,31 @@ for (const envVar of requiredEnvVars) {
     await pool.query(`ALTER TABLE product_registry ADD COLUMN IF NOT EXISTS scalev_variant_unique_id varchar(80)`);
     await pool.query(`ALTER TABLE package_registry ADD COLUMN IF NOT EXISTS scalev_variant_unique_id varchar(80)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_store_orders_scalev_order_id ON store_orders (scalev_order_id) WHERE scalev_order_id IS NOT NULL`);
+    // Digital delivery outbox. Add nullable first so pre-existing orders can be
+    // marked completed and are never re-emailed after this migration.
+    await pool.query(`
+      ALTER TABLE store_orders
+        ADD COLUMN IF NOT EXISTS delivery_status text,
+        ADD COLUMN IF NOT EXISTS delivery_attempts integer NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS delivery_claimed_at timestamp,
+        ADD COLUMN IF NOT EXISTS delivery_sent_at timestamp,
+        ADD COLUMN IF NOT EXISTS delivery_error text`);
+    await pool.query(`UPDATE store_orders SET delivery_status='sent' WHERE delivery_status IS NULL`);
+    await pool.query(`ALTER TABLE store_orders ALTER COLUMN delivery_status SET DEFAULT 'pending'`);
+    await pool.query(`ALTER TABLE store_orders ALTER COLUMN delivery_status SET NOT NULL`);
+    // The Drizzle model has always declared both columns unique, but the live
+    // database pre-dates those constraints. The outbox's atomic conflict claim
+    // depends on the database enforcing this invariant.
+    await pool.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_store_orders_midtrans_order_id
+      ON store_orders (midtrans_order_id)`);
+    await pool.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_store_orders_access_token
+      ON store_orders (access_token)`);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_store_orders_delivery_queue
+      ON store_orders (delivery_status, delivery_claimed_at)
+      WHERE delivery_status <> 'sent'`);
     console.log(`${new Date().toLocaleTimeString()} [express] order-api correlation columns ready`);
 
     // Seed default (idempotent, ON CONFLICT DO NOTHING) — admin bisa menambah lagi
@@ -808,7 +835,32 @@ for (const envVar of requiredEnvVars) {
     console.error(`${new Date().toLocaleTimeString()} [express] store_products.download_path DDL error:`, e);
   }
 
+  // ── Private digital-product bytes (server-only, paid-token delivery) ──────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS digital_product_files (
+        id serial PRIMARY KEY,
+        product_registry_id varchar(40) NOT NULL
+          REFERENCES product_registry(product_id) ON DELETE CASCADE,
+        storage_key text NOT NULL UNIQUE,
+        file_name text NOT NULL,
+        mime_type text NOT NULL DEFAULT 'application/octet-stream',
+        size_bytes integer NOT NULL,
+        sha256 varchar(64) NOT NULL,
+        content bytea NOT NULL,
+        created_at timestamp NOT NULL DEFAULT now(),
+        updated_at timestamp NOT NULL DEFAULT now()
+      )`);
+    await pool.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_digital_product_file_product
+      ON digital_product_files (product_registry_id)`);
+    console.log(`${new Date().toLocaleTimeString()} [express] digital_product_files table ready`);
+  } catch (e) {
+    console.error(`${new Date().toLocaleTimeString()} [express] digital_product_files DDL error:`, e);
+  }
+
   await registerRoutes(httpServer, app);
+  startDigitalDeliveryOutboxWorker();
 
   // ── Boot-time channel health check ──────────────────────────────────────────
   if (!process.env.APP_URL) {
@@ -2497,6 +2549,12 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
 
       // ── Store Products — produk unggulan di katalog marketplace ──────────
       try { await seedStoreProducts(); } catch (err) { log("[Seed StoreProducts] Error: " + (err as Error).message); }
+      try {
+        await seedSbuSkkEbook();
+        invalidateStoreCatalog();
+      } catch (err) {
+        log("[Seed SBU-SKK Ebook] Error: " + (err as Error).message);
+      }
 
       // Kelompokkan hanya agent promotable yang belum punya Modul efektif.
       // Reconciler tidak mengubah prompt, harga, model, visibilitas, atau kelas premium.

@@ -94,6 +94,10 @@ import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 import { registerSalesLadderRoutes } from "./sales-ladder";
 import { seedContractorLadder } from "./sales-ladder-seed";
 import { reconcileContractorL1Ebooks } from "./sales-ladder-reconcile";
+import {
+  isDatabaseDigitalProductPath,
+  readDatabaseDigitalProduct,
+} from "./lib/digital-product-storage";
 
 const _require = createRequire(import.meta.url);
 const { PDFParse: _PDFParse, VerbosityLevel: _VerbosityLevel } = _require("pdf-parse") as {
@@ -8288,11 +8292,52 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     res.json({ success: true });
   });
 
-  // GET /api/store/access/:token — verify access token & return chatbot info
+  // GET /api/store/access/:token/download — stream a digital file only after
+  // the opaque order token has been verified as paid.
+  app.get("/api/store/access/:token/download", async (req, res) => {
+    try {
+      const order = await storage.getStoreOrderByAccessToken(req.params.token);
+      if (!order) return res.status(404).json({ error: "Access token tidak valid" });
+      if (String(order.status).toLowerCase() !== "paid") {
+        return res.status(403).json({ error: "Pembayaran belum dikonfirmasi" });
+      }
+
+      const product = order.productId
+        ? await storage.getStoreProduct(order.productId)
+        : null;
+      const downloadPath = product?.downloadPath?.trim();
+      if (!downloadPath) {
+        return res.status(404).json({ error: "File digital tidak ditemukan" });
+      }
+
+      if (isDatabaseDigitalProductPath(downloadPath)) {
+        const file = await readDatabaseDigitalProduct(downloadPath);
+        const safeAsciiName = file.fileName.replace(/["\r\n]/g, "_");
+        res.setHeader("Content-Type", file.mimeType);
+        res.setHeader("Content-Length", String(file.content.length));
+        res.setHeader("Content-Disposition", `attachment; filename="${safeAsciiName}"; filename*=UTF-8''${encodeURIComponent(file.fileName)}`);
+        res.setHeader("Cache-Control", "private, no-store, max-age=0");
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        return res.send(file.content);
+      }
+
+      const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+      const resolvedUrl = await resolveDownloadUrl(downloadPath, 300);
+      return res.redirect(302, resolvedUrl);
+    } catch (error) {
+      console.error("[StoreAccess] Gagal mengirim file digital:", error);
+      return res.status(500).json({ error: "Gagal menyiapkan file digital" });
+    }
+  });
+
+  // GET /api/store/access/:token — verify a paid access token & return product info
   app.get("/api/store/access/:token", async (req, res) => {
     try {
       const order = await storage.getStoreOrderByAccessToken(req.params.token);
       if (!order) return res.status(404).json({ error: "Access token tidak valid" });
+      if (String(order.status).toLowerCase() !== "paid") {
+        return res.status(403).json({ error: "Pembayaran belum dikonfirmasi" });
+      }
 
       const baseUrl = getServerBaseUrl(req);
       const orderAny = order as any;
@@ -8309,8 +8354,13 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         if (dpProduct && (dpProduct as any).downloadPath) {
           let downloadUrl: string | null = null;
           try {
-            const { resolveDownloadUrl } = await import("./lib/supabase-storage");
-            downloadUrl = await resolveDownloadUrl((dpProduct as any).downloadPath, 86_400);
+            const downloadPath = String((dpProduct as any).downloadPath);
+            if (isDatabaseDigitalProductPath(downloadPath)) {
+              downloadUrl = `${baseUrl}/api/store/access/${encodeURIComponent(req.params.token)}/download`;
+            } else {
+              const { resolveDownloadUrl } = await import("./lib/supabase-storage");
+              downloadUrl = await resolveDownloadUrl(downloadPath, 86_400);
+            }
           } catch (dlErr) {
             console.error("[StoreAccess] Gagal resolve download URL:", dlErr);
           }
@@ -8394,9 +8444,9 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
-  // ── Admin: manage store products (authenticated) ──────────────────────────
+  // ── Admin: manage store products ──────────────────────────────────────────
 
-  app.get("/api/store/admin/products", isAuthenticated, async (_req, res) => {
+  app.get("/api/store/admin/products", isAuthenticated, requireAdmin, async (_req, res) => {
     try {
       // Fetch ALL products (including inactive) for admin view
       const products = await db.select().from(storeProducts).orderBy(storeProducts.sortOrder, storeProducts.id);
@@ -8425,7 +8475,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
-  app.post("/api/store/admin/products", isAuthenticated, async (req, res) => {
+  app.post("/api/store/admin/products", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const product = await storage.createStoreProduct(req.body);
       invalidateStoreCatalog();
@@ -8436,7 +8486,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
-  app.patch("/api/store/admin/products/:id", isAuthenticated, async (req, res) => {
+  app.patch("/api/store/admin/products/:id", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       // Reject zero/negative price overrides so a typo can never publish a
       // Rp 0 or negative-priced product to buyers. (null = clear override, OK)
@@ -8456,7 +8506,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
   });
 
   // Bulk reorder — must be BEFORE /:id routes so Express doesn't treat "reorder" as an ID
-  app.post("/api/store/admin/products/reorder", isAuthenticated, async (req, res) => {
+  app.post("/api/store/admin/products/reorder", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const { items } = req.body as { items: { id: number; sortOrder: number }[] };
       if (!Array.isArray(items)) return res.status(400).json({ error: "items array required" });
@@ -8470,7 +8520,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
-  app.delete("/api/store/admin/products/:id", isAuthenticated, async (req, res) => {
+  app.delete("/api/store/admin/products/:id", isAuthenticated, requireAdmin, async (req, res) => {
     try {
       const ok = await storage.deleteStoreProduct(Number(req.params.id));
       invalidateStoreCatalog();
@@ -8481,7 +8531,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
   });
 
   // POST /api/admin/store/products/:id/test-download — verify the signed URL is reachable
-  app.post("/api/admin/store/products/:id/test-download", isAuthenticated, async (req: any, res) => {
+  app.post("/api/admin/store/products/:id/test-download", isAuthenticated, requireAdmin, async (req: any, res) => {
     try {
       const userId = req.user?.claims?.sub;
       if (!userId) return res.status(401).json({ error: "Unauthorized" });
@@ -8512,7 +8562,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
     }
   });
 
-  app.get("/api/store/admin/orders", isAuthenticated, async (_req, res) => {
+  app.get("/api/store/admin/orders", isAuthenticated, requireAdmin, async (_req, res) => {
     try {
       const { db: dbOrd } = await import("./db");
       const { storeOrders: soTblOrd, storeProducts: spTblOrd } = await import("@shared/schema");
@@ -20736,7 +20786,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     }
   });
 
-  // ── Scalev Webhook (PUBLIC — no auth) ──────────────────────────────────────
+  // ── Scalev Webhook (public endpoint, secret/HMAC authenticated) ─────────────
   // Scalev sends POST to this URL when order payment status changes.
   // Set this URL in app.scalev.id → Settings → Developers → Webhook URL
   app.post("/api/webhooks/scalev", async (req: any, res: any) => {
@@ -20744,7 +20794,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       // Verifikasi keaslian webhook (berlapis, aman-secara-default):
       //   1. Tanda tangan HMAC-SHA256 (SCALEV_SIGNING_SECRET) atas body mentah.
       //   2. Secret bersama (SCALEV_WEBHOOK_SECRET) via header / query `?secret=`.
-      //   3. Tanpa secret sama sekali → terima (perilaku lama, non-breaking).
+      //   3. Tanpa secret sama sekali → tolak (paid delivery fail-closed).
       // Mencegah pihak luar mengirim order palsu (mis. memicu clone Premium Privat
       // atau Purchase palsu ke Meta). Detail: server/lib/meta-capi.ts.
       const { verifyScalevWebhookAuth } = await import("./lib/meta-capi");
@@ -20760,14 +20810,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         );
         return res.status(401).json({ error: "Unauthorized" });
       }
-      if (auth.method === "observe") {
-        const relevantHeaders = Object.keys(req.headers || {})
-          .filter((h) => /sign|secret|scalev|hmac|hub/i.test(h))
-          .join(", ") || "(tidak ada header signature)";
-        console.warn(
-          `[Scalev Webhook] DITERIMA (mode observasi) — SCALEV_SIGNING_SECRET diset tapi signature belum cocok (present=${auth.sigPresent} hdr=${auth.sigHeader || "none"}). Header relevan: ${relevantHeaders}. Untuk gerbang WAJIB: set SCALEV_WEBHOOK_SECRET lalu tambahkan ?secret= di URL webhook; atau set SCALEV_SIGNATURE_STRICT=true setelah format signature dikonfirmasi.`,
-        );
-      } else if (process.env.SCALEV_SIGNING_SECRET) {
+      if (process.env.SCALEV_SIGNING_SECRET) {
         console.log(
           `[Scalev Webhook] Auth OK via ${auth.method} (signature present=${auth.sigPresent} valid=${auth.sigValid} hdr=${auth.sigHeader || "none"})`,
         );
@@ -20851,8 +20894,18 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
 
       // Check duplicate (use midtransOrderId field to store scalev orderId)
       const existing = await storage.getStoreOrderByMidtransId(`scalev_${orderId}`);
+      let existingDigitalProduct: any = null;
       if (existing) {
-        return res.status(200).json({ received: true, note: "Duplicate, already processed" });
+        // Digital delivery retries are resumable: a prior process may have
+        // persisted the order but crashed before email. Continue into the
+        // outbox path with the already-bound product/token instead of returning.
+        if (existing.productId) {
+          const existingProduct = await storage.getStoreProduct(existing.productId).catch(() => null);
+          if (existingProduct?.downloadPath) existingDigitalProduct = existingProduct;
+        }
+        if (!existingDigitalProduct) {
+          return res.status(200).json({ received: true, note: "Duplicate, already processed" });
+        }
       }
 
       // ── Meta Conversions API: kirim event Purchase (fire-and-forget) ─────────
@@ -20946,7 +20999,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       }
       // ─────────────────────────────────────────────────────────────────────────
 
-      // ── Digital Product Delivery (download_path via Supabase Storage) ─────────
+      // ── Digital Product Delivery (private DB object, Supabase, or external) ──
       // Matching priority:
       //   1. product_ref param (store product ID) — set by frontend when buyer clicks Beli
       //   2. scalev_product_name exact match (admin-configured)
@@ -20957,6 +21010,39 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           data.name || "",
           ...Object.keys(finalVariants),
         ].map((s: string) => s.trim().toLowerCase()).filter(Boolean);
+        const webhookVariantIds = new Set<number>();
+        const webhookVariantUniqueIds = new Set<string>();
+        const collectVariant = (value: any) => {
+          if (value == null) return;
+          if (typeof value === "number" || (typeof value === "string" && /^\d+$/.test(value))) {
+            const parsed = Number(value);
+            if (Number.isSafeInteger(parsed) && parsed > 0) webhookVariantIds.add(parsed);
+            return;
+          }
+          if (typeof value === "string") {
+            if (value.startsWith("variant_")) webhookVariantUniqueIds.add(value);
+            return;
+          }
+          if (Array.isArray(value)) {
+            value.forEach(collectVariant);
+            return;
+          }
+          if (typeof value === "object") {
+            collectVariant(value.variant_id);
+            collectVariant(value.variantId);
+            collectVariant(value.id);
+            collectVariant(value.variant_unique_id);
+            collectVariant(value.variantUniqueId);
+            collectVariant(value.unique_id);
+          }
+        };
+        collectVariant(data.variant_id);
+        collectVariant(data.variantId);
+        collectVariant(data.variant);
+        collectVariant(data.variants);
+        collectVariant(data.items);
+        collectVariant(data.line_items);
+        collectVariant(data.order_items);
 
         // product_ref is the store_products.id appended to checkout URL by the frontend
         const productRefRaw: string | undefined =
@@ -20966,13 +21052,22 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           undefined;
         const productRefId: number | null = productRefRaw ? parseInt(String(productRefRaw), 10) : null;
 
-        if ((webhookProductNames.length > 0 || productRefId) && customerEmail) {
+        if (
+          (
+            webhookProductNames.length > 0 ||
+            productRefId ||
+            webhookVariantIds.size > 0 ||
+            webhookVariantUniqueIds.size > 0 ||
+            existingDigitalProduct
+          ) &&
+          customerEmail
+        ) {
           try {
             const { db: dbDp } = await import("./db");
             const { storeProducts: spTbl } = await import("@shared/schema");
             const { isNotNull: dpNotNull, eq: dpEq } = await import("drizzle-orm");
 
-            let matched: any = null;
+            let matched: any = existingDigitalProduct;
 
             // Priority 1: match by store product ID (most reliable)
             if (productRefId && !isNaN(productRefId)) {
@@ -20987,7 +21082,31 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               }
             }
 
-            // Priority 2 & 3: name-based matching
+            // Priority 2: bind to the exact Scalev variant whenever the payload
+            // exposes one. This survives product-name changes in Scalev.
+            if (!matched && webhookVariantIds.size > 0) {
+              const allVariantMatches = await dbDp
+                .select()
+                .from(spTbl)
+                .where(dpNotNull(spTbl.downloadPath));
+              const variantMatches = allVariantMatches.filter(
+                (p: any) =>
+                  p.scalevVariantId != null && webhookVariantIds.has(Number(p.scalevVariantId)),
+              );
+              if (variantMatches.length > 1) {
+                throw new Error(
+                  `Variant Scalev cocok ke ${variantMatches.length} produk digital; delivery dihentikan.`,
+                );
+              }
+              if (variantMatches[0]) {
+                matched = variantMatches[0];
+                console.log(
+                  `[DigitalDelivery] Matched by Scalev variant ${matched.scalevVariantId}: "${matched.name}"`,
+                );
+              }
+            }
+
+            // Priority 3 & 4: name-based matching
             if (!matched && webhookProductNames.length > 0) {
               const allDigital = await dbDp
                 .select()
@@ -21009,60 +21128,44 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                 `[Scalev] Digital product matched: "${matched.name}" → ${matched.downloadPath}`,
               );
               try {
-                const { resolveDownloadUrl, isExternalDownloadUrl } = await import("./lib/supabase-storage");
-                const { sendDigitalProductDeliveryEmail } = await import("./lib/email");
-                const { randomUUID: dpUUID } = await import("crypto");
-                const { db: dbOrd } = await import("./db");
-                const { storeOrders: soTbl } = await import("@shared/schema");
-
-                // Generate access token BEFORE everything so it can be used as
-                // both the order correlation key and the Brevo tag.
-                // The order record is persisted FIRST so the token is durable in
-                // the DB before Brevo can emit any bounce event — eliminating the
-                // insert-after-send race that could permanently lose WA fallback.
-                const dpAccessToken = dpUUID();
-                const orderCorrelationTag = `digital-delivery-${dpAccessToken}`;
-
-                // Persist order FIRST — token in DB before Brevo can bounce.
-                await dbOrd.insert(soTbl).values({
+                const {
+                  ensureDigitalDeliveryOrder,
+                  markDigitalDeliverySentByFallback,
+                  processDigitalDeliveryOrder,
+                } = await import("./lib/digital-delivery-outbox");
+                const durableOrder = await ensureDigitalDeliveryOrder({
                   productId: matched.id,
                   customerName: customerName || "Customer",
                   customerEmail,
                   customerPhone,
                   amount: Math.round(grossRevenue),
                   midtransOrderId: `scalev_${orderId}`,
-                  accessToken: dpAccessToken,
-                  status: "paid",
-                } as any).onConflictDoNothing();
-                console.log(`[DigitalDelivery] Order recorded for "${matched.name}" — ${customerEmail}`);
+                });
+                const delivery = await processDigitalDeliveryOrder(
+                  durableOrder.id,
+                  getServerBaseUrl(req),
+                );
 
-                // Resolve download URL — full URL (Google Drive etc.) or Supabase signed URL.
-                // KRITIS: order sudah tersimpan di atas. Jika signing gagal (mis.
-                // SUPABASE_URL/SERVICE_ROLE_KEY belum dikonfigurasi), JANGAN biarkan
-                // error jatuh ke catch luar dan menghilangkan jejak — tandai order
-                // 'pending' agar bisa di-retry dan kirim alert WA ke superadmin.
-                const isPermanentLink = isExternalDownloadUrl(matched.downloadPath);
-                let signedUrl: string;
-                try {
-                  signedUrl = await resolveDownloadUrl(matched.downloadPath, 86_400);
-                } catch (urlErr: any) {
-                  console.error(`[DigitalDelivery] Gagal resolve download URL untuk "${matched.name}": ${urlErr?.message}`);
-                  // Order tetap tersimpan — turunkan status ke 'pending' supaya admin bisa retry.
-                  try {
-                    const { eq: dpEqOrd } = await import("drizzle-orm");
-                    await dbOrd.update(soTbl)
-                      .set({ status: "pending" } as any)
-                      .where(dpEqOrd(soTbl.accessToken, dpAccessToken));
-                  } catch (updErr: any) {
-                    console.error("[DigitalDelivery] Gagal menandai order pending:", updErr?.message);
-                  }
-                  // Alert superadmin via WA (fire-and-forget, tidak memblokir webhook).
+                if (!delivery.claimed) {
+                  return res.status(200).json({
+                    received: true,
+                    type: "digital_product_delivery",
+                    note:
+                      delivery.deliveryStatus === "sent"
+                        ? "Duplicate, already delivered"
+                        : `Delivery ${delivery.deliveryStatus}`,
+                  });
+                }
+                if (!delivery.deliveryUrl) {
+                  console.error(
+                    `[DigitalDelivery] Gagal resolve download URL untuk "${matched.name}": ${delivery.error}`,
+                  );
                   void _sendDigitalDeliveryFailureAlert({
                     productName: matched.name,
                     customerEmail,
                     customerPhone,
                     orderId: `scalev_${orderId}`,
-                    reason: urlErr?.message || "unknown",
+                    reason: delivery.error || "unknown",
                   }).catch(() => {});
                   return res.status(200).json({
                     received: true,
@@ -21070,40 +21173,31 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                     note: "delivery_failed_order_pending",
                   });
                 }
-
-                // Send delivery email — await so we can fall back to WA if it fails immediately.
-                // Result ditangkap dengan reason+detail (sama dengan jalur manual order)
-                // agar admin tidak menebak-nebak penyebab kegagalan pengiriman otomatis.
-                let emailResult: { sent: boolean; reason?: string; detail?: string };
-                try {
-                  emailResult = await sendDigitalProductDeliveryEmail({
-                    to: customerEmail,
-                    customerName: customerName || null,
-                    productName: matched.name,
-                    downloadUrl: signedUrl,
-                    expiryHours: isPermanentLink ? null : 24,
-                    orderCorrelationTag,
-                  });
-                } catch (emailErr: any) {
-                  emailResult = { sent: false, reason: "exception", detail: emailErr?.message || String(emailErr) };
-                }
-                const emailSent = emailResult.sent;
+                const dpAccessToken = delivery.accessToken;
+                const deliveryUrl = delivery.deliveryUrl;
+                const isPermanentLink = delivery.permanentLink === true;
+                const emailSent = delivery.emailSent === true;
                 if (emailSent) {
-                  console.log(`[DigitalDelivery] Email terkirim ke ${customerEmail} untuk "${matched.name}" (token: ${dpAccessToken})`);
+                  console.log(
+                    `[DigitalDelivery] Email terkirim ke ${customerEmail} untuk "${matched.name}" (token: ${dpAccessToken})`,
+                  );
                 } else {
-                  console.error(`[DigitalDelivery] Email gagal ke ${customerEmail} untuk "${matched.name}" (${emailResult.reason}${emailResult.detail ? `: ${emailResult.detail}` : ""})`);
+                  console.error(
+                    `[DigitalDelivery] Email gagal ke ${customerEmail} untuk "${matched.name}" (${delivery.error || "unknown"})`,
+                  );
                 }
 
                 // Immediate WA fallback: Brevo rejected the send synchronously
                 // (API error, network error, or BREVO_API_KEY not configured).
-                // We already have signedUrl in memory — send directly without DB lookup.
+                // We already have the delivery URL in memory — send directly
+                // without another DB lookup.
                 const immediateFonnteKey = process.env.FONNTE_API_TOKEN || process.env.FONNTE_API_KEY;
                 if (!emailSent && customerPhone && immediateFonnteKey) {
                   const greet = (customerName || "").trim() || "Pembeli";
                   const waMessage =
                     `📦 *${matched.name}*\n\n` +
                     `Halo ${greet},\n\n` +
-                    `Link download produk Anda sudah siap:\n${signedUrl}\n\n` +
+                    `Link download produk Anda sudah siap:\n${deliveryUrl}\n\n` +
                     (isPermanentLink
                       ? `💾 Simpan pesan ini — link download Anda dapat digunakan kapan saja.\n\n`
                       : `⚠️ Link berlaku 24 jam. Simpan segera sebelum kedaluwarsa.\n\n`) +
@@ -21119,6 +21213,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
                       // Mark token as already WA-delivered so the async bounce
                       // handler skips a duplicate send if Brevo later bounces.
                       _digitalDeliveryWaSentTokens.add(dpAccessToken);
+                      await markDigitalDeliverySentByFallback(delivery.orderId);
                       console.log(`[DigitalDelivery] WA fallback (immediate) terkirim ke ${customerPhone} untuk "${matched.name}"`);
                     } else {
                       console.error(`[DigitalDelivery] WA fallback (immediate) gagal ke ${customerPhone}: ${waJson.reason ?? `HTTP ${waRes.status}`}`);

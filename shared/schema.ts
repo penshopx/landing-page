@@ -1,7 +1,13 @@
 import { z } from "zod";
-import { pgTable, text, boolean, timestamp, date, real, integer, bigint, jsonb, varchar, serial, uuid, uniqueIndex, index } from "drizzle-orm/pg-core";
+import { pgTable, text, boolean, timestamp, date, real, integer, bigint, jsonb, varchar, serial, uuid, uniqueIndex, index, customType } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 // Export auth models (required for Replit Auth)
 export * from "./models/auth";
@@ -2202,6 +2208,13 @@ export const storeOrders = pgTable("store_orders", {
   midtransOrderId: text("midtrans_order_id").notNull().unique(),
   accessToken: text("access_token").notNull().unique(),
   status: text("status").notNull().default("pending"),
+  // Durable at-least-once digital delivery outbox. Historical rows are
+  // backfilled to "sent" by startup DDL; new orders begin at "pending".
+  deliveryStatus: text("delivery_status").notNull().default("pending"),
+  deliveryAttempts: integer("delivery_attempts").notNull().default(0),
+  deliveryClaimedAt: timestamp("delivery_claimed_at"),
+  deliverySentAt: timestamp("delivery_sent_at"),
+  deliveryError: text("delivery_error"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   // ── Unified Order API (Fase B) — kolom aditif, nullable, backward-compatible.
   // Order paket dari POST /api/v1/orders: package_id + versi snapshot untuk audit;
@@ -2881,6 +2894,24 @@ export const productRegistry = pgTable("product_registry", {
   createdAt:        timestamp("created_at").defaultNow().notNull(),
   updatedAt:        timestamp("updated_at").defaultNow().notNull(),
 });
+
+// Private binary fulfillment assets. Bytes stay server-side in PostgreSQL and
+// are only streamed after a paid store order token has been verified.
+export const digitalProductFiles = pgTable("digital_product_files", {
+  id:                serial("id").primaryKey(),
+  productRegistryId: varchar("product_registry_id", { length: 40 }).notNull()
+                       .references(() => productRegistry.productId, { onDelete: "cascade" }),
+  storageKey:        text("storage_key").notNull().unique(),
+  fileName:          text("file_name").notNull(),
+  mimeType:          text("mime_type").notNull().default("application/octet-stream"),
+  sizeBytes:         integer("size_bytes").notNull(),
+  sha256:            varchar("sha256", { length: 64 }).notNull(),
+  content:           bytea("content").notNull(),
+  createdAt:         timestamp("created_at").defaultNow().notNull(),
+  updatedAt:         timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("uq_digital_product_file_product").on(table.productRegistryId),
+]);
 
 // ── Solution / Sector / Tier / Package Registries (Phase 1) ────────────────
 export const solutionRegistry = pgTable("solution_registry", {

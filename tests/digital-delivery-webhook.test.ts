@@ -57,6 +57,7 @@ after(async () => {
 async function createTestProduct(opts: {
   name: string;
   scalevProductName?: string;
+  scalevVariantId?: number;
   downloadPath: string;
 }): Promise<number> {
   const [row] = await db
@@ -71,6 +72,7 @@ async function createTestProduct(opts: {
       sortOrder: 9999,
       downloadPath: opts.downloadPath,
       ...(opts.scalevProductName ? { scalevProductName: opts.scalevProductName } : {}),
+      ...(opts.scalevVariantId ? { scalevVariantId: opts.scalevVariantId } : {}),
     } as any)
     .returning({ id: storeProducts.id });
   createdProductIds.push(row.id);
@@ -85,6 +87,7 @@ function buildWebhookPayload(opts: {
   customerName?: string;
   customerPhone?: string;
   productRef?: number;
+  variantId?: number;
 }): object {
   return {
     data: {
@@ -92,6 +95,7 @@ function buildWebhookPayload(opts: {
       payment_status: "paid",
       gross_revenue: "99000",
       product_name: opts.productName,
+      ...(opts.variantId ? { variant_id: opts.variantId } : {}),
       customer: {
         email: opts.customerEmail,
         name: opts.customerName || "Test Buyer",
@@ -108,7 +112,7 @@ function buildWebhookPayload(opts: {
  * POST payload ke /api/webhooks/scalev pada dev server.
  * Auth lolos lewat:
  *   - SCALEV_WEBHOOK_SECRET → kirim via header x-scalev-secret
- *   - Tidak ada secret dikonfigurasi → terima otomatis (mode "none-configured")
+ *   - Server wajib memiliki SCALEV_WEBHOOK_SECRET atau SCALEV_SIGNING_SECRET
  */
 async function postWebhook(payload: object): Promise<{ status: number; body: any }> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -271,6 +275,106 @@ test("webhook paid + product_ref ID cocok → order tersimpan (prioritas 1)", as
   const order = await fetchOrder(orderId);
   assert.ok(order, "Order harus tersimpan setelah pencocokan product_ref ID");
   assert.equal(order.productId, productId, "productId di order harus sesuai dengan ID produk test");
+});
+
+test("webhook mengikat produk digital lewat Scalev variant ID meski nama payload berbeda", async () => {
+  const variantId = 900_000_000 + Math.floor(Math.random() * 10_000_000);
+  const orderId = `test_${RUN}_by_variant`;
+  const productId = await createTestProduct({
+    name: `${RUN} Produk Variant`,
+    scalevVariantId: variantId,
+    downloadPath: EXTERNAL_DOWNLOAD_URL,
+  });
+
+  const { status, body } = await postWebhook(
+    buildWebhookPayload({
+      orderId,
+      productName: `nama-scalev-berubah-${RUN}`,
+      customerEmail: `variant_${RUN}@test.gustafta.id`,
+      variantId,
+    }),
+  );
+
+  assert.equal(status, 200);
+  assert.equal(body.type, "digital_product_delivery", JSON.stringify(body));
+  const order = await fetchOrder(orderId);
+  assert.ok(order);
+  assert.equal(order.productId, productId);
+});
+
+test("webhook konkuren mengklaim satu order dan satu delivery attempt dengan token yang sama", async () => {
+  const variantId = 910_000_000 + Math.floor(Math.random() * 10_000_000);
+  const orderId = `test_${RUN}_concurrent`;
+  const productId = await createTestProduct({
+    name: `${RUN} Produk Concurrent`,
+    scalevVariantId: variantId,
+    downloadPath: EXTERNAL_DOWNLOAD_URL,
+  });
+  const payload = buildWebhookPayload({
+    orderId,
+    productName: `nama-tidak-dipakai-${RUN}`,
+    customerEmail: `concurrent_${RUN}@test.gustafta.id`,
+    variantId,
+  });
+
+  const responses = await Promise.all(Array.from({ length: 8 }, () => postWebhook(payload)));
+  assert.ok(responses.every((response) => response.status === 200));
+
+  const mid = `scalev_${orderId}`;
+  createdOrderMidtransIds.push(mid);
+  const rows = await db
+    .select()
+    .from(storeOrders)
+    .where(eq(storeOrders.midtransOrderId, mid));
+  assert.equal(rows.length, 1, "Constraint DB harus menyisakan tepat satu order");
+  assert.equal(rows[0].productId, productId);
+  assert.equal(
+    rows[0].deliveryAttempts,
+    1,
+    "Hanya claimant atomik yang boleh melakukan delivery attempt",
+  );
+  assert.ok(rows[0].accessToken.length > 10);
+});
+
+test("retry melanjutkan order yang sudah tersimpan sebelum email tanpa mengganti token", async () => {
+  const productName = `${RUN} Produk Recovery`;
+  const orderId = `test_${RUN}_recover`;
+  const mid = `scalev_${orderId}`;
+  const accessToken = randomUUID();
+  const productId = await createTestProduct({
+    name: productName,
+    downloadPath: EXTERNAL_DOWNLOAD_URL,
+  });
+  await db.insert(storeOrders).values({
+    productId,
+    customerName: "Recovery Buyer",
+    customerEmail: `recover_${RUN}@test.gustafta.id`,
+    customerPhone: "",
+    amount: 99_000,
+    midtransOrderId: mid,
+    accessToken,
+    status: "pending",
+    deliveryStatus: "pending",
+  });
+  createdOrderMidtransIds.push(mid);
+
+  const { status, body } = await postWebhook(
+    buildWebhookPayload({
+      orderId,
+      productName,
+      customerEmail: `recover_${RUN}@test.gustafta.id`,
+    }),
+  );
+  assert.equal(status, 200);
+  assert.equal(body.type, "digital_product_delivery", JSON.stringify(body));
+  const [recovered] = await db
+    .select()
+    .from(storeOrders)
+    .where(eq(storeOrders.midtransOrderId, mid))
+    .limit(1);
+  assert.equal(recovered.accessToken, accessToken, "Retry wajib memakai token persisted");
+  assert.equal(recovered.status, "paid");
+  assert.equal(recovered.deliveryAttempts, 1);
 });
 
 // ═════════════════════════════════════════════════════════════════════════════

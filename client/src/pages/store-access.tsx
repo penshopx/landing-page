@@ -35,6 +35,16 @@ interface StoreAccessData {
   downloadUrl?: string | null;
 }
 
+class StoreAccessError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = "StoreAccessError";
+  }
+}
+
 function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(price);
 }
@@ -97,15 +107,19 @@ export default function StoreAccess() {
   const { token } = useParams<{ token: string }>();
   const [activeFormat, setActiveFormat] = useState<"chat" | "iframe" | "widget">("chat");
 
-  const { data, isLoading, isError } = useQuery<StoreAccessData>({
+  const { data, error, isLoading, isError } = useQuery<StoreAccessData, StoreAccessError>({
     queryKey: ["/api/store/access", token],
     queryFn: async () => {
       const res = await fetch(`/api/store/access/${token}`);
-      if (!res.ok) throw new Error("Akses tidak valid");
+      if (!res.ok) {
+        const payload = await res.json().catch(() => null);
+        throw new StoreAccessError(payload?.error || "Akses tidak valid", res.status);
+      }
       return res.json();
     },
     enabled: !!token,
   });
+  const isPaymentPending = error?.status === 403;
 
   // Rewrite all delivery URLs to use the current browser's domain.
   // When customer opens this page from the deployed .replit.app link, all
@@ -147,6 +161,21 @@ export default function StoreAccess() {
             <Skeleton className="h-10 w-2/3 bg-white/10" />
             <Skeleton className="h-48 w-full bg-white/10" />
             <Skeleton className="h-32 w-full bg-white/10" />
+          </div>
+        ) : isPaymentPending ? (
+          <div className="text-center py-20" data-testid="state-access-payment-pending">
+            <div className="text-6xl mb-4">⏳</div>
+            <h1 className="text-2xl font-bold mb-2 text-yellow-400">Pembayaran Diproses</h1>
+            <p className="text-gray-400 mb-6">
+              Pembayaran Anda belum terkonfirmasi. Halaman akses dan file akan aktif otomatis setelah pembayaran berhasil.
+            </p>
+            <Button
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+              onClick={() => window.location.reload()}
+            >
+              Cek Lagi
+            </Button>
           </div>
         ) : isError ? (
           <div className="text-center py-20">

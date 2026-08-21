@@ -222,15 +222,13 @@ export async function sendMetaPurchaseEvent(params: MetaPurchaseParams): Promise
 //   1. Tanda tangan HMAC-SHA256 (SCALEV_SIGNING_SECRET) atas body mentah — cara
 //      "signing secret" Scalev. Coba beberapa nama header umum + hex/base64.
 //   2. Secret bersama (SCALEV_WEBHOOK_SECRET) lewat header atau query `?secret=`.
-//   3. Bila TIDAK ada secret sama sekali → terima (perilaku lama, non-breaking).
-// Format signature Scalev tidak terdokumentasi resmi, jadi tanda tangan hanya
-// MENERIMA bila cocok — TIDAK pernah jadi satu-satunya penolak. Selama secret
-// bersama diset (mis. `?secret=` di URL), order asli tetap lolos walau format
-// signature berbeda. Diagnostik di handler mencatat NAMA header (bukan nilai)
-// saat ditolak, supaya format asli Scalev bisa dikenali dari order pertama.
+//   3. Bila TIDAK ada secret sama sekali → tolak (paid delivery harus fail-closed).
+// Jika salah satu secret dikonfigurasi, request wajib lolos setidaknya satu
+// metode. Shared secret tetap menjadi jalur kompatibilitas bila format HMAC
+// Scalev berubah. Diagnostik handler hanya mencatat NAMA header (bukan nilai).
 export interface ScalevAuthResult {
   authorized: boolean;
-  method: "signature" | "shared-secret" | "none-configured" | "observe" | "rejected";
+  method: "signature" | "shared-secret" | "rejected";
   sigPresent: boolean;
   sigValid: boolean;
   sigHeader?: string;
@@ -297,9 +295,11 @@ export function verifyScalevWebhookAuth(
     }
   }
 
-  // 3. Tidak ada secret dikonfigurasi sama sekali → terima (legacy, non-breaking)
+  // 3. Tidak ada secret dikonfigurasi sama sekali → tolak. Webhook ini dapat
+  // membuka akses produk berbayar, jadi misconfiguration tidak boleh berubah
+  // menjadi bypass autentikasi.
   if (!sharedSecret && !signingSecret) {
-    return { authorized: true, method: "none-configured", sigPresent, sigValid, sigHeader };
+    return { authorized: false, method: "rejected", sigPresent, sigValid, sigHeader };
   }
 
   // Shared secret diset = gerbang WAJIB & otoritatif. Sampai sini berarti tidak
@@ -308,14 +308,8 @@ export function verifyScalevWebhookAuth(
     return { authorized: false, method: "rejected", sigPresent, sigValid, sigHeader };
   }
 
-  // HANYA signing secret yang diset (tanpa shared secret). Format signature Scalev
-  // TIDAK terdokumentasi resmi, jadi default AMAN = mode observasi: TERIMA + tandai
-  // untuk di-log, supaya order asli tak pernah di-drop hanya karena tebakan format
-  // salah. Setelah format signature dikonfirmasi dari log, set
-  // SCALEV_SIGNATURE_STRICT=true untuk mengubahnya jadi penolak tegas.
-  const strict = /^(1|true|yes)$/i.test(process.env.SCALEV_SIGNATURE_STRICT || "");
-  if (strict) {
-    return { authorized: false, method: "rejected", sigPresent, sigValid, sigHeader };
-  }
-  return { authorized: true, method: "observe", sigPresent, sigValid, sigHeader };
+  // Signing secret dikonfigurasi berarti HMAC wajib. Jangan pernah menerima
+  // payment_status=paid dalam mode observasi: event palsu dapat membuka produk
+  // berbayar dan mengirim token download yang valid.
+  return { authorized: false, method: "rejected", sigPresent, sigValid, sigHeader };
 }

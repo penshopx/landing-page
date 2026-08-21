@@ -16,6 +16,9 @@ function ProductCard({ p }: { p: DigitalProduct }) {
       }`}
       data-testid={`card-digital-${p.slug}`}
     >
+      {p.cover && (
+        <img src={p.cover} alt={`Sampul ${p.judul}`} className="w-full aspect-[3/4] object-cover rounded-2xl mb-5 border border-slate-200 dark:border-slate-700" data-testid={`cover-digital-${p.slug}`} />
+      )}
       <div className="flex items-start justify-between mb-4">
         <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-md bg-orange-500 shadow-orange-200 dark:shadow-orange-900/40">
           <BookOpen className="h-5 w-5 text-white" />
@@ -32,7 +35,7 @@ function ProductCard({ p }: { p: DigitalProduct }) {
             variant="outline"
             className={p.gratis ? "text-emerald-600 border-emerald-300 dark:text-emerald-400" : "text-slate-700 dark:text-slate-200"}
           >
-            {p.hargaLabel}
+            <span data-testid={`price-digital-${p.slug}`}>{p.hargaLabel}</span>
           </Badge>
         </div>
       </div>
@@ -150,7 +153,7 @@ export default function EbookToolkitPage() {
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 flex items-start gap-4">
           <Lock className="h-5 w-5 text-slate-400 shrink-0 mt-0.5" />
           <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-            Ebook berbayar dikirim sebagai PDF terkunci password ke WhatsApp/email Anda setelah pembayaran.
+            Ebook berbayar dikirim otomatis melalui email setelah pembayaran terkonfirmasi, melalui tautan akses pesanan yang aman.
             Ebook baru dari tim Gustafta dirilis bertahap — pantau rak ini secara berkala.
           </p>
         </div>

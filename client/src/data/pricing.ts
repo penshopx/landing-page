@@ -21,6 +21,8 @@
  */
 
 import { PAYMENT_BASE_URL } from "@/lib/payment-base";
+export { SBU_SKK_EBOOK } from "@shared/sbu-skk-ebook";
+export type { SbuSkkEbook } from "@shared/sbu-skk-ebook";
 
 // ─── Harga inti ────────────────────────────────────────────────────────────────
 export const PRICING = {

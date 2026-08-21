@@ -62,6 +62,10 @@ const files = [
   // Catches regressions where the field is dropped from the catalog response or
   // the handler falls back to the root payment domain instead of the checkout path.
   resolve(__dirname, "store-beli-scalev-checkout.test.ts"),
+  // DB + HTTP regression: canonical Registry/Store/Scalev mapping for the
+  // SBU-SKK ebook, private bytea integrity, exact Sales Ladder mapping, no
+  // client-side PDF leak, and paid-only token download through the real server.
+  resolve(__dirname, "sbu-skk-ebook-delivery.test.ts"),
   // DB integration + static: when a product with a scalev_variant_id is later
   // given a payment_url, the catalog serves BOTH fields together (transition is
   // clean), every Beli handler takes exactly one checkout path (no double
