@@ -44,9 +44,17 @@ const readyQuery = {
 };
 
 describe("public landing synchronization", () => {
-  it("uses canonical destinations for the complete SBU-SKK journey", () => {
-    render(<Landing />);
+  it("restores the platform breadth and keeps four priority sessions", () => {
+    const { container } = render(<Landing />);
 
+    expect(screen.getByTestId("shared-header")).toBeInTheDocument();
+    expect(screen.getByTestId("section-sbu")).toBeInTheDocument();
+    expect(screen.getByTestId("section-skk")).toBeInTheDocument();
+    expect(screen.getByTestId("section-tender")).toBeInTheDocument();
+    expect(screen.getByTestId("section-proyek")).toBeInTheDocument();
+    expect(screen.getByTestId("primary-link-skk")).toHaveAttribute("href", "/skk");
+    expect(screen.getByTestId("primary-link-tender")).toHaveAttribute("href", "/tender");
+    expect(screen.getByTestId("primary-link-proyek")).toHaveAttribute("href", "/ruang-proyek");
     expect(screen.getByTestId("cta-hero-cek-kesiapan"))
       .toHaveAttribute("href", SBU_SKK_FUNNEL.readiness.landingPath);
     expect(screen.getByTestId("cta-funnel-readiness"))
@@ -59,7 +67,22 @@ describe("public landing synchronization", () => {
       .toHaveAttribute("href", SBU_SKK_FUNNEL.aiSpecialist.landingPath);
     expect(screen.getByTestId("cta-final-cek-kesiapan"))
       .toHaveAttribute("href", SBU_SKK_FUNNEL.readiness.landingPath);
-    expect(screen.getByText("Produk")).toHaveAttribute("href", "/produk");
+
+    for (const href of [
+      "/klinik-konsultasi",
+      "/bedah-dokumen",
+      "/brain-project",
+      "/ruang-simpan",
+      "/asisten-ai",
+      "/ebook",
+      "/mini-apps",
+      "/produk",
+    ]) {
+      expect(
+        container.querySelector(`a[href="${href}"]`),
+        `landing should retain access to ${href}`,
+      ).toBeInTheDocument();
+    }
   });
 });
 

@@ -74,6 +74,7 @@
 - [Solution Package Engine](solution-package-engine.md) — komersial = SOLUTION×SECTOR×TIER×DURATION; package_products = access matrix; versi live IMMUTABLE via package_version_snapshots (snapshot dalam tx yang sama dengan perubahan).
 - [DB-test abort recovery](db-test-abort-recovery.md) — DB-mutating tests must write a durable recovery record before mutating + self-heal next run; after() never fires on SIGKILL/OOM.
 - [Landing page segmen](segment-landing-pages.md) — 4 halaman solusi per segmen: /kontraktor /biro-jasa /konsultan-iso /skk (portal ekosistem interaktif); nav header punya baris "Solusi untuk:" di shared-header navSolusi.
+- [Platform-first public landing](platform-first-public-landing.md) — landing tetap mengenalkan ekosistem lengkap; SBU, SKK, Tender, Proyek masing-masing sesi substantif, bukan identitas tunggal.
 - [Gaia SIAP external AI API](gaia-siap-external-ai-api.md) — POST /api/v1/ai/assist, Bearer GAIA_SIAP_API_KEY fail-closed; body cap harus PRA-PARSE; err.body jangan pernah masuk log.
 - [Unified Order API](unified-order-api.md) — /api/v1/orders: SCALEV_ORDER via POST /v3/orders bila variant termapping (korelasi scalev_order_id, webhook lookup SEBELUM dedup legacy), else/gagal → MANUAL_WA; harga dari snapshot.
 - [Scalev /o/ page payment methods](scalev-order-page-payment.md) — hosted order page renders options ONLY from store-attached payment_accounts; empty at store level → page shows just Unpaid+WhatsApp, no VA.

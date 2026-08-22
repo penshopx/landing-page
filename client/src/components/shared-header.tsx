@@ -248,6 +248,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
   // Baris 1 — pintu masuk utama (kategori besar)
   const navRow1 = [
     { href: "/ruang-proyek",      label: "Ruang Proyek",        icon: FolderKanban,  badge: "Portfolio" },
+    { href: "/#jalur-sbu-skk",    label: "SBU–SKK",             icon: ClipboardList, badge: "Jalur" },
     { href: "/klinik-konsultasi", label: "Klinik Konsultasi",   icon: Stethoscope },
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
@@ -261,7 +262,10 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/kontraktor",    label: "Kontraktor",    icon: Building2 },
     { href: "/biro-jasa",     label: "Biro Jasa",     icon: Briefcase },
     { href: "/konsultan-iso", label: "Konsultan ISO", icon: ClipboardList },
+    { href: "/cek-kesiapan-sbu", label: "Portal SBU", icon: Building2, badge: "Mulai" },
     { href: "/skk",           label: "Portal SKK",    icon: GraduationCap, badge: "Ekosistem" },
+    { href: "/tender",        label: "Portal Tender", icon: FileText },
+    { href: "/ruang-proyek",  label: "Portal Proyek", icon: FolderKanban },
   ];
 
   // Baris 2 — tools & layanan spesifik
@@ -279,6 +283,19 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
   const allNavItems = partnerItems ?? [...navSolusi, ...navRow1, ...navRow2];
 
   const isActive = (href: string) => location === href;
+  const scrollToLandingSection = (sectionId: string) => {
+    let attempts = 0;
+    const tryScroll = () => {
+      const target = document.getElementById(sectionId);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      attempts += 1;
+      if (attempts < 12) requestAnimationFrame(tryScroll);
+    };
+    requestAnimationFrame(tryScroll);
+  };
 
   return (
     <div className="sticky top-0 z-50">
@@ -405,7 +422,17 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
                   )}
                   <div className="border-t pt-2 mt-1 flex flex-col gap-1">
                     {allNavItems.map((item) => (
-                      <Link key={item.href} href={item.href} onClick={() => setMobileMenuOpen(false)}>
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          if (item.href === "/#jalur-sbu-skk") {
+                            window.setTimeout(() => scrollToLandingSection("jalur-sbu-skk"), 400);
+                          }
+                        }}
+                        data-testid={item.href === "/#jalur-sbu-skk" ? "mobile-nav-sbu-skk" : undefined}
+                      >
                         <Button
                           variant={isActive(item.href) ? "secondary" : "ghost"}
                           className={`w-full justify-start ${"subtle" in item && item.subtle ? "text-muted-foreground" : ""}`}
@@ -504,7 +531,12 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
             {/* Baris 1 — kategori utama */}
             <div className="flex items-center justify-center gap-0.5 h-10">
               {navRow1.map((item) => (
-                <Link key={item.href} href={item.href}>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  data-testid={item.href === "/#jalur-sbu-skk" ? "nav-sbu-skk" : undefined}
+                  onClick={item.href === "/#jalur-sbu-skk" ? () => scrollToLandingSection("jalur-sbu-skk") : undefined}
+                >
                   <Button
                     variant={isActive(item.href) ? "secondary" : "ghost"}
                     size="sm"
