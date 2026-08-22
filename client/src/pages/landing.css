@@ -122,6 +122,9 @@
 .landing-page h1 { font-size: clamp(2.5rem, 5vw, 3.75rem); letter-spacing: -.045em; }
 .landing-page h2 { font-size: clamp(1.75rem, 3.5vw, 2.5rem); letter-spacing: -.035em; }
 .landing-page h3 { letter-spacing: -.015em; }
+.landing-page [data-testid="section-knowledge-to-ai"] h2 {
+  color: var(--landing-ink) !important;
+}
 .landing-page header {
   background-color: var(--landing-header) !important;
   border-color: var(--landing-line) !important;
@@ -143,6 +146,31 @@
 .landing-page header [class*="hover:bg-muted"]:hover { background-color: var(--landing-hover-muted) !important; }
 .landing-page header .bg-gradient-to-r {
   background-image: linear-gradient(90deg, var(--landing-violet), var(--landing-blue)) !important;
+}
+
+/*
+ * SharedHeader is rendered alongside (rather than inside) .landing-page.
+ * Keep these overrides limited to documents that currently show the landing.
+ * The first and third navigation rows use ghost buttons, so they need an
+ * explicit foreground color instead of inheriting the global theme token.
+ */
+body:has(.landing-page) header nav > div:nth-child(1) button,
+body:has(.landing-page) header nav > div:nth-child(3) button {
+  color: #1e293b !important;
+}
+body:has(.landing-page) header nav > div:nth-child(1) button:hover,
+body:has(.landing-page) header nav > div:nth-child(3) button:hover {
+  color: #111827 !important;
+  background-color: var(--landing-hover-muted) !important;
+}
+.dark body:has(.landing-page) header nav > div:nth-child(1) button,
+.dark body:has(.landing-page) header nav > div:nth-child(3) button {
+  color: #f1f5f9 !important;
+}
+.dark body:has(.landing-page) header nav > div:nth-child(1) button:hover,
+.dark body:has(.landing-page) header nav > div:nth-child(3) button:hover {
+  color: #ffffff !important;
+  background-color: #1e293b !important;
 }
 .landing-page a,
 .landing-page button,
