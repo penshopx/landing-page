@@ -40,6 +40,17 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Gustafta" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
+    <script>
+      (() => {
+        try {
+          const savedTheme = localStorage.getItem("gustafta-ui-theme");
+          const theme = savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+          document.documentElement.classList.add(theme);
+        } catch {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
 
     <!-- Structured Data — Organization -->
     <script type="application/ld+json">

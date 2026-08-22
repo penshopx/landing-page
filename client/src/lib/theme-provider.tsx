@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useLayoutEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -12,6 +12,18 @@ type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
 };
+
+function getInitialTheme(storageKey: string, defaultTheme: Theme): Theme {
+  try {
+    const storedTheme = localStorage.getItem(storageKey);
+    if (storedTheme === "dark" || storedTheme === "light" || storedTheme === "system") {
+      return storedTheme;
+    }
+  } catch {
+    // Fall through to the configured default when storage is unavailable.
+  }
+  return defaultTheme;
+}
 
 const initialState: ThemeProviderState = {
   theme: "system",
@@ -27,10 +39,10 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => getInitialTheme(storageKey, defaultTheme)
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = window.document.documentElement;
 
     root.classList.remove("light", "dark");
