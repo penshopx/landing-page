@@ -1,9 +1,13 @@
 // @vitest-environment happy-dom
-import React from "react";
+import React, { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Landing from "../client/src/pages/landing";
-import { ChaesaWidget } from "../client/src/components/chaesa-widget";
+import {
+  ChaesaWidget,
+  helpdeskConfig,
+  platformGuideConfig,
+} from "../client/src/components/chaesa-widget";
 import { SBU_SKK_FUNNEL } from "../shared/sbu-skk-ebook";
 
 const useQueryMock = vi.hoisted(() => vi.fn());
@@ -42,6 +46,39 @@ const readyQuery = {
   isRefetchError: false,
   refetch: vi.fn(),
 };
+
+const readyGuideQuery = {
+  ...readyQuery,
+  data: {
+    id: "43",
+    name: "Panduan Gustafta",
+    slug: "gustafta-platform-guide",
+    availability: "ready",
+    greetingMessage: "Saya siap memandu penggunaan platform.",
+    conversationStarters: [
+      "Saya baru di Gustafta. Mulai dari mana?",
+      "Bagaimana menggunakan Knowledge Base?",
+    ],
+  },
+};
+
+function DualWidgetHarness() {
+  const [open, setOpen] = useState<"helpdesk" | "guide" | null>(null);
+  return (
+    <>
+      <ChaesaWidget
+        config={helpdeskConfig}
+        isOpen={open === "helpdesk"}
+        onOpenChange={(next) => setOpen(next ? "helpdesk" : null)}
+      />
+      <ChaesaWidget
+        config={platformGuideConfig}
+        isOpen={open === "guide"}
+        onOpenChange={(next) => setOpen(next ? "guide" : null)}
+      />
+    </>
+  );
+}
 
 describe("public landing synchronization", () => {
   it("restores the platform breadth and keeps four priority sessions", () => {
@@ -127,7 +164,7 @@ describe("global Help Desk widget", () => {
     fireEvent.click(screen.getByTestId("button-helpdesk-toggle"));
 
     expect(screen.getByTestId("helpdesk-unavailable-state")).toHaveTextContent(
-      "Help Desk belum dapat digunakan",
+      "Help Desk Pekerjaan belum dapat digunakan",
     );
     expect(screen.getByTestId("input-helpdesk-message")).toBeDisabled();
     fireEvent.click(screen.getByTestId("button-helpdesk-retry"));
@@ -169,5 +206,100 @@ describe("global Help Desk widget", () => {
 
     view.unmount();
     expect(aborted).toBe(true);
+  });
+
+  it("keeps metadata, labels, placement, test IDs, and open state separate", () => {
+    useQueryMock.mockImplementation(({ queryKey }: { queryKey: string[] }) =>
+      queryKey[0] === platformGuideConfig.metadataEndpoint
+        ? readyGuideQuery
+        : readyQuery,
+    );
+
+    render(<DualWidgetHarness />);
+
+    expect(useQueryMock).toHaveBeenCalledWith(expect.objectContaining({
+      queryKey: [helpdeskConfig.metadataEndpoint],
+    }));
+    expect(useQueryMock).toHaveBeenCalledWith(expect.objectContaining({
+      queryKey: [platformGuideConfig.metadataEndpoint],
+    }));
+
+    const helpdeskToggle = screen.getByTestId("button-helpdesk-toggle");
+    const guideToggle = screen.getByTestId("button-platform-guide-toggle");
+    expect(helpdeskToggle.closest(".fixed")).toHaveClass("right-6");
+    expect(guideToggle.closest(".fixed")).toHaveClass("left-6");
+    expect(helpdeskToggle).toHaveTextContent("Help Desk Pekerjaan");
+    expect(guideToggle).toHaveTextContent("Panduan Gustafta");
+
+    fireEvent.click(helpdeskToggle);
+    expect(screen.getByRole("dialog", { name: "Help Desk Pekerjaan" }))
+      .toBeInTheDocument();
+    expect(screen.getByTestId("input-helpdesk-message"))
+      .toHaveAttribute("placeholder", "Tanya soal SBU, SKK, Tender, atau Proyek...");
+
+    fireEvent.click(guideToggle);
+    expect(screen.queryByRole("dialog", { name: "Help Desk Pekerjaan" }))
+      .not.toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "Panduan Gustafta" }))
+      .toBeInTheDocument();
+    expect(screen.getByTestId("input-platform-guide-message"))
+      .toHaveAttribute("placeholder", "Tanya cara menggunakan Gustafta...");
+  });
+
+  it("sends the platform guide to its own slug and visitor session", async () => {
+    useQueryMock.mockReturnValue(readyGuideQuery);
+    render(<ChaesaWidget config={platformGuideConfig} />);
+    fireEvent.click(screen.getByTestId("button-platform-guide-toggle"));
+    fireEvent.click(screen.getByText(readyGuideQuery.data.conversationStarters[0]));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    const [, init] = vi.mocked(fetch).mock.calls[0];
+    const payload = JSON.parse(String(init?.body));
+    expect(payload.agentId).toBe("gustafta-platform-guide");
+    expect(payload.sessionId).toMatch(/^panduan-gustafta-/);
+    expect(payload.sessionId).not.toMatch(/^chaesa-/);
+    expect(payload.content).toBe(readyGuideQuery.data.conversationStarters[0]);
+  });
+
+  it("aborts only the controlled widget that is closed", async () => {
+    useQueryMock.mockImplementation(({ queryKey }: { queryKey: string[] }) =>
+      queryKey[0] === platformGuideConfig.metadataEndpoint
+        ? readyGuideQuery
+        : readyQuery,
+    );
+    const aborted: string[] = [];
+    vi.stubGlobal("fetch", vi.fn((_url: string, init?: RequestInit) => {
+      const payload = JSON.parse(String(init?.body));
+      return new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => {
+          aborted.push(payload.agentId);
+          reject(new DOMException("Aborted", "AbortError"));
+        });
+      });
+    }));
+
+    const view = render(
+      <>
+        <ChaesaWidget config={helpdeskConfig} isOpen onOpenChange={() => {}} />
+        <ChaesaWidget config={platformGuideConfig} isOpen onOpenChange={() => {}} />
+      </>,
+    );
+    fireEvent.click(screen.getByText(readyQuery.data.conversationStarters[0]));
+    fireEvent.click(screen.getByText(readyGuideQuery.data.conversationStarters[0]));
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+
+    view.rerender(
+      <>
+        <ChaesaWidget config={helpdeskConfig} isOpen={false} onOpenChange={() => {}} />
+        <ChaesaWidget config={platformGuideConfig} isOpen onOpenChange={() => {}} />
+      </>,
+    );
+    await waitFor(() => expect(aborted).toEqual(["gustafta-helpdesk"]));
+
+    view.unmount();
+    expect(aborted).toEqual([
+      "gustafta-helpdesk",
+      "gustafta-platform-guide",
+    ]);
   });
 });

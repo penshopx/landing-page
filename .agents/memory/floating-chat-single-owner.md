@@ -1,7 +1,9 @@
 ---
-name: Floating chatbot single owner
-description: Global floating help chat is ChaesaWidget in App.tsx; never mount per-page floating chats.
+name: Floating chat global ownership
+description: App globally owns the two official public help widgets; never mount per-page copies.
 ---
-Aturan: satu-satunya floating chatbot publik adalah `ChaesaWidget`, dirender global di `AppContent` (App.tsx) untuk semua path non-partner kecuali `WIDGET_EXCLUDED_PATHS`.
-**Why:** per-page `ChatPopup`/`DialogGustaftaWidget` menumpuk dengan Chaesa di pojok kanan bawah (dua tombol chat bertindih) — ditemukan di pricing/documentation/subscription/sector-landing dan sudah dibersihkan (Agu 2026).
-**How to apply:** butuh chat di halaman baru? Tidak perlu apa-apa — Chaesa sudah global. Dialog Gustafta tetap produk terpisah dengan halamannya sendiri, jangan dijadikan widget lagi.
+Aturan: aplikasi memiliki tepat dua widget bantuan publik global: Panduan Gustafta di kiri dan Help Desk Pekerjaan di kanan. Hanya satu panel boleh terbuka pada satu waktu.
+
+**Why:** salinan per halaman menumpuk dengan widget global, sedangkan dua panel terbuka sekaligus saling menutup konten—terutama di mobile.
+
+**How to apply:** jangan mount chat mengambang dari halaman baru. Tambahkan perubahan pada pemilik global yang sudah ada, pertahankan dua posisi berlawanan, dan koordinasikan state buka/tutup di tingkat aplikasi.

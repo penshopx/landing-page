@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation, useParams } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -446,7 +446,7 @@ import SupplierBotPage from "@/pages/supplierbot";
 import RuangKelolaPage from "@/pages/ruang-kelola";
 import RuangSimpanPage from "@/pages/ruang-simpan";
 import RuangProyekPage from "@/pages/ruang-proyek";
-import { ChaesaWidget } from "@/components/chaesa-widget";
+import { ChaesaWidget, helpdeskConfig, platformGuideConfig } from "@/components/chaesa-widget";
 import { MultiClawProvider } from "@/contexts/multiclaw-context";
 import { ProfileCompletionGuard } from "@/components/profile-completion-guard";
 import { NewAgentGrantsNotice } from "@/components/new-agent-grants-notice";
@@ -2136,6 +2136,20 @@ function AppContent() {
   // Widget Chaesa (Gustafta) disembunyikan di host mitra whitelabel
   const showWidget = !partner && !WIDGET_EXCLUDED_PATHS.some(p => location.startsWith(p));
 
+  // Controlled open state for both widgets — only one may be open at a time
+  const [helpdeskOpen, setHelpdeskOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
+
+  const handleHelpdeskOpenChange = (next: boolean) => {
+    setHelpdeskOpen(next);
+    if (next) setGuideOpen(false);
+  };
+
+  const handleGuideOpenChange = (next: boolean) => {
+    setGuideOpen(next);
+    if (next) setHelpdeskOpen(false);
+  };
+
   useMetaPixel();
 
   // Whitelabel: judul tab & favicon mengikuti brand mitra
@@ -2160,7 +2174,20 @@ function AppContent() {
       <ProfileCompletionGuard />
       <NewAgentGrantsNotice />
       <Router />
-      {showWidget && <ChaesaWidget />}
+      {showWidget && (
+        <>
+          <ChaesaWidget
+            config={helpdeskConfig}
+            isOpen={helpdeskOpen}
+            onOpenChange={handleHelpdeskOpenChange}
+          />
+          <ChaesaWidget
+            config={platformGuideConfig}
+            isOpen={guideOpen}
+            onOpenChange={handleGuideOpenChange}
+          />
+        </>
+      )}
       <Toaster />
     </>
   );

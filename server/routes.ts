@@ -103,15 +103,26 @@ import { registerPromotionEngineRoutes, resolveOrderAttribution } from "./promot
 import { seedContractorLadder } from "./sales-ladder-seed";
 import { reconcileContractorL1Ebooks } from "./sales-ladder-reconcile";
 import {
+  buildHelpdeskStartupReconciliationPatch,
+  buildPlatformGuideStartupReconciliationPatch,
   GUSTAFTA_HELPDESK_SLUG,
+  GUSTAFTA_PLATFORM_GUIDE_SLUG,
   getPublicHelpdeskRequestIssues,
+  getPublicPlatformGuideRequestIssues,
   resolveHelpdeskSeedTarget,
+  resolvePlatformGuideSeedTarget,
   resolvePublicHelpdeskAgent,
+  resolvePublicPlatformGuideAgent,
   toPublicHelpdeskAgent,
+  toPublicPlatformGuideAgent,
 } from "./helpdesk-agent";
 import {
+  claimHelpdeskAgentId,
+  claimPlatformGuideAgentId,
   isRememberedHelpdeskAgentId,
+  isRememberedPlatformGuideAgentId,
   rememberHelpdeskAgentId,
+  rememberPlatformGuideAgentId,
 } from "./helpdesk-identity-registry";
 import {
   isDatabaseDigitalProductPath,
@@ -2359,7 +2370,7 @@ export async function registerRoutes(
   });
 
   // ==================== Public Agent Routes ====================
-  
+
   // Get Gustafta Helpdesk (public - for landing page chatbot)
   app.get("/api/agents/gustafta-assistant", async (_req, res) => {
     try {
@@ -2376,12 +2387,58 @@ export async function registerRoutes(
           retryable: true,
         });
       }
-      await rememberHelpdeskAgentId(resolution.agent.id);
+      const identityClaim = await claimHelpdeskAgentId(resolution.agent.id);
+      if (!identityClaim.ok) {
+        res.setHeader("Retry-After", "30");
+        return res.status(503).json({
+          error: "Gustafta Helpdesk sedang tidak tersedia.",
+          reason: "public_helpdesk_identity_conflict",
+          issues: ["agent_id_registered_for_multiple_helpdesks"],
+          retryable: true,
+        });
+      }
       res.json(toPublicHelpdeskAgent(resolution.agent));
     } catch (error) {
       console.error("[Helpdesk] failed to resolve public configuration:", error);
       res.status(503).json({
         error: "Gustafta Helpdesk sedang tidak tersedia.",
+        reason: "lookup_failed",
+        retryable: true,
+      });
+    }
+  });
+
+  // Get the separate Gustafta platform-usage guide (public).
+  app.get("/api/agents/gustafta-platform-guide", async (_req, res) => {
+    try {
+      res.setHeader("Cache-Control", "no-store");
+      const resolution = await resolvePublicPlatformGuideAgent(storage);
+      if (!resolution.ok) {
+        console.warn(
+          `[PlatformGuide] unavailable: ${resolution.reason} (${resolution.issues.join(",")})`,
+        );
+        res.setHeader("Retry-After", "30");
+        return res.status(503).json({
+          error: "Panduan Gustafta sedang tidak tersedia.",
+          reason: resolution.reason,
+          retryable: true,
+        });
+      }
+      const identityClaim = await claimPlatformGuideAgentId(resolution.agent.id);
+      if (!identityClaim.ok) {
+        res.setHeader("Retry-After", "30");
+        return res.status(503).json({
+          error: "Panduan Gustafta sedang tidak tersedia.",
+          reason: "public_helpdesk_identity_conflict",
+          issues: ["agent_id_registered_for_multiple_helpdesks"],
+          retryable: true,
+        });
+      }
+      res.json(toPublicPlatformGuideAgent(resolution.agent));
+    } catch (error) {
+      console.error("[PlatformGuide] failed to resolve public configuration:", error);
+      res.status(503).json({
+        error: "Panduan Gustafta sedang tidak tersedia.",
         reason: "lookup_failed",
         retryable: true,
       });
@@ -3467,35 +3524,85 @@ export async function registerRoutes(
   });
 
   // Seed Gustafta Helpdesk and Dokumentender chatbots
-  app.post("/api/agents/seed-knowledge-base", isAuthenticated, async (_req, res) => {
+  app.post(
+    "/api/agents/seed-knowledge-base",
+    isAuthenticated,
+    requireAdmin,
+    async (_req, res) => {
     try {
       const existingAgents = await storage.getAgents();
       const createdAgents: any[] = [];
       
-      // Create or update Gustafta Helpdesk
+      // Create or reconcile both public Help Desks without overriding an
+      // administrator's disabled/private/archived state on existing rows.
       const helpdeskExisting = await resolveHelpdeskSeedTarget(storage);
-      const { gustaftaKnowledgeBaseAgent } = await import("./seed-knowledge-base");
+      const platformGuideExisting = await resolvePlatformGuideSeedTarget(storage);
+      const {
+        gustaftaKnowledgeBaseAgent,
+        gustaftaPlatformGuideAgent,
+      } = await import("./seed-knowledge-base");
+
+      if (helpdeskExisting) {
+        const identityClaim = await claimHelpdeskAgentId(helpdeskExisting.id);
+        if (!identityClaim.ok) {
+          return res.status(409).json({
+            error: "Gustafta Helpdesk memiliki konflik identitas dan tidak diubah.",
+            reason: "public_helpdesk_identity_conflict",
+          });
+        }
+      }
+      if (platformGuideExisting) {
+        const identityClaim = await claimPlatformGuideAgentId(
+          platformGuideExisting.id,
+        );
+        if (!identityClaim.ok) {
+          return res.status(409).json({
+            error: "Panduan Gustafta memiliki konflik identitas dan tidak diubah.",
+            reason: "public_helpdesk_identity_conflict",
+          });
+        }
+      }
+
       if (!helpdeskExisting) {
         const helpdesk = await storage.createAgent(gustaftaKnowledgeBaseAgent as any);
-        await rememberHelpdeskAgentId(helpdesk.id);
+        const identityClaim = await claimHelpdeskAgentId(helpdesk.id);
+        if (!identityClaim.ok) {
+          return res.status(409).json({
+            error: "Gustafta Helpdesk gagal mengklaim identitas publik.",
+            reason: "public_helpdesk_identity_conflict",
+          });
+        }
         createdAgents.push(helpdesk);
       } else {
-        await storage.updateAgent(String(helpdeskExisting.id), {
-          name: (gustaftaKnowledgeBaseAgent as any).name,
-          slug: (gustaftaKnowledgeBaseAgent as any).slug,
-          systemPrompt: (gustaftaKnowledgeBaseAgent as any).systemPrompt,
-          greetingMessage: (gustaftaKnowledgeBaseAgent as any).greetingMessage,
-          conversationStarters: (gustaftaKnowledgeBaseAgent as any).conversationStarters,
-          personality: (gustaftaKnowledgeBaseAgent as any).personality,
-          tagline: (gustaftaKnowledgeBaseAgent as any).tagline,
-          description: (gustaftaKnowledgeBaseAgent as any).description,
-          isPublic: true,
-          isActive: true,
-          isEnabled: true,
-          archived: false,
-        } as any);
-        await rememberHelpdeskAgentId(helpdeskExisting.id);
+        await storage.updateAgent(
+          String(helpdeskExisting.id),
+          buildHelpdeskStartupReconciliationPatch(
+            gustaftaKnowledgeBaseAgent as any,
+          ) as any,
+        );
         createdAgents.push({ ...helpdeskExisting, updated: true });
+      }
+
+      if (!platformGuideExisting) {
+        const platformGuide = await storage.createAgent(
+          gustaftaPlatformGuideAgent as any,
+        );
+        const identityClaim = await claimPlatformGuideAgentId(platformGuide.id);
+        if (!identityClaim.ok) {
+          return res.status(409).json({
+            error: "Panduan Gustafta gagal mengklaim identitas publik.",
+            reason: "public_helpdesk_identity_conflict",
+          });
+        }
+        createdAgents.push(platformGuide);
+      } else {
+        await storage.updateAgent(
+          String(platformGuideExisting.id),
+          buildPlatformGuideStartupReconciliationPatch(
+            gustaftaPlatformGuideAgent as any,
+          ) as any,
+        );
+        createdAgents.push({ ...platformGuideExisting, updated: true });
       }
       
       const dokumentenderExists = existingAgents.some(
@@ -3519,7 +3626,8 @@ export async function registerRoutes(
       console.error("Seed knowledge base error:", error);
       res.status(500).json({ error: "Failed to seed knowledge base chatbots", details: error?.message });
     }
-  });
+    },
+  );
 
   // One-time seed: KB + Mini Apps untuk agent ID 3 (HUB Regulasi Jasa Konstruksi)
   // Idempotent — skip jika data sudah ada. Bisa dipanggil siapa saja yang login.
@@ -5501,7 +5609,7 @@ Kembalikan HANYA JSON, tanpa markdown, tanpa penjelasan tambahan.`;
     requestedAgentId: string,
   ): Promise<MessageAgentTargetResolution> {
     let agent: any;
-    let knownHelpdeskIdentity = false;
+    let knownIdentity: "helpdesk" | "platform-guide" | undefined;
 
     if (requestedAgentId === GUSTAFTA_HELPDESK_SLUG) {
       const resolution = await resolvePublicHelpdeskAgent(storage);
@@ -5514,19 +5622,112 @@ Kembalikan HANYA JSON, tanpa markdown, tanpa penjelasan tambahan.`;
         };
       }
       agent = resolution.agent;
-      knownHelpdeskIdentity = true;
-      await rememberHelpdeskAgentId(agent.id);
+      knownIdentity = "helpdesk";
+      const identityClaim = await claimHelpdeskAgentId(agent.id);
+      if (!identityClaim.ok) {
+        return {
+          ok: false,
+          status: 503,
+          reason: "public_helpdesk_identity_conflict",
+          issues: ["agent_id_registered_for_multiple_helpdesks"],
+        };
+      }
+    } else if (requestedAgentId === GUSTAFTA_PLATFORM_GUIDE_SLUG) {
+      const resolution = await resolvePublicPlatformGuideAgent(storage);
+      if (!resolution.ok) {
+        return {
+          ok: false,
+          status: 503,
+          reason: resolution.reason,
+          issues: resolution.issues,
+        };
+      }
+      agent = resolution.agent;
+      knownIdentity = "platform-guide";
+      const identityClaim = await claimPlatformGuideAgentId(agent.id);
+      if (!identityClaim.ok) {
+        return {
+          ok: false,
+          status: 503,
+          reason: "public_helpdesk_identity_conflict",
+          issues: ["agent_id_registered_for_multiple_helpdesks"],
+        };
+      }
     } else {
       agent = await storage.getAgent(requestedAgentId);
       if (!agent) {
         return { ok: false, status: 404, reason: "not_found" };
       }
-      knownHelpdeskIdentity = await isRememberedHelpdeskAgentId(agent.id);
+      const [knownHelpdesk, knownPlatformGuide] = await Promise.all([
+        isRememberedHelpdeskAgentId(agent.id),
+        isRememberedPlatformGuideAgentId(agent.id),
+      ]);
+      if (knownHelpdesk && knownPlatformGuide) {
+        return {
+          ok: false,
+          status: 503,
+          reason: "public_helpdesk_identity_conflict",
+          issues: ["agent_id_registered_for_multiple_helpdesks"],
+        };
+      }
+      if (knownHelpdesk) knownIdentity = "helpdesk";
+      if (knownPlatformGuide) knownIdentity = "platform-guide";
     }
 
-    const issues = await getPublicHelpdeskRequestIssues(storage, agent, {
-      knownHelpdeskIdentity,
-    });
+    let issues: string[] | null;
+    if (knownIdentity === "helpdesk") {
+      const identityClaim = await claimHelpdeskAgentId(agent.id);
+      if (!identityClaim.ok) {
+        return {
+          ok: false,
+          status: 503,
+          reason: "public_helpdesk_identity_conflict",
+          issues: ["agent_id_registered_for_multiple_helpdesks"],
+        };
+      }
+      issues = await getPublicHelpdeskRequestIssues(storage, agent, {
+        knownHelpdeskIdentity: true,
+      });
+    } else if (knownIdentity === "platform-guide") {
+      const identityClaim = await claimPlatformGuideAgentId(agent.id);
+      if (!identityClaim.ok) {
+        return {
+          ok: false,
+          status: 503,
+          reason: "public_helpdesk_identity_conflict",
+          issues: ["agent_id_registered_for_multiple_helpdesks"],
+        };
+      }
+      issues = await getPublicPlatformGuideRequestIssues(storage, agent, {
+        knownPlatformGuideIdentity: true,
+      });
+    } else {
+      issues = await getPublicHelpdeskRequestIssues(storage, agent);
+      if (issues !== null) {
+        const identityClaim = await claimHelpdeskAgentId(agent.id);
+        if (!identityClaim.ok) {
+          return {
+            ok: false,
+            status: 503,
+            reason: "public_helpdesk_identity_conflict",
+            issues: ["agent_id_registered_for_multiple_helpdesks"],
+          };
+        }
+      } else {
+        issues = await getPublicPlatformGuideRequestIssues(storage, agent);
+        if (issues !== null) {
+          const identityClaim = await claimPlatformGuideAgentId(agent.id);
+          if (!identityClaim.ok) {
+            return {
+              ok: false,
+              status: 503,
+              reason: "public_helpdesk_identity_conflict",
+              issues: ["agent_id_registered_for_multiple_helpdesks"],
+            };
+          }
+        }
+      }
+    }
     if (issues && issues.length > 0) {
       return {
         ok: false,
@@ -12214,22 +12415,77 @@ Balas dengan JSON dengan struktur PERSIS ini:
 
   // ==================== DYNAMIC WIDGET API ====================
 
+  async function validateDynamicPublicHelpdeskAgent(agent: any) {
+    if (!agent) return undefined;
+
+    const [knownHelpdesk, knownPlatformGuide] = await Promise.all([
+      isRememberedHelpdeskAgentId(agent.id),
+      isRememberedPlatformGuideAgentId(agent.id),
+    ]);
+    if (knownHelpdesk && knownPlatformGuide) return undefined;
+
+    if (knownHelpdesk) {
+      const identityClaim = await claimHelpdeskAgentId(agent.id);
+      if (!identityClaim.ok) return undefined;
+      const issues = await getPublicHelpdeskRequestIssues(storage, agent, {
+        knownHelpdeskIdentity: true,
+      });
+      return issues && issues.length > 0 ? undefined : agent;
+    }
+    if (knownPlatformGuide) {
+      const identityClaim = await claimPlatformGuideAgentId(agent.id);
+      if (!identityClaim.ok) return undefined;
+      const issues = await getPublicPlatformGuideRequestIssues(storage, agent, {
+        knownPlatformGuideIdentity: true,
+      });
+      return issues && issues.length > 0 ? undefined : agent;
+    }
+
+    const helpdeskIssues = await getPublicHelpdeskRequestIssues(storage, agent);
+    if (helpdeskIssues !== null) {
+      const identityClaim = await claimHelpdeskAgentId(agent.id);
+      if (!identityClaim.ok || helpdeskIssues.length > 0) return undefined;
+      return agent;
+    }
+
+    const platformGuideIssues = await getPublicPlatformGuideRequestIssues(
+      storage,
+      agent,
+    );
+    if (platformGuideIssues !== null) {
+      const identityClaim = await claimPlatformGuideAgentId(agent.id);
+      if (!identityClaim.ok || platformGuideIssues.length > 0) return undefined;
+    }
+    return agent;
+  }
+
   async function resolveAgent(agentId: string) {
     if (agentId === "dokumentender") {
       const allAgents = await storage.getAgents();
       const dok = allAgents.find(a => a.name === "Dokumentender Assistant");
       if (dok) agentId = dok.id.toString();
-    } else if (agentId === "gustafta-helpdesk") {
+    } else if (agentId === GUSTAFTA_HELPDESK_SLUG) {
       const resolution = await resolvePublicHelpdeskAgent(storage);
       if (!resolution.ok) return undefined;
-      await rememberHelpdeskAgentId(resolution.agent.id);
+      const identityClaim = await claimHelpdeskAgentId(resolution.agent.id);
+      if (!identityClaim.ok) return undefined;
+      return resolution.agent;
+    } else if (agentId === GUSTAFTA_PLATFORM_GUIDE_SLUG) {
+      const resolution = await resolvePublicPlatformGuideAgent(storage);
+      if (!resolution.ok) return undefined;
+      const identityClaim = await claimPlatformGuideAgentId(resolution.agent.id);
+      if (!identityClaim.ok) return undefined;
       return resolution.agent;
     }
     const isNumeric = /^\d+$/.test(agentId);
     if (!isNumeric) {
-      return await storage.getAgentBySlug(agentId);
+      return await validateDynamicPublicHelpdeskAgent(
+        await storage.getAgentBySlug(agentId),
+      );
     }
-    return await storage.getAgent(agentId);
+    return await validateDynamicPublicHelpdeskAgent(
+      await storage.getAgent(agentId),
+    );
   }
 
   // Webhook notifikasi WA internal (briefing/alert) — POST { message } → WA founder via Fonnte.

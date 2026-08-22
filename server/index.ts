@@ -1523,12 +1523,21 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
       // Legalitas) hanya menyentuh data seri-nya sendiri — tidak menghapus chatbot user.
       {
         try {
-          const { gustaftaKnowledgeBaseAgent, dokumentenderAgent } = M_knowledgeBase;
+          const {
+            gustaftaKnowledgeBaseAgent,
+            gustaftaPlatformGuideAgent,
+            dokumentenderAgent,
+          } = M_knowledgeBase;
           const {
             buildHelpdeskStartupReconciliationPatch,
+            buildPlatformGuideStartupReconciliationPatch,
             resolveHelpdeskSeedTarget,
+            resolvePlatformGuideSeedTarget,
           } = await import("./helpdesk-agent");
-          const { rememberHelpdeskAgentId } = await import(
+          const {
+            claimHelpdeskAgentId,
+            claimPlatformGuideAgentId,
+          } = await import(
             "./helpdesk-identity-registry"
           );
           const helpdesk = await resolveHelpdeskSeedTarget(storage);
@@ -1541,18 +1550,74 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
             configuredHelpdesk = await storage.createAgent(
               gustaftaKnowledgeBaseAgent as any,
             );
-            log("Gustafta Helpdesk auto-seeded with canonical identity");
-          } else {
-            configuredHelpdesk = await storage.updateAgent(
-              String(helpdesk.id),
-              helpdeskPatch as any,
+            const identityClaim = await claimHelpdeskAgentId(
+              configuredHelpdesk.id,
             );
-            log("Gustafta Helpdesk reconciled to canonical public configuration");
+            if (identityClaim.ok) {
+              log("Gustafta Helpdesk auto-seeded with canonical identity");
+            } else {
+              log(
+                "Gustafta Helpdesk registry conflict detected after create; public access remains fail-closed",
+              );
+            }
+          } else {
+            const identityClaim = await claimHelpdeskAgentId(helpdesk.id);
+            if (!identityClaim.ok) {
+              configuredHelpdesk = helpdesk;
+              log(
+                "Gustafta Helpdesk registry conflict detected before reconcile; content was not changed",
+              );
+            } else {
+              configuredHelpdesk = await storage.updateAgent(
+                String(helpdesk.id),
+                helpdeskPatch as any,
+              );
+              log("Gustafta Helpdesk reconciled to canonical public configuration");
+            }
           }
           if (!configuredHelpdesk) {
             throw new Error("Gustafta Helpdesk reconciliation returned no agent");
           }
-          await rememberHelpdeskAgentId(configuredHelpdesk.id);
+
+          const platformGuide = await resolvePlatformGuideSeedTarget(storage);
+          const platformGuidePatch = buildPlatformGuideStartupReconciliationPatch(
+            gustaftaPlatformGuideAgent as any,
+          );
+          let configuredPlatformGuide;
+          if (!platformGuide) {
+            configuredPlatformGuide = await storage.createAgent(
+              gustaftaPlatformGuideAgent as any,
+            );
+            const identityClaim = await claimPlatformGuideAgentId(
+              configuredPlatformGuide.id,
+            );
+            if (identityClaim.ok) {
+              log("Panduan Gustafta auto-seeded with separate canonical identity");
+            } else {
+              log(
+                "Panduan Gustafta registry conflict detected after create; public access remains fail-closed",
+              );
+            }
+          } else {
+            const identityClaim = await claimPlatformGuideAgentId(
+              platformGuide.id,
+            );
+            if (!identityClaim.ok) {
+              configuredPlatformGuide = platformGuide;
+              log(
+                "Panduan Gustafta registry conflict detected before reconcile; content was not changed",
+              );
+            } else {
+              configuredPlatformGuide = await storage.updateAgent(
+                String(platformGuide.id),
+                platformGuidePatch as any,
+              );
+              log("Panduan Gustafta reconciled to canonical public configuration");
+            }
+          }
+          if (!configuredPlatformGuide) {
+            throw new Error("Panduan Gustafta reconciliation returned no agent");
+          }
 
           const existingAgents = await storage.getAgents();
           const dokExists = existingAgents.some(

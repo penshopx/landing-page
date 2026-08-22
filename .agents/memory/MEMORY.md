@@ -86,7 +86,8 @@
 - [Strategi dua domain](two-domain-strategy.md) — gustafta.my.id = platform (semua produk+data); dokumenproyek.com = etalase tanpa DB pelanggan + jasa manusia; rak /ebook-toolkit data-driven, ebook = lead gratis + premium terkunci.
 - [Prod shares dev DB](prod-shares-dev-db.md) — gustafta.my.id reads the SAME Postgres as dev; data edits are instantly live in prod, only code needs republish. No Replit "production database" exists.
 - [Public anonymous chat sessionId](public-anon-chat-sessionid.md) — public-agent chat pages MUST send per-visitor sessionId to /api/messages/stream, else agent-wide history (PII) leaks antar pengunjung.
-- [Floating chatbot single owner](floating-chat-single-owner.md) — hanya ChaesaWidget global di App.tsx; jangan mount ChatPopup/DialogGustafta per halaman (bertindih).
+- [Floating chat global ownership](floating-chat-single-owner.md) — App owns exactly two official public widgets; never mount per-page copies, and keep only one panel open.
+- [Dual public Help Desk identity](dual-public-helpdesk-identity.md) — work consultation and platform guidance are separate canonical agents with atomic, fail-closed ID ownership.
 - [Reconciler vs boot seeds](reconciler-boot-seed-boundaries.md) — audit di batas transaksi; graph rewrite wajib cocok penuh dengan legacy shape dan mengunci write agar edit pengguna tidak hilang.
 - [Dual-auth active-session parity](dual-auth-active-session-parity.md) — protected routes must recognize OIDC + email sessions and enforce inactive/blocked revocation through one shared checker.
 - [Manual fulfillment processing leases](manual-fulfillment-processing-leases.md) — recover stale processing claims idempotently, and version final/error writes so an old worker cannot clobber a new one.
