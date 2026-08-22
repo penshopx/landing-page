@@ -40,6 +40,10 @@ export type SbuSkkEbook = typeof SBU_SKK_EBOOK;
  * paths and provider credentials deliberately stay server-only.
  */
 export const SBU_SKK_FUNNEL = {
+  readiness: {
+    title: "Cek Kesiapan SBU",
+    landingPath: "/cek-kesiapan-sbu",
+  },
   miniEbook: {
     assetSlug: "mini-ebook-sbu-skk",
     title: "Mini Ebook SBU-SKK Tanpa Bingung",

@@ -39,6 +39,11 @@ export default function MiniEbookSbuSkk() {
             <h1 className="mt-5 font-display text-5xl font-bold leading-[.98] tracking-[-.05em] md:text-7xl">{SBU_SKK_FUNNEL.miniEbook.title}</h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#d5e3df]">{SBU_SKK_FUNNEL.miniEbook.subtitle}</p>
             <div className="mt-8 flex flex-wrap gap-3">{["20 halaman", "Ringkasan praktis", "Akses 30 hari"].map(x => <span key={x} className="rounded-full border border-[#d5e3df]/25 px-3 py-1.5 text-sm">{x}</span>)}</div>
+            <Button asChild variant="outline" className="mt-6 border-[#e8a83e]/60 bg-transparent text-[#e8a83e] hover:bg-[#e8a83e]/10 hover:text-[#f3bc59]">
+              <Link href={SBU_SKK_FUNNEL.readiness.landingPath}>
+                Cek kesiapan tanpa email <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
           {state==="success" ? <div className="relative z-10 rounded-2xl border border-white/15 bg-[#f7f3ea] p-8 text-[#1c2b2d] shadow-2xl"><ShieldCheck className="h-10 w-10 text-[#17727a]"/><h2 className="mt-5 font-display text-2xl font-bold">Cek inbox Anda</h2><p className="mt-3 text-sm leading-relaxed text-[#637276]">Tautan akses Mini Ebook telah dikirim ke email yang Anda daftarkan. Jika belum terlihat, periksa folder promosi atau spam.</p><Link href="/ebook-sbu-skk" className="mt-6 inline-flex items-center font-bold text-[#17727a]">Lanjut ke panduan lengkap <ArrowRight className="ml-2 h-4 w-4"/></Link></div> : <form onSubmit={submit} className="relative z-10 rounded-2xl border border-white/15 bg-[#f7f3ea] p-6 text-[#1c2b2d] shadow-2xl md:p-8" aria-label="Form akses Mini Ebook">
             <div className="mb-6 flex items-center gap-3"><div className="rounded-xl bg-[#e8a83e] p-3"><FileText className="h-5 w-5" /></div><div><p className="font-display text-xl font-bold">Kirim ke email saya</p><p className="text-sm text-[#637276]">Tanpa kartu. Tanpa komitmen.</p></div></div>

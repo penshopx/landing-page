@@ -187,6 +187,7 @@ import { seedStoreProducts } from "./seed-store-products";
 import { seedSbuSkkEbook } from "./seed-sbu-skk-ebook";
 import { seedSbuSkkFunnel } from "./seed-sbu-skk-funnel";
 import { ensureSbuSkkFunnelSchema } from "./sbu-skk-funnel-schema";
+import { registerSbuReadinessEventIngress } from "./sbu-skk-funnel";
 import { startDigitalDeliveryOutboxWorker } from "./lib/digital-delivery-outbox";
 
 const seedModuleRegistry: Record<string, any> = {
@@ -298,6 +299,10 @@ declare module "http" {
     rawBody: unknown;
   }
 }
+
+// Privacy-first readiness analytics has a strict 1 KB parser and shared
+// rate limiter before the app-wide 50 MB JSON parser.
+registerSbuReadinessEventIngress(app);
 
 // Guard khusus /api/tender-ingest: tolak body besar SEBELUM JSON di-parse
 // (endpoint publik ber-kunci; limit global 50mb terlalu besar untuk jalur ini)

@@ -141,6 +141,11 @@ export default function EbookSbuSkkPage() {
                 <Button asChild variant="outline" className="h-12 border-white/25 bg-transparent text-[#f7f3ea]">
                   <Link href="/mini-ebook-sbu-skk">Mulai dari ringkasan gratis</Link>
                 </Button>
+                <Button asChild variant="outline" className="h-12 border-[#e8a83e]/60 bg-transparent text-[#e8a83e]">
+                  <Link href={SBU_SKK_FUNNEL.readiness.landingPath}>
+                    Cek kesiapan SBU
+                  </Link>
+                </Button>
               </div>
             </div>
             <img

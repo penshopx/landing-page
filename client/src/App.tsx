@@ -104,6 +104,7 @@ import CashflowPbjPage from "@/pages/cashflow-pbj";
 import EbookKasMerahPage from "@/pages/ebook-kas-merah";
 import EbookToolkitPage from "@/pages/ebook-toolkit";
 import EbookSbuSkkPage from "@/pages/ebook-sbu-skk";
+import CekKesiapanSbuPage from "@/pages/cek-kesiapan-sbu";
 import MiniEbookSbuSkk from "@/pages/mini-ebook-sbu-skk";
 import MiniEbookSbuSkkAccess from "@/pages/mini-ebook-sbu-skk-access";
 import TutorAiSbuSkk from "@/pages/tutor-ai-sbu-skk";
@@ -451,7 +452,7 @@ import { ProfileCompletionGuard } from "@/components/profile-completion-guard";
 import { NewAgentGrantsNotice } from "@/components/new-agent-grants-notice";
 import { CartProvider } from "@/hooks/use-cart";
 
-const WIDGET_EXCLUDED_PATHS = ["/legal", "/embed/", "/chaesa", "/demo/", "/bot/", "/chat/", "/chatbot/", "/modul/", "/m/", "/mini-app/"];
+const WIDGET_EXCLUDED_PATHS = ["/legal", "/embed/", "/chaesa", "/demo/", "/bot/", "/chat/", "/chatbot/", "/modul/", "/m/", "/mini-app/", "/cek-kesiapan-sbu"];
 
 function DialogGustaftaRedirect() {
   const [, navigate] = useLocation();
@@ -618,6 +619,7 @@ function Router() {
       <Route path="/ebook-kas-merah" component={EbookKasMerahPage} />
       <Route path="/ebook-toolkit" component={EbookToolkitPage} />
       <Route path="/ebook-sbu-skk" component={EbookSbuSkkPage} />
+      <Route path="/cek-kesiapan-sbu" component={CekKesiapanSbuPage} />
       <Route path="/mini-ebook-sbu-skk/access/:token" component={MiniEbookSbuSkkAccess} />
       <Route path="/mini-ebook-sbu-skk" component={MiniEbookSbuSkk} />
       <Route path="/tutor-ai-sbu-skk" component={TutorAiSbuSkk} />

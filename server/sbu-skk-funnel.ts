@@ -16,10 +16,17 @@
  * Stream gate for sbu-skk-tutor is injected in server/routes.ts (small hook).
  */
 
-import type { Express, Request, Response } from "express";
+import express, { type Express, type Request, type Response } from "express";
 import { createHash, randomBytes } from "node:crypto";
+import { z } from "zod";
 import { pool } from "./db";
 import { SBU_SKK_EBOOK, SBU_SKK_FUNNEL } from "@shared/sbu-skk-ebook";
+import {
+  SBU_READINESS_RUBRIC_VERSION,
+  type SbuReadinessBand,
+  type SbuReadinessDestination,
+  type SbuReadinessEventType,
+} from "@shared/sbu-readiness";
 import { sendEmail } from "./lib/email";
 import { getWaContact } from "./lib/wa-contact";
 import { PostgresRateLimitStore } from "./lib/rate-limiter";
@@ -40,6 +47,144 @@ async function checkLeadRate(ip: string): Promise<boolean> {
   return hit.count <= 5;
 }
 
+async function checkReadinessEventRate(ip: string): Promise<boolean> {
+  const key = createHash("sha256").update(ip).digest("hex").slice(0, 32);
+  const hit = await leadRateStore.hit(
+    `sbu-readiness-event:${key}`,
+    60_000,
+    Date.now(),
+  );
+  return hit.count <= 30;
+}
+
+export const SBU_READINESS_EVENT_PATH = "/api/sbu-skk/readiness/events";
+
+export function getTrustedClientIp(req: Request): string {
+  return req.ip || req.socket?.remoteAddress || "unknown";
+}
+
+export function registerSbuReadinessEventIngress(
+  app: Express,
+  options: {
+    checkRate?: (ip: string) => Promise<boolean>;
+  } = {},
+): void {
+  const parseSmallJson = express.json({ limit: "1kb", strict: true });
+  const checkRate = options.checkRate || checkReadinessEventRate;
+
+  // This middleware is registered before the global 50 MB parser. It both
+  // rate-limits malformed/oversized attempts and enforces the actual byte cap,
+  // including chunked requests without Content-Length.
+  app.use(SBU_READINESS_EVENT_PATH, async (req, res, next) => {
+    if (req.method !== "POST") return next();
+    res.setHeader("Cache-Control", "no-store");
+
+    try {
+      if (!(await checkRate(getTrustedClientIp(req)))) {
+        return res.status(429).json({
+          error: "Terlalu banyak event. Coba lagi dalam 1 menit.",
+        });
+      }
+    } catch (error) {
+      console.error(
+        "[SBU Readiness] Ingress rate limit failed:",
+        (error as Error).message,
+      );
+      return res.status(503).json({ error: "Pengukuran sementara tidak tersedia." });
+    }
+
+    if (!req.is("application/json")) {
+      return res.status(415).json({ error: "Content-Type harus application/json." });
+    }
+
+    parseSmallJson(req, res, (error?: unknown) => {
+      if (error) {
+        const parserError = error as { type?: string };
+        if (parserError.type === "entity.too.large") {
+          return res.status(413).json({ error: "Payload terlalu besar." });
+        }
+        return res.status(400).json({ error: "JSON tidak valid." });
+      }
+      res.locals.sbuReadinessIngressChecked = true;
+      next();
+    });
+  });
+}
+
+const readinessEventSchema = z.object({
+  eventType: z.enum(["result", "cta"]),
+  band: z.enum(["foundation", "organize", "validate"]),
+  destination: z.enum(["mini-ebook", "ebook", "ai-specialist"]).optional(),
+  rubricVersion: z.literal(SBU_READINESS_RUBRIC_VERSION),
+}).strict().superRefine((event, context) => {
+  if (event.eventType === "cta" && !event.destination) {
+    context.addIssue({
+      code: "custom",
+      path: ["destination"],
+      message: "Tujuan CTA wajib diisi.",
+    });
+  }
+  if (event.eventType === "result" && event.destination) {
+    context.addIssue({
+      code: "custom",
+      path: ["destination"],
+      message: "Event hasil tidak menerima tujuan CTA.",
+    });
+  }
+});
+
+export interface SbuReadinessAggregateEvent {
+  eventType: SbuReadinessEventType;
+  band: SbuReadinessBand;
+  destination?: SbuReadinessDestination;
+  rubricVersion: typeof SBU_READINESS_RUBRIC_VERSION;
+}
+
+export function parseSbuReadinessAggregateEvent(
+  input: unknown,
+): SbuReadinessAggregateEvent {
+  return readinessEventSchema.parse(input);
+}
+
+export function buildSbuReadinessAggregateKey(
+  input: SbuReadinessAggregateEvent,
+): string {
+  const parsed = parseSbuReadinessAggregateEvent(input);
+  return [
+    "sbu_readiness",
+    parsed.rubricVersion,
+    parsed.eventType,
+    parsed.band,
+    parsed.destination || "none",
+  ].join(":");
+}
+
+/**
+ * Persist only an anonymous aggregate counter. No answer, session, user, IP,
+ * referrer, or company field is accepted or written.
+ */
+export async function recordSbuReadinessAggregateEvent(
+  input: SbuReadinessAggregateEvent,
+  executor: {
+    query: (text: string, params?: unknown[]) => Promise<unknown>;
+  } = pool,
+): Promise<void> {
+  const key = buildSbuReadinessAggregateKey(input);
+  await executor.query(
+    `INSERT INTO system_config (key, value, updated_at)
+     VALUES ($1, '1', now())
+     ON CONFLICT (key) DO UPDATE SET
+       value = (
+         CASE
+           WHEN system_config.value ~ '^[0-9]+$' THEN system_config.value::bigint
+           ELSE 0
+         END + 1
+       )::text,
+       updated_at = now()`,
+    [key],
+  );
+}
+
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
@@ -47,12 +192,6 @@ function normalizeEmail(email: string): string {
 function normalizeWhatsapp(wa: string | undefined): string | null {
   if (!wa || !wa.trim()) return null;
   return wa.trim().replace(/\s+/g, "").replace(/^0/, "+62");
-}
-
-function getClientIp(req: Request): string {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string") return forwarded.split(",")[0].trim();
-  return req.socket?.remoteAddress || "unknown";
 }
 
 function getSessionUserId(req: Request): string {
@@ -603,9 +742,35 @@ export async function fulfillSbuSkkOffer(
 
 // ─── Route registration ────────────────────────────────────────────────────────
 export function registerSbuSkkFunnelRoutes(app: Express): void {
+  // ── POST /api/sbu-skk/readiness/events ───────────────────────────────────
+  // Anonymous aggregate measurement only. The readiness answers never leave
+  // the browser and any extra field is rejected by the strict schema.
+  app.post(SBU_READINESS_EVENT_PATH, async (req: Request, res: Response) => {
+    res.setHeader("Cache-Control", "no-store");
+    if (res.locals.sbuReadinessIngressChecked !== true) {
+      return res.status(503).json({ error: "Pengukuran belum dikonfigurasi." });
+    }
+
+    const parsed = readinessEventSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Event assessment tidak valid." });
+    }
+
+    try {
+      await recordSbuReadinessAggregateEvent(parsed.data);
+      return res.status(204).end();
+    } catch (error) {
+      console.error(
+        "[SBU Readiness] Aggregate event failed:",
+        (error as Error).message,
+      );
+      return res.status(503).json({ error: "Pengukuran sementara tidak tersedia." });
+    }
+  });
+
   // ── POST /api/sbu-skk/lead ────────────────────────────────────────────────
   app.post("/api/sbu-skk/lead", async (req: Request, res: Response) => {
-    const ip = getClientIp(req);
+    const ip = getTrustedClientIp(req);
     try {
       if (!(await checkLeadRate(ip))) {
         return res.status(429).json({ error: "Terlalu banyak permintaan. Coba lagi dalam 1 menit." });
