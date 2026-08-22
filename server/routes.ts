@@ -3727,7 +3727,7 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
 
   // ── Research Feed sweep — beri "mata" nyata ke tim riset (Google News RSS → KB) ──
   // Owner/admin dari agen feed yang boleh memicu. Resolusi agen via slug (bukan ID).
-  app.post("/api/research/sweep", isAuthenticated, requireAdmin, async (req, res) => {
+  app.post("/api/research/sweep", isAuthenticated, requireSuperAdmin, async (req, res) => {
     try {
       const { runResearchSweep, FEED_STREAMS, AD_MATERIAL_SLUG, RETENTION_SLUG, CLOSING_SLUG } =
         await import("./lib/research-feed");
@@ -3749,7 +3749,7 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
         if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
       }
 
-      const result = await runResearchSweep();
+      const result = await runResearchSweep("manual");
       res.json({ ok: true, result });
     } catch (error) {
       console.error("[/api/research/sweep]", error);
@@ -3761,7 +3761,7 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
   // Kumpulkan agen tim marketing (via SLUG, bukan ID) + dokumen KB harian yang
   // mereka hasilkan (materi iklan, retensi, closing, feed riset). Read-only; setiap
   // agen di-otorisasi terpisah (assertCanAccessAgentChat), skip yang tak boleh diakses.
-  app.get("/api/marketing-team/overview", isAuthenticated, requireAdmin, async (req, res) => {
+  app.get("/api/marketing-team/overview", isAuthenticated, requireSuperAdmin, async (req, res) => {
     try {
       const {
         AD_MATERIAL_SLUG, RETENTION_SLUG, CLOSING_SLUG,
@@ -3820,6 +3820,19 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
     } catch (error) {
       console.error("[/api/marketing-team/overview]", error);
       res.status(500).json({ error: "Gagal memuat ringkasan tim marketing" });
+    }
+  });
+
+  // Arsip Peta Kebutuhan & Rekomendasi Solusi. Payload hanya berisi berita
+  // publik + sinyal internal agregat; akses dibatasi ketat ke superadmin.
+  app.get("/api/marketing-team/opportunity-reports", isAuthenticated, requireSuperAdmin, async (_req, res) => {
+    try {
+      const { listMarketNeedsReports } = await import("./lib/market-needs-report");
+      const reports = await listMarketNeedsReports(30);
+      res.json({ reports });
+    } catch (error) {
+      console.error("[/api/marketing-team/opportunity-reports]", error);
+      res.status(500).json({ error: "Gagal memuat laporan kebutuhan pasar" });
     }
   });
 

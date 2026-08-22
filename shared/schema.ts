@@ -2252,6 +2252,31 @@ export const insertResearchReportSchema = createInsertSchema(researchReports).om
 export type InsertResearchReport = z.infer<typeof insertResearchReportSchema>;
 export type ResearchReport = typeof researchReports.$inferSelect;
 
+// Laporan internal kebutuhan pasar dan rekomendasi solusi Gustafta. Setiap run
+// adalah snapshot immutable, dibuat pipeline Tim Marketing dan hanya dibaca superadmin.
+// Payload berisi sinyal agregat; tidak menyimpan isi chat atau identitas pelanggan.
+export const marketNeedsReports = pgTable("market_needs_reports", {
+  id: serial("id").primaryKey(),
+  reportDate: date("report_date").notNull(),
+  generatedBy: text("generated_by").notNull().default("scheduler"),
+  sourceCount: integer("source_count").notNull().default(0),
+  internalSignalWindowDays: integer("internal_signal_window_days").notNull().default(30),
+  payload: jsonb("payload").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (t) => ({
+  reportDateIdx: index("market_needs_reports_report_date_idx").on(t.reportDate),
+  updatedIdx: index("market_needs_reports_updated_idx").on(t.updatedAt),
+}));
+
+export const insertMarketNeedsReportSchema = createInsertSchema(marketNeedsReports).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertMarketNeedsReport = z.infer<typeof insertMarketNeedsReportSchema>;
+export type MarketNeedsReport = typeof marketNeedsReports.$inferSelect;
+
 // ── Scalev Product Mappings ──────────────────────────────────────────────────
 export const scalevMappings = pgTable("scalev_mappings", {
   id: serial("id").primaryKey(),

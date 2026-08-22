@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft, RefreshCw, MessageSquare, Copy, Check, CalendarDays,
-  Megaphone, Heart, Handshake, Search, Clock, AlertCircle,
+  Megaphone, Heart, Handshake, Search, Clock, AlertCircle, Target,
+  ShieldCheck, ExternalLink, BarChart3,
 } from "lucide-react";
 
 interface DailyDoc {
@@ -37,6 +38,75 @@ interface Overview {
   orchestrator: { id: number | string; name: string; tagline: string | null; avatar: string | null } | null;
   streams: Stream[];
 }
+
+type MarketDecision = "promote" | "monitor" | "product_gap";
+type MarketConfidence = "low" | "medium" | "high";
+
+interface MarketEvidence {
+  id: string;
+  kind: "market" | "internal";
+  title: string;
+  summary: string;
+  publisher?: string;
+  publishedAt?: string;
+  url?: string;
+}
+
+interface RecommendedProduct {
+  id: string;
+  source: "registry" | "store";
+  name: string;
+  productType: string;
+  category: string;
+  description: string;
+  targetUsers: string;
+  officialUrl: string | null;
+  price: number | null;
+}
+
+interface OpportunityReport {
+  id: number;
+  reportDate: string;
+  generatedBy: "scheduler" | "manual";
+  sourceCount: number;
+  internalSignalWindowDays: number;
+  payload: {
+    generatedAt: string;
+    periodDays: number;
+    executiveSummary: string;
+    methodologyNotice: string;
+    marketSignals: Array<{ title: string; summary: string; evidenceIds: string[] }>;
+    evidence: MarketEvidence[];
+    recommendations: Array<{
+      rank: number;
+      decision: MarketDecision;
+      need: string;
+      segment: string;
+      product: RecommendedProduct | null;
+      rationale: string;
+      confidence: MarketConfidence;
+      evidenceIds: string[];
+      suggestedMessage: string;
+      suggestedChannels: string[];
+      durationDays: number | null;
+    }>;
+    caveats: string[];
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+const DECISION_LABEL: Record<MarketDecision, string> = {
+  promote: "Promosikan",
+  monitor: "Pantau",
+  product_gap: "Gap Produk",
+};
+
+const CONFIDENCE_LABEL: Record<MarketConfidence, string> = {
+  high: "Keyakinan tinggi",
+  medium: "Keyakinan sedang",
+  low: "Keyakinan rendah",
+};
 
 const STREAM_ICON: Record<string, React.ReactNode> = {
   "materi-iklan": <Megaphone className="w-5 h-5" />,
@@ -153,13 +223,189 @@ function StreamCard({ stream }: { stream: Stream }) {
   );
 }
 
+function OpportunityReportCard({ report }: { report: OpportunityReport }) {
+  const { toast } = useToast();
+  const [copiedRank, setCopiedRank] = useState<number | null>(null);
+  const evidenceById = new Map(report.payload.evidence.map((item) => [item.id, item]));
+
+  const copyMessage = async (rank: number, message: string) => {
+    if (!message) return;
+    try {
+      await navigator.clipboard.writeText(message);
+      setCopiedRank(rank);
+      toast({ title: "Pesan promosi tersalin", description: "Tinjau kembali sebelum dipublikasikan." });
+      setTimeout(() => setCopiedRank(null), 2000);
+    } catch {
+      toast({ title: "Gagal menyalin", variant: "destructive" });
+    }
+  };
+
+  return (
+    <Card className="border-violet-500/30" data-testid="card-opportunity-report">
+      <CardHeader className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-3 justify-between">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+              <Target className="w-5 h-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg" data-testid="text-opportunity-title">
+                Peta Kebutuhan & Rekomendasi Solusi
+              </CardTitle>
+              <p className="text-xs text-muted-foreground mt-1">
+                {formatDate(report.payload.generatedAt)} · {report.sourceCount} sumber pasar · sinyal agregat {report.internalSignalWindowDays} hari
+              </p>
+            </div>
+          </div>
+          <Badge variant="outline" className="w-fit border-violet-500/40 text-violet-700 dark:text-violet-300">
+            <ShieldCheck className="w-3 h-3 mr-1" /> Khusus Superadmin
+          </Badge>
+        </div>
+        <p className="text-sm leading-relaxed" data-testid="text-opportunity-summary">
+          {report.payload.executiveSummary}
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {report.payload.marketSignals.length > 0 && (
+          <div className="rounded-lg border bg-muted/20 p-4 space-y-3">
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-violet-500" /> Sinyal Pasar Utama
+            </h3>
+            <div className="grid gap-3 md:grid-cols-2">
+              {report.payload.marketSignals.map((signal, index) => (
+                <div key={`${signal.title}-${index}`} className="space-y-1">
+                  <p className="text-sm font-medium">{signal.title}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{signal.summary}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold">Rekomendasi untuk Ditinjau</h3>
+          {report.payload.recommendations.map((recommendation) => {
+            const citedEvidence = recommendation.evidenceIds
+              .map((id) => evidenceById.get(id))
+              .filter((item): item is MarketEvidence => Boolean(item));
+            return (
+              <div
+                key={`${report.id}-${recommendation.rank}`}
+                className="rounded-lg border p-4 space-y-3"
+                data-testid={`card-recommendation-${recommendation.rank}`}
+              >
+                <div className="flex flex-wrap items-start gap-2 justify-between">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-xs font-semibold text-muted-foreground">#{recommendation.rank}</span>
+                      <Badge
+                        variant={recommendation.decision === "promote" ? "default" : "secondary"}
+                        className={recommendation.decision === "product_gap" ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : ""}
+                      >
+                        {DECISION_LABEL[recommendation.decision]}
+                      </Badge>
+                      <Badge variant="outline">{CONFIDENCE_LABEL[recommendation.confidence]}</Badge>
+                    </div>
+                    <p className="font-semibold mt-2">{recommendation.need}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Segmen: {recommendation.segment}</p>
+                  </div>
+                  {recommendation.product && (
+                    <div className="sm:text-right">
+                      <p className="text-sm font-semibold text-primary">{recommendation.product.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {recommendation.product.productType.replaceAll("_", " ")} · {recommendation.product.category}
+                      </p>
+                      {recommendation.product.officialUrl && (
+                        <a
+                          href={recommendation.product.officialUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+                          data-testid={`link-product-${recommendation.rank}`}
+                        >
+                          Buka tautan resmi <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-sm text-muted-foreground leading-relaxed">{recommendation.rationale}</p>
+
+                {citedEvidence.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {citedEvidence.map((evidence) => evidence.url ? (
+                      <a
+                        key={evidence.id}
+                        href={evidence.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        title={evidence.summary}
+                        className="inline-flex items-center gap-1 text-xs rounded-md border px-2 py-1 hover:border-primary/50"
+                      >
+                        {evidence.id} · {evidence.publisher || "Sumber pasar"} <ExternalLink className="w-3 h-3" />
+                      </a>
+                    ) : (
+                      <span
+                        key={evidence.id}
+                        title={evidence.summary}
+                        className="inline-flex items-center gap-1 text-xs rounded-md border px-2 py-1 text-muted-foreground"
+                      >
+                        {evidence.id} · Sinyal agregat
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {recommendation.suggestedMessage && (
+                  <div className="rounded-md bg-muted/40 p-3 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-semibold">Draf pesan promosi</p>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyMessage(recommendation.rank, recommendation.suggestedMessage)}
+                        data-testid={`button-copy-recommendation-${recommendation.rank}`}
+                      >
+                        {copiedRank === recommendation.rank ? <Check className="w-3.5 h-3.5 mr-1" /> : <Copy className="w-3.5 h-3.5 mr-1" />}
+                        {copiedRank === recommendation.rank ? "Tersalin" : "Salin"}
+                      </Button>
+                    </div>
+                    <p className="text-sm whitespace-pre-wrap">{recommendation.suggestedMessage}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Kanal: {recommendation.suggestedChannels.join(", ") || "Belum ditentukan"}
+                      {recommendation.durationDays ? ` · Durasi saran: ${recommendation.durationDays} hari` : ""}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+          <p className="text-xs leading-relaxed text-muted-foreground" data-testid="text-methodology-notice">
+            <span className="font-semibold text-foreground">Batas interpretasi:</span>{" "}
+            {report.payload.methodologyNotice}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function MonitorMarketing() {
   const { toast } = useToast();
+  const [selectedReportIdx, setSelectedReportIdx] = useState(0);
   const { data: adminMe, isLoading: adminLoading } = useQuery<{ isAdmin: boolean; isSuperAdmin: boolean; role: string }>({ queryKey: ["/api/admin/me"] });
-  const isAdminUser = adminMe?.isAdmin === true;
+  const isSuperAdminUser = adminMe?.isSuperAdmin === true;
   const { data, isLoading, error } = useQuery<Overview>({
     queryKey: ["/api/marketing-team/overview"],
-    enabled: isAdminUser,
+    enabled: isSuperAdminUser,
+  });
+  const { data: reportData, isLoading: reportsLoading, error: reportsError } = useQuery<{ reports: OpportunityReport[] }>({
+    queryKey: ["/api/marketing-team/opportunity-reports"],
+    enabled: isSuperAdminUser,
   });
 
   const sweepMutation = useMutation({
@@ -170,6 +416,8 @@ export default function MonitorMarketing() {
     onSuccess: () => {
       toast({ title: "Tim marketing dijalankan", description: "Hasil baru sedang dibuat. Muat ulang sebentar lagi untuk melihatnya." });
       queryClient.invalidateQueries({ queryKey: ["/api/marketing-team/overview"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/marketing-team/opportunity-reports"] });
+      setSelectedReportIdx(0);
     },
     onError: (e: any) => {
       toast({ title: "Gagal menjalankan", description: e?.message || "Coba lagi.", variant: "destructive" });
@@ -179,6 +427,8 @@ export default function MonitorMarketing() {
   const streams = data?.streams ?? [];
   const produksi = streams.filter((s) => s.group === "produksi");
   const riset = streams.filter((s) => s.group === "riset");
+  const reports = reportData?.reports ?? [];
+  const selectedReport = reports[selectedReportIdx] ?? reports[0];
 
   const lastUpdated = streams
     .flatMap((s) => s.docs.map((d) => new Date(d.createdAt).getTime()))
@@ -196,7 +446,7 @@ export default function MonitorMarketing() {
     );
   }
 
-  if (!isAdminUser) {
+  if (!isSuperAdminUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-4">
         <Card className="max-w-md w-full" data-testid="card-access-denied">
@@ -206,7 +456,7 @@ export default function MonitorMarketing() {
             </div>
             <div>
               <h1 className="text-lg font-bold" data-testid="text-access-denied">Akses Terbatas</h1>
-              <p className="text-sm text-muted-foreground mt-1">Halaman ini hanya untuk tim internal Gustafta.</p>
+              <p className="text-sm text-muted-foreground mt-1">Halaman ini hanya dapat dibuka oleh Super Admin Gustafta.</p>
             </div>
             <Link href="/dashboard">
               <Button variant="outline" className="gap-2" data-testid="button-back-dashboard">
@@ -232,8 +482,8 @@ export default function MonitorMarketing() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold" data-testid="text-page-title">Monitor Tim Marketing</h1>
-              <p className="text-sm text-muted-foreground">Pantau hasil kerja harian tim marketing AI Anda di satu tempat.</p>
+               <h1 className="text-2xl font-bold" data-testid="text-page-title">Monitor Kebutuhan Pasar</h1>
+               <p className="text-sm text-muted-foreground">Tinjau riset, rekomendasi solusi, dan bahan promosi dari Tim Marketing.</p>
             </div>
           </div>
           <Button
@@ -278,6 +528,61 @@ export default function MonitorMarketing() {
             </CardContent>
           </Card>
         )}
+
+        <section className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+            <div>
+              <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                Peta Kebutuhan & Rekomendasi
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1">Laporan privat untuk membantu keputusan promosi—bukan publikasi otomatis.</p>
+            </div>
+            {reports.length > 1 && (
+              <div className="flex flex-wrap gap-1.5">
+                {reports.slice(0, 14).map((report, index) => (
+                  <button
+                    key={report.id}
+                    onClick={() => setSelectedReportIdx(index)}
+                    data-testid={`button-report-date-${index}`}
+                    className={`text-xs px-2.5 py-1 rounded-md border transition-colors ${
+                      (selectedReport?.id === report.id)
+                        ? "border-violet-500 bg-violet-500/10 text-violet-700 dark:text-violet-300 font-medium"
+                        : "border-border text-muted-foreground hover:border-violet-500/50"
+                    }`}
+                  >
+                    {new Date(report.createdAt).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                    {" · "}
+                    {new Date(report.createdAt).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                    {report.generatedBy === "manual" ? " manual" : ""}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {reportsLoading ? (
+            <Card><CardContent className="py-6 space-y-3">
+              <Skeleton className="h-6 w-2/3" />
+              <Skeleton className="h-28 w-full" />
+            </CardContent></Card>
+          ) : reportsError ? (
+            <Card><CardContent className="py-6 text-sm text-muted-foreground flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" /> Gagal memuat arsip rekomendasi.
+            </CardContent></Card>
+          ) : selectedReport ? (
+            <OpportunityReportCard report={selectedReport} />
+          ) : (
+            <Card data-testid="card-report-empty">
+              <CardContent className="py-8 text-center space-y-2">
+                <Target className="w-8 h-8 mx-auto text-muted-foreground" />
+                <p className="font-medium">Belum ada laporan kebutuhan pasar</p>
+                <p className="text-sm text-muted-foreground">
+                  Tekan “Jalankan Sekarang” untuk membuat laporan pertama dari riset dan katalog resmi.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </section>
 
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2">

@@ -963,6 +963,13 @@ export interface SweepResult {
   retention?: { agentId: number; generated: boolean; chunks: number; reason?: string };
   salesPlaybook?: { agentId: number; created: boolean; chunks: number };
   closingKit?: { agentId: number; generated: boolean; chunks: number; reason?: string };
+  marketNeedsReport?: {
+    generated: boolean;
+    reportId?: number;
+    recommendations?: number;
+    sourceCount?: number;
+    reason?: string;
+  };
   skipped: string[];
   // Kompatibilitas mundur (kode/UI lama yang membaca .local / .global).
   local?: StreamResult;
@@ -973,7 +980,9 @@ export interface SweepResult {
  * Jalankan satu putaran riset untuk SEMUA stream feed. Resolusi agen via SLUG
  * (bukan ID hardcoded). Juga memastikan playbook metode riset ter-seed sekali.
  */
-export async function runResearchSweep(): Promise<SweepResult> {
+export async function runResearchSweep(
+  generatedBy: "scheduler" | "manual" = "scheduler",
+): Promise<SweepResult> {
   const result: SweepResult = { streams: [], skipped: [] };
   const docsBySlug: Record<string, string> = {};
 
@@ -1112,6 +1121,21 @@ export async function runResearchSweep(): Promise<SweepResult> {
     }
   } catch (e) {
     console.error(`[Pipeline] generate amunisi jualan gagal:`, (e as Error).message);
+  }
+
+  // ── TAHAP 5 — PETA KEBUTUHAN & REKOMENDASI SOLUSI ──
+  // Menggabungkan bukti pasar publik, sinyal penggunaan internal AGREGAT, dan
+  // katalog resmi. Output hanya laporan privat superadmin; tidak auto-publish.
+  try {
+    const { generateMarketNeedsReport } = await import("./market-needs-report");
+    result.marketNeedsReport = await generateMarketNeedsReport({
+      researchDocuments: docsBySlug,
+      generatedBy,
+    });
+  } catch (e) {
+    const reason = (e as Error).message;
+    console.error(`[Pipeline] generate peta kebutuhan gagal:`, reason);
+    result.marketNeedsReport = { generated: false, reason };
   }
 
   return result;

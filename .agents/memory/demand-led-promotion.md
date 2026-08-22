@@ -7,4 +7,4 @@ description: Product-discovery direction: use market and aggregate demand signal
 
 **Why:** Gustafta already has a broad solution catalog while ebook production is slow and expensive. The strategic bottleneck is discoverability and evidence-based prioritization, not a shortage of content products.
 
-**How to apply:** Start with private, superadmin-approved research reports that distinguish evidence from inference and map demand only to canonical ready products. Use aggregate, privacy-safe in-app signals plus cited external research; do not publish or personalize automatically. Expand to public campaign placement only after first-party funnel measurement is available.
+**How to apply:** Upgrade the existing internal Tim Marketing/research-feed pipeline rather than creating a parallel generic monitoring team. Start with private, superadmin-approved research reports that distinguish evidence from inference and map demand only to canonical ready products. Use aggregate, privacy-safe in-app signals plus cited external research; do not publish or personalize automatically. Expand to public campaign placement only after first-party funnel measurement is available.

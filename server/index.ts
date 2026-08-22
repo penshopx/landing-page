@@ -3145,7 +3145,7 @@ function startScheduler() {
   scheduleAtWIB("Research Feed Sweep", 6, 30, async () => {
     const { runResearchSweep } = await import("./lib/research-feed");
     const result = await runResearchSweep();
-    log(`[Research Feed] sweep selesai: lokal=${result.local?.chunks ?? "-"} chunk, global=${result.global?.chunks ?? "-"} chunk, materi-iklan=${result.adMaterials?.generated ? result.adMaterials.chunks + " chunk" : (result.adMaterials?.reason ?? "-")}, skip=[${result.skipped.join(",")}]`);
+    log(`[Research Feed] sweep selesai: lokal=${result.local?.chunks ?? "-"} chunk, global=${result.global?.chunks ?? "-"} chunk, materi-iklan=${result.adMaterials?.generated ? result.adMaterials.chunks + " chunk" : (result.adMaterials?.reason ?? "-")}, peta-kebutuhan=${result.marketNeedsReport?.generated ? result.marketNeedsReport.recommendations + " rekomendasi" : (result.marketNeedsReport?.reason ?? "-")}, skip=[${result.skipped.join(",")}]`);
   });
 
   // ── Owner Monthly Usage cleanup — 03:15 WIB (buang baris bulan lama) ────────

@@ -56,6 +56,20 @@ Output disimpan KB prefix `Amunisi Jualan Harian`. **Tidak auto-kirim** — draf
 final founder. Agen ini juga berfungsi sebagai **chatbot bantu jualan** (RAG) yang siap menjawab calon
 pembeli dengan grounding yang sama.
 
+### Tahap 5 — PETA KEBUTUHAN & REKOMENDASI SOLUSI
+Temuan riset publik digabungkan dengan sinyal internal yang sudah diagregasi (jumlah event penggunaan,
+order, dan langganan per produk/AI Specialist selama 30 hari) serta katalog resmi yang aktif. Tahap ini
+menghasilkan 3 status: **promote**, **monitor**, atau **product gap**. ID produk dan tautan tidak dipercaya
+dari keluaran model—server mencocokkannya kembali ke katalog resmi sebelum laporan disimpan.
+
+Setiap eksekusi tersimpan sebagai snapshot immutable (termasuk rerun manual pada hari yang sama) dan hanya
+tersedia untuk **superadmin**. Sinyal internal dengan kelompok kurang dari 3 disembunyikan; hitungan yang
+ditampilkan memakai rentang/bucket, bukan angka kecil yang presisi. Sistem tidak membaca
+isi chat, dokumen privat, email, telepon, atau metadata identitas pelanggan. Karena telemetry Store untuk
+impression/search/click belum tersedia, laporan tidak boleh disebut daftar “paling dicari”. Laporan juga
+tidak pernah mengubah featured product, mengirim pesan, memasang iklan, atau mempublikasikan konten secara
+otomatis; semua tindakan tetap melalui **◆ gerbang manusia**.
+
 ## Prune-scope KB (terpisah, tidak saling hapus)
 `Feed Riset` · `Panduan Metode Riset` · `Materi Iklan Harian` · `Panduan Platform Iklan` ·
 `Fondasi Gustafta` · `Sequence Retensi Harian` · `Fondasi Penjualan` · `Amunisi Jualan Harian`.
