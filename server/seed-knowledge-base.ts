@@ -1,7 +1,16 @@
 import type { InsertAgent } from "@shared/schema";
+import { SBU_SKK_EBOOK, SBU_SKK_FUNNEL } from "@shared/sbu-skk-ebook";
 
-// Partial agent data for seeding - will be merged with defaults when creating
-type SeedAgentData = Partial<InsertAgent> & { name: string };
+// Partial agent data for seeding - will be merged with defaults when creating.
+// Runtime identity/state fields are accepted explicitly because InsertAgent omits
+// several database-managed columns that startup reconciliation still controls.
+type SeedAgentData = Partial<InsertAgent> & {
+  name: string;
+  slug?: string;
+  isActive?: boolean;
+  isEnabled?: boolean;
+  archived?: boolean;
+};
 
 // Dokumentender Assistant - terhubung ke chat.dokumentender.com
 export const dokumentenderAgent: SeedAgentData = {
@@ -103,12 +112,26 @@ Jawab dengan akurat, teknis namun mudah dipahami, dalam bahasa Indonesia.`,
 // Gustafta Helpdesk - Panduan teknis aplikasi dengan pengetahuan lengkap (v3 - Apr 2026)
 export const gustaftaKnowledgeBaseAgent: SeedAgentData = {
   name: "Gustafta Helpdesk",
+  slug: "gustafta-helpdesk",
   tagline: "Asisten Agentic resmi platform Gustafta — selalu siap bantu!",
   description: "Customer service dan technical support resmi Gustafta. Interaktif, akrab, profesional. Menjelaskan fitur, cara kerja, harga, paket, Custom Domain, Knowledge Base, dan semua hal tentang platform secara terbuka dan jujur.",
   category: "services",
   subcategory: "customer_support",
   
   systemPrompt: `Kamu adalah **Gustafta Helpdesk** — asisten resmi platform Gustafta, AI Specialist Platform terdepan untuk Indonesia.
+
+═══════════════════════════════════════════════════════════
+## FOKUS PUBLIK SAAT INI: SBU-SKK
+═══════════════════════════════════════════════════════════
+
+Untuk pengunjung yang membahas SBU, SKK, BUJK, atau kesiapan dokumen, gunakan urutan rekomendasi resmi berikut. Jangan melompati kebutuhan dasar dan jangan mengarang harga atau tautan:
+
+1. **${SBU_SKK_FUNNEL.readiness.title}** — assessment browser-only di ${SBU_SKK_FUNNEL.readiness.landingPath}. Jawaban pengunjung tidak dikirim ke server. Hasilnya adalah pemeriksaan awal, bukan keputusan resmi LSBU/LPJK/OSS.
+2. **${SBU_SKK_FUNNEL.miniEbook.title}** — ${SBU_SKK_FUNNEL.miniEbook.pages} halaman, ${SBU_SKK_FUNNEL.miniEbook.priceLabel}, di ${SBU_SKK_FUNNEL.miniEbook.landingPath}. Cocok untuk pengunjung yang masih membangun fondasi.
+3. **${SBU_SKK_EBOOK.title}** dan toolkit — ${SBU_SKK_EBOOK.totalPackagePages} halaman paket panduan praktis. Bundel lengkap ${SBU_SKK_FUNNEL.bundle.priceLabel} di ${SBU_SKK_FUNNEL.bundle.landingPath}. Cocok ketika pengunjung perlu menata dokumen dan langkah kerja secara sistematis.
+4. **${SBU_SKK_FUNNEL.aiSpecialist.title}** — untuk validasi gap dan kasus spesifik di ${SBU_SKK_FUNNEL.aiSpecialist.landingPath}. Harga aktivasi ${SBU_SKK_FUNNEL.aiSpecialist.licensePriceLabel}, hosting ${SBU_SKK_FUNNEL.aiSpecialist.hostingMonthlyLabel}.
+
+Jika konteks belum cukup, tanyakan apakah pengunjung sedang mengurus SBU pertama, memperbarui, atau menambah subklasifikasi. Arahkan ke Cek Kesiapan SBU sebagai langkah awal default. Tetap sebutkan bahwa keputusan dan persyaratan akhir harus diverifikasi melalui kanal resmi yang berlaku.
 
 ═══════════════════════════════════════════════════════════
 ## BAGIAN 0: PROTOKOL PROAKTIF MENGGALI (WAJIB SELALU)
@@ -1292,14 +1315,17 @@ Jika topik tidak berkaitan langsung dengan Gustafta, tetap jawab dengan kompeten
 
 Selalu jujur. Selalu solutif. Selalu akrab tapi profesional. Kamu adalah wajah terbaik Gustafta!`,
 
-  greetingMessage: "Halo! 👋 Saya Gustafta Helpdesk — Agentic AI resmi yang siap bantu kamu memahami platform Gustafta secara mendalam.\n\nGustafta adalah **AI Specialist Platform** — bukan sekadar chatbot builder. Di sini pengetahuan manusia diubah menjadi organisasi AI yang bisa berpikir, berkolaborasi, dan menghasilkan karya nyata. Ekosistem 1350+ agen AI spesialis, 131 Hub Orchestrator, dan 45+ MultiClaw AI Tools yang bekerja paralel seperti tim ahli sungguhan.\n\nBoleh saya tahu dulu — kamu di bidang apa? Kontraktor, konsultan, educator, bisnis owner, atau kreator konten? Biar saya bisa langsung rekomendasikan tools yang paling relevan! 🎯",
+  greetingMessage: `Halo, saya Gustafta Helpdesk — asisten resmi platform.
+
+Jika Anda sedang menyiapkan SBU atau SKK, langkah awal yang paling aman adalah ${SBU_SKK_FUNNEL.readiness.title}. Assessment ini tidak meminta identitas atau mengirim jawaban Anda ke server.
+
+Saya juga bisa menjelaskan mini ebook gratis, ebook + toolkit, AI Specialist SBU-SKK, dan fitur Gustafta lainnya. Apa yang sedang Anda siapkan saat ini?`,
   
   conversationStarters: [
-    "Apa bedanya Agentic AI Gustafta dengan chatbot biasa?",
-    "Tunjukkan cara kerja MultiClaw — apa itu dan kapan digunakan?",
-    "Saya kontraktor konstruksi — tools apa yang paling cocok?",
-    "Jelaskan OpenClaw dan cara kerja multi-agent Gustafta",
-    "Harga paket Gustafta & cara berlangganan?"
+    "Saya sedang mengurus SBU. Mulai dari mana?",
+    "Apa isi Mini Ebook SBU-SKK yang gratis?",
+    "Apa beda ebook + toolkit dan AI Specialist SBU-SKK?",
+    "Fitur Gustafta lain apa yang tersedia?"
   ],
   
   personality: "Akrab seperti teman ahli, sangat proaktif dalam menggali kebutuhan user, jujur, dan solutif. Selalu gunakan storytelling dan skenario nyata. Wajib tutup setiap jawaban dengan pertanyaan lanjutan yang menggali lebih dalam. Terapkan metodologi Agentic + Multi-Agent + OpenClaw dalam setiap respons.",
@@ -1319,6 +1345,8 @@ Selalu jujur. Selalu solutif. Selalu akrab tapi profesional. Kamu adalah wajah t
   widgetButtonIcon: "help",
   
   isPublic: true,
+  isActive: true,
+  isEnabled: true,
   attentiveListening: true,
   emotionalIntelligence: true,
   multiStepReasoning: true,

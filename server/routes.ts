@@ -103,6 +103,17 @@ import { registerPromotionEngineRoutes, resolveOrderAttribution } from "./promot
 import { seedContractorLadder } from "./sales-ladder-seed";
 import { reconcileContractorL1Ebooks } from "./sales-ladder-reconcile";
 import {
+  GUSTAFTA_HELPDESK_SLUG,
+  getPublicHelpdeskRequestIssues,
+  resolveHelpdeskSeedTarget,
+  resolvePublicHelpdeskAgent,
+  toPublicHelpdeskAgent,
+} from "./helpdesk-agent";
+import {
+  isRememberedHelpdeskAgentId,
+  rememberHelpdeskAgentId,
+} from "./helpdesk-identity-registry";
+import {
   isDatabaseDigitalProductPath,
   readDatabaseDigitalProduct,
 } from "./lib/digital-product-storage";
@@ -2352,16 +2363,28 @@ export async function registerRoutes(
   // Get Gustafta Helpdesk (public - for landing page chatbot)
   app.get("/api/agents/gustafta-assistant", async (_req, res) => {
     try {
-      const agents = await storage.getAgents();
-      const gustaftaHelpdesk = agents.find(agent => 
-        agent.name === "Gustafta Helpdesk" || agent.name === "Gustafta Assistant"
-      );
-      if (!gustaftaHelpdesk) {
-        return res.status(404).json({ error: "Gustafta Helpdesk not found" });
+      res.setHeader("Cache-Control", "no-store");
+      const resolution = await resolvePublicHelpdeskAgent(storage);
+      if (!resolution.ok) {
+        console.warn(
+          `[Helpdesk] unavailable: ${resolution.reason} (${resolution.issues.join(",")})`,
+        );
+        res.setHeader("Retry-After", "30");
+        return res.status(503).json({
+          error: "Gustafta Helpdesk sedang tidak tersedia.",
+          reason: resolution.reason,
+          retryable: true,
+        });
       }
-      res.json(sanitizeAgentForPublic(gustaftaHelpdesk));
+      await rememberHelpdeskAgentId(resolution.agent.id);
+      res.json(toPublicHelpdeskAgent(resolution.agent));
     } catch (error) {
-      res.status(500).json({ error: "Failed to fetch Gustafta Helpdesk" });
+      console.error("[Helpdesk] failed to resolve public configuration:", error);
+      res.status(503).json({
+        error: "Gustafta Helpdesk sedang tidak tersedia.",
+        reason: "lookup_failed",
+        retryable: true,
+      });
     }
   });
 
@@ -3450,22 +3473,28 @@ export async function registerRoutes(
       const createdAgents: any[] = [];
       
       // Create or update Gustafta Helpdesk
-      const helpdeskExisting = existingAgents.find(
-        agent => agent.name === "Gustafta Helpdesk" || agent.name === "Gustafta Assistant"
-      );
+      const helpdeskExisting = await resolveHelpdeskSeedTarget(storage);
       const { gustaftaKnowledgeBaseAgent } = await import("./seed-knowledge-base");
-      const VERSION_MARKER = "HELPDESK_v3_RUANG_PROYEK";
       if (!helpdeskExisting) {
         const helpdesk = await storage.createAgent(gustaftaKnowledgeBaseAgent as any);
+        await rememberHelpdeskAgentId(helpdesk.id);
         createdAgents.push(helpdesk);
-      } else if (!((helpdeskExisting.systemPrompt || "") as string).includes(VERSION_MARKER)) {
-        // Prompt outdated — update to latest version
+      } else {
         await storage.updateAgent(String(helpdeskExisting.id), {
+          name: (gustaftaKnowledgeBaseAgent as any).name,
+          slug: (gustaftaKnowledgeBaseAgent as any).slug,
           systemPrompt: (gustaftaKnowledgeBaseAgent as any).systemPrompt,
           greetingMessage: (gustaftaKnowledgeBaseAgent as any).greetingMessage,
           conversationStarters: (gustaftaKnowledgeBaseAgent as any).conversationStarters,
           personality: (gustaftaKnowledgeBaseAgent as any).personality,
+          tagline: (gustaftaKnowledgeBaseAgent as any).tagline,
+          description: (gustaftaKnowledgeBaseAgent as any).description,
+          isPublic: true,
+          isActive: true,
+          isEnabled: true,
+          archived: false,
         } as any);
+        await rememberHelpdeskAgentId(helpdeskExisting.id);
         createdAgents.push({ ...helpdeskExisting, updated: true });
       }
       
@@ -5464,6 +5493,51 @@ Kembalikan HANYA JSON, tanpa markdown, tanpa penjelasan tambahan.`;
     }
   });
 
+  type MessageAgentTargetResolution =
+    | { ok: true; agent: any }
+    | { ok: false; status: 404 | 503; reason: string; issues?: string[] };
+
+  async function resolveMessageAgentTarget(
+    requestedAgentId: string,
+  ): Promise<MessageAgentTargetResolution> {
+    let agent: any;
+    let knownHelpdeskIdentity = false;
+
+    if (requestedAgentId === GUSTAFTA_HELPDESK_SLUG) {
+      const resolution = await resolvePublicHelpdeskAgent(storage);
+      if (!resolution.ok) {
+        return {
+          ok: false,
+          status: 503,
+          reason: resolution.reason,
+          issues: resolution.issues,
+        };
+      }
+      agent = resolution.agent;
+      knownHelpdeskIdentity = true;
+      await rememberHelpdeskAgentId(agent.id);
+    } else {
+      agent = await storage.getAgent(requestedAgentId);
+      if (!agent) {
+        return { ok: false, status: 404, reason: "not_found" };
+      }
+      knownHelpdeskIdentity = await isRememberedHelpdeskAgentId(agent.id);
+    }
+
+    const issues = await getPublicHelpdeskRequestIssues(storage, agent, {
+      knownHelpdeskIdentity,
+    });
+    if (issues && issues.length > 0) {
+      return {
+        ok: false,
+        status: 503,
+        reason: "invalid_configuration",
+        issues,
+      };
+    }
+    return { ok: true, agent };
+  }
+
   // Send message and get AI response
   app.post("/api/messages", chatIpRateLimiter, chatAgentIdRateLimiter, async (req, res) => {
     try {
@@ -5472,11 +5546,19 @@ Kembalikan HANYA JSON, tanpa markdown, tanpa penjelasan tambahan.`;
         return res.status(400).json({ error: parsed.error.message });
       }
 
-      // Get agent configuration first (needed for owner-based quota check)
-      const agent = await storage.getAgent(parsed.data.agentId);
-      if (!agent) {
-        return res.status(404).json({ error: "Agent not found" });
+      const target = await resolveMessageAgentTarget(parsed.data.agentId);
+      if (!target.ok) {
+        return res.status(target.status).json({
+          error: target.status === 404
+            ? "Agent not found"
+            : "Gustafta Helpdesk sedang tidak tersedia.",
+          reason: target.reason,
+          issues: target.issues,
+          retryable: target.status === 503,
+        });
       }
+      const agent = target.agent;
+      parsed.data.agentId = String(agent.id);
 
       // Gate akses: agen PRIVAT milik user lain hanya boleh diakses
       // owner/admin/kolaborator (anti-IDOR). Publik & agen sistem tetap terbuka.
@@ -6095,11 +6177,19 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         return res.status(400).json({ error: parsed.error.message });
       }
       
-      // Get agent configuration for persona
-      const agent = await storage.getAgent(parsed.data.agentId);
-      if (!agent) {
-        return res.status(404).json({ error: "Agent not found" });
+      const target = await resolveMessageAgentTarget(parsed.data.agentId);
+      if (!target.ok) {
+        return res.status(target.status).json({
+          error: target.status === 404
+            ? "Agent not found"
+            : "Gustafta Helpdesk sedang tidak tersedia.",
+          reason: target.reason,
+          issues: target.issues,
+          retryable: target.status === 503,
+        });
       }
+      const agent = target.agent;
+      parsed.data.agentId = String(agent.id);
 
       // Gate akses: agen PRIVAT milik user lain hanya boleh diakses
       // owner/admin/kolaborator (anti-IDOR). Publik & agen sistem tetap terbuka.
@@ -12130,9 +12220,10 @@ Balas dengan JSON dengan struktur PERSIS ini:
       const dok = allAgents.find(a => a.name === "Dokumentender Assistant");
       if (dok) agentId = dok.id.toString();
     } else if (agentId === "gustafta-helpdesk") {
-      const allAgents = await storage.getAgents();
-      const helpdesk = allAgents.find(a => a.name === "Gustafta Helpdesk" || a.name === "Gustafta Assistant");
-      if (helpdesk) agentId = helpdesk.id.toString();
+      const resolution = await resolvePublicHelpdeskAgent(storage);
+      if (!resolution.ok) return undefined;
+      await rememberHelpdeskAgentId(resolution.agent.id);
+      return resolution.agent;
     }
     const isNumeric = /^\d+$/.test(agentId);
     if (!isNumeric) {

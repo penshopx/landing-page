@@ -2,7 +2,16 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { HelpCircle, Send, Loader2, X, ChevronDown, Bot } from "lucide-react";
+import {
+  AlertCircle,
+  Bot,
+  ChevronDown,
+  HelpCircle,
+  Loader2,
+  RefreshCw,
+  Send,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MessageContent } from "@/lib/format-message";
 
@@ -13,8 +22,12 @@ interface WidgetMessage {
 }
 
 interface HelpdeskAgent {
-  id: string | number;
+  id: string;
   name: string;
+  slug: "gustafta-helpdesk";
+  availability: "ready";
+  greetingMessage: string;
+  conversationStarters: string[];
 }
 
 export function ChaesaWidget() {
@@ -22,15 +35,43 @@ export function ChaesaWidget() {
   const [messages, setMessages] = useState<WidgetMessage[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionId] = useState(() => {
+    const randomPart = typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return `chaesa-${randomPart}`;
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
 
-  const { data: helpdeskAgent } = useQuery<HelpdeskAgent>({
+  const {
+    data: helpdeskAgent,
+    isLoading: isHelpdeskLoading,
+    isFetching: isHelpdeskFetching,
+    isError: isHelpdeskError,
+    isRefetchError: isHelpdeskRefetchError,
+    refetch: refetchHelpdesk,
+  } = useQuery<HelpdeskAgent>({
     queryKey: ["/api/agents/gustafta-assistant"],
-    retry: false,
-    staleTime: Infinity,
+    retry: 2,
+    retryDelay: attempt => Math.min(1000 * (2 ** attempt), 5000),
+    staleTime: 60_000,
+    refetchOnWindowFocus: true,
+    refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
   });
+  const isHelpdeskUnavailable = isHelpdeskError || isHelpdeskRefetchError;
+  const isHelpdeskReady =
+    helpdeskAgent?.availability === "ready" && !isHelpdeskUnavailable;
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      abortRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -40,7 +81,7 @@ export function ChaesaWidget() {
 
   const sendMessage = useCallback(async (text?: string) => {
     const msg = (text || input).trim();
-    if (!msg || isStreaming || !helpdeskAgent) return;
+    if (!msg || isStreaming || !helpdeskAgent || !isHelpdeskReady) return;
 
     setInput("");
 
@@ -58,10 +99,10 @@ export function ChaesaWidget() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          agentId: String(helpdeskAgent.id),
+          agentId: helpdeskAgent.slug,
           role: "user",
           content: msg,
-          sessionId: sessionId || undefined,
+          sessionId,
         }),
         signal: abortRef.current.signal,
       });
@@ -77,11 +118,14 @@ export function ChaesaWidget() {
       const decoder = new TextDecoder();
       if (!reader) throw new Error("No stream");
 
+      let buffer = "";
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        const raw = decoder.decode(value, { stream: true });
-        for (const line of raw.split("\n")) {
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
           if (!line.startsWith("data: ")) continue;
           const data = line.slice(6);
           if (data === "[DONE]") continue;
@@ -92,9 +136,6 @@ export function ChaesaWidget() {
               setMessages(prev => prev.map(m =>
                 m.id === assistantId ? { ...m, content: assistantContent } : m
               ));
-            }
-            if (parsed.sessionId && !sessionId) {
-              setSessionId(String(parsed.sessionId));
             }
             // Handle server-sent error events (all providers failed, rate-limit, etc.)
             if (parsed.type === "error" || parsed.error) {
@@ -115,14 +156,24 @@ export function ChaesaWidget() {
         ));
       }
     } catch (err: any) {
-      if (err?.name === "AbortError") return;
+      if (err?.name === "AbortError") {
+        if (mountedRef.current) {
+          setMessages(prev => prev.map(m =>
+            m.id === assistantId && !m.content
+              ? { ...m, content: "Permintaan dihentikan." }
+              : m
+          ));
+        }
+        return;
+      }
       setMessages(prev => prev.map(m =>
         m.id === assistantId ? { ...m, content: "Maaf, terjadi kesalahan. Coba lagi." } : m
       ));
     } finally {
-      setIsStreaming(false);
+      abortRef.current = null;
+      if (mountedRef.current) setIsStreaming(false);
     }
-  }, [input, isStreaming, helpdeskAgent, sessionId]);
+  }, [input, isStreaming, helpdeskAgent, isHelpdeskReady, sessionId]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -131,16 +182,12 @@ export function ChaesaWidget() {
     }
   };
 
-  const QUICK_PROMPTS = [
-    { emoji: "🤖", text: "Apa bedanya Agentic AI Gustafta dengan chatbot biasa?" },
-    { emoji: "🧩", text: "Bagaimana cara merakit satu tim AI lewat Blueprint Builder?" },
-    { emoji: "⚡", text: "Tunjukkan cara kerja MultiClaw — apa itu dan kapan digunakan?" },
-    { emoji: "🛠️", text: "AI Tools apa saja yang siap pakai (RAB, K3 Vision, Proposal)?" },
-    { emoji: "🧭", text: "Saya mau mulai dari nol — harus dari mana dulu?" },
-    { emoji: "🏗️", text: "Saya kontraktor/konsultan konstruksi — tools paling cocok apa?" },
-    { emoji: "🗄️", text: "Apa itu Kuasa Digital & Paspor Dokumen di Ruang Simpan?" },
-    { emoji: "💳", text: "Harga paket Gustafta & cara berlangganan?" },
-  ];
+  const quickPrompts = helpdeskAgent?.conversationStarters ?? [];
+
+  const closeWidget = () => {
+    abortRef.current?.abort();
+    setIsOpen(false);
+  };
 
   return (
     <>
@@ -149,6 +196,8 @@ export function ChaesaWidget() {
           <div
             className="w-80 sm:w-96 rounded-2xl border border-border shadow-2xl flex flex-col overflow-hidden bg-card"
             style={{ height: "500px" }}
+            role="dialog"
+            aria-label="Gustafta Help Desk"
           >
             <div className="flex items-center justify-between p-4 border-b border-border bg-primary/5">
               <div className="flex items-center gap-2">
@@ -158,47 +207,100 @@ export function ChaesaWidget() {
                 <div>
                   <div className="font-semibold text-sm text-foreground">Gustafta Help Desk</div>
                   <div className="text-xs text-muted-foreground flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 inline-block" />
-                    Asisten resmi platform
+                    <span
+                      className={cn(
+                        "w-1.5 h-1.5 rounded-full inline-block",
+                        isHelpdeskReady
+                          ? "bg-green-500"
+                          : isHelpdeskLoading || isHelpdeskFetching
+                            ? "bg-amber-500 animate-pulse"
+                            : "bg-red-500",
+                      )}
+                    />
+                    {isHelpdeskReady
+                      ? "Asisten resmi platform"
+                      : isHelpdeskLoading || isHelpdeskFetching
+                        ? "Menyiapkan layanan"
+                        : "Layanan tidak tersedia"}
                   </div>
                 </div>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsOpen(false)}
+                onClick={closeWidget}
                 className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
                 data-testid="button-helpdesk-close"
+                aria-label="Tutup Gustafta Help Desk"
               >
                 <ChevronDown className="w-4 h-4" />
               </Button>
             </div>
 
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3">
-              {messages.length === 0 && (
+              {isHelpdeskLoading && !helpdeskAgent && (
+                <div className="h-full min-h-72 flex flex-col items-center justify-center gap-3 px-6 text-center" data-testid="helpdesk-loading-state">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Menyiapkan Help Desk</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      Kami sedang memeriksa konfigurasi asisten resmi.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {isHelpdeskUnavailable && (
+                <div className="h-full min-h-72 flex flex-col items-center justify-center gap-3 px-6 text-center" role="alert" data-testid="helpdesk-unavailable-state">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10">
+                    <AlertCircle className="h-5 w-5 text-destructive" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Help Desk belum dapat digunakan</p>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                      Konfigurasi asisten sedang tidak tersedia. Tidak ada data pengganti yang ditampilkan.
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => refetchHelpdesk()}
+                    disabled={isHelpdeskFetching}
+                    className="gap-2"
+                    data-testid="button-helpdesk-retry"
+                  >
+                    {isHelpdeskFetching
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : <RefreshCw className="h-3.5 w-3.5" />}
+                    Coba lagi
+                  </Button>
+                </div>
+              )}
+
+              {isHelpdeskReady && messages.length === 0 && (
                 <div className="py-3">
                   <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
                     <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
                       <Bot className="w-4 h-4 text-primary-foreground" />
                     </div>
                     <div>
-                      <p className="text-foreground font-semibold text-xs">Halo! Saya Gustafta Helpdesk 👋</p>
-                      <p className="text-muted-foreground text-[10px] leading-snug mt-0.5">
-                        Saya bukan chatbot biasa — saya Agentic AI yang proaktif menggali kebutuhan Anda. Tanyakan apa saja tentang Gustafta!
+                      <p className="text-foreground font-semibold text-xs">{helpdeskAgent.name}</p>
+                      <p className="text-muted-foreground text-[10px] leading-snug mt-0.5 whitespace-pre-line">
+                        {helpdeskAgent.greetingMessage}
                       </p>
                     </div>
                   </div>
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2 px-1">Mulai dengan pertanyaan ini:</p>
                   <div className="space-y-1.5">
-                    {QUICK_PROMPTS.map((p, i) => (
+                    {quickPrompts.map((prompt, i) => (
                       <button
-                        key={i}
-                        onClick={() => sendMessage(p.text)}
+                        key={prompt}
+                        onClick={() => sendMessage(prompt)}
                         className="w-full p-2.5 rounded-lg border border-border hover:border-primary/40 bg-background hover:bg-primary/5 text-left transition-all flex items-start gap-2 group"
                         data-testid={`helpdesk-starter-${i}`}
                       >
-                        <span className="text-sm flex-shrink-0 mt-0.5">{p.emoji}</span>
-                        <span className="text-[11px] text-muted-foreground group-hover:text-foreground leading-snug">{p.text}</span>
+                        <HelpCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-primary" />
+                        <span className="text-[11px] text-muted-foreground group-hover:text-foreground leading-snug">{prompt}</span>
                       </button>
                     ))}
                   </div>
@@ -242,15 +344,21 @@ export function ChaesaWidget() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder={helpdeskAgent ? "Tanya apa saja tentang Gustafta..." : "Memuat..."}
+                  placeholder={
+                    isHelpdeskReady
+                      ? "Tanya tentang SBU-SKK atau fitur Gustafta..."
+                      : isHelpdeskLoading || isHelpdeskFetching
+                        ? "Menyiapkan Help Desk..."
+                        : "Help Desk belum tersedia"
+                  }
                   className="resize-none text-xs min-h-[36px] max-h-24 py-2"
                   rows={1}
-                  disabled={isStreaming || !helpdeskAgent}
+                  disabled={isStreaming || !isHelpdeskReady}
                   data-testid="input-helpdesk-message"
                 />
                 <Button
                   onClick={() => sendMessage()}
-                  disabled={!input.trim() || isStreaming || !helpdeskAgent}
+                  disabled={!input.trim() || isStreaming || !isHelpdeskReady}
                   size="sm"
                   className="h-9 w-9 p-0 rounded-lg flex-shrink-0"
                   data-testid="button-helpdesk-send"
@@ -271,6 +379,7 @@ export function ChaesaWidget() {
           className="flex items-center gap-2 px-4 py-3 rounded-full shadow-2xl transition-all hover:scale-105 active:scale-95 relative bg-primary text-primary-foreground"
           data-testid="button-helpdesk-toggle"
           title="Gustafta Help Desk"
+          aria-label={isOpen ? "Tutup Gustafta Help Desk" : "Buka Gustafta Help Desk"}
         >
           {isOpen ? (
             <>
@@ -281,7 +390,17 @@ export function ChaesaWidget() {
             <>
               <HelpCircle className="w-5 h-5" />
               <span className="font-semibold text-sm">Gustafta Help Desk</span>
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-green-400 border-2 border-background text-background text-xs flex items-center justify-center font-bold">✓</span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "absolute -top-1 -right-1 w-4 h-4 rounded-full border-2 border-background",
+                  isHelpdeskReady
+                    ? "bg-green-400"
+                    : isHelpdeskLoading || isHelpdeskFetching
+                      ? "bg-amber-400 animate-pulse"
+                      : "bg-red-400",
+                )}
+              />
             </>
           )}
         </button>

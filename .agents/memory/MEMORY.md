@@ -31,7 +31,7 @@
 - [AI Organization Blueprint](organization-blueprint.md) — Fase 3: Blueprint flow designs a TEAM of agents; members ref each other by localId (not agentId), wiring source-of-truth = org structure.edges, resolved to agenticSubAgents at config time.
 - [Team-formation as the Jasa Order offering](team-formation-offering.md) — Proposal = selling work-team formation; org-builder is the ready surface (hier. teams, per-member ◆ gate, atomic wire); gaps: multi-department suggest, dialog/proposal→org handoff not wired.
 - [Meta CAPI bridge](meta-capi-bridge.md) — Purchase events relayed server-side from Scalev webhook; fire-and-forget, dedup via event_id, hashed PII, token in body not URL.
-- [Public-agent SSE authz](public-agent-sse-authz.md) — deny gate must be `isPublic !== true`, never userId-based (legacy no-owner agents leak); SSE streams need req close → abort upstream LLM.
+- [Public-agent SSE authz](public-agent-sse-authz.md) — public gates fail closed; fixed-role widgets resolve stable identity per send; startup preserves admin availability state.
 - [jsonb double-encoding](jsonb-double-encoding.md) — jsonb column can store a JSON *string*; Array.isArray gates then silently skip orchestration. Normalize at read+write; audit with jsonb_typeof.
 - [Orchestrator boot demotion](orchestrator-boot-demotion.md) — fixOrphanedOrchestrators() demotes is_orchestrator agents with no toolbox at boot; but runtime orchestration keys ONLY off non-empty agenticSubAgents, so teams still delegate. Don't fight the flag.
 - [code_execution sandbox quirks](code-execution-sandbox-quirks.md) — no process.env in sandbox; use executeSql callback; it returns command tag not RETURNING rows (SELECT back to get ids).

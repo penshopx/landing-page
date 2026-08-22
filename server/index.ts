@@ -1524,31 +1524,37 @@ Data yang belum tersedia akan saya estimasi dengan standar industri dan ditandai
       {
         try {
           const { gustaftaKnowledgeBaseAgent, dokumentenderAgent } = M_knowledgeBase;
-          const existingAgents = await storage.getAgents();
-          
-          const helpdeskExists = existingAgents.some(
-            (agent: any) => agent.name === "Gustafta Helpdesk" || agent.name === "Gustafta Assistant"
+          const {
+            buildHelpdeskStartupReconciliationPatch,
+            resolveHelpdeskSeedTarget,
+          } = await import("./helpdesk-agent");
+          const { rememberHelpdeskAgentId } = await import(
+            "./helpdesk-identity-registry"
           );
-          if (!helpdeskExists) {
-            await storage.createAgent(gustaftaKnowledgeBaseAgent as any);
-            log("Gustafta Helpdesk chatbot auto-seeded successfully");
-          } else {
-            const helpdesk = existingAgents.find(
-              (agent: any) => agent.name === "Gustafta Helpdesk" || agent.name === "Gustafta Assistant"
-            );
-            if (helpdesk) {
-              await storage.updateAgent(helpdesk.id, {
-                systemPrompt: gustaftaKnowledgeBaseAgent.systemPrompt,
-                greetingMessage: gustaftaKnowledgeBaseAgent.greetingMessage,
-                conversationStarters: gustaftaKnowledgeBaseAgent.conversationStarters,
-                personality: gustaftaKnowledgeBaseAgent.personality,
-                tagline: gustaftaKnowledgeBaseAgent.tagline,
-                description: gustaftaKnowledgeBaseAgent.description,
-              } as any);
-              log("Gustafta Helpdesk chatbot updated with latest configuration");
-            }
-          }
+          const helpdesk = await resolveHelpdeskSeedTarget(storage);
+          const helpdeskPatch = buildHelpdeskStartupReconciliationPatch(
+            gustaftaKnowledgeBaseAgent as any,
+          );
 
+          let configuredHelpdesk;
+          if (!helpdesk) {
+            configuredHelpdesk = await storage.createAgent(
+              gustaftaKnowledgeBaseAgent as any,
+            );
+            log("Gustafta Helpdesk auto-seeded with canonical identity");
+          } else {
+            configuredHelpdesk = await storage.updateAgent(
+              String(helpdesk.id),
+              helpdeskPatch as any,
+            );
+            log("Gustafta Helpdesk reconciled to canonical public configuration");
+          }
+          if (!configuredHelpdesk) {
+            throw new Error("Gustafta Helpdesk reconciliation returned no agent");
+          }
+          await rememberHelpdeskAgentId(configuredHelpdesk.id);
+
+          const existingAgents = await storage.getAgents();
           const dokExists = existingAgents.some(
             (agent: any) => agent.name === "Dokumentender Assistant"
           );
