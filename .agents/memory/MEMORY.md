@@ -89,3 +89,4 @@
 - [Reconciler vs boot seeds](reconciler-boot-seed-boundaries.md) — audit di batas transaksi; graph rewrite wajib cocok penuh dengan legacy shape dan mengunci write agar edit pengguna tidak hilang.
 - [Dual-auth active-session parity](dual-auth-active-session-parity.md) — protected routes must recognize OIDC + email sessions and enforce inactive/blocked revocation through one shared checker.
 - [Manual fulfillment processing leases](manual-fulfillment-processing-leases.md) — recover stale processing claims idempotently, and version final/error writes so an old worker cannot clobber a new one.
+- [Demand-led promotion](demand-led-promotion.md) — ebook is supporting depth, not the trigger; market signals should select which existing AI Specialist/app is promoted, with superadmin approval.
