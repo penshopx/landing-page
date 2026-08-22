@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useContactNumbers } from "@/lib/contact";
 import { syncOrderedProducts, nextFormSortOrderOnToggle } from "@/lib/store-sort-order";
+import { AdminPromotionEngine } from "@/components/admin-promotion-engine";
 
 // ---- Types ----
 interface AdminMeData {
@@ -2248,6 +2249,7 @@ export default function AdminPage() {
           {/* ========== STORE TAB ========== */}
           <TabsContent value="store" className="mt-4">
             <div className="space-y-4">
+              <AdminPromotionEngine />
 
               {/* ── Kelola Produk ── */}
               <Card>

@@ -20,6 +20,7 @@ import { PRICING } from "@/data/pricing";
 import { useCart } from "@/hooks/use-cart";
 import { CartDrawer } from "@/components/cart-drawer";
 import { useContactNumbers } from "@/lib/contact";
+import { trackStoreSearch } from "@/lib/promotion-attribution";
 
 const CATEGORY_LABELS: Record<string, string> = {
   engineering: "Teknik & Engineering",
@@ -257,7 +258,11 @@ export default function Store() {
     },
   });
 
-  const handleSearch = useCallback(() => { setSearch(searchInput); setPage(1); }, [searchInput]);
+  const handleSearch = useCallback(() => {
+    setSearch(searchInput);
+    setPage(1);
+    void trackStoreSearch(searchInput);
+  }, [searchInput]);
   const handleCategoryChange = (cat: string) => { setSelectedCategory(cat); setPage(1); };
   const handleModuleChange = (slug: string) => {
     setSelectedModule((prev) => (prev === slug ? "" : slug));

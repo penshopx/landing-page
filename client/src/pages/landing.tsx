@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useAuth } from "@/hooks/use-auth";
 import { SharedHeader } from "@/components/shared-header";
+import { PromotionCampaign } from "@/components/promotion-campaign";
 import explainerVideo from "@assets/generated_videos/gustafta_promo_24s_web.mp4";
 import explainerPoster from "@assets/generated_videos/gustafta_promo_24s_poster.jpg";
 import overviewVideo from "@assets/generated_videos/gustafta_explainer.mp4";
@@ -643,6 +644,8 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <PromotionCampaign placement="homepage" />
 
       {/* ── STATS BAR ── */}
       <section className="py-8 px-4 bg-slate-50 dark:bg-slate-900/60 border-y border-slate-200 dark:border-slate-800">

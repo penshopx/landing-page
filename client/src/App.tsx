@@ -39,6 +39,7 @@ import Pricing from "@/pages/pricing";
 import SyaratKetentuan from "@/pages/syarat-ketentuan";
 import KebijakanPrivasi from "@/pages/kebijakan-privasi";
 import CheckoutPage from "@/pages/checkout";
+import PromotionCheckoutPage from "@/pages/promotion-checkout";
 import Produk from "@/pages/produk";
 import KatalogProduk from "@/pages/katalog-produk";
 import Marketplace from "@/pages/marketplace";
@@ -514,6 +515,7 @@ function Router() {
       <Route path="/syarat-ketentuan" component={SyaratKetentuan} />
       <Route path="/kebijakan-privasi" component={KebijakanPrivasi} />
       <Route path="/checkout" component={CheckoutPage} />
+      <Route path="/promotion-checkout" component={PromotionCheckoutPage} />
       <Route path="/produk" component={KatalogProduk} />
       <Route path="/produk-builder" component={Produk} />
       <Route path="/marketplace" component={MarketplaceRedirect} />

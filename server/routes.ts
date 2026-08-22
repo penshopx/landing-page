@@ -99,6 +99,7 @@ import {
 } from "./sbu-skk-funnel";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 import { registerSalesLadderRoutes } from "./sales-ladder";
+import { registerPromotionEngineRoutes, resolveOrderAttribution } from "./promotion-engine";
 import { seedContractorLadder } from "./sales-ladder-seed";
 import { reconcileContractorL1Ebooks } from "./sales-ladder-reconcile";
 import {
@@ -8278,7 +8279,7 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
   // POST /api/store/order — create order + Midtrans Snap token (supports agentId or productId)
   app.post("/api/store/order", async (req, res) => {
     try {
-      const { agentId, productId, name, email, phone } = req.body;
+      const { agentId, productId, name, email, phone, campaignId, promotionEventId } = req.body;
       if (!name || !email) {
         return res.status(400).json({ error: "Nama dan email wajib diisi" });
       }
@@ -8352,6 +8353,17 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       const orderId = `STORE-${Date.now()}-${randomUUID().split("-")[0].toUpperCase()}`;
       const accessToken = randomUUID();
 
+      // Demand-led promotion attribution. Validated server-side; the client amount
+      // is NEVER trusted. Legacy store_products/agent orders do NOT map to
+      // product_registry/package_registry, so attribution is intentionally not
+      // stamped here (resolveOrderAttribution requires a canonical item id).
+      const attribution = await resolveOrderAttribution({
+        campaignId: campaignId != null ? Number(campaignId) : null,
+        promotionEventId: promotionEventId != null ? String(promotionEventId) : null,
+        productId: null,
+        packageId: null,
+      });
+
       const order = await storage.createStoreOrder({
         productId: resolvedProductId,
         agentId: resolvedAgentId,
@@ -8365,6 +8377,8 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         midtransOrderId: orderId,
         accessToken,
         status: "pending",
+        promotionCampaignId: attribution.promotionCampaignId,
+        promotionEventId: attribution.promotionEventId,
       });
 
       const waMsg = encodeURIComponent(
@@ -23636,6 +23650,9 @@ Min 300 kata. Bahasa Indonesia profesional. Sitasi regulasi spesifik domain ini.
 
   // Sales Ladder (Task #390) — superadmin only
   registerSalesLadderRoutes(app, { isAuthenticated, getDbRole });
+  // Demand-led Promotion Engine (Task #396) — human-approved campaigns; public
+  // active/events endpoints + admin-only catalog/overview/campaign management.
+  registerPromotionEngineRoutes(app, { isAuthenticated, getDbRole });
   // Seed contractor-sbu-readiness ladder (idempotent — never overwrites).
   // Awaited so a seed failure surfaces explicitly rather than hiding behind
   // a false-clean boot. If the seed table does not yet exist this will throw

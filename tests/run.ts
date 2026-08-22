@@ -161,6 +161,10 @@ const files = [
   // product_id permanen lintas edit/versi, 422 + missing untuk produk DRAFT.
   // Skipped when DATABASE_URL is absent.
   resolve(__dirname, "gaia-registry-admin-http.test.ts"),
+  // Demand-led promotion engine (Task #396): route guards, migration/schema,
+  // event privacy+dedupe, no raw search persistence, max 3/exactly 1 primary,
+  // eligibility, schedule/fallback, human approval, attribution, 7/30 scoring.
+  resolve(__dirname, "solution-promotion-engine.test.ts"),
 ];
 
 let hadFailure = false;

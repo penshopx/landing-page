@@ -18,6 +18,7 @@ import {
 import { apiRequest } from "@/lib/queryClient";
 import { Link, useLocation } from "wouter";
 import { useContactNumbers } from "@/lib/contact";
+import { PromotionCampaign } from "@/components/promotion-campaign";
 
 const CATEGORY_LABELS: Record<string, string> = {
   engineering: "Teknik & Engineering",
@@ -583,6 +584,8 @@ export default function StoreFeatured() {
           </div>
         </div>
       </section>
+
+      <PromotionCampaign placement="store" />
 
       {/* ── 2. PROBLEM (PAS) ── */}
       <section className="py-16 px-4 bg-gray-50 border-b border-gray-200">

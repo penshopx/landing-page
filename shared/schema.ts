@@ -2227,6 +2227,11 @@ export const storeOrders = pgTable("store_orders", {
   // POST /v3/orders (server-side create). Webhook mencocokkan data.order_id ke
   // kolom ini — bukan via nama/email. Null untuk order lama/manual.
   scalevOrderId: text("scalev_order_id"),
+  // Demand-led promotion attribution (Task #396) — additive, nullable. Stamped
+  // server-side ONLY after validating the campaign/item is active; order/revenue
+  // signals are derived from these columns, never trusted from the public route.
+  promotionCampaignId: integer("promotion_campaign_id"),
+  promotionEventId: varchar("promotion_event_id", { length: 80 }),
 });
 
 export const insertStoreOrderSchema = createInsertSchema(storeOrders).omit({ id: true, createdAt: true });
@@ -3342,3 +3347,123 @@ export type SalesLadderRow = typeof salesLadders.$inferSelect;
 export type SalesLadderNodeRow = typeof salesLadderNodes.$inferSelect;
 export type SalesLadderEdgeRow = typeof salesLadderEdges.$inferSelect;
 export type SalesLadderCoverageRow = typeof salesLadderCoverage.$inferSelect;
+
+// ─── DEMAND-LED PROMOTION ENGINE (Task #396) ──────────────────────────────────
+// Human-approved promotion campaigns that surface ONE primary + ≤2 support offers
+// on canonical placements (homepage/store). Nothing is auto-published; each
+// campaign is a superadmin/admin-approved draft → publish transition.
+//
+// Privacy invariants (see promotion-engine.ts):
+//   - promotion_events rows carry NO name/email/phone/chat/document content/IP/UA.
+//   - Search events accept a raw query only transiently; it is classified into a
+//     fixed problem/segment taxonomy server-side and the raw text is NEVER stored.
+//   - Session identity is a server-side hash of a validated opaque session id.
+//   - eventId is a client-supplied idempotency key; unique per (campaign,event).
+//
+// Immutability: promotion_campaign_items is a snapshot of canonical inventory
+// facts captured at campaign creation; the live catalog can drift afterwards but
+// the snapshot never changes. Attribution on store_orders is nullable + additive.
+export const promotionCampaigns = pgTable("promotion_campaigns", {
+  id:            serial("id").primaryKey(),
+  // Human-facing campaign name; slug is derived + unique for stable references.
+  name:          text("name").notNull(),
+  slug:          text("slug").notNull().unique(),
+  // Fixed placement taxonomy: array of homepage | store. A campaign can display
+  // consistently on both. Public active resolution matches placement = ANY(...).
+  placements:    text("placements").array().notNull(),
+  // Fixed segment taxonomy key (see PROMOTION_SEGMENTS).
+  segment:       varchar("segment", { length: 40 }).notNull(),
+  // Fixed problem taxonomy key the campaign addresses (see PROMOTION_PROBLEMS).
+  problem:       varchar("problem", { length: 40 }).notNull(),
+  // Persuasion hook + call-to-action label copy (validated lengths, no PII).
+  hook:          text("hook").notNull(),
+  cta:           text("cta").notNull(),
+  // Transparent, human-readable justification recorded at creation.
+  reason:        text("reason").notNull(),
+  // Lifecycle: DRAFT | ACTIVE | PAUSED | ARCHIVED. No auto-publish.
+  status:        varchar("status", { length: 20 }).notNull().default("DRAFT"),
+  // Schedule window; active resolution filters on [startsAt, endsAt].
+  startsAt:      timestamp("starts_at", { withTimezone: true }).notNull(),
+  endsAt:        timestamp("ends_at", { withTimezone: true }).notNull(),
+  // Approval trail — who created and who published (never auto).
+  createdBy:     varchar("created_by", { length: 255 }).notNull(),
+  publishedBy:   varchar("published_by", { length: 255 }),
+  publishedAt:   timestamp("published_at", { withTimezone: true }),
+  pausedBy:      varchar("paused_by", { length: 255 }),
+  pausedAt:      timestamp("paused_at", { withTimezone: true }),
+  createdAt:     timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:     timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index("idx_promotion_campaigns_status").on(table.status),
+  index("idx_promotion_campaigns_schedule").on(table.startsAt, table.endsAt),
+]);
+
+// Immutable snapshot of the canonical eligible inventory facts at creation time.
+// role: primary (exactly 1) | support (≤2). itemKind: product | package.
+export const promotionCampaignItems = pgTable("promotion_campaign_items", {
+  id:            serial("id").primaryKey(),
+  campaignId:    integer("campaign_id").notNull()
+                   .references(() => promotionCampaigns.id, { onDelete: "cascade" }),
+  role:          varchar("role", { length: 20 }).notNull(), // primary | support
+  itemKind:      varchar("item_kind", { length: 20 }).notNull(), // product | package
+  // Canonical business keys (product_registry.product_id / package_registry.package_id).
+  // Exactly one of productId/packageId is set, matching itemKind (enforced in code).
+  productId:     varchar("product_id", { length: 40 }),
+  packageId:     varchar("package_id", { length: 60 }),
+  packageVersion: integer("package_version"),
+  // Canonical id in a single column for the unique (campaign, kind, id) constraint.
+  canonicalId:   varchar("canonical_id", { length: 60 }).notNull(),
+  // Snapshot of the display + CTA facts as they were when the campaign was created.
+  snapshot:      jsonb("snapshot").$type<Record<string, unknown>>().notNull(),
+  sortOrder:     integer("sort_order").notNull().default(0),
+  createdAt:     timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  index("idx_promotion_campaign_items_campaign").on(table.campaignId, table.sortOrder),
+  // No duplicate canonical item within one campaign.
+  uniqueIndex("uq_promotion_item_canonical").on(table.campaignId, table.itemKind, table.canonicalId),
+  // Exactly one primary per campaign (partial unique index).
+  uniqueIndex("uq_promotion_item_primary").on(table.campaignId)
+    .where(sql`role = 'primary'`),
+]);
+
+// Append-only, deduped signal ledger. Public writes are heavily constrained.
+// eventId provides idempotency; (campaignId, eventId) is unique so retries and
+// double-fires collapse to a single row.
+export const promotionEvents = pgTable("promotion_events", {
+  id:            serial("id").primaryKey(),
+  // Client-supplied idempotency key (opaque, validated length). GLOBALLY unique so
+  // durable dedupe works even when campaignId is NULL (classified general search).
+  eventId:       varchar("event_id", { length: 80 }).notNull(),
+  campaignId:    integer("campaign_id")
+                   .references(() => promotionCampaigns.id, { onDelete: "set null" }),
+  // Fixed event taxonomy: impression | click | search | trial | lead | return_visit
+  // plus server-only: order (never accepted from the public event route).
+  eventType:     varchar("event_type", { length: 20 }).notNull(),
+  placement:     varchar("placement", { length: 20 }).notNull(),
+  // Server-side classification of a search query into fixed taxonomies.
+  // The raw query text is NEVER persisted.
+  problem:       varchar("problem", { length: 40 }),
+  segment:       varchar("segment", { length: 40 }),
+  // Which campaign item (if any) the signal is attributed to. item_role ∈ {primary,support}.
+  itemRole:      varchar("item_role", { length: 20 }),
+  productId:     varchar("product_id", { length: 40 }),
+  packageId:     varchar("package_id", { length: 60 }),
+  // SHA-256 hash of a validated opaque session id (never the raw id).
+  sessionHash:   varchar("session_hash", { length: 64 }),
+  // Monetary fields are populated ONLY by server-side order derivation.
+  amount:        integer("amount"),
+  createdAt:     timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("uq_promotion_event_id").on(table.eventId),
+  index("idx_promotion_events_campaign_type").on(table.campaignId, table.eventType, table.createdAt),
+  index("idx_promotion_events_signal").on(table.eventType, table.problem, table.segment, table.createdAt),
+  index("idx_promotion_events_created").on(table.createdAt),
+]);
+
+export const insertPromotionCampaignSchema = createInsertSchema(promotionCampaigns).omit({
+  id: true, createdAt: true, updatedAt: true,
+});
+export type InsertPromotionCampaign = z.infer<typeof insertPromotionCampaignSchema>;
+export type PromotionCampaignRow = typeof promotionCampaigns.$inferSelect;
+export type PromotionCampaignItemRow = typeof promotionCampaignItems.$inferSelect;
+export type PromotionEventRow = typeof promotionEvents.$inferSelect;
