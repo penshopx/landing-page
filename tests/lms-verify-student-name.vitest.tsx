@@ -123,4 +123,24 @@ describe("LmsVerify — studentName fallback email-prefix", () => {
       expect(screen.getAllByText(CODE).length).toBeGreaterThan(0);
     });
   });
+
+  it("menampilkan kartu 'Sertifikat Tidak Valid' untuk kode yang tidak dikenal", async () => {
+    fetchSpy.mockImplementationOnce(async () =>
+      new Response(JSON.stringify({ error: "Sertifikat tidak ditemukan" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByText("Sertifikat Tidak Valid")).toBeTruthy();
+    });
+
+    expect(screen.getAllByText(CODE).length).toBeGreaterThan(0);
+    expect(screen.getByText("hello@gustafta.com")).toBeTruthy();
+    expect(screen.queryByText("Sertifikat Valid & Asli")).toBeNull();
+    expect(screen.queryByText(EMAIL_PREFIX)).toBeNull();
+  });
 });
