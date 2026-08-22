@@ -1,0 +1,120 @@
+/*
+ * Landing restoration: the landing owns this visual language so SharedHeader
+ * and the application shell remain unchanged everywhere else.
+ */
+.landing-page {
+  --landing-ink: #111827;
+  --landing-ink-deep: #312e81;
+  --landing-violet: #4f46e5;
+  --landing-blue: #2563eb;
+  --landing-violet-soft: #eef0ff;
+  --landing-blue-soft: #edf5ff;
+  --landing-surface: #ffffff;
+  --landing-canvas: #f8fafc;
+  --landing-line: #e2e8f0;
+  --landing-copy: #475569;
+  --landing-gold: #ffcf5c;
+  font-family: var(--font-sans);
+}
+
+/* Replace the redesign's parchment / teal tokens without touching shared pages. */
+.landing-page [class~="bg-[#f7f1e6]"] { background-color: var(--landing-canvas) !important; }
+.landing-page [class~="bg-[#fffaf1]"] { background-color: var(--landing-surface) !important; }
+.landing-page [class~="bg-[#f0e8d9]"] { background-color: var(--landing-violet-soft) !important; }
+.landing-page [class~="bg-[#e7f0eb]"],
+.landing-page [class~="bg-[#e1efea]"] { background-color: var(--landing-blue-soft) !important; }
+.landing-page [class~="bg-[#dce9e5]"],
+.landing-page [class~="bg-[#c8ddd4]"] { background-color: #dceaff !important; }
+.landing-page [class~="bg-[#9cc4c6]"] { background-color: #dbeafe !important; color: #1e40af !important; }
+.landing-page [class~="bg-[#173847]"],
+.landing-page [class~="bg-[#214c5b]"] { background-color: var(--landing-ink-deep) !important; }
+.landing-page [class~="bg-[#102a35]"] { background-color: #171943 !important; }
+.landing-page [class~="bg-[#c96f52]"] { background-color: var(--landing-violet) !important; }
+.landing-page [class~="bg-[#f4c95d]"] { background-color: var(--landing-gold) !important; }
+.landing-page [class~="bg-primary"] { background-color: var(--landing-violet) !important; color: #ffffff !important; }
+.landing-page [class~="bg-muted/60"] { background-color: #f0f2fa !important; }
+.landing-page [class~="bg-muted/20"] { background-color: #f6f7fb !important; }
+.landing-page [class~="bg-muted/60"][class~="text-muted-foreground"] { color: #475569 !important; }
+.landing-page [class~="bg-muted/60"] [class~="text-foreground/70"] { color: #334155 !important; }
+.landing-page [class~="bg-muted/60"] [class~="hover:text-foreground"]:hover { color: var(--landing-ink) !important; }
+.landing-page [class~="bg-muted/60"] [class~="hover:text-green-600"]:hover { color: #15803d !important; }
+.landing-page [class~="bg-background/95"],
+.landing-page [class~="bg-background/80"] { background-color: rgba(255, 255, 255, .94) !important; }
+.landing-page [class~="hover:bg-primary"]:hover,
+.landing-page [class~="hover:bg-[#24566a]"]:hover { background-color: #4338ca !important; }
+
+.landing-page [class~="text-[#173847]"] { color: var(--landing-ink) !important; }
+.landing-page [class~="text-[#f7f1e6]"],
+.landing-page [class~="text-[#fff8ec]"] { color: #fbfbff !important; }
+.landing-page [class~="text-[#b55e45]"],
+.landing-page [class~="text-[#c96f52]"] { color: var(--landing-violet) !important; }
+.landing-page [class~="text-[#f4c95d]"] { color: var(--landing-gold) !important; }
+.landing-page [class~="text-[#9cc4c6]"],
+.landing-page [class~="text-[#c7e2df]"],
+.landing-page [class~="text-[#c7d5d3]"] { color: #eef2ff !important; }
+.landing-page [class~="text-[#ffe0b7]"] { color: #e0e7ff !important; }
+.landing-page [class~="text-[#607373]"],
+.landing-page [class~="text-[#687a78]"],
+.landing-page [class~="text-[#8a9b98]"] { color: var(--landing-copy) !important; }
+.landing-page [class~="text-[#9db5bc]"] { color: #dbeafe !important; }
+
+.landing-page [class~="border-[#d4ded8]"],
+.landing-page [class~="border-[#d7e0da]"],
+.landing-page [class~="border-[#e2d9c8]"],
+.landing-page [class~="border-[#e7ded0]"] { border-color: var(--landing-line) !important; }
+.landing-page [class~="border-[#c96f52]"] { border-color: var(--landing-violet) !important; }
+.landing-page [class~="border-[#8baeb0]"],
+.landing-page [class~="border-[#7b9ca3]"],
+.landing-page [class~="border-[#9bb8b7]"],
+.landing-page [class~="border-[#9db5bc]"],
+.landing-page [class~="border-[#9cc4c6]"],
+.landing-page [class~="border-[#52777d]"] { border-color: #a5b4fc !important; }
+
+.landing-page .font-display,
+.landing-page .font-mono { font-family: var(--font-sans) !important; }
+.landing-page [class*="rounded-[1.5rem]"],
+.landing-page [class*="rounded-[1.65rem]"],
+.landing-page [class*="rounded-[1.75rem]"] { border-radius: .875rem !important; }
+.landing-page .rounded-2xl { border-radius: .75rem !important; }
+.landing-page .rounded-xl { border-radius: .625rem !important; }
+.landing-page h1 { font-size: clamp(2.5rem, 5vw, 3.75rem); letter-spacing: -.045em; }
+.landing-page h2 { font-size: clamp(1.75rem, 3.5vw, 2.5rem); letter-spacing: -.035em; }
+.landing-page h3 { letter-spacing: -.015em; }
+.landing-page header {
+  background-color: rgba(255, 255, 255, .94) !important;
+  border-color: var(--landing-line) !important;
+}
+.landing-page header [class~="text-foreground"] { color: var(--landing-ink) !important; }
+.landing-page header [class~="text-foreground/70"],
+.landing-page header [class~="text-muted-foreground"] { color: #475569 !important; }
+.landing-page header [class~="text-primary"] { color: var(--landing-violet) !important; }
+.landing-page header [class~="text-emerald-600"],
+.landing-page header [class~="dark:text-emerald-400"] { color: #047857 !important; }
+.landing-page header [class~="text-emerald-700"],
+.landing-page header [class~="dark:text-emerald-300"] { color: #065f46 !important; }
+.landing-page header [class*="border-border"] { border-color: var(--landing-line) !important; }
+.landing-page header [class*="border-primary"] { border-color: #a5b4fc !important; }
+.landing-page header [class~="bg-popover"],
+.landing-page header [class~="bg-card"] { background-color: #ffffff !important; }
+.landing-page header [class*="hover:text-foreground"]:hover { color: var(--landing-ink) !important; }
+.landing-page header [class*="hover:text-green-600"]:hover { color: #15803d !important; }
+.landing-page header [class*="hover:bg-muted"]:hover { background-color: #f1f5f9 !important; }
+.landing-page header .bg-gradient-to-r {
+  background-image: linear-gradient(90deg, var(--landing-violet), var(--landing-blue)) !important;
+}
+.landing-page a,
+.landing-page button,
+.landing-page summary { transition: color .2s ease, background-color .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.landing-page a:focus-visible,
+.landing-page button:focus-visible,
+.landing-page summary:focus-visible { outline: 3px solid rgba(90, 85, 214, .35); outline-offset: 3px; }
+.landing-page .shadow-\[0_12px_34px_rgba\(23\,56\,71\,\.06\)\],
+.landing-page .shadow-\[0_20px_42px_rgba\(23\,56\,71\,\.13\)\],
+.landing-page [class*="shadow-[0_"] {
+  box-shadow: 0 12px 34px rgba(47, 57, 125, .08) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-page *,
+  .landing-page *::before,
+  .landing-page *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

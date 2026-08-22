@@ -25,6 +25,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SBU_SKK_EBOOK, SBU_SKK_FUNNEL } from "@/data/pricing";
 import { trackLead } from "@/lib/meta-pixel";
 import { LandingIdentityCarousel, LandingVideoCarousel } from "@/components/landing-media-carousel";
+import "./landing.css";
 
 const funnel = SBU_SKK_FUNNEL;
 const ebook = SBU_SKK_EBOOK;
@@ -78,7 +79,7 @@ export default function Landing() {
   const lead = (content_name: string) => trackLead({ content_name });
 
   return (
-    <div className="min-h-[100dvh] overflow-x-hidden bg-[#f7f1e6] text-[#173847]" data-testid="page-landing">
+    <div className="landing-page min-h-[100dvh] overflow-x-hidden bg-[#f7f1e6] text-[#173847]" data-testid="page-landing">
       <SharedHeader />
       <div className="border-b border-[#e2d9c8] bg-[#f0e8d9] px-4 py-2.5 text-center text-xs font-medium text-[#607373]">
         <span className="mr-2 inline-block rounded-full bg-[#173847] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#f7f1e6]">Platform konstruksi</span>
