@@ -1,0 +1,595 @@
+Ya. Kalau kita sudah sepakat bahwa **Gustafta.my.id adalah “gudang/chatbot library”**, maka yang perlu kita definisikan sekarang bukan sekadar deskripsi chatbot, tetapi **paket deliverable standar setiap chatbot**.
+
+Saya sarankan Gustafta memiliki **“Chatbot Productization System”**: setiap chatbot yang masuk katalog otomatis mempunyai paket aset yang sama. Ini membuat katalog terlihat profesional dan scalable.
+
+## 1. Arsitektur deliverable Gustafta
+
+Saya akan membaginya menjadi 4 lapisan:
+
+**DISCOVER → UNDERSTAND → TRY → GO DEEPER**
+
+| Layer          | Deliverable                                       | Fungsi                 |
+| -------------- | ------------------------------------------------- | ---------------------- |
+| **Discover**   | Hook + Thumbnail + Card                           | Membuat orang tertarik |
+| **Understand** | Short Description + Use Cases + Example Questions | Membuat orang paham    |
+| **Try**        | Chatbot Live + Demo Conversation                  | Membuktikan manfaat    |
+| **Go Deeper**  | Mini Guide / Ebook / Premium Package              | Monetisasi lanjutan    |
+
+Jadi **chatbot itu sendiri adalah core product**, sedangkan aset lainnya adalah **product wrapper**.
+
+---
+
+# 2. DELIVERABLE WAJIB setiap chatbot
+
+Ini yang menurut saya harus menjadi standar.
+
+### A. Product Identity
+
+Setiap chatbot mempunyai:
+
+* Nama
+* Kategori
+* Subkategori
+* Target pengguna
+* Status: Free / Premium
+* Badge: New / Popular / Recommended
+* Versi
+* Last Updated
+* CTA
+
+Contoh:
+
+> **AI SBU & SKK**
+>
+> Kategori: Konstruksi
+> Target: BUJK / Kontraktor
+> Status: Free
+> Badge: ⭐ Popular
+
+---
+
+# 3. Hook
+
+Ini **bukan deskripsi produk**.
+
+Ini adalah satu kalimat yang membuat orang merasa:
+
+> “Ini masalah saya.”
+
+Contoh:
+
+> **Bingung menentukan SKK yang tepat untuk tenaga ahli perusahaan Anda?**
+
+atau:
+
+> **Jangan sampai dokumen tender Anda gugur hanya karena persyaratan yang terlewat.**
+
+Hook ini nantinya bisa dipakai ulang untuk:
+
+* Card
+* Landing page
+* Meta Ads
+* WhatsApp
+* Instagram
+* Thumbnail
+* Video
+
+Jadi **satu hook menghasilkan banyak aset marketing.**
+
+---
+
+# 4. Short Description
+
+Maksimal 1–2 kalimat.
+
+Contoh:
+
+> AI Specialist yang membantu kontraktor memahami persyaratan SBU, SKK, dokumen, dan langkah pemenuhannya.
+
+Ini digunakan di:
+
+* katalog
+* search result
+* homepage
+* chatbot directory
+
+---
+
+# 5. “Bisa digunakan untuk apa?”
+
+Ini penting karena orang sering tidak tahu harus bertanya apa.
+
+Misalnya:
+
+### Cocok untuk:
+
+* Mengecek persyaratan SBU
+* Memahami kebutuhan SKK
+* Menyiapkan dokumen
+* Mengidentifikasi kekurangan
+* Memahami langkah berikutnya
+
+Ini membuat chatbot terasa **konkret**.
+
+---
+
+# 6. Example Questions
+
+Menurut saya ini salah satu deliverable **paling penting**.
+
+Jangan hanya:
+
+> **[Mulai Chat]**
+
+Tetapi tampilkan:
+
+### 💬 Coba tanyakan:
+
+> “SKK apa yang dibutuhkan tenaga ahli saya?”
+
+> “Apa persyaratan SBU untuk subklasifikasi ini?”
+
+> “Dokumen apa yang masih kurang?”
+
+> “Bagaimana langkah pengurusannya?”
+
+User langsung mendapatkan ide:
+
+> **“Oh, ternyata saya bisa bertanya seperti itu.”**
+
+Ini bisa meningkatkan klik dan penggunaan.
+
+---
+
+# 7. Expected Outcome
+
+Berikan ekspektasi yang jelas.
+
+Contoh:
+
+### Yang akan Anda dapatkan:
+
+✓ Penjelasan
+✓ Checklist
+✓ Analisis
+✓ Rekomendasi
+✓ Langkah berikutnya
+
+Ini penting untuk membedakan **AI yang benar-benar punya pekerjaan** dengan chatbot generik.
+
+---
+
+# 8. Chatbot Live
+
+Ini adalah **produk utamanya**.
+
+Bukan demo gambar.
+
+Bukan video.
+
+**User benar-benar harus bisa mencoba.**
+
+CTA:
+
+> **💬 Coba Sekarang**
+
+Kemudian langsung masuk ke chatbot.
+
+---
+
+# 9. Demo Conversation
+
+Ini saya sarankan sebagai deliverable **Level 2**, tetapi sangat powerful.
+
+Misalnya di Card:
+
+### Contoh percakapan
+
+**User**
+
+> Saya memiliki BUJK kecil dan ingin mengurus SBU. Apa yang perlu saya siapkan?
+
+**AI SBU Specialist**
+
+> Untuk menentukan persyaratan yang tepat, saya perlu mengetahui...
+
+Kemudian:
+
+> **Lihat contoh lengkap →**
+
+Kenapa bagus?
+
+Karena user **belum perlu klik chatbot untuk memahami kualitasnya**.
+
+---
+
+# 10. Thumbnail
+
+Setiap chatbot harus punya gambar identitas.
+
+Tidak perlu mahal.
+
+Yang penting konsisten.
+
+Misalnya seluruh Gustafta menggunakan:
+
+**GUSTAFTA AI**
+
+**AI SBU & SKK**
+
+**CONSTRUCTION**
+
+Jadi ketika orang melihat katalog, mereka langsung mengenali:
+
+> “Oh, ini bagian dari keluarga Gustafta.”
+
+---
+
+# 11. Video Demo
+
+Ini **tidak wajib untuk semua chatbot**.
+
+Saya akan memberikan badge:
+
+### 🎥 Demo tersedia
+
+Hanya untuk chatbot yang:
+
+* populer
+* premium
+* kompleks
+* punya conversion potential tinggi
+
+Video cukup:
+
+**30–60 detik.**
+
+Struktur:
+
+> Problem → Question → AI Response → Result → CTA
+
+---
+
+# 12. Mini Guide
+
+Ini **bukan deliverable wajib**.
+
+Ini hanya dibuat ketika chatbot sudah memiliki traction.
+
+Contoh:
+
+**Chatbot**
+
+> AI SBU & SKK
+
+↓
+
+**Mini Guide**
+
+> 7 Kesalahan yang Sering Membuat Pengurusan SBU Terhambat
+
+↓
+
+**Ebook**
+
+> SBU & SKK Tanpa Bingung
+
+↓
+
+**Premium**
+
+> SBU Professional
+
+Dengan demikian:
+
+**Chatbot menghasilkan ebook.**
+
+Bukan:
+
+**Ebook menghasilkan chatbot.**
+
+Itu perbedaan strategisnya.
+
+---
+
+# 13. Ebook
+
+Ebook menjadi **deep content product**.
+
+Tidak perlu dibuat untuk seluruh chatbot.
+
+Saya akan membuatnya berdasarkan:
+
+### Demand × Monetization × Authority
+
+Misalnya chatbot tertentu mendapatkan:
+
+10.000 views
+2.000 chat
+500 returning users
+
+Maka itu kandidat kuat untuk ebook.
+
+---
+
+# 14. Premium Package
+
+Ini layer paling bawah.
+
+Contohnya:
+
+### Free
+
+**AI SBU & SKK**
+
+↓
+
+### Content
+
+**Mini Guide**
+
+↓
+
+### Knowledge Product
+
+**Ebook SBU & SKK**
+
+↓
+
+### Premium
+
+**SBU Professional**
+
+↓
+
+### Business
+
+**Gustafta Business / Workroom**
+
+Jadi satu chatbot bisa menjadi **product ladder**.
+
+---
+
+# 15. Deliverable internal untuk setiap chatbot
+
+Selain yang dilihat user, saya menyarankan Gustafta mempunyai **Internal Product Sheet**.
+
+Isinya:
+
+### Chatbot Master Record
+
+**Identity**
+
+* Name
+* Slug
+* Category
+* Sector
+* Target User
+
+**Positioning**
+
+* Problem
+* Hook
+* Promise
+* Differentiator
+
+**Knowledge**
+
+* Knowledge Base
+* Sources
+* Version
+* Last Review
+
+**Interaction**
+
+* Starter Questions
+* Conversation Flow
+* Guardrails
+* Escalation
+
+**Commercial**
+
+* Free/Premium
+* Price
+* Upsell
+* Related Products
+
+**Marketing**
+
+* Thumbnail
+* Short Copy
+* Long Copy
+* Video
+* Social Copy
+
+Ini penting karena ketika chatbot sudah mencapai **100–500 chatbot**, Anda tidak boleh mengandalkan dokumentasi manual yang berbeda-beda.
+
+---
+
+# 16. Saya akan membuat 3 kelas deliverable
+
+Ini yang menurut saya paling cocok untuk Gustafta.
+
+## 🟢 LEVEL A — EVERY CHATBOT
+
+**Wajib**
+
+* Nama
+* Kategori
+* Hook
+* Short description
+* Target user
+* Use cases
+* 3–5 starter questions
+* Expected outcomes
+* Thumbnail
+* Live chatbot
+* CTA
+
+**Effort: ± rendah**
+
+---
+
+## 🟡 LEVEL B — FEATURED CHATBOT
+
+Untuk chatbot yang mulai populer:
+
+* Semua Level A
+* Demo conversation
+* Video 30–60 detik
+* Landing section
+* Social content
+* WhatsApp share card
+
+**Effort: sedang**
+
+---
+
+## 🔴 LEVEL C — FLAGSHIP CHATBOT
+
+Untuk chatbot yang terbukti menghasilkan uang:
+
+* Semua Level B
+* Mini ebook
+* Full ebook
+* Webinar/tutorial
+* Premium package
+* Case study
+* Testimonial
+* Ads campaign
+
+**Effort: tinggi**
+
+---
+
+# 17. Ini menghasilkan “Product Flywheel”
+
+Yang saya suka dari model ini adalah:
+
+**Chatbot baru**
+
+↓
+
+**Chatbot Card**
+
+↓
+
+**Masuk katalog**
+
+↓
+
+**Orang menemukan**
+
+↓
+
+**Orang mencoba**
+
+↓
+
+**Data penggunaan**
+
+↓
+
+**Chatbot populer**
+
+↓
+
+**Video**
+
+↓
+
+**Mini Guide**
+
+↓
+
+**Ebook**
+
+↓
+
+**Premium Product**
+
+↓
+
+**Revenue**
+
+↓
+
+**Data + testimonial**
+
+↓
+
+**Chatbot semakin kuat**
+
+↓
+
+**Masuk katalog lagi**
+
+Itu membuat **Gustafta bukan hanya marketplace chatbot**, tetapi sebuah **mesin produksi dan distribusi produk AI**.
+
+---
+
+# 18. Dan ada satu deliverable yang menurut saya sangat penting untuk Gustafta
+
+### ⭐ “Why this AI?”
+
+Setiap chatbot harus menjawab satu pertanyaan:
+
+> **“Kenapa saya menggunakan chatbot ini, bukan ChatGPT biasa?”**
+
+Misalnya:
+
+### Mengapa AI SBU & SKK?
+
+> **Tidak perlu mulai dari nol.**
+>
+> AI ini dirancang khusus dengan knowledge dan alur kerja yang berfokus pada kebutuhan SBU & SKK.
+
+Tidak perlu menjelaskan teknologi.
+
+User hanya perlu memahami:
+
+> **“ChatGPT bisa banyak hal. Tapi yang ini memang dibuat untuk pekerjaan saya.”**
+
+**Ini yang akan menjadi diferensiasi utama gudang chatbot Gustafta.**
+
+---
+
+# Jadi kalau kita kunci sekarang
+
+Saya akan menjadikan **deliverable standar satu chatbot Gustafta** seperti ini:
+
+### 🟢 CORE
+
+**1. Identity**
+**2. Hook**
+**3. Description**
+**4. Target User**
+**5. Use Cases**
+**6. Example Questions**
+**7. Expected Outcome**
+**8. Thumbnail**
+**9. Live Chatbot**
+**10. CTA**
+
+### 🟡 BOOSTER
+
+**11. Demo Conversation**
+**12. Video Demo**
+**13. Social Content**
+**14. Share Card**
+
+### 🔴 MONETIZATION
+
+**15. Mini Guide**
+**16. Ebook**
+**17. Premium Package**
+**18. Webinar / Training**
+**19. Case Study**
+
+Dan prinsipnya:
+
+> **Tidak semua chatbot perlu mencapai Level C.**
+
+Justru **Level A harus bisa dibuat sangat cepat**, sehingga Gustafta bisa terus menambah chatbot tanpa terjebak pekerjaan produksi konten.
+
+Dengan sistem ini, **“chatbot baru” otomatis berarti “produk baru + halaman katalog baru + aset marketing dasar baru”**. Itu yang saya rasa paling cocok untuk posisi akhir Gustafta sebagai **gudang chatbot yang terus bertambah**.

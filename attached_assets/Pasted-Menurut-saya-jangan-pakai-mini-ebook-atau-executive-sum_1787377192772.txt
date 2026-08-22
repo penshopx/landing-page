@@ -1,0 +1,328 @@
+Menurut saya **jangan pakai mini ebook atau executive summary sebagai default untuk setiap chatbot**. Itu justru akan membuat pekerjaan Gustafta berat lagi.
+
+Untuk Gustafta, saya akan memakai **format “Chatbot Card”** sebagai standar. Tujuannya bukan menjelaskan chatbot secara lengkap, tetapi membuat orang berpikir:
+
+> **“Ini kayaknya memang yang saya butuhkan. Saya mau coba.”**
+
+## Formula yang saya sarankan
+
+Setiap chatbot cukup punya **5 lapisan informasi**:
+
+### 1. Hook — masalah yang langsung terasa
+
+Bukan:
+
+> **AI Specialist SBU & SKK**
+
+Tetapi:
+
+> **Bingung menentukan persyaratan SBU dan SKK perusahaan Anda?**
+
+Ini yang menangkap perhatian.
+
+---
+
+### 2. Promise — apa yang bisa dilakukan
+
+Contoh:
+
+> **Tanyakan langsung ke AI yang dirancang khusus untuk membantu Anda memahami persyaratan, proses, dan dokumen SBU & SKK.**
+
+Satu atau dua kalimat saja.
+
+---
+
+### 3. “Bisa apa?” — 3–5 contoh konkret
+
+Misalnya:
+
+**Anda bisa bertanya:**
+
+* “Apa persyaratan SBU untuk subklasifikasi ini?”
+* “SKK apa yang dibutuhkan tenaga ahli saya?”
+* “Dokumen apa yang harus saya siapkan?”
+* “Apa yang perlu diperbaiki dari data perusahaan saya?”
+
+Ini **jauh lebih menjual daripada deskripsi panjang** karena user langsung membayangkan dirinya menggunakan chatbot.
+
+---
+
+### 4. Output / hasil
+
+Berikan gambaran:
+
+> **Hasil yang Anda dapatkan:**
+>
+> ✓ Penjelasan langkah demi langkah
+> ✓ Checklist dokumen
+> ✓ Identifikasi kekurangan
+> ✓ Rekomendasi langkah berikutnya
+
+---
+
+### 5. CTA
+
+Bukan:
+
+> **Learn More**
+
+Tetapi:
+
+> **💬 Coba Chatbot Ini**
+
+atau:
+
+> **🚀 Mulai Konsultasi Gratis**
+
+---
+
+# Jadi struktur kartunya kira-kira seperti ini
+
+### 🏗️ AI SBU & SKK
+
+**Bingung menentukan persyaratan SBU dan SKK perusahaan Anda?**
+
+AI Specialist yang membantu Anda memahami persyaratan, dokumen, dan langkah pemenuhan sertifikasi konstruksi.
+
+**Anda bisa bertanya:**
+
+> “SKK apa yang dibutuhkan tenaga ahli saya?”
+
+> “Dokumen apa yang harus saya siapkan?”
+
+> “Apa yang masih kurang dari perusahaan saya?”
+
+**Dapatkan:**
+
+✓ Analisis
+✓ Checklist
+✓ Penjelasan langkah
+✓ Rekomendasi tindakan
+
+**[💬 Coba AI SBU & SKK]**
+
+---
+
+# Lalu bagaimana dengan gambar dan video?
+
+**Ya, tetapi jangan sebagai requirement setiap chatbot.**
+
+Saya akan membaginya menjadi 3 level.
+
+### LEVEL 1 — Wajib
+
+**Text Card**
+
+Ini harus dimiliki **semua chatbot**.
+
+Effort sangat rendah.
+
+---
+
+### LEVEL 2 — Untuk chatbot unggulan
+
+**Gambar/thumbnail**
+
+Misalnya:
+
+![Image](https://images.openai.com/static-rsc-4/JeOy9TuxWy_3fdVVoYCZNZp6AHyq5-BK4e8yFIUEkHazZBRe75ijz5RKBng7dXcPWrGwdH5OBMYSuI0DmSIR-sVvhY-d3jm0CWQA02UzeUNZLHivFu8vO-LJipeH1kyg2jN6O2pecmVzqaCuyojeFQUzNl3KfkNQyMcEJ_ojax5RrJco9800zzdoVba23xM6?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/3ZBjnplS-Z-PUDMb2EpMO1NzbOWceXL5qF_LE9w7xYz8fvF4GsCrBj5Nk6wDTQMXFkLnfwne58S-wK85rqaqNpkG-SHku9EZPRwlnZu5_QAwojTUOsNyCtX8q1NHPjuJhOAQ0Z6Hwk1353S6jtFKqrMNpfRDgDeDz6S3AfWxpm3fXdWj5JIQBaWli_Aysl6A?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/HccQ28m_6Ycr3Jyt9i5rJT5hLIWyPCuPTsAsOt_jeU4AbA473XbG_EO0Vt95766GhgEaGDP8qhbqaCIfF7cVnbTn9Qt1-oQtllmRQ7ZH9RM6ToMTwDbvDfTDGXouxkGU6RwlkurANNmX5wRhcgKnZmDR3eJq1wgFfRQ_DN9vZiu7UCzZhbQXmF7EOzzJeOEN?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/dMPValUrOGFTKmy8L_nErEq59YOx1jyqyPTuC0GMHHG0BhzN35r05DXWdIxWJg26e_FeRGiiiDsvRwDX2lvvn6tEJtV9Atp9eRD-IbwBCZ9wgZB1i077b4P2-nYh4hvqPZpcXreel5KIA-KyWltHmRcnyPM1bGEdlUwGcAsC_wd3PJGwhandZQowrLGbZSRz?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/rU0FRQcQ0j0zAVRqeggKYjksDFjDVm4LAZEaa6gebSXtqynnEbDIJyJqn4Mm_sGpRk8D4sCpaAolTFBtJITeZf9tvyC5emWqCuYLD5svBGJJqtzIYSKdMO7OsivpASdv9Wbm7i5oOEFH1kJy734Z6N7XTC2JH7OF4uddcNPePoo62xdI7DI3j5sfKQZnOG8D?purpose=fullsize)
+
+![Image](https://images.openai.com/static-rsc-4/U-DPdTtLkXJRjs8NuDATlYdgZcSjqmpKJ2Vf536WmWmSvhGN6UjcdKu460lbpxYAH3UFNURX6akWkZyDRRrqfckoxE8N7tisEwsvcAxGNXEWER6JZ9cEmmJ9QsYGIu6c9O6eNiN9mY3VjTKIo2EB9PHPbim6j5bE4JnMU74IYIx9aLPLskjMOIdauu2KG_G3?purpose=fullsize)
+
+Bukan gambar dekoratif saja.
+
+Gambar harus memperkuat:
+
+> **“Saya mengerti chatbot ini untuk apa.”**
+
+---
+
+### LEVEL 3 — Untuk chatbot yang sudah terbukti populer
+
+Baru dibuat:
+
+**Video 30–60 detik**
+
+Formatnya sederhana:
+
+> **Masalah → buka chatbot → ketik pertanyaan → AI menjawab → CTA**
+
+Tidak perlu produksi video mahal.
+
+Contoh:
+
+**0–5 detik**
+
+> “Masih bingung menentukan SKK yang tepat?”
+
+**5–15 detik**
+
+User mengetik pertanyaan.
+
+**15–35 detik**
+
+AI memberikan jawaban.
+
+**35–45 detik**
+
+> “Coba sendiri AI SBU & SKK di Gustafta.”
+
+Selesai.
+
+---
+
+# Bagaimana dengan mini ebook?
+
+Saya justru akan **memindahkannya ke tahap setelah user tertarik**.
+
+Jangan:
+
+**Kartu → Mini Ebook → Chatbot**
+
+Tetapi:
+
+**Kartu → Chatbot → Mini Ebook**
+
+Karena chatbot adalah **produk yang ingin kita kenalkan**.
+
+Mini ebook menjadi **pendalaman / lead magnet / upsell**.
+
+---
+
+# Bagaimana dengan Executive Summary?
+
+Menurut saya **tidak perlu untuk user umum**.
+
+Executive summary lebih cocok untuk:
+
+* B2B
+* proposal
+* corporate
+* institutional buyer
+* premium package
+* decision maker
+
+Untuk katalog chatbot publik, terlalu berat.
+
+---
+
+# Saya akan membuat sistem 3 tingkat untuk Gustafta
+
+Ini yang menurut saya paling ideal:
+
+| Level  | Asset                         | Tujuan               |
+| ------ | ----------------------------- | -------------------- |
+| **L1** | Chatbot Card                  | Membuat user klik    |
+| **L2** | Thumbnail + contoh percakapan | Membuat user percaya |
+| **L3** | Video demo                    | Membuat user yakin   |
+
+Kemudian:
+
+| Setelah klik                  | Asset                         |
+| ----------------------------- | ----------------------------- |
+| User mencoba                  | **Chatbot**                   |
+| User ingin belajar            | **Mini Guide**                |
+| User ingin lengkap            | **Ebook**                     |
+| User ingin solusi lebih dalam | **Premium Chatbot / Package** |
+
+Jadi **tidak semua chatbot harus punya ebook**.
+
+---
+
+# Dan ada satu hal yang menurut saya sangat penting untuk Gustafta
+
+Jangan menjual chatbot dengan bahasa:
+
+> “AI berbasis LLM dengan knowledge base terintegrasi…”
+
+atau:
+
+> “AI Agent dengan orchestration…”
+
+atau:
+
+> “Powered by advanced generative AI…”
+
+**User tidak peduli.**
+
+Jual **pekerjaannya**.
+
+Misalnya:
+
+❌ **AI Legal Assistant**
+
+lebih lemah daripada:
+
+✅ **“Bingung membaca kontrak? Upload dokumen dan tanyakan apa saja.”**
+
+---
+
+❌ **AI Financial Specialist**
+
+lebih lemah daripada:
+
+✅ **“Cari tahu ke mana uang proyek Anda sebenarnya mengalir.”**
+
+---
+
+❌ **AI Education Counselor**
+
+lebih lemah daripada:
+
+✅ **“Bantu cari pathway pendidikan yang sesuai dengan tujuan siswa.”**
+
+---
+
+# Bahkan saya akan membuat satu formula standar untuk seluruh katalog Gustafta
+
+**[MASALAH]**
+
+> Apa masalah yang sedang dialami user?
+
+↓
+
+**[AI SOLUTION]**
+
+> Chatbot ini membantu apa?
+
+↓
+
+**[EXAMPLE]**
+
+> Contoh pertanyaan yang bisa diajukan.
+
+↓
+
+**[OUTCOME]**
+
+> Apa yang akan didapat user?
+
+↓
+
+**[CTA]**
+
+> Coba sekarang.
+
+Dengan format ini, **Anda bisa memasukkan 80 chatbot ke katalog tanpa harus membuat 80 ebook.**
+
+Dan yang paling penting:
+
+> **Setiap chatbot baru cukup dibuatkan satu Card.**
+
+Itulah yang membuat strategi ini benar-benar **low effort dan scalable**.
+
+Kalau saya yang mengunci arsitektur Gustafta sekarang, saya akan menjadikan **Chatbot Card sebagai “unit marketing standar” Gustafta**. Setiap kali ada chatbot baru, checklist produksinya hanya:
+
+**Nama → Hook → Deskripsi → 3 contoh pertanyaan → 3–4 manfaat → thumbnail → CTA.**
+
+Baru kalau chatbot tersebut **terbukti populer**, kita naikkan menjadi **video → mini guide → ebook → premium product**.
+
+Dengan begitu, Gustafta bisa tumbuh menjadi **“gudang chatbot” tanpa setiap penambahan chatbot menciptakan beban produksi konten yang besar.**
