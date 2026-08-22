@@ -197,7 +197,7 @@ export function LandingVideoCarousel() {
                       aria-label={slide.title}
                       className="h-full w-full object-cover"
                       controls
-                      onEnded={() => index === 0 && select(1)}
+                      loop
                       playsInline
                       poster={slide.poster}
                       preload="metadata"

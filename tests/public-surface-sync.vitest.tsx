@@ -127,12 +127,14 @@ describe("public landing synchronization", () => {
 
     const promo = screen.getByTestId("landing-video-slide-1");
     expect(promo).toHaveAttribute("controls");
+    expect(promo).toHaveAttribute("loop");
     expect(promo).toHaveAttribute("playsinline");
     expect(promo).toHaveAttribute("src", expect.stringContaining("gustafta_promo_24s_web.mp4"));
     expect(promo).toHaveAttribute("poster", expect.stringContaining("gustafta_promo_24s_poster.jpg"));
 
     const explainer = screen.getByTestId("landing-video-slide-2");
     expect(explainer).toHaveAttribute("controls");
+    expect(explainer).toHaveAttribute("loop");
     expect(explainer).toHaveAttribute("playsinline");
     expect(explainer).toHaveAttribute("src", expect.stringContaining("gustafta_explainer.mp4"));
     expect(explainer).toHaveAttribute("poster", expect.stringContaining("gustafta_explainer_poster.jpg"));
@@ -154,7 +156,7 @@ describe("public landing synchronization", () => {
     expect(screen.getByTestId("landing-identity-next")).toBeInTheDocument();
   });
 
-  it("moves both carousels manually and advances to the second video when the first ends", async () => {
+  it("moves both carousels manually while each video remains on its selected looping slide", async () => {
     render(<Landing />);
 
     expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
@@ -164,9 +166,7 @@ describe("public landing synchronization", () => {
     expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
 
     fireEvent.ended(screen.getByTestId("landing-video-slide-1"));
-    await waitFor(() => {
-      expect(screen.getByTestId("landing-video-dot-2")).toHaveAttribute("aria-pressed", "true");
-    });
+    expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
 
     expect(screen.getByTestId("landing-identity-dot-1")).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByTestId("landing-identity-next"));
