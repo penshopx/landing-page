@@ -7,62 +7,125 @@ import { databaseStorageKey } from "./lib/digital-product-storage";
 import { CONTRACTOR_L1_EBOOKS } from "./sales-ladder-blueprint";
 import { SBU_SKK_EBOOK } from "@shared/sbu-skk-ebook";
 
-const PRIVATE_FILE_NAME = "SBU-SKK-Tanpa-Bingung.pdf";
-const APPROVED_PDF_SHA256 = "b4e52689e568e1112ef9ad2b04c8ae3e59ac375ee32e2d77d36a2346e80f75f3";
-const PRIVATE_DOWNLOAD_PATH =
-  "db-object:digital-products/ebooks/sbu-skk-tanpa-bingung/v1.0.0/sbu-skk-tanpa-bingung.pdf";
-const PRIVATE_ASSET_CANDIDATES = [
-  path.resolve(process.cwd(), "dist/private-assets/sbu-skk-tanpa-bingung-v1.0.0.pdf"),
-  path.resolve(process.cwd(), "attached_assets/0_Ebook_SBU-SKK-final_1787296226294.pdf"),
-];
+// ── Approved asset manifests (hashes LOCKED by Task #395) ──────────────────
+const MAIN_FILE = {
+  fileName: "SBU-SKK-Tanpa-Bingung.pdf",
+  sha256: "3df699f2d540e868081e8c23e904ce516b642e72b83a8989207ff6b5a84c2048",
+  pages: 264,
+  downloadPath:
+    "db-object:digital-products/ebooks/sbu-skk-tanpa-bingung/v2.0.0/sbu-skk-tanpa-bingung.pdf",
+  sortOrder: 0,
+  role: "main",
+  label: "Ebook SBU & SKK Tanpa Bingung (264 halaman)",
+  candidates: [
+    path.resolve(process.cwd(), "dist/private-assets/sbu-skk-tanpa-bingung-v2.0.0.pdf"),
+    path.resolve(process.cwd(), "attached_assets/Ebook_SBU-SKK-ok_1787368451833.pdf"),
+  ],
+};
 
-async function loadPrivatePdf(): Promise<Buffer> {
-  for (const candidate of PRIVATE_ASSET_CANDIDATES) {
+const SUPPLEMENT_FILE = {
+  fileName: "Lampiran-Toolkit-SBU-SKK.pdf",
+  sha256: "3aa4d83eeed5a9d970b2655451a8fe3db9c402de0c5ed69b12dd55d1caaa4c66",
+  pages: 29,
+  downloadPath:
+    "db-object:digital-products/ebooks/sbu-skk-tanpa-bingung/v2.0.0/lampiran-toolkit.pdf",
+  sortOrder: 1,
+  role: "supplement",
+  label: "Lampiran Toolkit SBU-SKK (29 halaman)",
+  candidates: [
+    path.resolve(process.cwd(), "dist/private-assets/sbu-skk-lampiran-toolkit-v1.0.0.pdf"),
+    path.resolve(process.cwd(), "dist/private-assets/lampiran-toolkit-sbu-skk-v2.0.0.pdf"),
+    path.resolve(process.cwd(), "attached_assets/LAMPIRAN_EBOOK_1787369070797.pdf"),
+  ],
+};
+
+async function loadPrivatePdf(
+  candidates: string[],
+  expectedSha256: string,
+  label: string,
+): Promise<Buffer> {
+  for (const candidate of candidates) {
     try {
       const bytes = await readFile(candidate);
       if (bytes.subarray(0, 5).toString("ascii") !== "%PDF-") {
         throw new Error("File tidak memiliki signature PDF.");
       }
-      if (bytes.length < 1_000_000) {
+      if (bytes.length < 50_000) {
         throw new Error(`Ukuran PDF tidak wajar (${bytes.length} byte).`);
+      }
+      const sha256 = createHash("sha256").update(bytes).digest("hex");
+      if (sha256 !== expectedSha256) {
+        throw new Error(
+          `Hash PDF ${label} tidak cocok. Got ${sha256}, expected ${expectedSha256}.`,
+        );
       }
       return bytes;
     } catch (error: any) {
       if (error?.code !== "ENOENT") throw error;
     }
   }
-  throw new Error("Aset PDF privat SBU-SKK tidak ditemukan di source maupun bundle server.");
+  throw new Error(
+    `Aset PDF privat "${label}" tidak ditemukan di semua kandidat path.`,
+  );
 }
 
 /**
- * Reconciles one commercial identity across Registry, Store fulfillment, the
- * private binary, and the already-approved Contractor Sales Ladder L1 node.
+ * Reconciles the ebook commercial identity across Registry, Store fulfillment,
+ * TWO private binary files (main ebook + lampiran toolkit), and the approved
+ * Contractor Sales Ladder L1 node.
+ *
+ * Multi-file: removes the old per-product unique index and seeds both files.
+ * Backward compatible: store_products.download_path keeps the primary file path.
  */
 export async function seedSbuSkkEbook(): Promise<void> {
-  const pdf = await loadPrivatePdf();
-  const sha256 = createHash("sha256").update(pdf).digest("hex");
-  if (sha256 !== APPROVED_PDF_SHA256) {
-    throw new Error(`Hash PDF privat SBU-SKK tidak cocok dengan aset final yang disetujui (${sha256}).`);
-  }
-  const storageKey = databaseStorageKey(PRIVATE_DOWNLOAD_PATH);
-  // The newly-provisioned /p/:slug page is not attached to the payment store
-  // yet (Scalev returns 404), while the account's canonical variant checkout is
-  // live. Keep the Store URL on the proven variant flow used by the main catalog.
-  const checkoutUrl =
-    `${PAYMENT_BASE_URL}/c/checkout?variant_ids=${SBU_SKK_EBOOK.scalev.variantId}&qty=1`;
+  const [mainPdf, supplementPdf] = await Promise.all([
+    loadPrivatePdf(MAIN_FILE.candidates, MAIN_FILE.sha256, MAIN_FILE.label),
+    loadPrivatePdf(
+      SUPPLEMENT_FILE.candidates,
+      SUPPLEMENT_FILE.sha256,
+      SUPPLEMENT_FILE.label,
+    ),
+  ]);
+
+  const mainStorageKey = databaseStorageKey(MAIN_FILE.downloadPath);
+  const supplementStorageKey = databaseStorageKey(SUPPLEMENT_FILE.downloadPath);
+
+  const checkoutUrl = `${PAYMENT_BASE_URL}/c/checkout?variant_ids=${SBU_SKK_EBOOK.scalev.variantId}&qty=1`;
+
   const ladderEbook = CONTRACTOR_L1_EBOOKS.find((ebook) =>
     ebook.label.startsWith("SBU & SKK Tanpa Bingung:"),
   );
   if (!ladderEbook) {
-    throw new Error("Blueprint Sales Ladder tidak memiliki node L1 SBU-SKK yang disetujui.");
+    throw new Error(
+      "Blueprint Sales Ladder tidak memiliki node L1 SBU-SKK yang disetujui.",
+    );
   }
   const l1Label = ladderEbook.label;
 
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    await client.query("SELECT pg_advisory_xact_lock(hashtext('seed-sbu-skk-ebook-v1'))");
+    await client.query(
+      "SELECT pg_advisory_xact_lock(hashtext('seed-sbu-skk-ebook-v2'))",
+    );
 
+    // ── DDL: drop single-product uniqueness, add ordering/role columns ────────
+    // Safe to run repeatedly (IF EXISTS / IF NOT EXISTS guards).
+    await client.query(`
+      DROP INDEX IF EXISTS uq_digital_product_file_product
+    `);
+    await client.query(`
+      ALTER TABLE digital_product_files
+        ADD COLUMN IF NOT EXISTS sort_order integer NOT NULL DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS role varchar(30) NOT NULL DEFAULT 'main',
+        ADD COLUMN IF NOT EXISTS label text DEFAULT ''
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_digital_product_files_product
+      ON digital_product_files (product_registry_id, sort_order)
+    `);
+
+    // ── Product Registry ──────────────────────────────────────────────────────
     await client.query(
       `INSERT INTO product_registry (
          product_id, name, slug, product_type, category, subcategory,
@@ -75,7 +138,7 @@ export async function seedSbuSkkEbook(): Promise<void> {
        ) VALUES (
          $1,$2,$3,'EBOOK','EBOOK','SBU_SKK',
          $4,$5,$6,$7::jsonb,$8::jsonb,
-         '/ebook-sbu-skk',$9,'IDR','ONE_TIME','ACTIVE','1.0.0',
+         '/ebook-sbu-skk',$9,'IDR','ONE_TIME','ACTIVE','2.0.0',
          'STATIC_ASSET','DOWNLOAD',false,false,'READY',
          'STANDALONE_ONLY',true,false,false,
          false,'[]'::jsonb,'PRIVATE_DATABASE_OBJECT',$10,
@@ -114,10 +177,11 @@ export async function seedSbuSkkEbook(): Promise<void> {
         SBU_SKK_EBOOK.title,
         SBU_SKK_EBOOK.slug,
         SBU_SKK_EBOOK.subtitle,
-        `${SBU_SKK_EBOOK.pages} halaman panduan praktis untuk memahami transisi regulasi dan menata pemenuhan persyaratan SBU-SKK.`,
+        `${SBU_SKK_EBOOK.pages} halaman panduan praktis + ${SBU_SKK_EBOOK.toolkitPages} halaman Lampiran Toolkit.`,
         SBU_SKK_EBOOK.audience.join("; "),
         JSON.stringify([
           `${SBU_SKK_EBOOK.pages} halaman PDF`,
+          `${SBU_SKK_EBOOK.toolkitPages} halaman Lampiran Toolkit`,
           "Akses otomatis setelah pembayaran terkonfirmasi",
           "Tautan akses aman berbasis token order",
         ]),
@@ -127,6 +191,7 @@ export async function seedSbuSkkEbook(): Promise<void> {
       ],
     );
 
+    // ── Store product ─────────────────────────────────────────────────────────
     const existingStore = await client.query<{ id: number }>(
       `SELECT id
          FROM store_products
@@ -136,18 +201,20 @@ export async function seedSbuSkkEbook(): Promise<void> {
       [SBU_SKK_EBOOK.title, SBU_SKK_EBOOK.scalev.variantId],
     );
     if (existingStore.rowCount && existingStore.rowCount > 1) {
-      throw new Error(`Ditemukan ${existingStore.rowCount} store product dengan nama SBU-SKK yang sama.`);
+      throw new Error(
+        `Ditemukan ${existingStore.rowCount} store product dengan nama SBU-SKK yang sama.`,
+      );
     }
 
     const storeValues = [
       SBU_SKK_EBOOK.title,
-      `${SBU_SKK_EBOOK.subtitle}. PDF ${SBU_SKK_EBOOK.pages} halaman, dikirim otomatis setelah pembayaran terkonfirmasi.`,
+      `${SBU_SKK_EBOOK.subtitle}. PDF ${SBU_SKK_EBOOK.pages} halaman + Lampiran Toolkit ${SBU_SKK_EBOOK.toolkitPages} halaman, dikirim otomatis setelah pembayaran terkonfirmasi.`,
       SBU_SKK_EBOOK.amount,
       JSON.stringify(SBU_SKK_EBOOK.benefits),
       checkoutUrl,
       SBU_SKK_EBOOK.scalev.variantId,
       SBU_SKK_EBOOK.title,
-      PRIVATE_DOWNLOAD_PATH,
+      MAIN_FILE.downloadPath, // legacy primary file stays on store_products.download_path
     ];
 
     if (existingStore.rows[0]) {
@@ -174,13 +241,15 @@ export async function seedSbuSkkEbook(): Promise<void> {
       );
     }
 
+    // ── Digital product files (multi-file: main + supplement) ─────────────────
+    // Upsert main file (sort_order=0, role=main)
     await client.query(
       `INSERT INTO digital_product_files (
          product_registry_id, storage_key, file_name, mime_type,
-         size_bytes, sha256, content, updated_at
-       ) VALUES ($1,$2,$3,'application/pdf',$4,$5,$6,now())
-       ON CONFLICT (product_registry_id) DO UPDATE SET
-         storage_key=EXCLUDED.storage_key,
+         size_bytes, sha256, content, sort_order, role, label, updated_at
+       ) VALUES ($1,$2,$3,'application/pdf',$4,$5,$6,$7,$8,$9,now())
+       ON CONFLICT (storage_key) DO UPDATE SET
+         product_registry_id=EXCLUDED.product_registry_id,
          file_name=EXCLUDED.file_name,
          mime_type=EXCLUDED.mime_type,
          size_bytes=EXCLUDED.size_bytes,
@@ -190,22 +259,79 @@ export async function seedSbuSkkEbook(): Promise<void> {
              THEN EXCLUDED.content
            ELSE digital_product_files.content
          END,
+         sort_order=EXCLUDED.sort_order,
+         role=EXCLUDED.role,
+         label=EXCLUDED.label,
          updated_at=now()`,
       [
         SBU_SKK_EBOOK.registryProductId,
-        storageKey,
-        PRIVATE_FILE_NAME,
-        pdf.length,
-        sha256,
-        pdf,
+        mainStorageKey,
+        MAIN_FILE.fileName,
+        mainPdf.length,
+        MAIN_FILE.sha256,
+        mainPdf,
+        MAIN_FILE.sortOrder,
+        MAIN_FILE.role,
+        MAIN_FILE.label,
       ],
     );
 
+    // Remove any legacy single-file row that used the old storage key path
+    await client.query(
+      `DELETE FROM digital_product_files
+        WHERE product_registry_id = $1
+          AND storage_key NOT IN ($2, $3)`,
+      [
+        SBU_SKK_EBOOK.registryProductId,
+        mainStorageKey,
+        supplementStorageKey,
+      ],
+    );
+
+    // Upsert supplement file (sort_order=1, role=supplement)
+    await client.query(
+      `INSERT INTO digital_product_files (
+         product_registry_id, storage_key, file_name, mime_type,
+         size_bytes, sha256, content, sort_order, role, label, updated_at
+       ) VALUES ($1,$2,$3,'application/pdf',$4,$5,$6,$7,$8,$9,now())
+       ON CONFLICT (storage_key) DO UPDATE SET
+         product_registry_id=EXCLUDED.product_registry_id,
+         file_name=EXCLUDED.file_name,
+         mime_type=EXCLUDED.mime_type,
+         size_bytes=EXCLUDED.size_bytes,
+         sha256=EXCLUDED.sha256,
+         content=CASE
+           WHEN digital_product_files.sha256 IS DISTINCT FROM EXCLUDED.sha256
+             THEN EXCLUDED.content
+           ELSE digital_product_files.content
+         END,
+         sort_order=EXCLUDED.sort_order,
+         role=EXCLUDED.role,
+         label=EXCLUDED.label,
+         updated_at=now()`,
+      [
+        SBU_SKK_EBOOK.registryProductId,
+        supplementStorageKey,
+        SUPPLEMENT_FILE.fileName,
+        supplementPdf.length,
+        SUPPLEMENT_FILE.sha256,
+        supplementPdf,
+        SUPPLEMENT_FILE.sortOrder,
+        SUPPLEMENT_FILE.role,
+        SUPPLEMENT_FILE.label,
+      ],
+    );
+
+    // ── Sales Ladder validation ───────────────────────────────────────────────
     await client.query(
       `LOCK TABLE sales_ladders, sales_ladder_nodes, sales_ladder_edges
        IN SHARE ROW EXCLUSIVE MODE`,
     );
-    const targetNodes = await client.query<{ id: number; node_type: string; product_registry_id: string | null }>(
+    const targetNodes = await client.query<{
+      id: number;
+      node_type: string;
+      product_registry_id: string | null;
+    }>(
       `SELECT n.id, n.node_type, n.product_registry_id
          FROM sales_ladder_nodes n
          JOIN sales_ladders l ON l.id = n.ladder_id
@@ -220,7 +346,9 @@ export async function seedSbuSkkEbook(): Promise<void> {
       [SBU_SKK_EBOOK.registryProductId, l1Label],
     );
     if (targetNodes.rowCount !== 1) {
-      throw new Error(`Node L1 SBU-SKK harus tepat satu; ditemukan ${targetNodes.rowCount}.`);
+      throw new Error(
+        `Node L1 SBU-SKK harus tepat satu; ditemukan ${targetNodes.rowCount}.`,
+      );
     }
     await client.query(
       `UPDATE sales_ladder_nodes
@@ -259,7 +387,11 @@ export async function seedSbuSkkEbook(): Promise<void> {
       [SBU_SKK_EBOOK.registryProductId],
     );
     const state = ladderState.rows[0];
-    if (state.l1_count !== "5" || state.linked_count !== "1" || state.placeholder_count !== "4") {
+    if (
+      state.l1_count !== "5" ||
+      state.linked_count !== "1" ||
+      state.placeholder_count !== "4"
+    ) {
       throw new Error(
         `Sales Ladder tidak sesuai setelah mapping (L1=${state.l1_count}, linked=${state.linked_count}, placeholder=${state.placeholder_count}).`,
       );
@@ -267,7 +399,7 @@ export async function seedSbuSkkEbook(): Promise<void> {
 
     await client.query("COMMIT");
     console.log(
-      `${new Date().toLocaleTimeString()} [Seed SBU-SKK Ebook] ready — Registry, Store, private PDF, and Sales Ladder linked`,
+      `${new Date().toLocaleTimeString()} [Seed SBU-SKK Ebook] ready — Registry, Store, 2 private PDFs, and Sales Ladder linked`,
     );
   } catch (error) {
     await client.query("ROLLBACK");

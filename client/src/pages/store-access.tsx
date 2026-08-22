@@ -33,6 +33,7 @@ interface StoreAccessData {
   baseUrl: string | null;
   type?: "digital";
   downloadUrl?: string | null;
+  downloads?: Array<{ id: string; fileName: string; label: string; role: string; mimeType: string; sizeBytes: number; downloadUrl: string }>;
 }
 
 class StoreAccessError extends Error {
@@ -164,7 +165,7 @@ export default function StoreAccess() {
           </div>
         ) : isPaymentPending ? (
           <div className="text-center py-20" data-testid="state-access-payment-pending">
-            <div className="text-6xl mb-4">⏳</div>
+            <div className="mx-auto mb-4 h-12 w-12 animate-pulse rounded-full bg-yellow-400/20" />
             <h1 className="text-2xl font-bold mb-2 text-yellow-400">Pembayaran Diproses</h1>
             <p className="text-gray-400 mb-6">
               Pembayaran Anda belum terkonfirmasi. Halaman akses dan file akan aktif otomatis setelah pembayaran berhasil.
@@ -179,7 +180,7 @@ export default function StoreAccess() {
           </div>
         ) : isError ? (
           <div className="text-center py-20">
-            <div className="text-6xl mb-4">🔒</div>
+            <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-red-400" />
             <h1 className="text-2xl font-bold mb-2 text-red-400">Akses Tidak Valid</h1>
             <p className="text-gray-400 mb-6">Link akses tidak ditemukan atau sudah kadaluarsa.</p>
             <a href="/store">
@@ -241,7 +242,7 @@ export default function StoreAccess() {
                   className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
                   style={{ background: `${data.product.color}25`, border: `1px solid ${data.product.color}40` }}
                 >
-                  {data.product.emoji}
+                  <Package className="h-6 w-6" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -254,25 +255,25 @@ export default function StoreAccess() {
               </CardContent>
             </Card>
 
-            {/* ── Digital Product: Download Button ── */}
+            {/* ── Digital Product: Download Buttons ── */}
             {data.type === "digital" && (
               <Card className="bg-green-500/10 border-green-500/30">
-                <CardContent className="p-6 space-y-4 text-center">
-                  <div className="text-5xl">📄</div>
+                <CardContent className="p-6 space-y-4">
+                  <div className="text-center"><BookOpen className="mx-auto h-10 w-10 text-green-400" />
                   <div>
                     <h3 className="font-bold text-lg mb-1">Download File Anda</h3>
                     <p className="text-xs text-gray-400">
                       Klik tombol di bawah untuk mendownload file. Link download juga sudah dikirim ke email Anda.
                     </p>
                   </div>
-                  {data.downloadUrl ? (
-                    <a href={data.downloadUrl} target="_blank" rel="noopener noreferrer" className="block">
-                      <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-12 text-base" data-testid="button-download-file">
-                        <ExternalLink className="h-5 w-5 mr-2" />
-                        Download {data.product.name}
-                      </Button>
-                    </a>
-                  ) : (
+                  </div>
+                  {(data.downloads?.length ? data.downloads : data.downloadUrl ? [{ id: "legacy", fileName: data.product.name, label: data.product.name, role: "File digital", mimeType: "application/pdf", sizeBytes: 0, downloadUrl: data.downloadUrl }] : []).map(file => (
+                    <div key={file.id} className="flex flex-col gap-3 rounded-xl border border-green-500/20 bg-black/10 p-4 sm:flex-row sm:items-center">
+                      <div className="min-w-0 flex-1"><p className="font-semibold">{file.label}</p><p className="truncate text-xs text-gray-400">{file.fileName} · {file.role}{file.sizeBytes ? ` · ${(file.sizeBytes / 1024 / 1024).toFixed(1)} MB` : ""}</p></div>
+                      <a href={file.downloadUrl} target="_blank" rel="noopener noreferrer"><Button className="w-full bg-green-600 hover:bg-green-700 text-white sm:w-auto" data-testid={`button-download-${file.id}`}><ExternalLink className="mr-2 h-4 w-4" />Unduh file</Button></a>
+                    </div>
+                  ))}
+                  {!data.downloads?.length && !data.downloadUrl && (
                     <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-300">
                       Link download sedang bermasalah. Silakan hubungi kami via WhatsApp di bawah — kami kirim filenya langsung.
                     </div>

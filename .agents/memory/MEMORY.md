@@ -87,3 +87,5 @@
 - [Public anonymous chat sessionId](public-anon-chat-sessionid.md) — public-agent chat pages MUST send per-visitor sessionId to /api/messages/stream, else agent-wide history (PII) leaks antar pengunjung.
 - [Floating chatbot single owner](floating-chat-single-owner.md) — hanya ChaesaWidget global di App.tsx; jangan mount ChatPopup/DialogGustafta per halaman (bertindih).
 - [Reconciler vs boot seeds](reconciler-boot-seed-boundaries.md) — audit di batas transaksi; graph rewrite wajib cocok penuh dengan legacy shape dan mengunci write agar edit pengguna tidak hilang.
+- [Dual-auth active-session parity](dual-auth-active-session-parity.md) — protected routes must recognize OIDC + email sessions and enforce inactive/blocked revocation through one shared checker.
+- [Manual fulfillment processing leases](manual-fulfillment-processing-leases.md) — recover stale processing claims idempotently, and version final/error writes so an old worker cannot clobber a new one.

@@ -103,6 +103,9 @@ import CashflowPbjPage from "@/pages/cashflow-pbj";
 import EbookKasMerahPage from "@/pages/ebook-kas-merah";
 import EbookToolkitPage from "@/pages/ebook-toolkit";
 import EbookSbuSkkPage from "@/pages/ebook-sbu-skk";
+import MiniEbookSbuSkk from "@/pages/mini-ebook-sbu-skk";
+import MiniEbookSbuSkkAccess from "@/pages/mini-ebook-sbu-skk-access";
+import TutorAiSbuSkk from "@/pages/tutor-ai-sbu-skk";
 import EtalaseProyekPage from "@/pages/etalase-proyek";
 import BiroJasaSbuPage from "@/pages/biro-jasa-sbu";
 import JasaDokumenPage from "@/pages/jasa-dokumen";
@@ -613,6 +616,9 @@ function Router() {
       <Route path="/ebook-kas-merah" component={EbookKasMerahPage} />
       <Route path="/ebook-toolkit" component={EbookToolkitPage} />
       <Route path="/ebook-sbu-skk" component={EbookSbuSkkPage} />
+      <Route path="/mini-ebook-sbu-skk/access/:token" component={MiniEbookSbuSkkAccess} />
+      <Route path="/mini-ebook-sbu-skk" component={MiniEbookSbuSkk} />
+      <Route path="/tutor-ai-sbu-skk" component={TutorAiSbuSkk} />
       <Route path="/ebook" component={EbookToolkitPage} />
       <Route path="/etalase/:userId" component={EtalaseProyekPage} />
       <Route path="/biro-jasa-sbu" component={BiroJasaSbuPage} />
@@ -755,15 +761,15 @@ function Router() {
         <Route path="/sbu-claw" component={() => (
           <PremiumPageGuard
             feature="claw_sbu_tender" requiredPlan="starter"
-            title="SBUClaw — Multi-Agen SBU Konstruksi"
-            description="10 agen spesialis yang memandu proses pengurusan SBU Konstruksi end-to-end: mapping subklasifikasi, gap analysis, dokumen, SKK, hingga walkthrough OSS-RBA."
+            title="AI Specialist SBU-SKK"
+            description="AI Specialist SBU-SKK dengan 10 agen spesialis untuk memandu pengurusan SBU dan SKK end-to-end: mapping subklasifikasi, gap analysis, dokumen, hingga walkthrough OSS-RBA."
             highlights={["Smart mapping subklasifikasi BS/BG/IL/IM/KO","Checklist dokumen & gap analysis kualifikasi","Draft surat & estimasi biaya + timeline","Walkthrough OSS-RBA & LPJK step-by-step"]}
             icon={<HardHat className="h-12 w-12 text-amber-400" />}
             pas={{
-              problemTitle: "Ngurus SBU sendiri? Ini yang biasa bikin mentok",
+               problemTitle: "Mengurus SBU dan SKK sendiri? Ini yang biasa bikin mentok",
               problemBody: "Subklasifikasi BS/BG/IL/IM/KO membingungkan, syarat SKK tiap jabatan kerja beda-beda, dan alur OSS-RBA sering berubah. Banyak BUJK harus bolak-balik revisi karena salah pilih subklasifikasi atau dokumen kualifikasi kurang — padahal itu semua bisa dicek dari awal.",
               agitateBody: "Setiap revisi berarti antre ulang di LPJK dan waktu terbuang berminggu-minggu. Kalau SBU belum terbit saat masa pendaftaran tender dibuka, perusahaan Anda otomatis tersisih — proyek melayang ke kompetitor yang lebih siap.",
-              desireBody: "Dengan SBUClaw, Anda tinggal ceritakan bidang usaha dan pengalaman proyek — 10 agen spesialis langsung memetakan subklasifikasi yang tepat, mengecek gap kualifikasi & SKK yang masih kurang, menyiapkan checklist dokumen, sampai memandu Anda submit di OSS-RBA tanpa tebak-tebakan.",
+              desireBody: "Dengan AI Specialist SBU-SKK, Anda tinggal ceritakan bidang usaha dan pengalaman proyek — 10 agen spesialis langsung memetakan subklasifikasi yang tepat, mengecek gap kualifikasi & SKK yang masih kurang, menyiapkan checklist dokumen, sampai memandu Anda submit di OSS-RBA tanpa tebak-tebakan.",
               stats: [
                 { value: "10", label: "Agen Spesialis" },
                 { value: "5", label: "Subklasifikasi BS/BG/IL/IM/KO" },
@@ -771,9 +777,9 @@ function Router() {
               ],
               proofNote: "Mengacu pada regulasi LPJK & alur perizinan berusaha berbasis risiko (OSS-RBA) yang berlaku untuk sertifikasi Badan Usaha Jasa Konstruksi (BUJK).",
               faqs: [
-                { q: "Apakah SBUClaw menerbitkan SBU untuk saya?", a: "Tidak. SBUClaw adalah asisten AI yang memandu persiapan Anda — mapping subklasifikasi, gap analysis, dan checklist dokumen — sementara penerbitan SBU tetap melalui LPJK/lembaga sertifikasi berwenang." },
+                { q: "Apakah AI Specialist ini menerbitkan SBU untuk saya?", a: "Tidak. AI Specialist SBU-SKK memandu persiapan Anda — mapping subklasifikasi, gap analysis, dan checklist dokumen — sementara penerbitan SBU tetap melalui LPJK/lembaga sertifikasi berwenang." },
                 { q: "Saya belum tahu subklasifikasi apa yang cocok, bagaimana?", a: "Ceritakan bidang usaha dan pengalaman proyek Anda di chat — agen mapping akan merekomendasikan subklasifikasi BS/BG/IL/IM/KO yang paling sesuai beserta jenjang kualifikasinya." },
-                { q: "Apakah SBUClaw juga membahas keterkaitan dengan SKK tenaga kerja?", a: "Ya. Salah satu agen khusus menganalisis ketergantungan antara SKK penanggung jawab teknis dan persyaratan SBU yang Anda tuju." },
+                { q: "Apakah AI Specialist juga membahas keterkaitan dengan SKK tenaga kerja?", a: "Ya. Salah satu agen khusus menganalisis ketergantungan antara SKK penanggung jawab teknis dan persyaratan SBU yang Anda tuju." },
               ],
             }}
           ><SbuClawChat /></PremiumPageGuard>

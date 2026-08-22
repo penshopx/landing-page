@@ -263,7 +263,11 @@ async function checkUserIsActive(userId: string): Promise<boolean> {
   return isActive;
 }
 
-export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
+export type AuthenticationResult =
+  | { ok: true; userId: string }
+  | { ok: false; status: 401 | 403; message: string };
+
+export async function authenticateRequest(req: any): Promise<AuthenticationResult> {
   // Allow email-session authenticated users through
   if (req.session?.emailUser?.id) {
     // Inject a synthetic req.user so downstream code can read userId consistently
@@ -274,14 +278,20 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
       };
     }
     const active = await checkUserIsActive(req.session.emailUser.id);
-    if (!active) return res.status(403).json({ message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta." });
-    return next();
+    if (!active) {
+      return {
+        ok: false,
+        status: 403,
+        message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta.",
+      };
+    }
+    return { ok: true, userId: String(req.session.emailUser.id) };
   }
 
   const user = req.user as any;
 
-  if (!req.isAuthenticated() || !user) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (!req.isAuthenticated?.() || !user) {
+    return { ok: false, status: 401, message: "Unauthorized" };
   }
 
   if (!user.expires_at) {
@@ -289,9 +299,17 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
     const userId = user.claims?.sub;
     if (userId) {
       const active = await checkUserIsActive(userId);
-      if (!active) return res.status(403).json({ message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta." });
+      if (!active) {
+        return {
+          ok: false,
+          status: 403,
+          message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta.",
+        };
+      }
     }
-    return next();
+    return userId
+      ? { ok: true, userId: String(userId) }
+      : { ok: false, status: 401, message: "Unauthorized" };
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -304,9 +322,17 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
     const userId = user.claims?.sub;
     if (userId) {
       const active = await checkUserIsActive(userId);
-      if (!active) return res.status(403).json({ message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta." });
+      if (!active) {
+        return {
+          ok: false,
+          status: 403,
+          message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta.",
+        };
+      }
     }
-    return next();
+    return userId
+      ? { ok: true, userId: String(userId) }
+      : { ok: false, status: 401, message: "Unauthorized" };
   }
 
   const refreshed = await performTokenRefresh(user, req);
@@ -315,10 +341,26 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
     const userId = user.claims?.sub;
     if (userId) {
       const active = await checkUserIsActive(userId);
-      if (!active) return res.status(403).json({ message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta." });
+      if (!active) {
+        return {
+          ok: false,
+          status: 403,
+          message: "Akun Anda telah dinonaktifkan. Hubungi admin Gustafta.",
+        };
+      }
     }
-    return next();
+    return userId
+      ? { ok: true, userId: String(userId) }
+      : { ok: false, status: 401, message: "Unauthorized" };
   }
 
-  return res.status(401).json({ message: "Unauthorized" });
+  return { ok: false, status: 401, message: "Unauthorized" };
+}
+
+export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
+  const auth = await authenticateRequest(req);
+  if (!auth.ok) {
+    return res.status(auth.status).json({ message: auth.message });
+  }
+  return next();
 };

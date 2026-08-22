@@ -2907,11 +2907,153 @@ export const digitalProductFiles = pgTable("digital_product_files", {
   sizeBytes:         integer("size_bytes").notNull(),
   sha256:            varchar("sha256", { length: 64 }).notNull(),
   content:           bytea("content").notNull(),
+  // Deterministic ordering and semantic role (additive, nullable for legacy rows).
+  // sortOrder: 0-based ascending; role: "main" (primary download) | "supplement" | etc.
+  sortOrder:         integer("sort_order").notNull().default(0),
+  role:              varchar("role", { length: 30 }).notNull().default("main"),
+  label:             text("label").default(""),
   createdAt:         timestamp("created_at").defaultNow().notNull(),
   updatedAt:         timestamp("updated_at").defaultNow().notNull(),
 }, (table) => [
-  uniqueIndex("uq_digital_product_file_product").on(table.productRegistryId),
+  // Removed per-product uniqueness to support multi-file paid fulfillment (Task #395).
+  // The legacy uq_digital_product_file_product index is dropped via migration 0015.
+  index("idx_digital_product_files_product").on(table.productRegistryId, table.sortOrder),
 ]);
+
+// ── Lead asset registry: mini-ebook and other lead magnets ────────────────────
+// Bytes stored privately (same bytea pattern as digitalProductFiles). Never accessible
+// via paid store endpoints — separate token namespace enforced by design.
+export const leadAssets = pgTable("lead_assets", {
+  id:        serial("id").primaryKey(),
+  assetSlug: varchar("asset_slug", { length: 80 }).notNull().unique(),
+  title:     text("title").notNull(),
+  mimeType:  text("mime_type").notNull().default("application/pdf"),
+  sizeBytes: integer("size_bytes").notNull(),
+  sha256:    varchar("sha256", { length: 64 }).notNull(),
+  content:   bytea("content").notNull(),
+  pages:     integer("pages"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type LeadAsset = typeof leadAssets.$inferSelect;
+
+// Lead capture submissions for SBU-SKK funnel (and future funnels).
+// Campaign attribution, consent, and delivery state stored durably.
+export const leadSubmissions = pgTable("lead_submissions", {
+  id:                serial("id").primaryKey(),
+  assetSlug:         varchar("asset_slug", { length: 80 }).notNull(),
+  name:              text("name").notNull(),
+  email:             varchar("email", { length: 255 }).notNull(),
+  whatsapp:          varchar("whatsapp", { length: 30 }),
+  whatsappConsent:   boolean("whatsapp_consent").notNull().default(false),
+  // Campaign attribution
+  utmSource:         text("utm_source").default(""),
+  utmMedium:         text("utm_medium").default(""),
+  utmCampaign:       text("utm_campaign").default(""),
+  utmContent:        text("utm_content").default(""),
+  utmTerm:           text("utm_term").default(""),
+  referrer:          text("referrer").default(""),
+  landingPath:       text("landing_path").default(""),
+  // Access token (opaque, 30-day expiry)
+  accessToken:       varchar("access_token", { length: 64 }).notNull().unique(),
+  expiresAt:         timestamp("expires_at").notNull(),
+  // Delivery state
+  emailSent:         boolean("email_sent").notNull().default(false),
+  emailSentAt:       timestamp("email_sent_at"),
+  createdAt:         timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("uq_lead_submissions_email_slug").on(table.email, table.assetSlug),
+]);
+
+export type LeadSubmission = typeof leadSubmissions.$inferSelect;
+
+// ── Product entitlements (generic, durable, idempotent) ────────────────────────
+// Tracks time-boxed + quota-bounded access to a product capability (e.g. Tutor AI).
+// Supports pending-before-account (email-keyed), claim on authenticated login,
+// and duplicate-order idempotency (providerOrderRef UNIQUE constraint).
+export const productEntitlements = pgTable("product_entitlements", {
+  id:               serial("id").primaryKey(),
+  // Immutable business key for the capability granted (e.g. "sbu-skk-tutor-30d")
+  entitlementKey:   varchar("entitlement_key", { length: 60 }).notNull(),
+  // Normalized email (lowercase trim) — primary lookup before account exists
+  email:            varchar("email", { length: 255 }).notNull(),
+  // Gustafta userId — null until claimed by an authenticated user
+  userId:           varchar("user_id", { length: 255 }),
+  // Canonical product registry reference
+  productRegistryId: varchar("product_registry_id", { length: 40 }).notNull(),
+  // Agent that backs the entitlement (for tutor: "sbu-skk-tutor")
+  agentSlug:        varchar("agent_slug", { length: 80 }).notNull(),
+  // Entitlement window
+  startsAt:         timestamp("starts_at").notNull().defaultNow(),
+  expiresAt:        timestamp("expires_at").notNull(),
+  // Quota tracking
+  quotaTotal:       integer("quota_total").notNull().default(100),
+  quotaUsed:        integer("quota_used").notNull().default(0),
+  // Status: pending (no userId yet) | active | expired | revoked
+  status:           varchar("status", { length: 20 }).notNull().default("pending"),
+  // Provenance
+  source:           varchar("source", { length: 40 }).notNull().default("manual"),
+  // Provider/manual order references for dedup; NULL for manual grants
+  providerOrderRef: varchar("provider_order_ref", { length: 120 }),
+  manualOrderRef:   varchar("manual_order_ref", { length: 120 }),
+  grantedBy:        varchar("granted_by", { length: 255 }),
+  // Audit
+  createdAt:        timestamp("created_at").defaultNow().notNull(),
+  updatedAt:        timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  // Idempotency: one active entitlement per (entitlementKey, email, providerOrderRef)
+  // providerOrderRef-based dedup prevents extension or quota increase on duplicate events.
+  uniqueIndex("uq_entitlement_provider_order")
+    .on(table.entitlementKey, table.email, table.providerOrderRef)
+    .where(sql`${table.providerOrderRef} IS NOT NULL`),
+  uniqueIndex("uq_entitlement_manual_order")
+    .on(table.entitlementKey, table.manualOrderRef)
+    .where(sql`${table.manualOrderRef} IS NOT NULL`),
+  index("idx_entitlement_email_key").on(table.email, table.entitlementKey),
+  index("idx_entitlement_user_key").on(table.userId, table.entitlementKey),
+]);
+
+export type ProductEntitlement = typeof productEntitlements.$inferSelect;
+
+// ── SBU-SKK Tutor source chunks (ebook + toolkit grounding) ─────────────────
+export const sbuSkkTutorSources = pgTable("sbu_skk_tutor_sources", {
+  id:          serial("id").primaryKey(),
+  sourceTitle: text("source_title").notNull(),   // "Ebook SBU-SKK" | "Lampiran Toolkit"
+  pageNumber:  integer("page_number").notNull(),
+  chunkIndex:  integer("chunk_index").notNull().default(0),
+  content:     text("content").notNull(),
+  // Lexical search (simple word overlap — no external embedding required)
+  searchTerms: text("search_terms").default(""),
+  createdAt:   timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  index("idx_sbu_skk_tutor_sources_search").on(table.sourceTitle, table.pageNumber),
+]);
+
+export type SbuSkkTutorSource = typeof sbuSkkTutorSources.$inferSelect;
+
+// ── SBU-SKK manual orders (Tutor / Bundle / AI Specialist) ──────────────────
+// Created by POST /api/sbu-skk/orders when no Scalev variant exists.
+export const sbuSkkOrders = pgTable("sbu_skk_orders", {
+  id:            serial("id").primaryKey(),
+  offerKey:      varchar("offer_key", { length: 40 }).notNull(), // tutor | bundle | ai-specialist
+  productId:     varchar("product_id", { length: 40 }).notNull(),
+  amount:        integer("amount").notNull(),
+  buyerName:     text("buyer_name").notNull(),
+  buyerEmail:    varchar("buyer_email", { length: 255 }).notNull(),
+  buyerWhatsapp: varchar("buyer_whatsapp", { length: 30 }),
+  whatsappConsent: boolean("whatsapp_consent").notNull().default(false),
+  orderRef:      varchar("order_ref", { length: 80 }).notNull().unique(),
+  status:        varchar("status", { length: 20 }).notNull().default("pending"),
+  // Admin confirmation
+  confirmedBy:   varchar("confirmed_by", { length: 255 }),
+  confirmedAt:   timestamp("confirmed_at"),
+  confirmEvidence: text("confirm_evidence").default(""),
+  fulfillmentError: text("fulfillment_error").default(""),
+  entitlementId: integer("entitlement_id"),
+  createdAt:     timestamp("created_at").defaultNow().notNull(),
+  updatedAt:     timestamp("updated_at").defaultNow().notNull(),
+});
 
 // ── Solution / Sector / Tier / Package Registries (Phase 1) ────────────────
 export const solutionRegistry = pgTable("solution_registry", {

@@ -46,8 +46,16 @@ async function buildAll() {
   // without the paid-order token gate.
   await mkdir("dist/private-assets", { recursive: true });
   await copyFile(
-    "attached_assets/0_Ebook_SBU-SKK-final_1787296226294.pdf",
-    "dist/private-assets/sbu-skk-tanpa-bingung-v1.0.0.pdf",
+    "attached_assets/Ebook_SBU-SKK-ok_1787368451833.pdf",
+    "dist/private-assets/sbu-skk-tanpa-bingung-v2.0.0.pdf",
+  );
+  await copyFile(
+    "attached_assets/LAMPIRAN_EBOOK_1787369070797.pdf",
+    "dist/private-assets/sbu-skk-lampiran-toolkit-v1.0.0.pdf",
+  );
+  await copyFile(
+    "attached_assets/mini-ebook_SBU_1787369141323.pdf",
+    "dist/private-assets/mini-ebook-sbu-skk-v1.0.0.pdf",
   );
 
   console.log("building server...");

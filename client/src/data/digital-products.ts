@@ -6,7 +6,7 @@
 // ambil dari client/src/data/pricing.ts bila berbayar.
 // ============================================================
 import { CASHFLOW_EBOOK } from "@/data/pricing";
-import { SBU_SKK_EBOOK } from "@/data/pricing";
+import { SBU_SKK_EBOOK, SBU_SKK_FUNNEL } from "@/data/pricing";
 import sbuSkkCover from "@assets/0_cover_Ebook_SBU-SKK_1787296306789.png";
 
 export type DigitalProduct = {
@@ -43,7 +43,7 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     jenis: "ebook",
     judul: SBU_SKK_EBOOK.title,
     subjudul: SBU_SKK_EBOOK.subtitle,
-    deskripsi: "Panduan praktis 265 halaman untuk membaca perubahan, menata persyaratan, dan bekerja lebih tertib dalam transisi SBU-SKK.",
+    deskripsi: "Panduan praktis 264 halaman + toolkit 29 halaman untuk membaca perubahan, menata persyaratan, dan bekerja lebih tertib dalam transisi SBU-SKK.",
     hargaLabel: SBU_SKK_EBOOK.priceLabel,
     gratis: false,
     tier: "premium",
@@ -52,6 +52,21 @@ export const DIGITAL_PRODUCTS: DigitalProduct[] = [
     badge: "Panduan terbaru",
     ctaLabel: "Lihat panduan",
     cover: sbuSkkCover,
+  },
+  {
+    slug: SBU_SKK_FUNNEL.miniEbook.assetSlug,
+    jenis: "ebook",
+    judul: SBU_SKK_FUNNEL.miniEbook.title,
+    subjudul: SBU_SKK_FUNNEL.miniEbook.subtitle,
+    deskripsi: "Ringkasan 20 halaman untuk mengenali peta masalah SBU-SKK sebelum masuk ke panduan lengkap.",
+    hargaLabel: SBU_SKK_FUNNEL.miniEbook.priceLabel,
+    gratis: true,
+    tier: "lead",
+    href: "/mini-ebook-sbu-skk",
+    lini: "REGULASI KONSTRUKSI",
+    badge: "Form akses",
+    ctaLabel: "Isi formulir",
+    preNote: "Mulai dari sini",
   },
   {
     slug: "ebook-kas-merah",
