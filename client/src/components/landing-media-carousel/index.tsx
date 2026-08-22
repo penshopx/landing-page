@@ -38,7 +38,7 @@ const identitySlides = [
     eyebrow: "Identitas",
     title: "Dari monolog ke dialog",
     caption: "Gustafta memberi bahasa bersama agar keputusan kerja tidak berhenti di satu kepala.",
-    fit: "object-contain",
+    fit: "object-cover",
   },
   {
     src: assistedProfessionalUrl,
