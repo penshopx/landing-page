@@ -2252,6 +2252,47 @@ export const insertResearchReportSchema = createInsertSchema(researchReports).om
 export type InsertResearchReport = z.infer<typeof insertResearchReportSchema>;
 export type ResearchReport = typeof researchReports.$inferSelect;
 
+// Brief riset produk satu-kali dari Super Admin. Worker mengambil baris queued
+// dengan lease; retry membuat baris baru agar brief dan setiap hasil tetap immutable.
+export const marketResearchRequests = pgTable("market_research_requests", {
+  id: serial("id").primaryKey(),
+  requestedBy: varchar("requested_by", { length: 255 }).notNull(),
+  topic: text("topic").notNull(),
+  productId: varchar("product_id", { length: 160 }),
+  productName: text("product_name"),
+  objective: text("objective").notNull(),
+  targetSegment: text("target_segment").notNull().default(""),
+  marketScope: text("market_scope").notNull().default("Indonesia"),
+  status: varchar("status", { length: 20 }).notNull().default("queued"),
+  attemptCount: integer("attempt_count").notNull().default(0),
+  retryOfId: integer("retry_of_id"),
+  leaseToken: varchar("lease_token", { length: 64 }),
+  leaseExpiresAt: timestamp("lease_expires_at"),
+  lastError: text("last_error"),
+  startedAt: timestamp("started_at"),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+}, (t) => ({
+  statusCreatedIdx: index("market_research_requests_status_created_idx").on(t.status, t.createdAt),
+  requestedByIdx: index("market_research_requests_requested_by_idx").on(t.requestedBy, t.createdAt),
+}));
+
+export const insertMarketResearchRequestSchema = createInsertSchema(marketResearchRequests).omit({
+  id: true,
+  status: true,
+  attemptCount: true,
+  leaseToken: true,
+  leaseExpiresAt: true,
+  lastError: true,
+  startedAt: true,
+  completedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+export type InsertMarketResearchRequest = z.infer<typeof insertMarketResearchRequestSchema>;
+export type MarketResearchRequest = typeof marketResearchRequests.$inferSelect;
+
 // Laporan internal kebutuhan pasar dan rekomendasi solusi Gustafta. Setiap run
 // adalah snapshot immutable, dibuat pipeline Tim Marketing dan hanya dibaca superadmin.
 // Payload berisi sinyal agregat; tidak menyimpan isi chat atau identitas pelanggan.
@@ -2259,6 +2300,8 @@ export const marketNeedsReports = pgTable("market_needs_reports", {
   id: serial("id").primaryKey(),
   reportDate: date("report_date").notNull(),
   generatedBy: text("generated_by").notNull().default("scheduler"),
+  reportKind: varchar("report_kind", { length: 20 }).notNull().default("daily"),
+  researchRequestId: integer("research_request_id"),
   sourceCount: integer("source_count").notNull().default(0),
   internalSignalWindowDays: integer("internal_signal_window_days").notNull().default(30),
   payload: jsonb("payload").notNull(),
@@ -2266,6 +2309,7 @@ export const marketNeedsReports = pgTable("market_needs_reports", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (t) => ({
   reportDateIdx: index("market_needs_reports_report_date_idx").on(t.reportDate),
+  researchRequestIdx: index("market_needs_reports_research_request_idx").on(t.researchRequestId, t.createdAt),
   updatedIdx: index("market_needs_reports_updated_idx").on(t.updatedAt),
 }));
 

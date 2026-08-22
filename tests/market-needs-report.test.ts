@@ -109,6 +109,49 @@ test("rekomendasi produk memakai data katalog kanonik dan istilah customer-facin
   assert.match(recommendation.suggestedMessage, /AI Specialist/);
 });
 
+test("nama, harga, dan tautan produk dalam narasi model tidak pernah dipersistenkan", () => {
+  const hallucinated = validRawReport({
+    executiveSummary: "Gunakan Produk Tender Sakti seharga Rp 7.500.000 di https://palsu.example/checkout.",
+    marketSignals: [{
+      title: "Solusi Tender Sakti",
+      summary: "Platform Tender Sakti ditawarkan dengan harga IDR 8.000.000.",
+      evidenceIds: ["M1"],
+    }],
+    recommendations: [{
+      decision: "promote",
+      need: "Persiapan tender melalui Aplikasi Tender Sakti",
+      segment: "Kontraktor",
+      productId: canonicalProduct.id,
+      rationale: "Pilih TenderBot Pro, tersedia hanya 100 ribu di evil.example/checkout.",
+      confidence: "high",
+      evidenceIds: ["M1"],
+      suggestedMessage: "Coba TenderBot Pro seharga Rp 9.000.000 di https://palsu.example.",
+      suggestedChannels: ["WhatsApp"],
+      durationDays: 7,
+    }],
+    caveats: ["Biaya Rp 9.000.000 dapat berubah di /harga-palsu."],
+  });
+
+  const payload = validateAndResolveMarketReport(
+    hallucinated,
+    [canonicalProduct],
+    evidence,
+    "2026-08-22T00:00:00.000Z",
+  );
+  const serialized = JSON.stringify({
+    executiveSummary: payload.executiveSummary,
+    marketSignals: payload.marketSignals,
+    recommendationNarrative: payload.recommendations.map(({ product: _product, ...item }) => item),
+    caveats: payload.caveats,
+  });
+
+  assert.doesNotMatch(serialized, /Tender Sakti|Tender Palsu|TenderBot Pro/i);
+  assert.doesNotMatch(serialized, /100|ribu|evil\.example|7\.500\.000|8\.000\.000|9\.000\.000|palsu\.example|harga-palsu/i);
+  assert.match(payload.recommendations[0].suggestedMessage, /AI Specialist Tender/);
+  assert.match(payload.recommendations[0].suggestedMessage, /Rp\s*99\.000/);
+  assert.match(payload.recommendations[0].suggestedMessage, /\/tender/);
+});
+
 test("productId fiktif diturunkan menjadi product gap dan confidence rendah", () => {
   const raw = validRawReport({
     recommendations: [{

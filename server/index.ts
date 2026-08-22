@@ -1023,6 +1023,8 @@ for (const envVar of requiredEnvVars) {
 
   await registerRoutes(httpServer, app);
   startDigitalDeliveryOutboxWorker();
+  const { startMarketResearchRequestWorker } = await import("./lib/market-research-requests");
+  startMarketResearchRequestWorker();
 
   // ── Boot-time channel health check ──────────────────────────────────────────
   if (!process.env.APP_URL) {

@@ -70,6 +70,29 @@ impression/search/click belum tersedia, laporan tidak boleh disebut daftar “pa
 tidak pernah mengubah featured product, mengirim pesan, memasang iklan, atau mempublikasikan konten secara
 otomatis; semua tindakan tetap melalui **◆ gerbang manusia**.
 
+## Riset khusus atas permintaan Super Admin
+
+Selain sweep harian, Super Admin dapat mengirim brief satu kali dari
+`/monitor-marketing`. Brief dapat merujuk produk katalog aktif atau topik baru,
+serta memuat tujuan keputusan, segmen sasaran, dan cakupan pasar.
+
+- Permintaan disimpan dalam antrean persisten dengan status `queued`, `running`,
+  `completed`, atau `failed`.
+- Worker memproses satu permintaan pada satu waktu. Leader worker memakai lease
+  tersendiri (terpisah dari scheduler harian), sedangkan setiap klaim request juga
+  memakai lease. Pekerjaan yang terputus dapat dipulihkan setelah lease kedaluwarsa
+  tanpa membiarkan worker lama menimpa hasil worker baru.
+- Riset memakai query khusus ke Google News RSS. Hasilnya tidak dimasukkan ke feed
+  harian. Berbeda dari laporan harian, jalur ini tidak mengirim sinyal penggunaan,
+  order, atau langganan internal ke model; juga tidak membaca chat, dokumen unggahan,
+  atau identitas pelanggan.
+- Produk pilihan divalidasi ulang terhadap katalog kanonik server. Narasi model
+  dibersihkan dari nama produk, angka, harga, dan tautan; kartu produk serta draf
+  pesan disusun ulang oleh server dari fakta katalog kanonik.
+- Setiap retry membuat permintaan dan laporan baru. Riwayat lama tidak ditimpa.
+- Laporan khusus tetap privat untuk Super Admin dan tidak memiliki jalur publikasi
+  otomatis. Status rekomendasi tetap `promote`, `monitor`, atau `product_gap`.
+
 ## Prune-scope KB (terpisah, tidak saling hapus)
 `Feed Riset` · `Panduan Metode Riset` · `Materi Iklan Harian` · `Panduan Platform Iklan` ·
 `Fondasi Gustafta` · `Sequence Retensi Harian` · `Fondasi Penjualan` · `Amunisi Jualan Harian`.

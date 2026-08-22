@@ -10,8 +10,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowLeft, RefreshCw, MessageSquare, Copy, Check, CalendarDays,
   Megaphone, Heart, Handshake, Search, Clock, AlertCircle, Target,
-  ShieldCheck, ExternalLink, BarChart3,
+  ShieldCheck, ExternalLink, BarChart3, RotateCcw,
+  Loader2, ChevronRight,
 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface DailyDoc {
   id: number | string;
@@ -67,7 +71,7 @@ interface RecommendedProduct {
 interface OpportunityReport {
   id: number;
   reportDate: string;
-  generatedBy: "scheduler" | "manual";
+  generatedBy: "scheduler" | "manual" | "request";
   sourceCount: number;
   internalSignalWindowDays: number;
   payload: {
@@ -94,6 +98,38 @@ interface OpportunityReport {
   };
   createdAt: string;
   updatedAt: string;
+}
+
+interface ResearchProduct {
+  id: string;
+  name: string;
+  productType: string;
+  category: string;
+  description: string;
+  targetUsers: string;
+  officialUrl: string | null;
+  price: number | null;
+}
+
+type ResearchRequestStatus = "queued" | "running" | "completed" | "failed";
+interface ResearchRequest {
+  id: number;
+  requestedBy: string;
+  topic: string;
+  productId: string | null;
+  productName: string | null;
+  objective: string;
+  targetSegment: string;
+  marketScope: string;
+  status: ResearchRequestStatus;
+  attemptCount: number;
+  retryOfId: number | null;
+  lastError: string | null;
+  createdAt: string;
+  updatedAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
+  report: OpportunityReport | null;
 }
 
 const DECISION_LABEL: Record<MarketDecision, string> = {
@@ -253,7 +289,10 @@ function OpportunityReportCard({ report }: { report: OpportunityReport }) {
                 Peta Kebutuhan & Rekomendasi Solusi
               </CardTitle>
               <p className="text-xs text-muted-foreground mt-1">
-                {formatDate(report.payload.generatedAt)} · {report.sourceCount} sumber pasar · sinyal agregat {report.internalSignalWindowDays} hari
+                {formatDate(report.payload.generatedAt)} · {report.sourceCount} sumber pasar
+                {report.generatedBy === "request"
+                  ? " · riset publik terarah"
+                  : ` · sinyal agregat ${report.internalSignalWindowDays} hari`}
               </p>
             </div>
           </div>
@@ -394,6 +433,210 @@ function OpportunityReportCard({ report }: { report: OpportunityReport }) {
   );
 }
 
+const REQUEST_STATUS_LABEL: Record<ResearchRequestStatus, string> = {
+  queued: "Menunggu antrean",
+  running: "Sedang dianalisis",
+  completed: "Selesai",
+  failed: "Perlu ditinjau",
+};
+
+function RequestStatus({ status, requestId }: { status: ResearchRequestStatus; requestId: number }) {
+  const tone = status === "completed"
+    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+    : status === "failed"
+      ? "border-destructive/30 bg-destructive/10 text-destructive"
+      : status === "running"
+        ? "border-primary/30 bg-primary/10 text-primary"
+        : "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300";
+  return (
+    <Badge variant="outline" className={`gap-1.5 ${tone}`} data-testid={`request-status-${requestId}`}>
+      {(status === "queued" || status === "running") && <Loader2 className="h-3 w-3 animate-spin" />}
+      {REQUEST_STATUS_LABEL[status]}
+    </Badge>
+  );
+}
+
+function CustomResearchWorkflow() {
+  const { toast } = useToast();
+  const [topic, setTopic] = useState("");
+  const [productId, setProductId] = useState("");
+  const [objective, setObjective] = useState("");
+  const [targetSegment, setTargetSegment] = useState("");
+  const [marketScope, setMarketScope] = useState("Indonesia");
+  const [selectedRequestId, setSelectedRequestId] = useState<number | null>(null);
+  const [formError, setFormError] = useState("");
+
+  const { data: productData, isLoading: productsLoading, error: productsError } =
+    useQuery<{ products: ResearchProduct[] }>({ queryKey: ["/api/marketing-team/research-products"] });
+  const {
+    data: requestData,
+    isLoading: requestsLoading,
+    error: requestsError,
+  } = useQuery<{ requests: ResearchRequest[] }>({
+    queryKey: ["/api/marketing-team/research-requests"],
+    refetchInterval: (query) => {
+      const requests = (query.state.data as { requests?: ResearchRequest[] } | undefined)?.requests ?? [];
+      return requests.some((request) => request.status === "queued" || request.status === "running") ? 5000 : false;
+    },
+  });
+
+  const createRequest = useMutation({
+    mutationFn: async () => {
+      return apiRequest("POST", "/api/marketing-team/research-requests", {
+        topic: topic.trim(),
+        productId: productId || null,
+        objective: objective.trim(),
+        targetSegment: targetSegment.trim(),
+        marketScope: marketScope.trim(),
+      });
+    },
+    onSuccess: () => {
+      toast({ title: "Permintaan riset masuk", description: "Tim akan mengolah bukti dan menyusun laporan privat." });
+      setTopic("");
+      setProductId("");
+      setObjective("");
+      setTargetSegment("");
+      setMarketScope("Indonesia");
+      setFormError("");
+      queryClient.invalidateQueries({ queryKey: ["/api/marketing-team/research-requests"] });
+    },
+    onError: (error: any) => toast({
+      title: "Permintaan belum terkirim",
+      description: error?.message || "Periksa koneksi lalu coba lagi.",
+      variant: "destructive",
+    }),
+  });
+
+  const retryRequest = useMutation({
+    mutationFn: async (id: number) =>
+      apiRequest("POST", `/api/marketing-team/research-requests/${id}/retry`),
+    onSuccess: () => {
+      toast({ title: "Percobaan baru dibuat", description: "Run sebelumnya tetap tersimpan sebagai jejak audit." });
+      queryClient.invalidateQueries({ queryKey: ["/api/marketing-team/research-requests"] });
+    },
+    onError: (error: any) => toast({
+      title: "Gagal membuat percobaan baru",
+      description: error?.message || "Coba lagi beberapa saat.",
+      variant: "destructive",
+    }),
+  });
+
+  const requests = requestData?.requests ?? [];
+  const selectedRequest = requests.find((request) => request.id === selectedRequestId);
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (topic.trim().length < 3 || objective.trim().length < 10) {
+      setFormError("Topik minimal 3 karakter dan tujuan riset minimal 10 karakter.");
+      return;
+    }
+    setFormError("");
+    createRequest.mutate();
+  };
+
+  return (
+    <section className="space-y-4" data-testid="custom-research-workflow">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Search className="h-5 w-5" />
+        </div>
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wide">Minta riset terarah</h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Ajukan pertanyaan pasar dengan konteks yang cukup. Hasilnya tetap privat, dapat ditinjau, dan tidak pernah dipublikasikan otomatis.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+        <Card className="border-primary/20 bg-card/80" data-testid="card-research-request-form">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Brief untuk analis</CardTitle>
+            <p className="text-xs text-muted-foreground">Kolom bertanda wajib membantu kami menguji pertanyaan yang sama.</p>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handleSubmit} data-testid="research-request-form">
+              <div className="space-y-1.5">
+                <Label htmlFor="research-topic">Topik riset <span className="text-destructive">*</span></Label>
+                <Input id="research-topic" value={topic} onChange={(event) => setTopic(event.target.value)} placeholder="Contoh: kebutuhan pelaporan stok toko kecil" data-testid="input-research-topic" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="research-product">Produk pembanding <span className="font-normal text-muted-foreground">(opsional)</span></Label>
+                <select id="research-product" value={productId} onChange={(event) => setProductId(event.target.value)} className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" disabled={productsLoading} data-testid="select-research-product">
+                  <option value="">{productsLoading ? "Memuat katalog resmi…" : "Tanpa produk — cari gap kebutuhan"}</option>
+                  {(productData?.products ?? []).map((product) => <option key={product.id} value={product.id}>{product.name} · {product.category}</option>)}
+                </select>
+                {productsError && <p className="text-xs text-destructive">Katalog produk tidak dapat dimuat. Anda masih dapat mengajukan topik gap.</p>}
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="research-objective">Tujuan keputusan <span className="text-destructive">*</span></Label>
+                <Textarea id="research-objective" value={objective} onChange={(event) => setObjective(event.target.value)} placeholder="Keputusan apa yang ingin didukung oleh bukti ini?" rows={3} data-testid="textarea-research-objective" />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="research-segment">Segmen sasaran</Label>
+                  <Input id="research-segment" value={targetSegment} onChange={(event) => setTargetSegment(event.target.value)} placeholder="Contoh: pemilik toko 1–3 cabang" data-testid="input-research-segment" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="research-scope">Cakupan pasar</Label>
+                  <Input id="research-scope" value={marketScope} onChange={(event) => setMarketScope(event.target.value)} placeholder="Contoh: Indonesia, 12 bulan" data-testid="input-research-scope" />
+                </div>
+              </div>
+              {formError && <p className="text-sm text-destructive" data-testid="research-form-error">{formError}</p>}
+              <Button type="submit" className="w-full sm:w-auto" disabled={createRequest.isPending} data-testid="button-submit-research">
+                {createRequest.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ChevronRight className="mr-2 h-4 w-4" />}
+                {createRequest.isPending ? "Mengirim brief…" : "Kirim permintaan riset"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden" data-testid="card-research-history">
+          <CardHeader className="border-b bg-muted/20 pb-3">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <CardTitle className="text-base">Riwayat permintaan</CardTitle>
+                <p className="mt-1 text-xs text-muted-foreground">Pembaruan otomatis saat run masih berjalan.</p>
+              </div>
+              <Badge variant="secondary">{requests.length} run</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {requestsLoading ? (
+              <div className="space-y-3 p-4"><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /><Skeleton className="h-14 w-full" /></div>
+            ) : requestsError ? (
+              <div className="p-6 text-sm text-muted-foreground" data-testid="research-history-error">Riwayat belum dapat dimuat. Muat ulang halaman untuk mencoba lagi.</div>
+            ) : requests.length === 0 ? (
+              <div className="p-8 text-center"><Search className="mx-auto h-7 w-7 text-muted-foreground" /><p className="mt-2 text-sm font-medium">Belum ada permintaan custom</p><p className="mt-1 text-xs text-muted-foreground">Brief pertama Anda akan muncul di sini.</p></div>
+            ) : (
+              <div className="divide-y">
+                {requests.map((request) => (
+                  <div key={request.id} className="space-y-2 p-4 transition-colors hover:bg-muted/20" data-testid={`research-request-row-${request.id}`}>
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <button type="button" className="min-w-0 text-left" onClick={() => setSelectedRequestId(selectedRequestId === request.id ? null : request.id)} data-testid={`button-open-request-${request.id}`}>
+                        <p className="line-clamp-2 text-sm font-semibold">{request.topic}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">Run #{request.id} · {new Date(request.createdAt).toLocaleString("id-ID")} · percobaan {request.attemptCount}</p>
+                      </button>
+                      <RequestStatus status={request.status} requestId={request.id} />
+                    </div>
+                    {request.lastError && <p className="rounded-md border border-destructive/20 bg-destructive/5 p-2 text-xs text-destructive" data-testid={`research-request-error-${request.id}`}>{request.lastError}</p>}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {request.status === "completed" && request.report && <Button type="button" variant="outline" size="sm" onClick={() => setSelectedRequestId(request.id)} data-testid={`button-custom-report-${request.id}`}>Buka laporan <ChevronRight className="ml-1 h-3.5 w-3.5" /></Button>}
+                      {(request.status === "failed" || request.status === "completed") && <Button type="button" variant="ghost" size="sm" onClick={() => retryRequest.mutate(request.id)} disabled={retryRequest.isPending} data-testid={`button-retry-request-${request.id}`}><RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Coba lagi</Button>}
+                    </div>
+                    {selectedRequestId === request.id && request.report && (
+                      <div className="pt-2" data-testid={`custom-report-${request.id}`}><OpportunityReportCard report={request.report} /></div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </section>
+  );
+}
+
 export default function MonitorMarketing() {
   const { toast } = useToast();
   const [selectedReportIdx, setSelectedReportIdx] = useState(0);
@@ -501,7 +744,7 @@ export default function MonitorMarketing() {
           <Card data-testid="card-orchestrator">
             <CardContent className="flex flex-wrap items-center gap-4 py-4">
               <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-xl shrink-0">
-                {data.orchestrator.avatar || "📣"}
+                {data.orchestrator.avatar || <Megaphone className="w-5 h-5 text-primary" />}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold" data-testid="text-orchestrator-name">{data.orchestrator.name}</p>
@@ -520,6 +763,8 @@ export default function MonitorMarketing() {
             </CardContent>
           </Card>
         )}
+
+        <CustomResearchWorkflow />
 
         {error && (
           <Card>
@@ -614,7 +859,7 @@ export default function MonitorMarketing() {
         )}
 
         <p className="text-xs text-muted-foreground text-center pt-2">
-          Semua hasil di sini masih berupa <span className="font-medium">draf</span>. Keputusan akhir tetap di tangan Anda sebelum dipublikasikan (◆ gerbang manusia).
+          Semua hasil di sini masih berupa <span className="font-medium">draf</span>. Keputusan akhir tetap di tangan Anda sebelum dipublikasikan (gerbang manusia).
         </p>
       </div>
     </div>

@@ -66,7 +66,9 @@ export interface MarketNeedsPayload {
 export interface StoredMarketNeedsReport {
   id: number;
   reportDate: string;
-  generatedBy: "scheduler" | "manual";
+  generatedBy: "scheduler" | "manual" | "request";
+  reportKind: "daily" | "requested";
+  researchRequestId: number | null;
   sourceCount: number;
   internalSignalWindowDays: number;
   payload: MarketNeedsPayload;
@@ -128,6 +130,103 @@ function resultRows<T = Record<string, unknown>>(result: unknown): T[] {
 
 function trimText(value: unknown, max: number): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Narasi model hanya boleh menjelaskan kebutuhan dan bukti. Semua fakta komersial
+ * produk (nama, harga, tautan) dirender ulang dari katalog server.
+ */
+function sanitizeModelNarrative(
+  value: unknown,
+  max: number,
+  products: EligibleProduct[],
+): string {
+  let text = trimText(value, max * 2);
+
+  for (const product of [...products].sort((a, b) => b.name.length - a.name.length)) {
+    for (const canonicalValue of [product.name, product.id]) {
+      if (!canonicalValue.trim()) continue;
+      text = text.replace(
+        new RegExp(escapeRegExp(canonicalValue), "giu"),
+        "produk resmi terkait",
+      );
+    }
+  }
+
+  text = text
+    .replace(/\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/giu, "fakta katalog resmi")
+    .replace(/\b(?:https?:\/\/|www\.)[^\s<>"')\]]+/giu, "fakta katalog resmi")
+    .replace(/\b[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+(?::\d+)?(?:\/[^\s<>"')\]]*)?/giu, "fakta katalog resmi")
+    .replace(/\b[a-z0-9-]+\s+(?:dot|titik)\s+[a-z]{2,}(?:\s+slash\s+[a-z0-9/_-]+)?\b/giu, "fakta katalog resmi")
+    .replace(/(^|\s)\/[a-z0-9][a-z0-9/_-]*(?=$|[\s.,;!?])/giu, "$1fakta katalog resmi")
+    .replace(/[$€£¥₩₹₽]/gu, "ketentuan katalog resmi")
+    .replace(/\b(?:Rp\.?|IDR|USD|EUR|SGD|MYR|AUD)\s*\p{N}[\p{N}.,]*(?:\s*(?:ribu|juta|miliar))?\b/giu, "ketentuan katalog resmi")
+    .replace(
+      /\b(?:harga|biaya|tarif|gratis|free|diskon|promo|murah|mahal|terjangkau|sekali\s+bayar|per\s+bulan|per\s+tahun|ribu|juta|miliar|triliun|rupiah|dolar|dollar)\b/giu,
+      "ketentuan katalog resmi",
+    )
+    // Angka dari model tidak dipersistenkan dalam narasi. Evidence terstruktur dan
+    // fakta katalog tetap menyimpan angka dari sumber server yang tepercaya.
+    .replace(/\p{N}[\p{N}.,:%+\-]*/gu, "angka dari bukti")
+    .replace(
+      /\b(?:[Pp]roduk|[Ss]olusi|[Pp]latform|[Aa]plikasi|[Ll]ayanan|[Tt]ools?|AI Specialist|Asisten AI|[Gg]unakan|[Cc]oba|[Pp]ilih|[Pp]romosikan|[Tt]awarkan)\s+(?:bernama\s+)?(?:["“'][^"”'\n]{2,80}["”']|[\p{Lu}][\p{L}\p{N}&+._-]*(?:\s+[\p{Lu}][\p{L}\p{N}&+._-]*){0,5})/gu,
+      "produk resmi terkait",
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (
+    /\p{N}/u.test(text)
+    || /(?:https?:\/\/|www\.|[\w.+-]+@[\w.-]+\.[a-z]{2,})/iu.test(text)
+    || /\b[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:\/[^\s]*)?/iu.test(text)
+    || /(^|\s)\/[a-z0-9/_-]+/iu.test(text)
+    || /\b(?:harga|biaya|tarif|gratis|free|diskon|promo|murah|mahal|terjangkau|ribu|juta|miliar|triliun|rupiah|dolar|dollar)\b/iu.test(text)
+  ) {
+    throw new Error("unsafe-model-commercial-claim");
+  }
+
+  return text.slice(0, max);
+}
+
+function formatCanonicalPrice(price: number | null): string | null {
+  if (price == null || !Number.isFinite(price) || price <= 0) return null;
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(price);
+}
+
+function buildCanonicalSuggestedMessage(
+  product: EligibleProduct | null,
+  need: string,
+  segment: string,
+): string {
+  const audience = segment || "segmen terkait";
+  if (!product) {
+    return trimText(
+      `Kami sedang memetakan kebutuhan ${need} untuk ${audience}. ` +
+      "Belum ada produk resmi yang ditetapkan; masukan pasar akan ditinjau sebelum solusi dikembangkan.",
+      1600,
+    );
+  }
+
+  const canonicalPrice = formatCanonicalPrice(product.price);
+  const canonicalFacts = [
+    canonicalPrice ? `Harga katalog: ${canonicalPrice}.` : "",
+    product.officialUrl ? `Informasi resmi: ${product.officialUrl}.` : "",
+  ].filter(Boolean).join(" ");
+
+  return trimText(
+    `${audience}: kebutuhan ${need} sedang menjadi perhatian. ` +
+    `${product.name} adalah produk resmi Gustafta yang direkomendasikan untuk ditinjau. ` +
+    `${canonicalFacts} Publikasi tetap menunggu persetujuan Super Admin.`,
+    1600,
+  );
 }
 
 function safeOfficialUrl(value: unknown): string | null {
@@ -228,7 +327,7 @@ export function extractMarketEvidence(
   return evidence;
 }
 
-async function loadEligibleProducts(): Promise<EligibleProduct[]> {
+export async function loadEligibleProducts(): Promise<EligibleProduct[]> {
   const registryResult = await db.execute(sql`
     SELECT
       product_id AS "id",
@@ -422,6 +521,7 @@ export function validateAndResolveMarketReport(
   products: EligibleProduct[],
   evidence: MarketEvidence[],
   generatedAt: string,
+  options: { publicOnly?: boolean } = {},
 ): MarketNeedsPayload {
   const raw = rawReportSchema.parse(rawInput);
   const productsById = new Map(products.map((product) => [product.id, product]));
@@ -431,7 +531,7 @@ export function validateAndResolveMarketReport(
     const requestedProduct = item.productId ? productsById.get(item.productId) || null : null;
     let decision = item.decision;
     let confidence = item.confidence;
-    let rationale = trimText(item.rationale, 1600);
+    let rationale = sanitizeModelNarrative(item.rationale, 1600, products);
 
     if (decision !== "product_gap" && !requestedProduct) {
       decision = "product_gap";
@@ -441,18 +541,20 @@ export function validateAndResolveMarketReport(
 
     const verifiedEvidenceIds = item.evidenceIds.filter((id) => evidenceIds.has(id));
     if (verifiedEvidenceIds.length === 0) confidence = "low";
+    const need = sanitizeModelNarrative(item.need, 360, products);
+    const segment = sanitizeModelNarrative(item.segment, 240, products);
+    const resolvedProduct = decision === "product_gap" ? null : requestedProduct;
 
     return {
       rank: index + 1,
       decision,
-      need: trimText(item.need, 360),
-      segment: trimText(item.segment, 240),
-      product: decision === "product_gap" ? null : requestedProduct,
+      need,
+      segment,
+      product: resolvedProduct,
       rationale,
       confidence,
       evidenceIds: verifiedEvidenceIds,
-      suggestedMessage: trimText(item.suggestedMessage, 1600)
-        .replace(/\bchatbot\b/gi, "AI Specialist"),
+      suggestedMessage: buildCanonicalSuggestedMessage(resolvedProduct, need, segment),
       suggestedChannels: item.suggestedChannels.map((channel) => trimText(channel, 80)).filter(Boolean),
       durationDays: typeof item.durationDays === "number" && item.durationDays > 0
         ? Math.max(1, Math.min(30, Math.round(item.durationDays)))
@@ -462,22 +564,27 @@ export function validateAndResolveMarketReport(
 
   return {
     generatedAt,
-    periodDays: INTERNAL_SIGNAL_WINDOW_DAYS,
-    executiveSummary: trimText(raw.executiveSummary, 2400),
-    methodologyNotice:
-      "Laporan ini memakai berita publik dan sinyal penggunaan internal yang sudah diagregasi. " +
-      `Kelompok internal di bawah ${MIN_INTERNAL_COHORT} disembunyikan dan hitungan yang tampil dibucket. ` +
-      "Belum ada telemetry Store untuk impression, pencarian, dan klik, sehingga laporan tidak boleh " +
-      "diklaim sebagai daftar produk yang paling dicari. Semua promosi tetap memerlukan persetujuan superadmin.",
+    periodDays: options.publicOnly ? 0 : INTERNAL_SIGNAL_WINDOW_DAYS,
+    executiveSummary: sanitizeModelNarrative(raw.executiveSummary, 2400, products),
+    methodologyNotice: options.publicOnly
+      ? "Laporan khusus ini hanya memakai metadata berita publik dari Google News RSS dan katalog resmi Gustafta. " +
+        "Tidak ada isi chat, dokumen unggahan, identitas pelanggan, order, langganan, atau sinyal penggunaan internal yang dikirim ke model. " +
+        "Google News RSS adalah agregator berita, bukan pemantauan media sosial real-time."
+      : "Laporan ini memakai berita publik dan sinyal penggunaan internal yang sudah diagregasi. " +
+        `Kelompok internal di bawah ${MIN_INTERNAL_COHORT} disembunyikan dan hitungan yang tampil dibucket. ` +
+        "Belum ada telemetry Store untuk impression, pencarian, dan klik, sehingga laporan tidak boleh " +
+        "diklaim sebagai daftar produk yang paling dicari. Semua promosi tetap memerlukan persetujuan superadmin.",
     marketSignals: raw.marketSignals.map((signal) => ({
-      title: trimText(signal.title, 240),
-      summary: trimText(signal.summary, 1200),
+      title: sanitizeModelNarrative(signal.title, 240, products),
+      summary: sanitizeModelNarrative(signal.summary, 1200, products),
       evidenceIds: signal.evidenceIds.filter((id) => evidenceIds.has(id)),
     })),
     evidence,
     recommendations,
     caveats: [
-      ...raw.caveats.map((caveat) => trimText(caveat, 600)).filter(Boolean),
+      ...raw.caveats
+        .map((caveat) => sanitizeModelNarrative(caveat, 600, products))
+        .filter(Boolean),
       "Tidak ada publikasi, perubahan featured product, pengiriman pesan, atau belanja iklan yang dilakukan otomatis.",
     ],
   };
@@ -485,7 +592,17 @@ export function validateAndResolveMarketReport(
 
 export async function generateMarketNeedsReport(input: {
   researchDocuments: Record<string, string>;
-  generatedBy: "scheduler" | "manual";
+  generatedBy: "scheduler" | "manual" | "request";
+  researchRequest?: {
+    id: number;
+    leaseToken: string;
+    topic: string;
+    objective: string;
+    targetSegment: string;
+    marketScope: string;
+    productId: string | null;
+    productName: string | null;
+  };
 }): Promise<GenerateMarketNeedsResult> {
   const client = getMarketReportClient();
   if (!client) return { generated: false, reason: "no-openai-key" };
@@ -495,16 +612,27 @@ export async function generateMarketNeedsReport(input: {
     return { generated: false, reason: "no-research-sources", sourceCount: 0 };
   }
 
-  const [products, internalEvidence] = await Promise.all([
-    loadEligibleProducts(),
-    loadAggregateDemandEvidence(),
-  ]);
+  const products = await loadEligibleProducts();
+  // Jalur atas-permintaan sengaja lebih sempit dari laporan harian: hanya RSS
+  // publik yang masuk prompt model; telemetry internal tidak dimuat sama sekali.
+  const internalEvidence = input.researchRequest
+    ? []
+    : await loadAggregateDemandEvidence();
   if (products.length === 0) {
     return { generated: false, reason: "no-eligible-products", sourceCount: marketEvidence.length };
   }
+  const requestedProduct = input.researchRequest?.productId
+    ? products.find((product) => product.id === input.researchRequest?.productId) || null
+    : null;
+  if (input.researchRequest?.productId && !requestedProduct) {
+    return { generated: false, reason: "requested-product-not-eligible", sourceCount: marketEvidence.length };
+  }
 
   const evidence = [...marketEvidence, ...internalEvidence];
-  const compactProducts = products.map((product) => ({
+  const orderedProducts = requestedProduct
+    ? [requestedProduct, ...products.filter((product) => product.id !== requestedProduct.id)]
+    : products;
+  const compactProducts = orderedProducts.map((product) => ({
     id: product.id,
     name: product.name,
     type: product.productType,
@@ -522,8 +650,16 @@ export async function generateMarketNeedsReport(input: {
     publishedAt: item.publishedAt,
   }));
 
+  const evidenceScope = input.researchRequest
+    ? "bukti pasar publik dari RSS"
+    : "bukti pasar publik dan sinyal internal AGREGAT";
+  const internalEvidenceRule = input.researchRequest
+    ? "4. RISET KHUSUS tidak memuat sinyal internal. Jangan mengklaim ada data penggunaan, order, langganan, atau telemetry pelanggan."
+    : `4. Sinyal internal adalah agregat penggunaan/order/langganan, BUKAN isi chat dan BUKAN bukti
+   "paling dicari". Telemetry Store impression/search/click belum tersedia.`;
+
   const systemPrompt = `Kamu adalah Divisi Rekomendasi Produk & Kebutuhan Pasar internal Gustafta.
-Tugasmu: mengubah bukti pasar publik dan sinyal internal AGREGAT menjadi rekomendasi yang dapat
+Tugasmu: mengubah ${evidenceScope} menjadi rekomendasi yang dapat
 ditinjau superadmin. Kamu tidak pernah mempublikasikan apa pun.
 
 ATURAN KERAS:
@@ -533,12 +669,15 @@ ATURAN KERAS:
    productId wajib null.
 3. "promote" hanya jika ada bukti relevan dan produk resmi siap. "monitor" untuk bukti sedang/
    belum cukup. Confidence harus turun bila bukti hanya berita atau hanya satu sinyal.
-4. Sinyal internal adalah agregat penggunaan/order/langganan, BUKAN isi chat dan BUKAN bukti
-   "paling dicari". Telemetry Store impression/search/click belum tersedia.
+${internalEvidenceRule}
 5. evidenceIds hanya boleh memakai ID yang tersedia. Setiap rekomendasi wajib berusaha menyertakan
    bukti pasar dan/atau internal yang relevan.
 6. Gunakan bahasa pelanggan "AI Specialist" atau "Asisten AI", jangan gunakan "chatbot".
 7. Pesan promosi harus jujur, tanpa klaim hasil pasti. Keputusan publikasi adalah gerbang manusia.
+8. Untuk RISET KHUSUS, jawab pertanyaan dalam brief secara langsung. Bila productId pilihan tersedia,
+   evaluasi produk itu secara eksplisit pada rekomendasi pertama; jangan menggantinya diam-diam.
+9. Jangan tulis nama produk, harga, productId, atau tautan di field narasi. Letakkan referensi produk
+   hanya di productId terstruktur; server akan menyisipkan nama, harga, dan tautan dari katalog resmi.
 
 Kembalikan SATU objek JSON dengan bentuk:
 {
@@ -560,9 +699,25 @@ Kembalikan SATU objek JSON dengan bentuk:
 }
 Buat 3-6 rekomendasi, diurutkan dari yang paling layak ditindaklanjuti.`;
 
+  const requestBrief = input.researchRequest
+    ? `BRIEF RISET KHUSUS SUPERADMIN:
+- Topik: ${input.researchRequest.topic}
+- Produk resmi yang diminta: ${requestedProduct ? `${requestedProduct.id} — ${requestedProduct.name}` : "Tidak dipilih; teliti kebutuhan/gap produk"}
+- Tujuan/pertanyaan: ${input.researchRequest.objective}
+- Segmen sasaran: ${input.researchRequest.targetSegment || "Belum ditentukan"}
+- Cakupan pasar: ${input.researchRequest.marketScope || "Indonesia"}
+
+Ini laporan privat atas permintaan satu kali. Jawab brief di atas; jangan mengubahnya menjadi laporan pasar generik.`
+    : "";
+
+  const evidenceHeading = input.researchRequest
+    ? "BUKTI PASAR PUBLIK:"
+    : "BUKTI PASAR DAN SINYAL INTERNAL:";
   const userPrompt = `Tanggal laporan WIB: ${reportDateWIB()}
 
-BUKTI PASAR DAN SINYAL INTERNAL:
+${requestBrief}
+
+${evidenceHeading}
 ${JSON.stringify(compactEvidence)}
 
 KATALOG RESMI YANG BOLEH DIREKOMENDASIKAN:
@@ -609,30 +764,58 @@ Buat Peta Kebutuhan & Rekomendasi Solusi untuk superadmin.`;
   }
 
   const generatedAt = new Date().toISOString();
-  const payload = validateAndResolveMarketReport(parsed, products, evidence, generatedAt);
+  const payload = validateAndResolveMarketReport(
+    parsed,
+    products,
+    evidence,
+    generatedAt,
+    { publicOnly: Boolean(input.researchRequest) },
+  );
+  if (requestedProduct && payload.recommendations[0]?.product?.id !== requestedProduct.id) {
+    return {
+      generated: false,
+      reason: "requested-product-not-evaluated",
+      sourceCount: marketEvidence.length,
+    };
+  }
   const reportDate = reportDateWIB();
-  const inserted = await db.execute(sql`
-    INSERT INTO market_needs_reports (
-      report_date,
-      generated_by,
-      source_count,
-      internal_signal_window_days,
-      payload,
-      created_at,
-      updated_at
-    )
-    VALUES (
-      ${reportDate}::date,
-      ${input.generatedBy},
-      ${marketEvidence.length},
-      ${INTERNAL_SIGNAL_WINDOW_DAYS},
-      ${JSON.stringify(payload)}::jsonb,
-      NOW(),
-      NOW()
-    )
-    RETURNING id
-  `);
+  const inserted = input.researchRequest
+    ? await db.execute(sql`
+        INSERT INTO market_needs_reports (
+          report_date, generated_by, report_kind, research_request_id,
+          source_count, internal_signal_window_days, payload, created_at, updated_at
+        )
+        SELECT
+          ${reportDate}::date, 'request', 'requested', r.id,
+          ${marketEvidence.length}, 0,
+          ${JSON.stringify(payload)}::jsonb, NOW(), NOW()
+        FROM market_research_requests r
+        WHERE r.id = ${input.researchRequest.id}
+          AND r.status = 'running'
+          AND r.lease_token = ${input.researchRequest.leaseToken}
+          AND r.lease_expires_at > NOW()
+        RETURNING id
+      `)
+    : await db.execute(sql`
+        INSERT INTO market_needs_reports (
+          report_date, generated_by, report_kind, research_request_id,
+          source_count, internal_signal_window_days, payload, created_at, updated_at
+        )
+        VALUES (
+          ${reportDate}::date, ${input.generatedBy}, 'daily', NULL,
+          ${marketEvidence.length}, ${INTERNAL_SIGNAL_WINDOW_DAYS},
+          ${JSON.stringify(payload)}::jsonb, NOW(), NOW()
+        )
+        RETURNING id
+      `);
   const [row] = resultRows<{ id: number }>(inserted);
+  if (!row?.id) {
+    return {
+      generated: false,
+      reason: input.researchRequest ? "research-request-lease-lost" : "report-not-inserted",
+      sourceCount: marketEvidence.length,
+    };
+  }
 
   return {
     generated: true,
@@ -649,24 +832,64 @@ export async function listMarketNeedsReports(limit = 30): Promise<StoredMarketNe
       id,
       report_date::text AS "reportDate",
       generated_by AS "generatedBy",
+      report_kind AS "reportKind",
+      research_request_id AS "researchRequestId",
       source_count AS "sourceCount",
       internal_signal_window_days AS "internalSignalWindowDays",
       payload,
       created_at AS "createdAt",
       updated_at AS "updatedAt"
     FROM market_needs_reports
+    WHERE report_kind = 'daily'
     ORDER BY created_at DESC, id DESC
     LIMIT ${safeLimit}
   `);
 
-  return resultRows<any>(result).map((row) => ({
+  return resultRows<any>(result).map(mapStoredMarketNeedsReport);
+}
+
+function mapStoredMarketNeedsReport(row: any): StoredMarketNeedsReport {
+  const generatedBy = row.generatedBy === "request"
+    ? "request"
+    : row.generatedBy === "manual" ? "manual" : "scheduler";
+  return {
     id: Number(row.id),
     reportDate: String(row.reportDate),
-    generatedBy: row.generatedBy === "manual" ? "manual" : "scheduler",
+    generatedBy,
+    reportKind: row.reportKind === "requested" ? "requested" : "daily",
+    researchRequestId: row.researchRequestId == null ? null : Number(row.researchRequestId),
     sourceCount: Number(row.sourceCount) || 0,
-    internalSignalWindowDays: Number(row.internalSignalWindowDays) || INTERNAL_SIGNAL_WINDOW_DAYS,
+    internalSignalWindowDays: row.internalSignalWindowDays == null
+      ? INTERNAL_SIGNAL_WINDOW_DAYS
+      : Number(row.internalSignalWindowDays),
     payload: row.payload as MarketNeedsPayload,
     createdAt: new Date(row.createdAt).toISOString(),
     updatedAt: new Date(row.updatedAt).toISOString(),
-  }));
+  };
+}
+
+export async function listMarketNeedsReportsForRequest(
+  requestId: number,
+  limit = 10,
+): Promise<StoredMarketNeedsReport[]> {
+  const safeLimit = Math.max(1, Math.min(30, Math.round(limit)));
+  const result = await db.execute(sql`
+    SELECT
+      id,
+      report_date::text AS "reportDate",
+      generated_by AS "generatedBy",
+      report_kind AS "reportKind",
+      research_request_id AS "researchRequestId",
+      source_count AS "sourceCount",
+      internal_signal_window_days AS "internalSignalWindowDays",
+      payload,
+      created_at AS "createdAt",
+      updated_at AS "updatedAt"
+    FROM market_needs_reports
+    WHERE report_kind = 'requested'
+      AND research_request_id = ${requestId}
+    ORDER BY created_at DESC, id DESC
+    LIMIT ${safeLimit}
+  `);
+  return resultRows<any>(result).map(mapStoredMarketNeedsReport);
 }

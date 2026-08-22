@@ -3836,6 +3836,81 @@ SKK berlaku 5 tahun. Perpanjangan via: Pengembangan Keprofesian Berkelanjutan (P
     }
   });
 
+  // Produk kanonik yang boleh dipilih dalam brief riset khusus.
+  app.get("/api/marketing-team/research-products", isAuthenticated, requireSuperAdmin, async (_req, res) => {
+    try {
+      const { listResearchProducts } = await import("./lib/market-research-requests");
+      const products = await listResearchProducts();
+      res.json({ products });
+    } catch (error) {
+      console.error("[/api/marketing-team/research-products]", error);
+      res.status(500).json({ error: "Gagal memuat katalog produk riset" });
+    }
+  });
+
+  // Arsip permintaan privat terpisah dari laporan sweep harian.
+  app.get("/api/marketing-team/research-requests", isAuthenticated, requireSuperAdmin, async (_req, res) => {
+    try {
+      const { listResearchRequests } = await import("./lib/market-research-requests");
+      const requests = await listResearchRequests(50);
+      res.json({ requests });
+    } catch (error) {
+      console.error("[/api/marketing-team/research-requests]", error);
+      res.status(500).json({ error: "Gagal memuat permintaan riset" });
+    }
+  });
+
+  app.post("/api/marketing-team/research-requests", isAuthenticated, requireSuperAdmin, async (req: any, res) => {
+    try {
+      const {
+        createResearchRequest,
+        researchRequestInputSchema,
+      } = await import("./lib/market-research-requests");
+      const parsed = researchRequestInputSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: parsed.error.issues[0]?.message || "Brief riset tidak valid",
+        });
+      }
+      const requestedBy = String(req.user?.claims?.sub || req.user?.id || "");
+      if (!requestedBy) return res.status(401).json({ error: "Tidak terautentikasi" });
+      const request = await createResearchRequest(parsed.data, requestedBy);
+      return res.status(202).json({ request });
+    } catch (error: any) {
+      const status = error?.code === "QUEUE_FULL" ? 429
+        : error?.code === "PRODUCT_NOT_ELIGIBLE" ? 400
+        : 500;
+      if (status === 500) console.error("[POST /api/marketing-team/research-requests]", error);
+      return res.status(status).json({
+        error: status === 500 ? "Gagal menyimpan permintaan riset" : error.message,
+      });
+    }
+  });
+
+  app.post("/api/marketing-team/research-requests/:id/retry", isAuthenticated, requireSuperAdmin, async (req: any, res) => {
+    try {
+      const id = Number(req.params.id);
+      if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ error: "ID permintaan tidak valid" });
+      }
+      const requestedBy = String(req.user?.claims?.sub || req.user?.id || "");
+      if (!requestedBy) return res.status(401).json({ error: "Tidak terautentikasi" });
+      const { retryResearchRequest } = await import("./lib/market-research-requests");
+      const request = await retryResearchRequest(id, requestedBy);
+      return res.status(202).json({ request });
+    } catch (error: any) {
+      const status = error?.code === "NOT_FOUND" ? 404
+        : error?.code === "ALREADY_ACTIVE" ? 409
+        : error?.code === "QUEUE_FULL" ? 429
+        : error?.code === "PRODUCT_NOT_ELIGIBLE" ? 400
+        : 500;
+      if (status === 500) console.error("[POST /api/marketing-team/research-requests/:id/retry]", error);
+      return res.status(status).json({
+        error: status === 500 ? "Gagal memproses ulang permintaan riset" : error.message,
+      });
+    }
+  });
+
   app.post("/api/knowledge-base", isAuthenticated, async (req, res) => {
     try {
       const parsed = insertKnowledgeBaseSchema.safeParse(req.body);
