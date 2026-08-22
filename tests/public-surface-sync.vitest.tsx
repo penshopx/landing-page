@@ -121,6 +121,59 @@ describe("public landing synchronization", () => {
       ).toBeInTheDocument();
     }
   });
+
+  it("renders the supplied videos and curated images with stable media settings", () => {
+    render(<Landing />);
+
+    const promo = screen.getByTestId("landing-video-slide-1");
+    expect(promo).toHaveAttribute("controls");
+    expect(promo).toHaveAttribute("playsinline");
+    expect(promo).toHaveAttribute("src", expect.stringContaining("gustafta_promo_24s_web.mp4"));
+    expect(promo).toHaveAttribute("poster", expect.stringContaining("gustafta_promo_24s_poster.jpg"));
+
+    const explainer = screen.getByTestId("landing-video-slide-2");
+    expect(explainer).toHaveAttribute("controls");
+    expect(explainer).toHaveAttribute("playsinline");
+    expect(explainer).toHaveAttribute("src", expect.stringContaining("gustafta_explainer.mp4"));
+    expect(explainer).toHaveAttribute("poster", expect.stringContaining("gustafta_explainer_poster.jpg"));
+
+    for (const [index, fileName] of [
+      [1, "G01_1781941962427.png"],
+      [2, "G03_1781941962428.png"],
+      [3, "G05_1781941962429.png"],
+      [4, "G07_1781941962430.png"],
+    ] as const) {
+      const image = screen.getByTestId(`landing-identity-slide-${index}`);
+      expect(image).toHaveAttribute("loading", "lazy");
+      expect(image).toHaveAttribute("src", expect.stringContaining(fileName));
+    }
+
+    expect(screen.getByTestId("landing-video-previous")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-video-next")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-identity-previous")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-identity-next")).toBeInTheDocument();
+  });
+
+  it("moves both carousels manually and advances to the second video when the first ends", async () => {
+    render(<Landing />);
+
+    expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("landing-video-next"));
+    expect(screen.getByTestId("landing-video-dot-2")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("landing-video-previous"));
+    expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.ended(screen.getByTestId("landing-video-slide-1"));
+    await waitFor(() => {
+      expect(screen.getByTestId("landing-video-dot-2")).toHaveAttribute("aria-pressed", "true");
+    });
+
+    expect(screen.getByTestId("landing-identity-dot-1")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("landing-identity-next"));
+    expect(screen.getByTestId("landing-identity-dot-2")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("landing-identity-dot-4"));
+    expect(screen.getByTestId("landing-identity-dot-4")).toHaveAttribute("aria-pressed", "true");
+  });
 });
 
 describe("global Help Desk widget", () => {
