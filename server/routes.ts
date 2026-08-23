@@ -97,6 +97,7 @@ import {
   buildTutorSourceContext,
   augmentStoreAccessResponse,
 } from "./sbu-skk-funnel";
+import { SBU_SKK_EBOOK } from "@shared/sbu-skk-ebook";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
 import { registerSalesLadderRoutes } from "./sales-ladder";
 import { registerPromotionEngineRoutes, resolveOrderAttribution } from "./promotion-engine";
@@ -8751,10 +8752,22 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
       // Look up registry id via store product name
       const regRow = await pool.query<{ product_id: string }>(
-        `SELECT pr.product_id FROM product_registry pr
-          JOIN store_products sp ON lower(sp.name)=lower(pr.name)
-         WHERE sp.id=$1 LIMIT 1`,
-        [order.productId],
+        `SELECT pr.product_id
+           FROM product_registry pr
+           JOIN store_products sp ON (
+             (pr.product_id=$2 AND sp.scalev_variant_id=$3)
+             OR (
+               pr.product_id<>$2
+               AND lower(sp.name)=lower(pr.name)
+             )
+           )
+          WHERE sp.id=$1
+          LIMIT 1`,
+        [
+          order.productId,
+          SBU_SKK_EBOOK.registryProductId,
+          SBU_SKK_EBOOK.scalev.variantId,
+        ],
       );
       const productRegistryId = regRow.rows[0]?.product_id;
       if (!productRegistryId) return res.status(404).json({ error: "Registri produk tidak ditemukan" });
@@ -8867,17 +8880,32 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
           let downloads: any[] = [];
           try {
             const regRow = await pool.query<{ product_id: string }>(
-              `SELECT pr.product_id FROM product_registry pr
-                JOIN store_products sp ON lower(sp.name)=lower(pr.name)
-               WHERE sp.id=$1 LIMIT 1`,
-              [order.productId],
+              `SELECT pr.product_id
+                 FROM product_registry pr
+                 JOIN store_products sp ON (
+                   (pr.product_id=$2 AND sp.scalev_variant_id=$3)
+                   OR (
+                     pr.product_id<>$2
+                     AND lower(sp.name)=lower(pr.name)
+                   )
+                 )
+                WHERE sp.id=$1
+                LIMIT 1`,
+              [
+                order.productId,
+                SBU_SKK_EBOOK.registryProductId,
+                SBU_SKK_EBOOK.scalev.variantId,
+              ],
             );
             if (regRow.rows[0]) {
-              downloads = await augmentStoreAccessResponse(
+              const augmented = await augmentStoreAccessResponse(
                 regRow.rows[0].product_id,
                 req.params.token,
                 baseUrl,
               );
+              downloads = augmented.downloads;
+              (res.locals as any).levelOneDiagnostic =
+                augmented.levelOneDiagnostic;
             }
           } catch {}
           return res.json({
@@ -8886,6 +8914,8 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
             type: "digital",
             downloadUrl,
             downloads,
+            levelOneDiagnostic:
+              (res.locals as any).levelOneDiagnostic || null,
             chatUrl: null,
             embedCode: null,
             widgetScript: null,
@@ -28610,53 +28640,11 @@ Susun Executive Summary PKB 25 Poin sesuai format dan struktur di atas. Tulis le
 
   // ==================== AI TOOLS: DIAGNOSTIK KOMPETENSI ====================
   app.post("/api/tools/diagnostik-kompetensi", async (req: any, res: any) => {
-    try {
-      const { education, fieldOfStudy, yearsExperience, currentRole, keyProjects, targetDomain, targetLevel } = req.body;
-      if (!education || !targetDomain || !targetLevel) return res.status(400).json({ error: "Data tidak lengkap." });
-      const { OpenAI } = await import("openai");
-      const openai = new OpenAI({ apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY, ...(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL ? { baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL } : {}) });
-      const prompt = `Anda adalah DIAGNOSTIK AI — pakar SKKNI, KKNI, dan regulasi BNSP Indonesia.
-
-PROFIL KANDIDAT:
-- Pendidikan: ${education}, ${fieldOfStudy}
-- Pengalaman: ${yearsExperience} di bidang konstruksi
-- Jabatan/Peran: ${currentRole}
-- Proyek utama: ${keyProjects || "-"}
-- Target SKK: ${targetDomain}
-- Target Jenjang: ${targetLevel}
-
-Analisis profil ini dan kembalikan JSON SAJA (tanpa markdown) dengan format persis:
-{
-  "currentKKNI": "estimasi level KKNI/SKKNI saat ini berdasarkan profil",
-  "eligibleLevel": "level yang realistis dituju saat ini",
-  "readinessScore": 0-100 (angka saja),
-  "gapSummary": "1-2 kalimat ringkasan gap",
-  "strengths": ["3-5 kekuatan yang sudah dimiliki"],
-  "gaps": [
-    {"item": "gap spesifik 1", "severity": "tinggi|sedang|rendah"},
-    {"item": "gap spesifik 2", "severity": "tinggi|sedang|rendah"}
-  ],
-  "learningPath": [
-    {"step": 1, "action": "tindakan spesifik", "resource": "sumber/referensi"},
-    {"step": 2, "action": "tindakan spesifik", "resource": "sumber/referensi"},
-    {"step": 3, "action": "tindakan spesifik", "resource": "sumber/referensi"}
-  ],
-  "recommendation": "1 paragraf rekomendasi akhir yang personal dan actionable"
-}`;
-
-      const completion = await openai.chat.completions.create({
-        model: SMART_MODEL,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.3,
-        response_format: { type: "json_object" },
-      });
-      const content = completion.choices[0]?.message?.content ?? "{}";
-      const result = JSON.parse(content);
-      res.json(result);
-    } catch (e: any) {
-      console.error("diagnostik-kompetensi error:", e);
-      res.status(500).json({ error: "Gagal menganalisis profil. Coba lagi." });
-    }
+    res.status(403).json({
+      error: "Diagnosis kompetensi publik telah ditutup.",
+      code: "PAID_LEVEL_ONE_REQUIRED",
+      accessPath: "/ebook-sbu-skk",
+    });
   });
 
   // ==================== AI TOOLS G10: VALIDATOR KLAIM UK ====================
@@ -33232,77 +33220,11 @@ Aturan penting:
 
   // ==================== AI TOOLS: CEK KELAYAKAN SKK ====================
   app.post("/api/tools/cek-kelayakan-skk", async (req: any, res: any) => {
-    try {
-      const { pendidikan, pengalaman, bidang, skk_existing = "" } = req.body;
-      if (!pendidikan || !bidang) return res.status(400).json({ error: "Pendidikan dan bidang wajib diisi." });
-      const { OpenAI } = await import("openai");
-      const openai = new OpenAI({ apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.OPENAI_API_KEY, ...(process.env.AI_INTEGRATIONS_OPENAI_BASE_URL ? { baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL } : {}) });
-      const prompt = `Anda adalah konsultan sertifikasi SKK BNSP Indonesia yang ahli dalam regulasi PP 14/2021, Permen PUPR 6/2025, dan SKKNI konstruksi.
-
-Profil pengguna:
-- Pendidikan: ${pendidikan}
-- Pengalaman kerja relevan: ${pengalaman} tahun
-- Bidang utama: ${bidang}
-- SKK yang sudah dimiliki: ${skk_existing || "belum ada"}
-
-Analisis kelayakan SKK dan kembalikan JSON SAJA (tanpa markdown) persis format ini:
-{
-  "profil": {
-    "pendidikan": "${pendidikan}",
-    "pengalaman": ${pengalaman},
-    "bidang": "${bidang}"
-  },
-  "totalEligible": <angka>,
-  "totalSegera": <angka>,
-  "ringkasan": "narasi singkat 1-2 kalimat tentang posisi kompetensi saat ini",
-  "eligible": [
-    {
-      "jabatan": "nama jabatan SKK lengkap",
-      "level": "Muda|Madya|Utama|Teknisi/Analis|Operator",
-      "klasifikasi": "klasifikasi sub-bidang (cth: Bangunan Gedung, Jalan, K3, dll.)",
-      "jalurTerbaik": "Reguler|RPL|Bimtek+Uji",
-      "persentaseKesiapan": <70-100>,
-      "catatan": "catatan singkat mengapa eligible dan syarat tambahan jika ada"
-    }
-  ],
-  "segera": [
-    {
-      "jabatan": "nama jabatan SKK",
-      "level": "Muda|Madya|Utama",
-      "kurang": "apa yang masih kurang (cth: butuh 2 tahun pengalaman lagi, atau butuh S1)",
-      "estimasiWaktu": "cth: 1 tahun, 2 tahun"
-    }
-  ],
-  "prioritas": [
-    {
-      "urutan": 1,
-      "jabatan": "nama jabatan SKK",
-      "alasan": "alasan strategis mengapa harus diambil dulu"
-    }
-  ]
-}
-
-Aturan penting:
-- Eligible = memenuhi syarat pendidikan + pengalaman per regulasi BNSP/LPJK
-- Segera = kurang 1-3 tahun pengalaman ATAU satu level pendidikan
-- Prioritas maksimal 5 jabatan (yang paling marketable dan realistis)
-- Fokus pada bidang "${bidang}" dan bidang terkait langsung
-- Jangan duplikasi jabatan yang sudah dimiliki (${skk_existing})
-- Berikan setidaknya 3-6 jabatan eligible jika memungkinkan`;
-
-      const completion = await openai.chat.completions.create({
-        model: SMART_MODEL,
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.2,
-        response_format: { type: "json_object" },
-      });
-      const content = completion.choices[0]?.message?.content ?? "{}";
-      const result = JSON.parse(content);
-      res.json(result);
-    } catch (e: any) {
-      console.error("cek-kelayakan-skk error:", e);
-      res.status(500).json({ error: "Gagal menganalisis kelayakan. Coba lagi." });
-    }
+    res.status(403).json({
+      error: "Cek Kelayakan SKK publik telah ditutup.",
+      code: "PAID_LEVEL_ONE_REQUIRED",
+      accessPath: "/ebook-sbu-skk",
+    });
   });
 
   // ==================== KLINIK UJI KOMPETENSI: ASESMEN KESIAPAN (Dialog → Blueprint) ====================

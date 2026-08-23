@@ -8,7 +8,7 @@ export const SBU_SKK_EBOOK = {
   slug: "sbu-skk-tanpa-bingung",
   scalevCheckoutSlug: "sbu-skk-tanpa-bingung",
   title: "SBU & SKK Tanpa Bingung",
-  subtitle: "Dari Regulasi ke Aksi: Panduan Praktis Transisi SBU-SKK Setelah PP 28/2025 dan Perubahan Permen PU 06/2021",
+  subtitle: "Panduan Lengkap Pemenuhan Persyaratan Sertifikasi Konstruksi di Era Regulasi Baru PP 28/2025 dan Permen PU 06 Tahun 2025",
   priceLabel: "Rp149.000",
   amount: 149000,
   pages: 264,
@@ -25,6 +25,7 @@ export const SBU_SKK_EBOOK = {
     "Menata persyaratan serta dokumen agar proses kerja lebih terarah.",
     "Mengurangi langkah prosedural yang keliru sebelum pengajuan atau pembaruan.",
     "Menggunakan Lampiran Toolkit 29 halaman sebagai pendamping kerja praktis.",
+    "Memilih satu bonus diagnosis Level 1: Cek Kesiapan SBU atau Cek Kesiapan SKK.",
   ],
   scalev: {
     productId: 445696,

@@ -7,19 +7,19 @@ import { databaseStorageKey } from "./lib/digital-product-storage";
 import { CONTRACTOR_L1_EBOOKS } from "./sales-ladder-blueprint";
 import { SBU_SKK_EBOOK } from "@shared/sbu-skk-ebook";
 
-// ── Approved asset manifests (hashes LOCKED by Task #395) ──────────────────
+// ── Approved private asset manifests ────────────────────────────────────────
 const MAIN_FILE = {
   fileName: "SBU-SKK-Tanpa-Bingung.pdf",
-  sha256: "3df699f2d540e868081e8c23e904ce516b642e72b83a8989207ff6b5a84c2048",
+  sha256: "c9d3541026dc15f81a13600b5f574e1145562c9ffa6d0c4ca768b845aec01ffb",
   pages: 264,
   downloadPath:
-    "db-object:digital-products/ebooks/sbu-skk-tanpa-bingung/v2.0.0/sbu-skk-tanpa-bingung.pdf",
+    "db-object:digital-products/ebooks/sbu-skk-tanpa-bingung/v2.1.0/sbu-skk-tanpa-bingung.pdf",
   sortOrder: 0,
   role: "main",
   label: "Ebook SBU & SKK Tanpa Bingung (264 halaman)",
   candidates: [
-    path.resolve(process.cwd(), "dist/private-assets/sbu-skk-tanpa-bingung-v2.0.0.pdf"),
-    path.resolve(process.cwd(), "attached_assets/Ebook_SBU-SKK-ok_1787368451833.pdf"),
+    path.resolve(process.cwd(), "dist/private-assets/sbu-skk-tanpa-bingung-v2.1.0.pdf"),
+    path.resolve(process.cwd(), "attached_assets/Ebook_SBU-SKK-ok_1787497140987.pdf"),
   ],
 };
 
@@ -106,7 +106,7 @@ export async function seedSbuSkkEbook(): Promise<void> {
   try {
     await client.query("BEGIN");
     await client.query(
-      "SELECT pg_advisory_xact_lock(hashtext('seed-sbu-skk-ebook-v2'))",
+      "SELECT pg_advisory_xact_lock(hashtext('seed-sbu-skk-ebook-v2.1'))",
     );
 
     // ── DDL: drop single-product uniqueness, add ordering/role columns ────────
@@ -138,7 +138,7 @@ export async function seedSbuSkkEbook(): Promise<void> {
        ) VALUES (
          $1,$2,$3,'EBOOK','EBOOK','SBU_SKK',
          $4,$5,$6,$7::jsonb,$8::jsonb,
-         '/ebook-sbu-skk',$9,'IDR','ONE_TIME','ACTIVE','2.0.0',
+         '/ebook-sbu-skk',$9,'IDR','ONE_TIME','ACTIVE','2.1.0',
          'STATIC_ASSET','DOWNLOAD',false,false,'READY',
          'STANDALONE_ONLY',true,false,false,
          false,'[]'::jsonb,'PRIVATE_DATABASE_OBJECT',$10,
@@ -182,6 +182,8 @@ export async function seedSbuSkkEbook(): Promise<void> {
         JSON.stringify([
           `${SBU_SKK_EBOOK.pages} halaman PDF`,
           `${SBU_SKK_EBOOK.toolkitPages} halaman Lampiran Toolkit`,
+          "Satu pilihan diagnosis Level 1: SBU atau SKK",
+          "Hasil diagnosis Level 1 berupa skor dan status kesiapan",
           "Akses otomatis setelah pembayaran terkonfirmasi",
           "Tautan akses aman berbasis token order",
         ]),

@@ -4,7 +4,7 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { db, pool } from "../server/db";
-import { storeOrders } from "../shared/schema";
+import { storeOrders, storeProducts } from "../shared/schema";
 import { SBU_SKK_EBOOK } from "../shared/sbu-skk-ebook";
 import { CONTRACTOR_L1_EBOOKS } from "../server/sales-ladder-blueprint";
 import { inArray } from "drizzle-orm";
@@ -12,11 +12,12 @@ import { inArray } from "drizzle-orm";
 const SERVER_URL = `http://localhost:${process.env.PORT || 5000}`;
 const RUN = `sbu_skk_${Date.now()}_${randomUUID().slice(0, 8)}`;
 const createdOrderIds: number[] = [];
+const createdProductIds: number[] = [];
 let storeProductId = 0;
-// v2.0.0 canonical hashes
-const MAIN_EBOOK_SHA256 = "3df699f2d540e868081e8c23e904ce516b642e72b83a8989207ff6b5a84c2048";
+// v2.1.0 canonical main PDF + retained toolkit hashes
+const MAIN_EBOOK_SHA256 = "c9d3541026dc15f81a13600b5f574e1145562c9ffa6d0c4ca768b845aec01ffb";
 const SUPPLEMENT_SHA256 = "3aa4d83eeed5a9d970b2655451a8fe3db9c402de0c5ed69b12dd55d1caaa4c66";
-// expectedPdfSha256 is resolved from DB to support both v1 (legacy) and v2 (new) deployments
+// expectedPdfSha256 is resolved from DB so the HTTP assertion follows the seeded bytes.
 let expectedPdfSha256 = "";
 let expectedPdfSize = 0;
 
@@ -73,24 +74,6 @@ before(async () => {
   assert.equal(product.rowCount, 1, "Store harus memiliki tepat satu produk SBU-SKK");
   storeProductId = product.rows[0].id;
 
-  // Resolve expected hash/size from the 'main' file in the DB (v1 or v2 depending on deployment)
-  const dbFile = await pool.query<{ sha256: string; size_bytes: number }>(
-    `SELECT sha256, size_bytes FROM digital_product_files
-      WHERE product_registry_id=$1 AND role='main' ORDER BY sort_order LIMIT 1`,
-    [SBU_SKK_EBOOK.registryProductId],
-  );
-  if (dbFile.rows[0]) {
-    expectedPdfSha256 = dbFile.rows[0].sha256;
-    expectedPdfSize = dbFile.rows[0].size_bytes;
-  } else {
-    // fallback: read attached asset if DB not seeded yet
-    const localPdf = fs.readFileSync(
-      path.join(process.cwd(), "attached_assets/Ebook_SBU-SKK-ok_1787368451833.pdf"),
-    );
-    expectedPdfSha256 = createHash("sha256").update(localPdf).digest("hex");
-    expectedPdfSize = localPdf.length;
-  }
-
   let serverReady = false;
   for (let attempt = 0; attempt < 10; attempt++) {
     try {
@@ -105,11 +88,35 @@ before(async () => {
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
   assert.ok(serverReady, `Server test tidak tersedia di ${SERVER_URL}`);
+
+  // The server listens before asynchronous product reconciliation finishes.
+  // Wait for the approved hash instead of racing the previous database row.
+  for (let attempt = 0; attempt < 60; attempt++) {
+    const dbFile = await pool.query<{ sha256: string; size_bytes: number }>(
+      `SELECT sha256, size_bytes FROM digital_product_files
+        WHERE product_registry_id=$1 AND role='main' ORDER BY sort_order LIMIT 1`,
+      [SBU_SKK_EBOOK.registryProductId],
+    );
+    if (dbFile.rows[0]?.sha256 === MAIN_EBOOK_SHA256) {
+      expectedPdfSha256 = dbFile.rows[0].sha256;
+      expectedPdfSize = dbFile.rows[0].size_bytes;
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  assert.equal(
+    expectedPdfSha256,
+    MAIN_EBOOK_SHA256,
+    "Seeder harus merekonsiliasi PDF utama v2.1.0 sebelum tes berjalan",
+  );
 });
 
 after(async () => {
   if (createdOrderIds.length) {
     await db.delete(storeOrders).where(inArray(storeOrders.id, createdOrderIds)).catch(() => {});
+  }
+  if (createdProductIds.length) {
+    await db.delete(storeProducts).where(inArray(storeProducts.id, createdProductIds)).catch(() => {});
   }
 });
 
@@ -119,6 +126,9 @@ test("metadata kanonik menetapkan identitas, harga, dan Scalev variant yang dise
   assert.equal(SBU_SKK_EBOOK.amount, 149_000);
   assert.equal(SBU_SKK_EBOOK.priceLabel, "Rp149.000");
   assert.equal(SBU_SKK_EBOOK.pages, 264);
+  assert.equal(SBU_SKK_EBOOK.toolkitPages, 29);
+  assert.match(SBU_SKK_EBOOK.subtitle, /Permen PU 06 Tahun 2025/);
+  assert.doesNotMatch(SBU_SKK_EBOOK.subtitle, /06\/2021/);
   assert.equal(SBU_SKK_EBOOK.scalev.productId, 445696);
   assert.equal(SBU_SKK_EBOOK.scalev.variantId, 575747);
   assert.equal(
@@ -176,9 +186,7 @@ test("Registry, Store, dan file database menunjuk satu produk komersial yang sam
   const row = registryResult.rows[0];
   assert.equal(row.registry_count, "1");
   assert.equal(row.store_count, "1");
-  // Multi-file: 2 files (main + supplement); also accept 1 for legacy single-file deployments
-  const fileCount = parseInt(row.file_count, 10);
-  assert.ok(fileCount >= 1, `Must have at least 1 file, got ${row.file_count}`);
+  assert.equal(row.file_count, "2");
   assert.equal(row.registry_price, 149_000);
   assert.equal(row.store_price, 149_000);
   assert.equal(row.price_override, 149_000);
@@ -212,7 +220,17 @@ test("Registry, Store, dan file database menunjuk satu produk komersial yang sam
   assert.equal(fileRow.rows[0].mime_type, "application/pdf");
   assert.equal(fileRow.rows[0].size_bytes, expectedPdfSize);
   assert.equal(fileRow.rows[0].stored_bytes, expectedPdfSize);
-  assert.equal(fileRow.rows[0].sha256, expectedPdfSha256);
+  assert.equal(fileRow.rows[0].sha256, MAIN_EBOOK_SHA256);
+  assert.equal(expectedPdfSha256, MAIN_EBOOK_SHA256);
+
+  const supplement = await pool.query<{ sha256: string; size_bytes: number }>(
+    `SELECT sha256, size_bytes
+       FROM digital_product_files
+      WHERE product_registry_id=$1 AND role='supplement'`,
+    [SBU_SKK_EBOOK.registryProductId],
+  );
+  assert.equal(supplement.rowCount, 1);
+  assert.equal(supplement.rows[0].sha256, SUPPLEMENT_SHA256);
 });
 
 test("Sales Ladder mengubah hanya L1 SBU-SKK dan mempertahankan empat placeholder + edge", async () => {
@@ -296,11 +314,10 @@ test("client tidak mengimpor PDF privat atau path db-object; build hanya menyali
 
   const buildSource = readSource("script/build.ts");
   assert.ok(buildSource.includes("dist/private-assets"));
-  // v2.0.0 supersedes v1.0.0; accept either
-  const hasPdfPath =
-    buildSource.includes("sbu-skk-tanpa-bingung-v2.0.0.pdf") ||
-    buildSource.includes("sbu-skk-tanpa-bingung-v1.0.0.pdf");
-  assert.ok(hasPdfPath, "build.ts must reference the main ebook PDF path");
+  assert.ok(
+    buildSource.includes("sbu-skk-tanpa-bingung-v2.1.0.pdf"),
+    "build.ts must reference the approved v2.1.0 main ebook PDF",
+  );
   assert.ok(
     !/dist\/public[^;\n]*sbu-skk-tanpa-bingung-v[12]\.0\.0\.pdf/.test(buildSource),
     "Build tidak boleh menyalin PDF SBU-SKK ke dist/public",
@@ -337,6 +354,16 @@ test("token order pending ditolak untuk metadata dan byte download", async () =>
   const download = await fetch(`${SERVER_URL}/api/store/access/${token}/download`);
   assert.equal(download.status, 403);
   assert.match((await download.json()).error, /belum dikonfirmasi/i);
+
+  const diagnostic = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "sbu", answers: {} }),
+    },
+  );
+  assert.equal(diagnostic.status, 403);
 });
 
 test("token order paid menerima endpoint internal dan byte PDF yang hash-nya benar", async () => {
@@ -349,6 +376,18 @@ test("token order paid menerima endpoint internal dan byte PDF yang hash-nya ben
   assert.equal(body.type, "digital");
   assert.equal(body.product.name, SBU_SKK_EBOOK.title);
   assert.equal(body.order.status, "paid");
+  assert.equal(body.downloads.length, 2);
+  assert.deepEqual(
+    body.downloads.map((file: any) => file.role).sort(),
+    ["main", "supplement"],
+  );
+  assert.equal(body.levelOneDiagnostic.eligible, true);
+  assert.equal(body.levelOneDiagnostic.selectedType, null);
+  assert.equal(body.levelOneDiagnostic.result, null);
+  assert.deepEqual(
+    body.levelOneDiagnostic.choices.map((choice: any) => choice.type),
+    ["sbu", "skk"],
+  );
   const downloadUrl = new URL(body.downloadUrl, SERVER_URL);
   assert.equal(downloadUrl.pathname, `/api/store/access/${token}/download`);
   assert.ok(!JSON.stringify(body).includes("db-object:"));
@@ -364,4 +403,210 @@ test("token order paid menerima endpoint internal dan byte PDF yang hash-nya ben
   assert.equal(bytes.length, expectedPdfSize);
   assert.equal(bytes.subarray(0, 5).toString("ascii"), "%PDF-");
   assert.equal(createHash("sha256").update(bytes).digest("hex"), expectedPdfSha256);
+
+  const supplementMeta = body.downloads.find(
+    (file: any) => file.role === "supplement",
+  );
+  const supplement = await fetch(
+    `${SERVER_URL}${new URL(supplementMeta.downloadUrl, SERVER_URL).pathname}${new URL(supplementMeta.downloadUrl, SERVER_URL).search}`,
+  );
+  assert.equal(supplement.status, 200);
+  assert.equal(
+    createHash("sha256")
+      .update(Buffer.from(await supplement.arrayBuffer()))
+      .digest("hex"),
+    SUPPLEMENT_SHA256,
+  );
+});
+
+test("diagnosis paid menyimpan satu pilihan serta hanya mengembalikan skor dan status", async () => {
+  const token = randomUUID();
+  const orderId = await createOrder("paid", token);
+  const answers = {
+    journey: "first",
+    qualification: "small",
+    classification: "ready",
+    pjbu: "ready",
+    pjtbu: "ready",
+    pjskbu: "ready",
+    skk: "ready",
+    experience: "ready",
+    finance: "ready",
+    documents: "ready",
+  };
+
+  const first = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "sbu", answers }),
+    },
+  );
+  assert.equal(first.status, 201);
+  const firstBody = await first.json();
+  assert.deepEqual(Object.keys(firstBody.result).sort(), [
+    "rubricVersion",
+    "score",
+    "statusKey",
+    "statusLabel",
+    "type",
+  ]);
+  assert.equal(firstBody.result.type, "sbu");
+  assert.equal(firstBody.result.score, 100);
+  assert.equal(firstBody.result.statusKey, "validate");
+  assert.doesNotMatch(JSON.stringify(firstBody), /gap|answer|nextStep|strength/i);
+
+  const stored = await pool.query(
+    `SELECT diagnostic_type, score, status_key, status_label, rubric_version
+       FROM sbu_skk_level1_diagnostics
+      WHERE order_id=$1`,
+    [orderId],
+  );
+  assert.equal(stored.rowCount, 1);
+  assert.equal(stored.rows[0].diagnostic_type, "sbu");
+  assert.equal(stored.rows[0].score, 100);
+
+  const repeat = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "sbu", answers }),
+    },
+  );
+  assert.equal(repeat.status, 200);
+  assert.equal((await repeat.json()).alreadyCompleted, true);
+
+  const switchAttempt = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "skk", answers }),
+    },
+  );
+  assert.equal(switchAttempt.status, 409);
+
+  const metadata = await fetch(`${SERVER_URL}/api/store/access/${token}`);
+  const metadataBody = await metadata.json();
+  assert.equal(metadataBody.levelOneDiagnostic.selectedType, "sbu");
+  assert.equal(metadataBody.levelOneDiagnostic.result.score, 100);
+  assert.doesNotMatch(
+    JSON.stringify(metadataBody.levelOneDiagnostic),
+    /gap|answer|nextStep|strength/i,
+  );
+});
+
+test("token asing tidak dapat membuka atau menyimpan diagnosis", async () => {
+  const token = randomUUID();
+  const metadata = await fetch(`${SERVER_URL}/api/store/access/${token}`);
+  assert.equal(metadata.status, 404);
+
+  const diagnostic = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "skk", answers: {} }),
+    },
+  );
+  assert.equal(diagnostic.status, 404);
+});
+
+test("produk lain dengan nama sama tidak mewarisi diagnosis Paket Level 1", async () => {
+  const [spoof] = await db
+    .insert(storeProducts)
+    .values({
+      name: SBU_SKK_EBOOK.title,
+      description: "Produk penguji identitas immutable",
+      category: "Test",
+      price: SBU_SKK_EBOOK.amount,
+      scalevVariantId: SBU_SKK_EBOOK.scalev.variantId + 999,
+      downloadPath: "db-object:test/wrong-product.pdf",
+      isActive: false,
+    })
+    .returning({ id: storeProducts.id });
+  createdProductIds.push(spoof.id);
+
+  const previousProductId = storeProductId;
+  storeProductId = spoof.id;
+  const token = randomUUID();
+  await createOrder("paid", token);
+  storeProductId = previousProductId;
+
+  const metadata = await fetch(`${SERVER_URL}/api/store/access/${token}`);
+  assert.equal(metadata.status, 200);
+  const metadataBody = await metadata.json();
+  assert.equal(metadataBody.levelOneDiagnostic, null);
+  assert.deepEqual(metadataBody.downloads, []);
+
+  const diagnostic = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "sbu", answers: {} }),
+    },
+  );
+  assert.equal(diagnostic.status, 404);
+});
+
+test("submit SBU dan SKK bersamaan tetap menghasilkan tepat satu pilihan", async () => {
+  const token = randomUUID();
+  const orderId = await createOrder("paid", token);
+  const readySbu = {
+    journey: "first",
+    qualification: "small",
+    classification: "ready",
+    pjbu: "ready",
+    pjtbu: "ready",
+    pjskbu: "ready",
+    skk: "ready",
+    experience: "ready",
+    finance: "ready",
+    documents: "ready",
+  };
+  const readySkk = {
+    journey: "first",
+    targetLevel: "technician",
+    target: "ready",
+    education: "ready",
+    experience: "ready",
+    competency: "ready",
+    portfolio: "ready",
+    employment: "ready",
+    assessment: "ready",
+    documents: "ready",
+  };
+
+  const responses = await Promise.all([
+    fetch(`${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "sbu", answers: readySbu }),
+    }),
+    fetch(`${SERVER_URL}/api/store/access/${token}/level-one-diagnostic`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "skk", answers: readySkk }),
+    }),
+  ]);
+  assert.deepEqual(
+    responses.map((response) => response.status).sort(),
+    [201, 409],
+  );
+
+  const stored = await pool.query<{
+    count: string;
+    types: string[];
+  }>(
+    `SELECT count(*)::text AS count,
+            array_agg(diagnostic_type ORDER BY diagnostic_type) AS types
+       FROM sbu_skk_level1_diagnostics
+      WHERE order_id=$1`,
+    [orderId],
+  );
+  assert.equal(stored.rows[0].count, "1");
+  assert.equal(stored.rows[0].types.length, 1);
 });

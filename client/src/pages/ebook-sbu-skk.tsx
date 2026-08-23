@@ -112,7 +112,7 @@ export default function EbookSbuSkkPage() {
           <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 md:grid-cols-[1fr_.7fr] md:px-8 md:py-24">
             <div>
               <p className="text-xs font-bold uppercase tracking-[.2em] text-[#e8a83e]">
-                Panduan kerja · SBU / SKK
+                Paket Level 1 · SBU / SKK
               </p>
               <h1 className="mt-5 max-w-3xl font-display text-5xl font-bold leading-[.95] tracking-[-.05em] md:text-7xl">
                 {SBU_SKK_EBOOK.title}
@@ -123,7 +123,8 @@ export default function EbookSbuSkkPage() {
               <div className="mt-8 flex flex-wrap gap-3 text-sm">
                 {[
                   `${SBU_SKK_EBOOK.pages} halaman ebook`,
-                  `${SBU_SKK_EBOOK.toolkitPages} halaman toolkit`,
+                  `Lampiran Toolkit ${SBU_SKK_EBOOK.toolkitPages} halaman`,
+                  "Pilih 1 diagnosis: SBU atau SKK",
                   "Akses aman via email",
                 ].map((item) => (
                   <span key={item} className="rounded-full border border-white/20 px-3 py-1.5">
@@ -134,16 +135,13 @@ export default function EbookSbuSkkPage() {
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Button asChild className="h-12 bg-[#e8a83e] px-7 font-bold text-[#1c2b2d] hover:bg-[#f3bc59]">
                   <a href={checkout} target="_blank" rel="noopener noreferrer">
-                    Beli panduan — {SBU_SKK_EBOOK.priceLabel}
+                    Beli Paket Level 1 — {SBU_SKK_EBOOK.priceLabel}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
                 <Button asChild variant="outline" className="h-12 border-white/25 bg-transparent text-[#f7f3ea]">
-                  <Link href="/mini-ebook-sbu-skk">Mulai dari ringkasan gratis</Link>
-                </Button>
-                <Button asChild variant="outline" className="h-12 border-[#e8a83e]/60 bg-transparent text-[#e8a83e]">
                   <Link href={SBU_SKK_FUNNEL.readiness.landingPath}>
-                    Cek kesiapan SBU
+                    Lihat cara diagnosis bekerja
                   </Link>
                 </Button>
               </div>
@@ -157,7 +155,7 @@ export default function EbookSbuSkkPage() {
         </section>
 
         <section className="mx-auto max-w-6xl px-5 py-16 md:px-8">
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {SBU_SKK_EBOOK.benefits.map((benefit) => (
               <div key={benefit} className="rounded-2xl border border-[#d8d5cb] bg-[#fbfaf6] p-6">
                 <div className="mb-8 flex h-10 w-10 items-center justify-center rounded-xl bg-[#17727a] text-[#e8a83e]">
@@ -166,6 +164,41 @@ export default function EbookSbuSkkPage() {
                 <p className="font-semibold leading-relaxed">{benefit}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="bg-[#102f33] px-5 py-16 text-[#f7f3ea]">
+          <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[.75fr_1.25fr] md:items-center">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[.2em] text-[#7dd3fc]">
+                Hak diagnosis pembeli
+              </p>
+              <h2 className="mt-3 font-display text-4xl font-bold">
+                SBU <span className="text-[#7dd3fc]">atau</span> SKK.
+              </h2>
+              <p className="mt-4 leading-relaxed text-[#d5e3df]">
+                Setiap pembelian mendapat satu pilihan diagnosis. Pilihan
+                tersimpan pada pesanan dan tidak dapat dipakai untuk membuka
+                kedua hasil.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ["Cek Kesiapan SBU", "Untuk badan usaha: personel, pengalaman, keuangan, dan dokumen."],
+                ["Cek Kesiapan SKK", "Untuk tenaga kerja: target jabatan, pengalaman, portofolio, dan uji."],
+              ].map(([title, description]) => (
+                <div key={title} className="rounded-2xl border border-sky-300/25 bg-sky-300/[.07] p-5">
+                  <p className="font-bold text-sky-200">{title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#d5e3df]">
+                    {description}
+                  </p>
+                </div>
+              ))}
+              <p className="rounded-2xl border border-white/10 bg-white/[.04] p-5 text-sm leading-relaxed text-[#d5e3df] sm:col-span-2">
+                Hasil Level 1 hanya berupa <strong className="text-white">skor dan status kesiapan</strong>.
+                Analisis gap, urutan aksi, dan template lanjutan tersedia pada Level 2.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -179,9 +212,9 @@ export default function EbookSbuSkkPage() {
               <div className="rounded-2xl border border-[#e8a83e] bg-[#fbfaf6] p-6 md:col-span-2">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-display text-xl font-bold">Ebook + Toolkit</p>
+                    <p className="font-display text-xl font-bold">Paket Level 1</p>
                     <p className="mt-2 text-sm leading-relaxed text-[#637276]">
-                      {SBU_SKK_EBOOK.pages} halaman panduan utama + toolkit {SBU_SKK_EBOOK.toolkitPages} halaman.
+                      {SBU_SKK_EBOOK.pages} halaman e-book + Lampiran Toolkit {SBU_SKK_EBOOK.toolkitPages} halaman + satu diagnosis SBU atau SKK.
                     </p>
                   </div>
                   <p className="shrink-0 font-display text-xl font-bold text-[#17727a]">{SBU_SKK_EBOOK.priceLabel}</p>

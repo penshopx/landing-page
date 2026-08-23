@@ -3106,6 +3106,26 @@ export const sbuSkkTutorSources = pgTable("sbu_skk_tutor_sources", {
 
 export type SbuSkkTutorSource = typeof sbuSkkTutorSources.$inferSelect;
 
+// One immutable Level 1 diagnostic choice per paid ebook order. Raw answers are
+// deliberately not stored; only the minimal score/status result is retained.
+export const sbuSkkLevel1Diagnostics = pgTable("sbu_skk_level1_diagnostics", {
+  id:             serial("id").primaryKey(),
+  orderId:        integer("order_id").notNull()
+                    .references(() => storeOrders.id, { onDelete: "cascade" }),
+  diagnosticType: varchar("diagnostic_type", { length: 3 }).notNull(),
+  score:          integer("score").notNull(),
+  statusKey:      varchar("status_key", { length: 30 }).notNull(),
+  statusLabel:    text("status_label").notNull(),
+  rubricVersion:  varchar("rubric_version", { length: 80 }).notNull(),
+  createdAt:      timestamp("created_at").defaultNow().notNull(),
+  updatedAt:      timestamp("updated_at").defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("uq_sbu_skk_level1_diagnostic_order").on(table.orderId),
+]);
+
+export type SbuSkkLevel1Diagnostic =
+  typeof sbuSkkLevel1Diagnostics.$inferSelect;
+
 // ── SBU-SKK manual orders (Tutor / Bundle / AI Specialist) ──────────────────
 // Created by POST /api/sbu-skk/orders when no Scalev variant exists.
 export const sbuSkkOrders = pgTable("sbu_skk_orders", {

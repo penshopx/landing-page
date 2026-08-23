@@ -27,6 +27,11 @@ import {
   type SbuReadinessDestination,
   type SbuReadinessEventType,
 } from "@shared/sbu-readiness";
+import {
+  assessSbuSkkLevel1,
+  type SbuSkkLevel1DiagnosticType,
+  type SbuSkkLevel1Result,
+} from "@shared/sbu-skk-level1";
 import { sendEmail } from "./lib/email";
 import { getWaContact } from "./lib/wa-contact";
 import { PostgresRateLimitStore } from "./lib/rate-limiter";
@@ -597,6 +602,103 @@ export async function getPaidDownloads(
   }));
 }
 
+export interface SbuSkkLevel1DiagnosticAccess {
+  eligible: true;
+  choices: Array<{
+    type: SbuSkkLevel1DiagnosticType;
+    title: string;
+    description: string;
+  }>;
+  selectedType: SbuSkkLevel1DiagnosticType | null;
+  result: SbuSkkLevel1Result | null;
+}
+
+const LEVEL1_DIAGNOSTIC_CHOICES: SbuSkkLevel1DiagnosticAccess["choices"] = [
+  {
+    type: "sbu",
+    title: "Cek Kesiapan SBU",
+    description: "Nilai kesiapan awal badan usaha, personel, pengalaman, keuangan, dan dokumen.",
+  },
+  {
+    type: "skk",
+    title: "Cek Kesiapan SKK",
+    description: "Nilai kesiapan awal target jabatan, pengalaman, portofolio, dan persiapan uji.",
+  },
+];
+
+interface PaidLevelOneOrder {
+  id: number;
+  status: string;
+}
+
+async function getLevelOneOrderByAccessToken(
+  accessToken: string,
+  executor: {
+    query: (text: string, params?: unknown[]) => Promise<{ rows: PaidLevelOneOrder[] }>;
+  } = pool,
+  lock = false,
+): Promise<PaidLevelOneOrder | null> {
+  const row = await executor.query(
+    `SELECT so.id, so.status
+       FROM store_orders so
+       JOIN store_products sp ON sp.id=so.product_id
+      WHERE so.access_token=$1
+        AND sp.scalev_variant_id=$2
+      LIMIT 1
+      ${lock ? "FOR UPDATE OF so" : ""}`,
+    [
+      accessToken,
+      SBU_SKK_EBOOK.scalev.variantId,
+    ],
+  );
+  return row.rows[0] || null;
+}
+
+function mapStoredLevelOneResult(row: {
+  diagnostic_type: SbuSkkLevel1DiagnosticType;
+  score: number;
+  status_key: SbuSkkLevel1Result["statusKey"];
+  status_label: string;
+  rubric_version: string;
+}): SbuSkkLevel1Result {
+  return {
+    type: row.diagnostic_type,
+    score: row.score,
+    statusKey: row.status_key,
+    statusLabel: row.status_label,
+    rubricVersion: row.rubric_version,
+  };
+}
+
+export async function getLevelOneDiagnosticAccess(
+  accessToken: string,
+): Promise<SbuSkkLevel1DiagnosticAccess | null> {
+  const order = await getLevelOneOrderByAccessToken(accessToken);
+  if (!order || String(order.status).toLowerCase() !== "paid") return null;
+  const existing = await pool.query<{
+    diagnostic_type: SbuSkkLevel1DiagnosticType;
+    score: number;
+    status_key: SbuSkkLevel1Result["statusKey"];
+    status_label: string;
+    rubric_version: string;
+  }>(
+    `SELECT diagnostic_type, score, status_key, status_label, rubric_version
+       FROM sbu_skk_level1_diagnostics
+      WHERE order_id=$1
+      LIMIT 1`,
+    [order.id],
+  );
+  const result = existing.rows[0]
+    ? mapStoredLevelOneResult(existing.rows[0])
+    : null;
+  return {
+    eligible: true,
+    choices: LEVEL1_DIAGNOSTIC_CHOICES,
+    selectedType: result?.type || null,
+    result,
+  };
+}
+
 export type SbuSkkOfferKey = "tutor" | "bundle" | "ai-specialist";
 
 const SBU_SKK_PRODUCT_TO_OFFER = new Map<string, SbuSkkOfferKey>([
@@ -742,6 +844,110 @@ export async function fulfillSbuSkkOffer(
 
 // ─── Route registration ────────────────────────────────────────────────────────
 export function registerSbuSkkFunnelRoutes(app: Express): void {
+  app.post(
+    "/api/store/access/:token/level-one-diagnostic",
+    async (req: Request, res: Response) => {
+      setPrivateHeaders(res);
+      const parsed = z.object({
+        type: z.enum(["sbu", "skk"]),
+        answers: z.record(z.string()).refine(
+          (answers) =>
+            Object.keys(answers).length <= 12
+            && Object.values(answers).every((value) => value.length <= 40),
+          "Jawaban assessment tidak valid.",
+        ),
+      }).strict().safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ error: "Jawaban assessment tidak valid." });
+      }
+
+      const token = String(req.params.token || "");
+      if (token.length < 20 || token.length > 128) {
+        return res.status(400).json({ error: "Access token tidak valid." });
+      }
+
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const order = await getLevelOneOrderByAccessToken(token, client, true);
+        if (!order) {
+          await client.query("ROLLBACK");
+          return res.status(404).json({ error: "Paket Level 1 tidak ditemukan." });
+        }
+        if (String(order.status).toLowerCase() !== "paid") {
+          await client.query("ROLLBACK");
+          return res.status(403).json({ error: "Pembayaran belum dikonfirmasi." });
+        }
+
+        const existing = await client.query<{
+          diagnostic_type: SbuSkkLevel1DiagnosticType;
+          score: number;
+          status_key: SbuSkkLevel1Result["statusKey"];
+          status_label: string;
+          rubric_version: string;
+        }>(
+          `SELECT diagnostic_type, score, status_key, status_label, rubric_version
+             FROM sbu_skk_level1_diagnostics
+            WHERE order_id=$1
+            LIMIT 1`,
+          [order.id],
+        );
+        if (existing.rows[0]) {
+          await client.query("COMMIT");
+          const result = mapStoredLevelOneResult(existing.rows[0]);
+          if (result.type !== parsed.data.type) {
+            return res.status(409).json({
+              error: `Pilihan ${result.type.toUpperCase()} sudah dikunci untuk pesanan ini.`,
+              result,
+            });
+          }
+          return res.json({ result, alreadyCompleted: true });
+        }
+
+        let assessed: SbuSkkLevel1Result;
+        try {
+          assessed = assessSbuSkkLevel1(
+            parsed.data.type,
+            parsed.data.answers,
+          );
+        } catch (error) {
+          await client.query("ROLLBACK");
+          return res.status(400).json({
+            error: error instanceof Error
+              ? error.message
+              : "Jawaban assessment tidak valid.",
+          });
+        }
+
+        await client.query(
+          `INSERT INTO sbu_skk_level1_diagnostics (
+             order_id, diagnostic_type, score, status_key, status_label,
+             rubric_version, updated_at
+           ) VALUES ($1,$2,$3,$4,$5,$6,now())`,
+          [
+            order.id,
+            assessed.type,
+            assessed.score,
+            assessed.statusKey,
+            assessed.statusLabel,
+            assessed.rubricVersion,
+          ],
+        );
+        await client.query("COMMIT");
+        return res.status(201).json({ result: assessed, alreadyCompleted: false });
+      } catch (error) {
+        await client.query("ROLLBACK").catch(() => {});
+        console.error(
+          "[SBU-SKK Level 1] Diagnostic failed:",
+          (error as Error).message,
+        );
+        return res.status(500).json({ error: "Diagnosis belum dapat diproses." });
+      } finally {
+        client.release();
+      }
+    },
+  );
+
   // ── POST /api/sbu-skk/readiness/events ───────────────────────────────────
   // Anonymous aggregate measurement only. The readiness answers never leave
   // the browser and any extra field is rejected by the strict schema.
@@ -1297,14 +1503,18 @@ export async function augmentStoreAccessResponse(
   productRegistryId: string,
   accessToken: string,
   baseUrl: string,
-): Promise<Array<{
-  id: number;
-  fileName: string;
-  label: string;
-  role: string;
-  mimeType: string;
-  sizeBytes: number;
-  downloadUrl: string;
-}>> {
-  return getPaidDownloads(productRegistryId, accessToken, baseUrl);
+): Promise<{
+  downloads: Awaited<ReturnType<typeof getPaidDownloads>>;
+  levelOneDiagnostic: SbuSkkLevel1DiagnosticAccess | null;
+}> {
+  const downloads = await getPaidDownloads(
+    productRegistryId,
+    accessToken,
+    baseUrl,
+  );
+  const levelOneDiagnostic =
+    productRegistryId === SBU_SKK_EBOOK.registryProductId
+      ? await getLevelOneDiagnosticAccess(accessToken)
+      : null;
+  return { downloads, levelOneDiagnostic };
 }

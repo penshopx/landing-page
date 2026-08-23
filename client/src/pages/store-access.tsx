@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useContactNumbers } from "@/lib/contact";
+import {
+  SbuSkkLevelOneDiagnostic,
+  type LevelOneDiagnosticAccess,
+} from "@/components/sbu-skk-level1-diagnostic";
 
 interface StoreAccessData {
   order: {
@@ -34,6 +38,7 @@ interface StoreAccessData {
   type?: "digital";
   downloadUrl?: string | null;
   downloads?: Array<{ id: string; fileName: string; label: string; role: string; mimeType: string; sizeBytes: number; downloadUrl: string }>;
+  levelOneDiagnostic?: LevelOneDiagnosticAccess | null;
 }
 
 class StoreAccessError extends Error {
@@ -283,6 +288,13 @@ export default function StoreAccess() {
                   </p>
                 </CardContent>
               </Card>
+            )}
+
+            {data.type === "digital" && data.levelOneDiagnostic && token && (
+              <SbuSkkLevelOneDiagnostic
+                token={token}
+                access={data.levelOneDiagnostic}
+              />
             )}
 
             {/* ── Kemasan Produk: 4 Format ── */}
