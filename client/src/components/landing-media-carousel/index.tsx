@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Film, Image as ImageIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Film, HardHat } from "lucide-react";
 import {
   type CarouselApi,
   Carousel,
@@ -13,10 +13,13 @@ import promoPosterUrl from "@assets/generated_videos/gustafta_promo_24s_poster.j
 import explainerVideoUrl from "@assets/generated_videos/gustafta_explainer.mp4";
 import explainerVideoWebmUrl from "@assets/generated_videos/gustafta_explainer.webm";
 import explainerPosterUrl from "@assets/generated_videos/gustafta_explainer_poster.jpg";
-import identityCoverUrl from "@assets/G01_1781941962427.png";
-import assistedProfessionalUrl from "@assets/G03_1781941962428.png";
-import agentNetworkUrl from "@assets/G05_1781941962429.png";
-import workDialogueUrl from "@assets/G07_1781941962430.png";
+import constructionReadinessUrl from "@assets/generated_images/gustafta-konstruksi-01-kesiapan.png";
+import constructionPlanningUrl from "@assets/generated_images/gustafta-konstruksi-02-perencanaan.png";
+import constructionExecutionUrl from "@assets/generated_images/gustafta-konstruksi-03-pelaksanaan.png";
+import constructionMonitoringUrl from "@assets/generated_images/gustafta-konstruksi-04-monitoring.png";
+import constructionHandoverUrl from "@assets/generated_images/gustafta-konstruksi-05-serah-terima.png";
+import constructionWorkflowVideoUrl from "@assets/generated_videos/gustafta-konstruksi-workflow.mp4";
+import constructionWorkflowVideoWebmUrl from "@assets/generated_videos/gustafta-konstruksi-workflow.webm";
 
 const videoSlides = [
   {
@@ -35,40 +38,72 @@ const videoSlides = [
   },
 ];
 
-const identitySlides = [
+const constructionWorkflowSlides = [
   {
-    src: identityCoverUrl,
-    alt: "Sampul Trilogi Gustafta dengan identitas geometris berwarna biru",
-    eyebrow: "Identitas",
-    title: "Dari monolog ke dialog",
-    caption: "Gustafta memberi bahasa bersama agar keputusan kerja tidak berhenti di satu kepala.",
-    fit: "object-cover",
+    kind: "image" as const,
+    src: constructionReadinessUrl,
+    alt: "Manajer proyek meninjau dokumen tender dan gambar kerja dalam ruang kerja digital",
+    number: "01",
+    eyebrow: "Kesiapan & tender",
+    title: "Pekerjaan dimulai dari konteks yang lengkap.",
+    caption: "Persyaratan, dokumen, dan peluang tender dirapikan lebih dahulu agar tim tahu apa yang harus disiapkan.",
+    gustafta: "Tender dan Bedah Dokumen membantu menemukan kebutuhan, risiko, dan tindak lanjut sejak awal.",
   },
   {
-    src: assistedProfessionalUrl,
-    alt: "Profesional menggunakan antarmuka data digital di meja kerja",
-    eyebrow: "Profesional terbantu AI",
-    title: "Analisis tetap berpihak pada pengalaman",
-    caption: "AI membantu membaca konteks; profesional tetap memegang pertimbangan di lapangan.",
-    fit: "object-cover",
+    kind: "image" as const,
+    src: constructionPlanningUrl,
+    alt: "Engineer menyusun rencana bangunan, jadwal, dan koordinasi pekerjaan",
+    number: "02",
+    eyebrow: "Perencanaan",
+    title: "Rencana kerja tidak lagi berdiri sendiri.",
+    caption: "Gambar, jadwal, metode, dan pengetahuan tim bertemu dalam konteks yang dapat dipahami bersama.",
+    gustafta: "Brain Project dan Dokumen Proyek menjaga rencana, SOP, serta pengalaman tim tetap terhubung.",
   },
   {
-    src: agentNetworkUrl,
-    alt: "Jaringan modul biru yang terhubung mengelilingi satu titik pusat",
-    eyebrow: "Jaringan agen",
-    title: "Keahlian yang saling menemukan",
-    caption: "Setiap ruang kerja terhubung tanpa menghilangkan peran manusia di dalamnya.",
-    fit: "object-cover",
+    kind: "image" as const,
+    src: constructionExecutionUrl,
+    alt: "Tim konstruksi melaksanakan pekerjaan lapangan dengan pengawasan digital",
+    number: "03",
+    eyebrow: "Pelaksanaan",
+    title: "Keputusan lapangan tetap berada di jalurnya.",
+    caption: "Tim mengerjakan proyek dengan akses pada dokumen, arahan, dan keputusan terbaru yang dibutuhkan.",
+    gustafta: "Ruang Proyek menyatukan percakapan, dokumen, dan perkembangan pekerjaan dalam satu tempat.",
   },
   {
-    src: workDialogueUrl,
-    alt: "Visual identitas Gustafta untuk kolaborasi dan percakapan kerja",
-    eyebrow: "Kerja bersama",
-    title: "Konteks yang bergerak bersama tim",
-    caption: "Dari pertanyaan awal sampai keputusan berikutnya, pengetahuan tetap dapat diajak berdialog.",
-    fit: "object-cover",
+    kind: "image" as const,
+    src: constructionMonitoringUrl,
+    alt: "Engineer memeriksa mutu dan kemajuan pembangunan melalui tablet di lapangan",
+    number: "04",
+    eyebrow: "Monitoring & mutu",
+    title: "Progres dibaca sebelum menjadi masalah.",
+    caption: "Temuan, foto, dan perkembangan lapangan dapat ditelusuri agar tindak lanjut tidak terlambat.",
+    gustafta: "Ruang Proyek dan Asisten AI membantu merangkum progres serta menemukan pekerjaan yang perlu ditindaklanjuti.",
+  },
+  {
+    kind: "image" as const,
+    src: constructionHandoverUrl,
+    alt: "Tim proyek menyerahkan bangunan dan mengarsipkan pengetahuan pekerjaan",
+    number: "05",
+    eyebrow: "Serah terima",
+    title: "Pekerjaan selesai, pengetahuannya tetap hidup.",
+    caption: "Dokumen akhir, keputusan, dan pembelajaran proyek tidak hilang ketika bangunan diserahterimakan.",
+    gustafta: "Ruang Simpan menjaga arsip dan pengetahuan agar siap digunakan kembali pada pekerjaan berikutnya.",
+  },
+  {
+    kind: "video" as const,
+    webm: constructionWorkflowVideoWebmUrl,
+    mp4: constructionWorkflowVideoUrl,
+    poster: constructionExecutionUrl,
+    number: "06",
+    eyebrow: "Ringkasan bergerak",
+    title: "Satu alur kerja, terhubung dari awal hingga akhir.",
+    caption: "Lihat bagaimana informasi bergerak bersama pekerjaan konstruksi tanpa memutus peran profesional di dalamnya.",
+    gustafta: "Gustafta mengisi celah di antara dokumen, keputusan, pekerjaan lapangan, dan pengetahuan organisasi.",
   },
 ];
+
+const CONSTRUCTION_SLIDE_DURATION_MS = 5_200;
+const CONSTRUCTION_VIDEO_FALLBACK_MS = 10_000;
 
 function CarouselNavigation({
   active,
@@ -251,56 +286,181 @@ export function LandingVideoCarousel() {
   );
 }
 
-export function LandingIdentityCarousel() {
-  const { active, next, previous, select, setApi } = useCarouselState(identitySlides.length);
+export function LandingConstructionWorkflowCarousel() {
+  const { active, next, select, setApi } = useCarouselState(constructionWorkflowSlides.length);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const activeSlide = constructionWorkflowSlides[active];
+  const videoSlideIndex = constructionWorkflowSlides.length - 1;
+
+  const playActiveVideo = useCallback(() => {
+    if (active !== videoSlideIndex) return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+    video.defaultMuted = true;
+    void video.play().catch(() => {
+      // A canplay/loadeddata retry or the fallback timer will handle this.
+    });
+  }, [active, videoSlideIndex]);
+
+  const completeActiveVideo = useCallback(() => {
+    if (active !== videoSlideIndex) return;
+    videoRef.current?.pause();
+    select(0);
+  }, [active, select, videoSlideIndex]);
+
+  useEffect(() => {
+    const delay = activeSlide.kind === "video"
+      ? CONSTRUCTION_VIDEO_FALLBACK_MS
+      : CONSTRUCTION_SLIDE_DURATION_MS;
+    const timer = window.setTimeout(
+      activeSlide.kind === "video" ? completeActiveVideo : next,
+      delay,
+    );
+    return () => window.clearTimeout(timer);
+  }, [activeSlide.kind, completeActiveVideo, next]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (activeSlide.kind === "video") {
+      video.currentTime = 0;
+      playActiveVideo();
+      const retry = window.setTimeout(playActiveVideo, 250);
+      video.addEventListener("canplay", playActiveVideo);
+      return () => {
+        window.clearTimeout(retry);
+        video.removeEventListener("canplay", playActiveVideo);
+      };
+    }
+    video.pause();
+    video.currentTime = 0;
+  }, [activeSlide.kind, playActiveVideo]);
 
   return (
-    <section aria-labelledby="identity-carousel-heading" className="overflow-hidden bg-[#f7f1e6] px-5 py-20 md:py-24" data-testid="landing-identity-carousel">
+    <section
+      aria-labelledby="construction-workflow-heading"
+      className="overflow-hidden bg-[#091524] px-5 py-20 text-[#f8fafc] md:py-24"
+      data-testid="landing-construction-carousel"
+    >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div className="mb-9 flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
-            <div className="mb-3 flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[.2em] text-[#b55e45]">
-              <ImageIcon className="h-4 w-4" /> Bahasa Gustafta
+            <div className="mb-3 flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[.2em] text-[#67e8f9]">
+              <HardHat className="h-4 w-4" /> Konstruksi × Gustafta
             </div>
-            <h2 className="max-w-2xl font-display text-4xl font-semibold leading-tight tracking-[-.06em] text-[#173847] md:text-5xl" id="identity-carousel-heading">
-              Teknologi yang membuat percakapan kerja lebih bernilai.
+            <h2
+              className="max-w-3xl font-display text-4xl font-semibold leading-tight tracking-[-.06em] md:text-5xl"
+              id="construction-workflow-heading"
+            >
+              Dari dokumen pertama sampai serah terima.
             </h2>
           </div>
-          <p className="max-w-xs text-sm leading-6 text-[#687a78]">Geser untuk melihat prinsip yang membentuk cara Gustafta membantu profesional konstruksi.</p>
+          <div className="max-w-sm">
+            <p className="text-sm leading-6 text-[#b8c9d9]">
+              Ikuti alur otomatis untuk melihat bagaimana Gustafta mengisi pekerjaan konstruksi di setiap tahap.
+            </p>
+            <div className="mt-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[.2em] text-[#a78bfa]">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-[#67e8f9]" aria-hidden="true" />
+              Berjalan otomatis dan berulang
+            </div>
+          </div>
         </div>
         <Carousel
           className="min-w-0"
           opts={{ loop: true }}
           setApi={setApi}
-          data-testid="landing-identity-carousel-region"
-          tabIndex={0}
+          data-testid="landing-construction-carousel-region"
         >
           <CarouselContent className="ml-0">
-            {identitySlides.map((slide, index) => (
-              <CarouselItem className="pl-0" key={slide.src} role="tabpanel" aria-label={`${index + 1} dari ${identitySlides.length}: ${slide.title}`}>
-                <article className="grid overflow-hidden rounded-[1.65rem] border border-[#d4ded8] bg-[#fffaf1] md:grid-cols-[1.12fr_.88fr]">
-                  <div className="aspect-[4/3] overflow-hidden bg-[#dce9e5] md:aspect-[16/10]">
-                    <img
-                      alt={slide.alt}
-                      className={`h-full w-full ${slide.fit}`}
-                      data-testid={`landing-identity-slide-${index + 1}`}
-                      decoding="async"
-                      loading="lazy"
-                      src={slide.src}
-                    />
+            {constructionWorkflowSlides.map((slide, index) => (
+              <CarouselItem
+                aria-label={`${index + 1} dari ${constructionWorkflowSlides.length}: ${slide.title}`}
+                className="pl-0"
+                key={`${slide.kind}-${slide.number}`}
+                role="tabpanel"
+              >
+                <article className="grid overflow-hidden rounded-[1.75rem] border border-white/15 bg-[#10243a] shadow-[0_26px_70px_rgba(0,0,0,.3)] md:grid-cols-[.86fr_1.14fr]">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-[#07101d] md:aspect-auto md:min-h-[570px]">
+                    {slide.kind === "image" ? (
+                      <img
+                        alt={slide.alt}
+                        className="h-full w-full object-cover"
+                        data-testid={`landing-construction-slide-${index + 1}`}
+                        decoding="async"
+                        loading={index === 0 ? "eager" : "lazy"}
+                        src={slide.src}
+                      />
+                    ) : (
+                      <video
+                        aria-label={slide.title}
+                        autoPlay
+                        className="h-full w-full object-cover"
+                        data-testid={`landing-construction-slide-${index + 1}`}
+                        muted
+                        onCanPlay={playActiveVideo}
+                        onEnded={completeActiveVideo}
+                        onLoadedData={playActiveVideo}
+                        onTimeUpdate={(event) => {
+                          const video = event.currentTarget;
+                          if (
+                            Number.isFinite(video.duration)
+                            && video.duration > 0
+                            && video.duration - video.currentTime <= 0.18
+                          ) {
+                            completeActiveVideo();
+                          }
+                        }}
+                        playsInline
+                        poster={slide.poster}
+                        preload="auto"
+                        ref={videoRef}
+                      >
+                        <source src={slide.webm} type="video/webm" />
+                        <source src={slide.mp4} type="video/mp4" />
+                        Browser Anda belum mendukung pemutaran video.
+                      </video>
+                    )}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#07101d]/75 via-transparent to-transparent" />
+                    <span className="absolute bottom-5 left-5 rounded-full border border-white/25 bg-[#07101d]/75 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[.18em] text-[#dbeafe] backdrop-blur">
+                      Tahap {slide.number}
+                    </span>
                   </div>
-                  <div className="flex min-h-[260px] flex-col p-6 md:p-9">
-                    <p className="font-mono text-[11px] font-bold uppercase tracking-[.2em] text-[#b55e45]">{slide.eyebrow}</p>
-                    <h3 className="mt-5 max-w-sm font-display text-3xl font-semibold leading-[1.02] tracking-[-.05em] text-[#173847]">{slide.title}</h3>
-                    <p className="mt-5 max-w-sm text-sm leading-7 text-[#607373]">{slide.caption}</p>
-                    <span className="mt-auto pt-7 font-mono text-xs font-bold tracking-[.2em] text-[#8a9b98]">0{index + 1} / 0{identitySlides.length}</span>
+                  <div className="flex min-h-[360px] flex-col p-7 md:p-11">
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-[.2em] text-[#67e8f9]">{slide.eyebrow}</p>
+                    <h3 className="mt-5 max-w-lg font-display text-3xl font-semibold leading-[1.05] tracking-[-.05em] text-white md:text-4xl">{slide.title}</h3>
+                    <p className="mt-5 max-w-lg text-sm leading-7 text-[#b8c9d9]">{slide.caption}</p>
+                    <div className="mt-7 max-w-lg rounded-2xl border border-[#60a5fa]/25 bg-[#0b1b2d] p-5">
+                      <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-[.18em] text-[#a78bfa]">Peran Gustafta</p>
+                      <p className="text-sm leading-6 text-[#e2e8f0]">{slide.gustafta}</p>
+                    </div>
+                    <span className="mt-auto pt-8 font-mono text-xs font-bold tracking-[.2em] text-[#71869a]">
+                      {slide.number} / 0{constructionWorkflowSlides.length}
+                    </span>
                   </div>
                 </article>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="mt-5 text-[#173847]">
-            <CarouselNavigation active={active} count={identitySlides.length} label="landing-identity" onNext={next} onPrevious={previous} onSelect={select} />
+          <div className="mt-6 flex items-center justify-between gap-4">
+            <div className="flex gap-2" role="group" aria-label="Tahap konstruksi">
+              {constructionWorkflowSlides.map((slide, index) => (
+                <button
+                  aria-label={`Tampilkan tahap ${slide.number}`}
+                  aria-pressed={active === index}
+                  className={`h-2.5 rounded-full transition-[width,background-color] duration-300 ${
+                    active === index ? "w-9 bg-gradient-to-r from-[#22d3ee] to-[#a78bfa]" : "w-2.5 bg-white/25 hover:bg-white/45"
+                  }`}
+                  data-testid={`landing-construction-dot-${index + 1}`}
+                  key={slide.number}
+                  onClick={() => select(index)}
+                  type="button"
+                />
+              ))}
+            </div>
+            <span className="font-mono text-[10px] font-bold uppercase tracking-[.18em] text-[#71869a]">
+              Gambar bergeser setiap 5 detik
+            </span>
           </div>
         </Carousel>
       </div>

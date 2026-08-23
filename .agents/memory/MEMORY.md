@@ -94,3 +94,4 @@
 - [Demand-led promotion](demand-led-promotion.md) — ebook is supporting depth, not the trigger; market signals should select which existing AI Specialist/app is promoted, with superadmin approval.
 - [Feature-specific worker leases](feature-worker-leases.md) — new DB queues need their own leader lease during mixed-version rollouts; a shared scheduler leader can starve new workers.
 - [External agent runtime adoption](external-agent-runtime-adoption.md) — OpenClaw/Hermes stay optional and pilot-led; earn production scope through safety and proven value.
+- [Carousel video loop resilience](carousel-video-loop-resilience.md) — muted autoplay needs readiness retries; finish via time threshold plus ended and timer fallbacks.

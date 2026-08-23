@@ -24,7 +24,7 @@ import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
 import { SBU_SKK_EBOOK, SBU_SKK_FUNNEL } from "@/data/pricing";
 import { trackLead } from "@/lib/meta-pixel";
-import { LandingIdentityCarousel, LandingVideoCarousel } from "@/components/landing-media-carousel";
+import { LandingConstructionWorkflowCarousel, LandingVideoCarousel } from "@/components/landing-media-carousel";
 import "./landing.css";
 
 const funnel = SBU_SKK_FUNNEL;
@@ -123,7 +123,7 @@ export default function Landing() {
           </div></div>
         </section>
         <section className="border-y border-[#d4ded8] bg-[#f0e8d9] px-5 py-20 md:py-24" data-testid="section-knowledge-to-ai"><div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[.85fr_1.15fr]"><div><p className="mb-3 font-mono text-xs font-bold uppercase tracking-[.2em] text-[#b55e45]">Dari pengetahuan menjadi AI</p><h2 className="font-display text-4xl font-semibold leading-tight tracking-[-.06em] md:text-5xl">Pengetahuan lapangan tidak berhenti di kepala satu orang.</h2><p className="mt-5 max-w-md text-sm leading-7 text-[#607373]">Regulasi, SOP, metode kerja, dan pengalaman tim dapat dirapikan menjadi fondasi yang lebih mudah dicari dan digunakan kembali.</p><Link href="/brain-project" className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-[#173847]">Bangun fondasi pengetahuan <ArrowRight className="h-4 w-4" /></Link></div><div className="grid gap-3 sm:grid-cols-2">{["Regulasi & kebijakan", "Dokumen & SOP", "Metode kerja", "Pengalaman profesional"].map((item) => <div key={item} className="flex items-center gap-3 rounded-2xl border border-[#d4ded8] bg-[#fffaf1] p-4 text-sm font-semibold"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#9cc4c6] text-[#173847]"><Check className="h-4 w-4" /></span>{item}</div>)}</div></div></section>
-        <LandingIdentityCarousel />
+        <LandingConstructionWorkflowCarousel />
         <section className="px-5 py-20 md:py-24" data-testid="section-journey"><div className="mx-auto max-w-6xl"><div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="mb-3 font-mono text-xs font-bold uppercase tracking-[.2em] text-[#b55e45]">Cara kerja Gustafta</p><h2 className="font-display text-4xl font-semibold tracking-[-.06em] md:text-5xl">Satu alur yang bisa Anda lihat.</h2></div><p className="max-w-sm text-sm leading-6 text-[#687a78]">Temukan, pahami, kerjakan, lalu simpan konteksnya untuk langkah berikutnya.</p></div><div className="grid gap-3 md:grid-cols-4">{[["01","Temukan","Peluang dan pertanyaan masuk ke ruang yang tepat."],["02","Pahami","Dokumen dan pengetahuan diringkas menjadi konteks."],["03","Kerjakan","Tim mengambil langkah dengan alat yang sesuai."],["04","Simpan","Hasil kerja menjadi referensi untuk pekerjaan berikutnya."]].map(([n,t,b]) => <div key={n} className="border-l-2 border-[#c96f52] px-5 py-2"><span className="font-mono text-xs font-bold text-[#b55e45]">{n}</span><h3 className="mt-5 font-display text-xl font-semibold">{t}</h3><p className="mt-2 text-sm leading-6 text-[#687a78]">{b}</p></div>)}</div></div></section>
         <section className="px-5 py-20 md:py-28" id="platform">
           <div className="mx-auto max-w-6xl">

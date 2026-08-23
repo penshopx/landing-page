@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 import React, { useState } from "react";
+import { act } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Landing from "../client/src/pages/landing";
@@ -122,7 +123,7 @@ describe("public landing synchronization", () => {
     }
   });
 
-  it("renders the supplied videos and curated images with stable media settings", () => {
+  it("renders the supplied videos and the construction workflow media with stable settings", () => {
     render(<Landing />);
 
     const promo = screen.getByTestId("landing-video-slide-1");
@@ -152,23 +153,34 @@ describe("public landing synchronization", () => {
     expect(explainerSources[1]).toHaveAttribute("type", "video/mp4");
 
     for (const [index, fileName] of [
-      [1, "G01_1781941962427.png"],
-      [2, "G03_1781941962428.png"],
-      [3, "G05_1781941962429.png"],
-      [4, "G07_1781941962430.png"],
+      [1, "gustafta-konstruksi-01-kesiapan.png"],
+      [2, "gustafta-konstruksi-02-perencanaan.png"],
+      [3, "gustafta-konstruksi-03-pelaksanaan.png"],
+      [4, "gustafta-konstruksi-04-monitoring.png"],
+      [5, "gustafta-konstruksi-05-serah-terima.png"],
     ] as const) {
-      const image = screen.getByTestId(`landing-identity-slide-${index}`);
-      expect(image).toHaveAttribute("loading", "lazy");
+      const image = screen.getByTestId(`landing-construction-slide-${index}`);
+      expect(image).toHaveAttribute("loading", index === 1 ? "eager" : "lazy");
       expect(image).toHaveAttribute("src", expect.stringContaining(fileName));
     }
 
+    const workflowVideo = screen.getByTestId("landing-construction-slide-6");
+    expect(workflowVideo).toHaveAttribute("autoplay");
+    expect(workflowVideo).toHaveProperty("muted", true);
+    expect(workflowVideo).toHaveAttribute("playsinline");
+    const workflowSources = workflowVideo.querySelectorAll("source");
+    expect(workflowSources).toHaveLength(2);
+    expect(workflowSources[0]).toHaveAttribute("src", expect.stringContaining("gustafta-konstruksi-workflow.webm"));
+    expect(workflowSources[0]).toHaveAttribute("type", "video/webm");
+    expect(workflowSources[1]).toHaveAttribute("src", expect.stringContaining("gustafta-konstruksi-workflow.mp4"));
+    expect(workflowSources[1]).toHaveAttribute("type", "video/mp4");
+
     expect(screen.getByTestId("landing-video-previous")).toBeInTheDocument();
     expect(screen.getByTestId("landing-video-next")).toBeInTheDocument();
-    expect(screen.getByTestId("landing-identity-previous")).toBeInTheDocument();
-    expect(screen.getByTestId("landing-identity-next")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-construction-dot-1")).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("moves both carousels manually while each video remains on its selected looping slide", async () => {
+  it("moves the video carousel and loops the construction sequence after its video ends", async () => {
     render(<Landing />);
 
     expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
@@ -182,11 +194,25 @@ describe("public landing synchronization", () => {
     fireEvent.ended(screen.getByTestId("landing-video-slide-2"));
     expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
 
-    expect(screen.getByTestId("landing-identity-dot-1")).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByTestId("landing-identity-next"));
-    expect(screen.getByTestId("landing-identity-dot-2")).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByTestId("landing-identity-dot-4"));
-    expect(screen.getByTestId("landing-identity-dot-4")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByTestId("landing-construction-dot-1")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByTestId("landing-construction-dot-6"));
+    expect(screen.getByTestId("landing-construction-dot-6")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.ended(screen.getByTestId("landing-construction-slide-6"));
+    expect(screen.getByTestId("landing-construction-dot-1")).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("advances the construction images automatically without a visitor action", () => {
+    vi.useFakeTimers();
+    try {
+      render(<Landing />);
+      expect(screen.getByTestId("landing-construction-dot-1")).toHaveAttribute("aria-pressed", "true");
+      act(() => {
+        vi.advanceTimersByTime(5_300);
+      });
+      expect(screen.getByTestId("landing-construction-dot-2")).toHaveAttribute("aria-pressed", "true");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
