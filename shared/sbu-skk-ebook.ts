@@ -36,6 +36,51 @@ export const SBU_SKK_EBOOK = {
 export type SbuSkkEbook = typeof SBU_SKK_EBOOK;
 
 /**
+ * Canonical public links for the external tools used in the SBU/SKK renewal
+ * journey. Keeping them here prevents landing-page copy and URLs from drifting.
+ */
+export const SBU_SKK_RENEWAL_HUB = {
+  sbu: [
+    {
+      id: "lkut-readiness",
+      step: "01",
+      title: "Cek Kesiapan LKUT",
+      description: "Nilai kesiapan profil, keuangan, organisasi, dan kinerja sebelum menyusun laporan.",
+      href: "https://asset-linker-esterkristian26.replit.app/",
+    },
+    {
+      id: "lkut-report",
+      step: "02",
+      title: "Susun & Laporkan LKUT",
+      description: "Masuk ke aplikasi LKUT untuk membantu menyiapkan laporan kegiatan usaha tahunan.",
+      href: "https://konstruksi-laporan-tahunan.replit.app/landing-page/",
+    },
+    {
+      id: "smap-pub",
+      step: "03",
+      title: "Siapkan SMAP & PUB",
+      description: "Gunakan Compliance Hub untuk membantu menata dokumen SMAP dan PUB yang relevan.",
+      href: "https://compliance-document-creator-2-Esterkristian26.replit.app",
+    },
+  ],
+  skk: {
+    id: "executive-summary-skk",
+    step: "01",
+    title: "Executive Summary SKK",
+    description: "Susun ringkasan eksekutif sebagai bahan kerja untuk proses pembaruan SKK.",
+    href: "https://exum.dokumenproyek.com/",
+  },
+  annualOss: {
+    id: "lkpm-oss",
+    title: "Laporan LKPM",
+    description: "Sampaikan Laporan Kegiatan Penanaman Modal sebagai bagian dari kewajiban pelaporan OSS tahunan.",
+    href: "https://lkpm.dokumenproyek.com/",
+  },
+} as const;
+
+export type SbuSkkRenewalHub = typeof SBU_SKK_RENEWAL_HUB;
+
+/**
  * Canonical public metadata for the complete SBU-SKK funnel. Private asset
  * paths and provider credentials deliberately stay server-only.
  */

@@ -90,6 +90,8 @@ describe("public landing synchronization", () => {
     expect(screen.getByTestId("section-skk")).toBeInTheDocument();
     expect(screen.getByTestId("section-tender")).toBeInTheDocument();
     expect(screen.getByTestId("section-proyek")).toBeInTheDocument();
+    expect(screen.getByTestId("section-renewal-hub")).toHaveAttribute("id", "jalur-sbu-skk");
+    expect(screen.getByTestId("session-sbu")).toHaveAttribute("href", "#jalur-sbu-skk");
     expect(screen.getByTestId("primary-link-skk")).toHaveAttribute("href", "/skk");
     expect(screen.getByTestId("primary-link-tender")).toHaveAttribute("href", "/tender");
     expect(screen.getByTestId("primary-link-proyek")).toHaveAttribute("href", "/ruang-proyek");
@@ -121,6 +123,48 @@ describe("public landing synchronization", () => {
         `landing should retain access to ${href}`,
       ).toBeInTheDocument();
     }
+  });
+
+  it("scrolls the primary SBU session card to the renewal hub", () => {
+    window.history.replaceState(null, "", "/");
+    render(<Landing />);
+    const renewalHub = screen.getByTestId("section-renewal-hub");
+    const scrollIntoView = vi.fn();
+    renewalHub.scrollIntoView = scrollIntoView;
+
+    fireEvent.click(screen.getByTestId("session-sbu"));
+
+    expect(window.location.hash).toBe("#jalur-sbu-skk");
+    expect(scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
+  });
+
+  it("links the SBU and SKK renewal journey to all four external tools safely", () => {
+    render(<Landing />);
+
+    expect(screen.getByTestId("renewal-path-sbu")).toHaveTextContent("Persiapan perpanjangan SBU");
+    expect(screen.getByTestId("renewal-path-skk")).toHaveTextContent("Persiapan perpanjangan SKK");
+    expect(screen.getByTestId("renewal-path-oss")).toHaveTextContent("Kewajiban tahunan LKPM");
+
+    const expectedLinks = [
+      ["external-link-lkut-readiness", "https://asset-linker-esterkristian26.replit.app/"],
+      ["external-link-lkut-report", "https://konstruksi-laporan-tahunan.replit.app/landing-page/"],
+      ["external-link-smap-pub", "https://compliance-document-creator-2-Esterkristian26.replit.app"],
+      ["external-link-executive-summary-skk", "https://exum.dokumenproyek.com/"],
+      ["external-link-lkpm-oss", "https://lkpm.dokumenproyek.com/"],
+    ] as const;
+
+    for (const [testId, href] of expectedLinks) {
+      const link = screen.getByTestId(testId);
+      expect(link).toHaveAttribute("href", href);
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      expect(link).toHaveAccessibleName(/buka aplikasi eksternal di tab baru/i);
+    }
+
+    expect(screen.getByTestId("renewal-external-notice")).toHaveTextContent(
+      "Alat bantu, bukan pengajuan resmi.",
+    );
+    expect(screen.getByTestId("section-renewal-hub")).not.toHaveTextContent(/Permen|Peraturan Nomor/i);
   });
 
   it("renders the supplied videos and the construction workflow media with stable settings", () => {

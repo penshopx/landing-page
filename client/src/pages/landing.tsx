@@ -7,6 +7,7 @@ import {
   Check,
   ChevronRight,
   ClipboardCheck,
+  ExternalLink,
   FileCheck2,
   FolderKanban,
   FolderOpen,
@@ -18,17 +19,18 @@ import {
   Stethoscope,
   Wrench,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { SharedHeader } from "@/components/shared-header";
 import { useAuth } from "@/hooks/use-auth";
-import { SBU_SKK_EBOOK, SBU_SKK_FUNNEL } from "@/data/pricing";
+import { SBU_SKK_EBOOK, SBU_SKK_FUNNEL, SBU_SKK_RENEWAL_HUB } from "@/data/pricing";
 import { trackLead } from "@/lib/meta-pixel";
 import { LandingConstructionWorkflowCarousel, LandingVideoCarousel } from "@/components/landing-media-carousel";
 import "./landing.css";
 
 const funnel = SBU_SKK_FUNNEL;
 const ebook = SBU_SKK_EBOOK;
+const renewalHub = SBU_SKK_RENEWAL_HUB;
 
 function ActionLink({ href, children, testId, light = false, onClick }: {
   href: string; children: ReactNode; testId?: string; light?: boolean; onClick?: () => void;
@@ -42,13 +44,14 @@ function ActionLink({ href, children, testId, light = false, onClick }: {
   );
 }
 
-function Session({ number, label, title, body, href, icon: Icon, accent, testId }: {
+function Session({ number, label, title, body, href, icon: Icon, accent, testId, nativeAnchor = false, onClick }: {
   number: string; label: string; title: string; body: string; href: string;
   icon: typeof Building2; accent: string; testId: string;
+  nativeAnchor?: boolean; onClick?: MouseEventHandler<HTMLAnchorElement>;
 }) {
-  return (
-    <Link href={href} data-testid={testId}
-      className="group relative flex min-h-[280px] flex-col overflow-hidden rounded-[1.5rem] border border-[#d4ded8] bg-[#fffaf1] p-6 shadow-[0_12px_34px_rgba(23,56,71,.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8baeb0] hover:shadow-[0_20px_42px_rgba(23,56,71,.13)]">
+  const className = "group relative flex min-h-[280px] flex-col overflow-hidden rounded-[1.5rem] border border-[#d4ded8] bg-[#fffaf1] p-6 shadow-[0_12px_34px_rgba(23,56,71,.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8baeb0] hover:shadow-[0_20px_42px_rgba(23,56,71,.13)]";
+  const content = (
+    <>
       <span className={`absolute right-0 top-0 h-1.5 w-24 ${accent}`} />
       <div className="mb-10 flex items-center justify-between">
         <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${accent} ${accent.includes("173847") ? "text-[#f7f1e6]" : "text-[#173847]"}`}><Icon className="h-5 w-5" /></span>
@@ -60,6 +63,16 @@ function Session({ number, label, title, body, href, icon: Icon, accent, testId 
       <span className="mt-auto flex items-center gap-2 pt-5 text-sm font-bold text-[#173847] group-hover:text-[#b55e45]">
         Buka ruang ini <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
       </span>
+    </>
+  );
+
+  if (nativeAnchor) {
+    return <a href={href} onClick={onClick} data-testid={testId} className={className}>{content}</a>;
+  }
+
+  return (
+    <Link href={href} data-testid={testId} className={className}>
+      {content}
     </Link>
   );
 }
@@ -73,10 +86,70 @@ function Capability({ icon: Icon, title, body, href }: { icon: typeof Search; ti
   );
 }
 
+function ExternalToolCard({ step, label, title, body, href, icon: Icon, testId, dark = false }: {
+  step?: string;
+  label?: string;
+  title: string;
+  body: string;
+  href: string;
+  icon: typeof ClipboardCheck;
+  testId: string;
+  dark?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-testid={testId}
+      aria-label={`${title} — buka aplikasi eksternal di tab baru`}
+      className={dark
+        ? "group flex min-h-[240px] flex-col rounded-2xl border border-[#52777d] bg-[#214c5b] p-5 text-[#f7f1e6] transition-transform hover:-translate-y-1"
+        : "group flex min-h-[240px] flex-col rounded-2xl border border-[#d4ded8] bg-[#fffaf1] p-5 transition-transform hover:-translate-y-1 hover:border-[#8baeb0]"}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <span className={dark
+          ? "flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4c95d] text-[#173847]"
+          : "flex h-10 w-10 items-center justify-center rounded-xl bg-[#e1efea] text-[#173847]"}>
+          <Icon className="h-5 w-5" aria-hidden="true" />
+        </span>
+        <span className={dark
+          ? "font-mono text-[10px] font-bold uppercase tracking-[.18em] text-[#f4c95d]"
+          : "font-mono text-[10px] font-bold uppercase tracking-[.18em] text-[#b55e45]"}>
+          {label ?? `Langkah ${step}`}
+        </span>
+      </div>
+      <h3 className={dark
+        ? "mt-8 font-display text-xl font-semibold text-[#f7f1e6]"
+        : "mt-8 font-display text-xl font-semibold text-[#173847]"}>
+        {title}
+      </h3>
+      <p className={dark
+        ? "mt-2 text-sm leading-6 text-[#c7d5d3]"
+        : "mt-2 text-sm leading-6 text-[#687a78]"}>
+        {body}
+      </p>
+      <span className={dark
+        ? "mt-auto flex items-center gap-2 pt-5 text-xs font-bold text-[#f4c95d]"
+        : "mt-auto flex items-center gap-2 pt-5 text-xs font-bold text-[#173847]"}>
+        Buka aplikasi eksternal
+        <ExternalLink className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+      </span>
+    </a>
+  );
+}
+
 export default function Landing() {
   const { isAuthenticated } = useAuth();
   const workspaceHref = isAuthenticated ? "/dashboard" : "/login";
   const lead = (content_name: string) => trackLead({ content_name });
+  const scrollToRenewalHub: MouseEventHandler<HTMLAnchorElement> = (event) => {
+    event.preventDefault();
+    const target = document.getElementById("jalur-sbu-skk");
+    if (!target) return;
+    window.history.pushState(null, "", "#jalur-sbu-skk");
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="landing-page min-h-[100dvh] overflow-x-hidden bg-[#f7f1e6] text-[#173847]" data-testid="page-landing">
@@ -129,7 +202,7 @@ export default function Landing() {
           <div className="mx-auto max-w-6xl">
             <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><p className="mb-3 font-mono text-xs font-bold uppercase tracking-[.2em] text-[#b55e45]">Empat ruang prioritas</p><h2 className="max-w-3xl font-display text-4xl font-semibold leading-tight tracking-[-.06em] md:text-5xl">Pilih pekerjaan yang ingin<br />Anda gerakkan hari ini.</h2></div><p className="max-w-xs text-sm leading-6 text-[#687a78]">Tidak perlu mempelajari semuanya sekaligus. Mulai dari sesi yang paling dekat dengan pekerjaan Anda.</p></div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Session number="01" label="Legalitas" title="SBU" body="Cek kesiapan badan usaha dan ubah regulasi menjadi daftar kerja yang jelas." href={funnel.readiness.landingPath} icon={ShieldCheck} accent="bg-[#f4c95d]" testId="session-sbu" />
+              <Session number="01" label="Legalitas" title="SBU" body="Cek kesiapan badan usaha dan ubah regulasi menjadi daftar kerja yang jelas." href="#jalur-sbu-skk" icon={ShieldCheck} accent="bg-[#f4c95d]" testId="session-sbu" nativeAnchor onClick={scrollToRenewalHub} />
               <Session number="02" label="Kompetensi" title="SKK" body="Temukan jalur kompetensi, pembaruan, dan pendampingan untuk tenaga konstruksi." href="/skk" icon={GraduationCap} accent="bg-[#9cc4c6]" testId="session-skk" />
               <Session number="03" label="Peluang" title="Tender" body="Baca peluang, siapkan dokumen, dan masuk ke proses tender dengan konteks." href="/tender" icon={Search} accent="bg-[#c96f52]" testId="session-tender" />
               <Session number="04" label="Pelaksanaan" title="Proyek" body="Jaga dokumen, keputusan, dan progres pekerjaan tetap berada dalam satu ruang." href="/ruang-proyek" icon={FolderKanban} accent="bg-[#173847] text-[#f7f1e6]" testId="session-proyek" />
@@ -151,7 +224,110 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="scroll-mt-28 px-5 py-20 md:scroll-mt-64 md:py-28" id="jalur-sbu-skk" data-testid="section-sbu">
+        <section
+          className="scroll-mt-28 border-y border-[#d4ded8] bg-[#f0e8d9] px-5 py-20 md:scroll-mt-64 md:py-28"
+          id="jalur-sbu-skk"
+          data-testid="section-renewal-hub"
+        >
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-10 grid gap-6 lg:grid-cols-[1fr_.8fr] lg:items-end">
+              <div>
+                <p className="mb-3 font-mono text-xs font-bold uppercase tracking-[.2em] text-[#b55e45]">Jalur persiapan dokumen</p>
+                <h2 className="max-w-3xl font-display text-4xl font-semibold leading-tight tracking-[-.06em] md:text-5xl">
+                  Perpanjangan SBU & SKK, tanpa berpindah arah.
+                </h2>
+              </div>
+              <p className="max-w-xl text-sm leading-7 text-[#607373]">
+                Mulai dari pemeriksaan kesiapan, lanjutkan ke alat penyusunan yang sesuai, lalu periksa kembali hasilnya sebelum masuk ke proses resmi.
+              </p>
+            </div>
+
+            <div className="grid gap-5 lg:grid-cols-[1.55fr_.65fr]">
+              <div className="rounded-[1.5rem] bg-[#173847] p-5 md:p-7" data-testid="renewal-path-sbu">
+                <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                  <div>
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-[.2em] text-[#f4c95d]">Jalur 01 / Badan Usaha</p>
+                    <h3 className="mt-2 font-display text-2xl font-semibold text-[#f7f1e6]">Persiapan perpanjangan SBU</h3>
+                  </div>
+                  <p className="max-w-xs text-xs leading-5 text-[#c7d5d3]">Periksa LKUT, siapkan laporannya, lalu lengkapi area SMAP dan PUB yang relevan.</p>
+                </div>
+                <div className="grid gap-3 md:grid-cols-3">
+                  <ExternalToolCard
+                    step={renewalHub.sbu[0].step}
+                    title={renewalHub.sbu[0].title}
+                    body={renewalHub.sbu[0].description}
+                    href={renewalHub.sbu[0].href}
+                    icon={ClipboardCheck}
+                    testId="external-link-lkut-readiness"
+                    dark
+                  />
+                  <ExternalToolCard
+                    step={renewalHub.sbu[1].step}
+                    title={renewalHub.sbu[1].title}
+                    body={renewalHub.sbu[1].description}
+                    href={renewalHub.sbu[1].href}
+                    icon={FileCheck2}
+                    testId="external-link-lkut-report"
+                    dark
+                  />
+                  <ExternalToolCard
+                    step={renewalHub.sbu[2].step}
+                    title={renewalHub.sbu[2].title}
+                    body={renewalHub.sbu[2].description}
+                    href={renewalHub.sbu[2].href}
+                    icon={ShieldCheck}
+                    testId="external-link-smap-pub"
+                    dark
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-[1.5rem] border border-[#d4ded8] bg-[#e1efea] p-5 md:p-7" data-testid="renewal-path-skk">
+                <div className="mb-6">
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-[.2em] text-[#b55e45]">Jalur 02 / Tenaga Kerja</p>
+                  <h3 className="mt-2 font-display text-2xl font-semibold text-[#173847]">Persiapan perpanjangan SKK</h3>
+                  <p className="mt-3 text-xs leading-5 text-[#607373]">Gunakan ringkasan eksekutif sebagai bahan kerja sebelum proses pembaruan kompetensi.</p>
+                </div>
+                <ExternalToolCard
+                  step={renewalHub.skk.step}
+                  title={renewalHub.skk.title}
+                  body={renewalHub.skk.description}
+                  href={renewalHub.skk.href}
+                  icon={GraduationCap}
+                  testId="external-link-executive-summary-skk"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-start gap-3 rounded-xl border border-[#d4ded8] bg-[#fffaf1] p-4 text-xs leading-5 text-[#607373]" data-testid="renewal-external-notice">
+              <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-[#b55e45]" aria-hidden="true" />
+              <p>
+                <strong className="text-[#173847]">Alat bantu, bukan pengajuan resmi.</strong>{" "}
+                Setiap kartu membuka aplikasi eksternal di tab baru. Pemeriksaan akhir dan proses resmi tetap mengikuti ketentuan serta instansi yang berwenang.
+              </p>
+            </div>
+
+            <div className="mt-5 grid gap-5 rounded-[1.5rem] border border-[#d4ded8] bg-[#fffaf1] p-5 md:grid-cols-[.9fr_1.1fr] md:p-7" data-testid="renewal-path-oss">
+              <div>
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[.2em] text-[#b55e45]">Ritme kepatuhan / OSS</p>
+                <h3 className="mt-2 font-display text-2xl font-semibold text-[#173847]">Kewajiban tahunan LKPM</h3>
+                <p className="mt-3 max-w-md text-sm leading-6 text-[#687a78]">
+                  Jaga pelaporan Laporan Kegiatan Penanaman Modal tetap masuk dalam kalender kerja tahunan badan usaha.
+                </p>
+              </div>
+              <ExternalToolCard
+                label="Kewajiban tahunan"
+                title={renewalHub.annualOss.title}
+                body={renewalHub.annualOss.description}
+                href={renewalHub.annualOss.href}
+                icon={Building2}
+                testId="external-link-lkpm-oss"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="px-5 py-20 md:py-28" id="dukungan-sbu-skk" data-testid="section-sbu">
           <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1fr_1.2fr]">
             <div><p className="mb-3 font-mono text-xs font-bold uppercase tracking-[.2em] text-[#b55e45]">01 / SBU</p><h2 className="font-display text-4xl font-semibold leading-tight tracking-[-.06em] md:text-5xl">Bangun kesiapan sebelum mengajukan.</h2><p className="mt-5 text-sm leading-7 text-[#687a78]">Funnel resmi SBU-SKK dimulai dari diagnosis, lalu bergerak ke panduan gratis, paket kerja, atau pendamping khusus. Pilih tingkat bantuan yang sesuai tanpa menebak-nebak.</p></div>
             <div className="grid gap-3 sm:grid-cols-2">

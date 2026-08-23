@@ -9,6 +9,7 @@
 - [Production vs dev agent ID drift](prod-dev-id-drift.md) — prod DB IDs diverge from dev; all orchestrator routes MUST use slug lookup first, never hardcoded IDs. Sequence can lag behind explicit-ID inserts — add setval reset before bulk creates.
 - [jspdf/canvg blank screen](jspdf-canvg-blank.md) — jspdf (dynamic import) → canvg → missing core-js stubs → Vite optimizeDeps crash → blank screen. Fix: `optimizeDeps.exclude: ["jspdf","canvg"]` in vite.config.ts.
 - [Regulasi 2025 Pengadaan vs Perizinan](perpres-pengadaan.md) — Perpres 46/2025 = pengadaan/PBJP; PP 28/2025 = perizinan berusaha/PBBR. JANGAN tulis "Perpres 28/2025".
+- [Dasar regulasi PUB–LKUT](pub-lkut-regulation.md) — PUB–LKUT memakai Permen PU 07/2024; Permen PU 06/2025 menggantikan Permen PU 06/2021, bukan dasar PUB–LKUT.
 - [Model Produk & Layanan](gustafta-pricing-model.md) — 3 kelompok (biasa/premium/jasa), beda HANYA di lisensi; bulanan hosting untuk SEMUA produk; marketplace 80/20 dari lisensi saja; no free permanen; jangan gabung Kit+bulanan.
 - [Email verification & BREVO_API_KEY](email-verification-brevo.md) — email mati: cek secret hilang ATAU Brevo 401 "unrecognised IP" (fitur Authorized IPs harus dinonaktifkan, IP Replit berubah-ubah).
 - [Session cookie SameSite & Replit proxy](session-cookie-samesite.md) — "login tak tersimpan setelah tutup browser" = cookie SameSite=None dibuang proteksi 3rd-party; fix sameSite:lax. Dev proxy paksa None — verifikasi di app published.

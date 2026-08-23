@@ -21,8 +21,8 @@
  */
 
 import { PAYMENT_BASE_URL } from "@/lib/payment-base";
-export { SBU_SKK_EBOOK, SBU_SKK_FUNNEL } from "@shared/sbu-skk-ebook";
-export type { SbuSkkEbook, SbuSkkFunnel } from "@shared/sbu-skk-ebook";
+export { SBU_SKK_EBOOK, SBU_SKK_FUNNEL, SBU_SKK_RENEWAL_HUB } from "@shared/sbu-skk-ebook";
+export type { SbuSkkEbook, SbuSkkFunnel, SbuSkkRenewalHub } from "@shared/sbu-skk-ebook";
 
 // ─── Harga inti ────────────────────────────────────────────────────────────────
 export const PRICING = {
