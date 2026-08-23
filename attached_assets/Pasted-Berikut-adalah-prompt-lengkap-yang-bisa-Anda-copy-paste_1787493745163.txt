@@ -1,0 +1,63 @@
+Berikut adalah **prompt lengkap** yang bisa Anda *copy-paste* langsung ke **Replit Agent** (atau chat AI di Replit). Prompt ini dirancang agar Replit tidak hanya memperbaiki kode, tetapi juga membangun sistem konfigurasi yang sesuai dengan visi **Gustafta AI OS** (No-Code & Form-Based).
+
+Silakan salin teks di dalam kotak di bawah ini:
+
+***
+
+### 📋 Copy Prompt Ini ke Replit Agent:
+
+```text
+I need to refactor the AI integration layer of my "Gustafta AI OS" project to support "Custom OpenAI-Compatible Providers" (like BluePack) via a configuration form, adhering to a No-Code philosophy.
+
+Please analyze my current codebase and implement the following features:
+
+1. **Dynamic Configuration Schema**:
+   - Create a database model or config structure (e.g., `AIProviderSettings`) to store:
+     - `provider_name` (string)
+     - `base_url` (string, e.g., "https://ai.bluepack.my.id/v1")
+     - `api_key` (string, encrypted if possible)
+     - `model_name` (string, e.g., "bluepack-coding" or "claude-3-5-sonnet")
+     - `format_type` (enum: 'openai-compatible', 'anthropic-native')
+
+2. **Backend Gateway Logic**:
+   - Implement an `AIGateway` service that reads these settings dynamically.
+   - It must support the **OpenAI-Compatible** format:
+     - Endpoint: `{base_url}/chat/completions`
+     - Headers: `Authorization: Bearer {api_key}`, `Content-Type: application/json`
+     - Body: Standard OpenAI chat completion structure (`messages`, `stream`, etc.).
+   - Ensure it handles streaming (SSE) correctly if requested.
+
+3. **Frontend "AI Settings" Form**:
+   - Create a UI page/modal where admins can input the `base_url`, `api_key`, and `model_name`.
+   - This allows users to switch AI providers (e.g., from official Anthropic to BluePack) without touching the code.
+
+4. **Integration**:
+   - Update the main "Coach" or "Chat" module to use this new `AIGateway` instead of hardcoded environment variables.
+
+Please start by analyzing my current file structure, then propose the file changes needed to implement this.
+```
+
+***
+
+### 💡 Penjelasan Strategi Prompt Ini:
+
+1.  **"Dynamic Configuration Schema"**: Saya meminta Replit membuat "wadah" di database untuk menyimpan URL dan API Key BluePack Anda. Ini mewujudkan prinsip **Form-Based Configuration** Anda.
+2.  **"Backend Gateway Logic"**: Ini adalah instruksi teknis agar Replit membuat "jembatan" yang bisa berbicara dengan bahasa BluePack (format OpenAI-compatible), sehingga API Key Anda tidak ditolak.
+3.  **"Frontend Form"**: Ini kuncinya. Dengan meminta form UI, Anda memastikan bahwa di masa depan, Anda atau klien Anda bisa ganti API Key atau ganti provider (misal dari BluePack ke OpenAI asli) hanya lewat pengaturan aplikasi, tanpa perlu programmer lagi.
+4.  **"No-Code Philosophy"**: Frasa ini memberi tahu AI Replit bahwa solusinya harus ramah pengguna (user-friendly), bukan sekadar script backend yang rumit.
+
+### 🚀 Langkah Selanjutnya di Replit:
+
+1.  Buka proyek Gustafta Anda di Replit.
+2.  Buka panel **Replit Agent** (biasanya di sidebar kanan atau ikon AI).
+3.  **Paste** prompt di atas.
+4.  Replit Agent akan mulai "berpikir" dan memindai file Anda.
+5.  Jika Replit bertanya "Stack apa yang dipakai?" (misal Node.js, Python, atau React), jawab saja sesuai yang ada di proyek Anda.
+6.  Biarkan Replit membuat file-file baru atau mengedit yang existing.
+
+Setelah Replit selesai, Anda tinggal mengisi form pengaturan yang baru dibuat dengan:
+*   **Base URL**: `https://ai.bluepack.my.id/v1`
+*   **API Key**: `bluepack_xxx...` (Key Anda)
+*   **Model**: `bluepack-coding` (atau model lain yang tersedia)
+
+Apakah Anda ingin saya buatkan juga **daftar ceklis (checklist)** untuk menguji apakah integrasi ini sudah berhasil bekerja setelah Replit selesai coding?
