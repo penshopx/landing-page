@@ -127,17 +127,29 @@ describe("public landing synchronization", () => {
 
     const promo = screen.getByTestId("landing-video-slide-1");
     expect(promo).toHaveAttribute("controls");
-    expect(promo).toHaveAttribute("loop");
+    expect(promo).toHaveAttribute("autoplay");
+    expect(promo).toHaveProperty("muted", true);
     expect(promo).toHaveAttribute("playsinline");
-    expect(promo).toHaveAttribute("src", expect.stringContaining("gustafta_promo_24s_web.mp4"));
     expect(promo).toHaveAttribute("poster", expect.stringContaining("gustafta_promo_24s_poster.jpg"));
+    const promoSources = promo.querySelectorAll("source");
+    expect(promoSources).toHaveLength(2);
+    expect(promoSources[0]).toHaveAttribute("src", expect.stringContaining("gustafta_promo_24s_web.webm"));
+    expect(promoSources[0]).toHaveAttribute("type", "video/webm");
+    expect(promoSources[1]).toHaveAttribute("src", expect.stringContaining("gustafta_promo_24s_web.mp4"));
+    expect(promoSources[1]).toHaveAttribute("type", "video/mp4");
 
     const explainer = screen.getByTestId("landing-video-slide-2");
     expect(explainer).toHaveAttribute("controls");
-    expect(explainer).toHaveAttribute("loop");
+    expect(explainer).toHaveAttribute("autoplay");
+    expect(explainer).toHaveProperty("muted", true);
     expect(explainer).toHaveAttribute("playsinline");
-    expect(explainer).toHaveAttribute("src", expect.stringContaining("gustafta_explainer.mp4"));
     expect(explainer).toHaveAttribute("poster", expect.stringContaining("gustafta_explainer_poster.jpg"));
+    const explainerSources = explainer.querySelectorAll("source");
+    expect(explainerSources).toHaveLength(2);
+    expect(explainerSources[0]).toHaveAttribute("src", expect.stringContaining("gustafta_explainer.webm"));
+    expect(explainerSources[0]).toHaveAttribute("type", "video/webm");
+    expect(explainerSources[1]).toHaveAttribute("src", expect.stringContaining("gustafta_explainer.mp4"));
+    expect(explainerSources[1]).toHaveAttribute("type", "video/mp4");
 
     for (const [index, fileName] of [
       [1, "G01_1781941962427.png"],
@@ -166,6 +178,8 @@ describe("public landing synchronization", () => {
     expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
 
     fireEvent.ended(screen.getByTestId("landing-video-slide-1"));
+    expect(screen.getByTestId("landing-video-dot-2")).toHaveAttribute("aria-pressed", "true");
+    fireEvent.ended(screen.getByTestId("landing-video-slide-2"));
     expect(screen.getByTestId("landing-video-dot-1")).toHaveAttribute("aria-pressed", "true");
 
     expect(screen.getByTestId("landing-identity-dot-1")).toHaveAttribute("aria-pressed", "true");

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Film, Image as ImageIcon } from "lucide-react";
 import {
   type CarouselApi,
@@ -8,8 +8,10 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import promoVideoUrl from "@assets/generated_videos/gustafta_promo_24s_web.mp4";
+import promoVideoWebmUrl from "@assets/generated_videos/gustafta_promo_24s_web.webm";
 import promoPosterUrl from "@assets/generated_videos/gustafta_promo_24s_poster.jpg";
 import explainerVideoUrl from "@assets/generated_videos/gustafta_explainer.mp4";
+import explainerVideoWebmUrl from "@assets/generated_videos/gustafta_explainer.webm";
 import explainerPosterUrl from "@assets/generated_videos/gustafta_explainer_poster.jpg";
 import identityCoverUrl from "@assets/G01_1781941962427.png";
 import assistedProfessionalUrl from "@assets/G03_1781941962428.png";
@@ -18,13 +20,15 @@ import workDialogueUrl from "@assets/G07_1781941962430.png";
 
 const videoSlides = [
   {
-    src: promoVideoUrl,
+    webm: promoVideoWebmUrl,
+    mp4: promoVideoUrl,
     poster: promoPosterUrl,
     title: "Gustafta dalam 24 detik",
     caption: "Satu titik awal untuk kesiapan, peluang, dan pekerjaan konstruksi.",
   },
   {
-    src: explainerVideoUrl,
+    webm: explainerVideoWebmUrl,
+    mp4: explainerVideoUrl,
     poster: explainerPosterUrl,
     title: "Cara kerja yang punya konteks",
     caption: "Dari dokumen dan pengetahuan, menuju langkah kerja yang dapat dijalankan.",
@@ -162,6 +166,23 @@ function useCarouselState(count: number) {
 
 export function LandingVideoCarousel() {
   const { active, next, previous, select, setApi } = useCarouselState(videoSlides.length);
+  const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
+
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (!video) return;
+
+      if (index === active) {
+        void video.play().catch(() => {
+          // Browsers may still require a user gesture in restrictive contexts.
+        });
+        return;
+      }
+
+      video.pause();
+      video.currentTime = 0;
+    });
+  }, [active]);
 
   return (
     <section
@@ -190,20 +211,26 @@ export function LandingVideoCarousel() {
         >
           <CarouselContent className="ml-0">
             {videoSlides.map((slide, index) => (
-              <CarouselItem className="pl-0" key={slide.src} role="tabpanel" aria-label={`${index + 1} dari ${videoSlides.length}: ${slide.title}`}>
+              <CarouselItem className="pl-0" key={slide.webm} role="tabpanel" aria-label={`${index + 1} dari ${videoSlides.length}: ${slide.title}`}>
                 <figure>
                   <div className="aspect-video overflow-hidden rounded-[1.05rem] bg-[#102a35]">
                     <video
                       aria-label={slide.title}
                       className="h-full w-full object-cover"
                       controls
-                      loop
+                      autoPlay
+                      muted
+                      onEnded={next}
                       playsInline
                       poster={slide.poster}
                       preload="metadata"
-                      src={slide.src}
+                      ref={(video) => {
+                        videoRefs.current[index] = video;
+                      }}
                       data-testid={`landing-video-slide-${index + 1}`}
                     >
+                      <source src={slide.webm} type="video/webm" />
+                      <source src={slide.mp4} type="video/mp4" />
                       Browser Anda belum mendukung pemutaran video.
                     </video>
                   </div>
