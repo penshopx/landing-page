@@ -11,6 +11,7 @@
 - [Regulasi 2025 Pengadaan vs Perizinan](perpres-pengadaan.md) — Perpres 46/2025 = pengadaan/PBJP; PP 28/2025 = perizinan berusaha/PBBR. JANGAN tulis "Perpres 28/2025".
 - [Dasar regulasi PUB–LKUT](pub-lkut-regulation.md) — PUB–LKUT memakai Permen PU 07/2024; Permen PU 06/2025 menggantikan Permen PU 06/2021, bukan dasar PUB–LKUT.
 - [Model Produk & Layanan](gustafta-pricing-model.md) — 3 kelompok (biasa/premium/jasa), beda HANYA di lisensi; bulanan hosting untuk SEMUA produk; marketplace 80/20 dari lisensi saja; no free permanen; jangan gabung Kit+bulanan.
+- [Keluarga produk SBU & SKK](sbu-skk-product-families.md) — komersialisasi mengikuti dua pain point: SBU–LKUT–PUB dan SKK–Uji–PKB; tool/checker menjadi bonus tier berbayar, bukan produk gratis.
 - [Email verification & BREVO_API_KEY](email-verification-brevo.md) — email mati: cek secret hilang ATAU Brevo 401 "unrecognised IP" (fitur Authorized IPs harus dinonaktifkan, IP Replit berubah-ubah).
 - [Session cookie SameSite & Replit proxy](session-cookie-samesite.md) — "login tak tersimpan setelah tutup browser" = cookie SameSite=None dibuang proteksi 3rd-party; fix sameSite:lax. Dev proxy paksa None — verifikasi di app published.
 - [Acuan kanonik proyek](canonical-reference.md) — sumber identitas/visi/arsitektur Gustafta = `replit.md`; dokumen genesis `.local/gustafta-pedoman.md` sudah TIDAK ADA, jangan cari lagi.
