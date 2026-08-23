@@ -341,6 +341,7 @@ export async function createCanonicalOrder(input: CanonicalOrderInput): Promise<
     .insert(storeOrders)
     .values({
       productId: 0,
+      productRegistryId: item.productId || null,
       agentId: null,
       customerName: buyer.name,
       customerEmail: buyer.email,
@@ -356,6 +357,7 @@ export async function createCanonicalOrder(input: CanonicalOrderInput): Promise<
       packageVersion: item.packageVersion ?? null,
       itemName: `${item.productId ? `[${item.productId}] ` : ""}${item.name}`,
       source: "api_v1",
+      fulfillmentStatus: "pending",
       promotionCampaignId: attribution.promotionCampaignId,
       promotionEventId: attribution.promotionEventId,
     })
@@ -390,6 +392,7 @@ export async function createCanonicalOrder(input: CanonicalOrderInput): Promise<
       amount: item.amount,
       currency: item.currency,
       status: "pending",
+      access_url: `/store/access/${accessToken}`,
       payment_url: payment.payment_url,
       payment_mode: payment.payment_mode,
       wa_order_url: payment.wa_order_url,

@@ -2220,6 +2220,7 @@ export const storeOrders = pgTable("store_orders", {
   // Order paket dari POST /api/v1/orders: package_id + versi snapshot untuk audit;
   // item_name = snapshot nama item saat order; source = asal order (mis. "api_v1").
   packageId: varchar("package_id", { length: 60 }),
+  productRegistryId: varchar("product_registry_id", { length: 40 }),
   packageVersion: integer("package_version"),
   itemName: text("item_name"),
   source: text("source"),
@@ -2227,6 +2228,14 @@ export const storeOrders = pgTable("store_orders", {
   // POST /v3/orders (server-side create). Webhook mencocokkan data.order_id ke
   // kolom ini — bukan via nama/email. Null untuk order lama/manual.
   scalevOrderId: text("scalev_order_id"),
+  // Canonical fulfillment lifecycle for api_v1 orders. Payment state and
+  // fulfillment state are deliberately separate: a paid order may temporarily
+  // be failed/pending while access retries safely.
+  fulfillmentStatus: text("fulfillment_status").notNull().default("not_applicable"),
+  fulfillmentAttempts: integer("fulfillment_attempts").notNull().default(0),
+  fulfillmentAttemptedAt: timestamp("fulfillment_attempted_at"),
+  fulfillmentError: text("fulfillment_error"),
+  fulfilledAt: timestamp("fulfilled_at"),
   // Demand-led promotion attribution (Task #396) — additive, nullable. Stamped
   // server-side ONLY after validating the campaign/item is active; order/revenue
   // signals are derived from these columns, never trusted from the public route.

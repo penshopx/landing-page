@@ -154,6 +154,15 @@ export async function setupAuth(app: Express) {
       } catch (delErr) {
         console.error("[ReplitAuth] Failed to deliver pending premium clones:", delErr);
       }
+      try {
+        const { claimPendingEntitlements } = await import("../../sbu-skk-funnel");
+        const claimed = await claimPendingEntitlements(userId, email);
+        if (claimed > 0) {
+          console.log(`[ReplitAuth] Claimed ${claimed} pending product entitlement(s) for ${email}`);
+        }
+      } catch (entitlementErr) {
+        console.error("[ReplitAuth] Failed to claim pending product entitlements:", entitlementErr);
+      }
     }
     if (userId) {
       const user = await authStorage.getUser(userId);

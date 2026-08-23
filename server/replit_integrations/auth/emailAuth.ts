@@ -484,6 +484,13 @@ export function registerEmailAuthRoutes(app: Express): void {
       } catch (delErr) {
         console.error("[EmailAuth] Failed to deliver pending premium clones:", delErr);
       }
+      try {
+        const { claimPendingEntitlements } = await import("../../sbu-skk-funnel");
+        const claimed = await claimPendingEntitlements(userRow.id, email);
+        if (claimed > 0) console.log(`[EmailAuth] Claimed ${claimed} pending product entitlement(s) for ${email}`);
+      } catch (entitlementErr) {
+        console.error("[EmailAuth] Failed to claim pending product entitlements:", entitlementErr);
+      }
 
       // Auto-create pending trial request so super-admin can approve from admin panel
       try {
@@ -641,6 +648,14 @@ export function registerEmailAuthRoutes(app: Express): void {
           if (err) reject(err); else resolve();
         });
       });
+
+      try {
+        const { claimPendingEntitlements } = await import("../../sbu-skk-funnel");
+        const claimed = await claimPendingEntitlements(userRow.id, email);
+        if (claimed > 0) console.log(`[EmailAuth] Claimed ${claimed} pending product entitlement(s) for ${email}`);
+      } catch (entitlementErr) {
+        console.error("[EmailAuth] Failed to claim pending product entitlements:", entitlementErr);
+      }
 
       res.json({
         success: true,

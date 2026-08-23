@@ -96,6 +96,7 @@ import {
   consumeTutorMessageQuota,
   buildTutorSourceContext,
   augmentStoreAccessResponse,
+  getPaidDownloads,
 } from "./sbu-skk-funnel";
 import { SBU_SKK_EBOOK } from "@shared/sbu-skk-ebook";
 import { seedLexCom, seedLexComInSeries } from "./seed-lexcom";
@@ -8746,6 +8747,42 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       const fileId = parseInt(req.params.fileId, 10);
       if (!fileId || isNaN(fileId)) return res.status(400).json({ error: "File ID tidak valid" });
 
+      if ((order as any).source === "api_v1") {
+        const { getCanonicalOrderAccess } = await import("./order-fulfillment");
+        const access = await getCanonicalOrderAccess(order.id);
+        if (access.productRegistryIds.length === 0) {
+          return res.status(403).json({ error: "Akses produk belum selesai diproses" });
+        }
+        const fileRow = await pool.query<{
+          file_name: string;
+          mime_type: string;
+          size_bytes: number;
+          content: Buffer;
+          sha256: string;
+        }>(
+          `SELECT file_name, mime_type, size_bytes, content, sha256
+             FROM digital_product_files
+            WHERE id=$1
+              AND product_registry_id = ANY($2::text[])
+            LIMIT 1`,
+          [fileId, access.productRegistryIds],
+        );
+        if (!fileRow.rows[0]) {
+          return res.status(403).json({ error: "File tidak dimiliki oleh order ini" });
+        }
+        const file = fileRow.rows[0];
+        const content = Buffer.isBuffer(file.content)
+          ? file.content
+          : Buffer.from(file.content);
+        const safeAsciiName = file.file_name.replace(/["\r\n]/g, "_");
+        res.setHeader("Content-Type", file.mime_type);
+        res.setHeader("Content-Length", String(content.length));
+        res.setHeader("Content-Disposition", `attachment; filename="${safeAsciiName}"; filename*=UTF-8''${encodeURIComponent(file.file_name)}`);
+        res.setHeader("Cache-Control", "private, no-store, max-age=0");
+        res.setHeader("X-Content-Type-Options", "nosniff");
+        return res.send(content);
+      }
+
       // Get product registry id from store product
       const product = order.productId ? await storage.getStoreProduct(order.productId) : null;
       if (!product) return res.status(404).json({ error: "Produk tidak ditemukan" });
@@ -8853,6 +8890,47 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
       const baseUrl = getServerBaseUrl(req);
       const orderAny = order as any;
+
+      if (orderAny.source === "api_v1") {
+        const { getCanonicalOrderAccess } = await import("./order-fulfillment");
+        const access = await getCanonicalOrderAccess(order.id);
+        const downloads = (
+          await Promise.all(
+            access.productRegistryIds.map((productId) =>
+              getPaidDownloads(productId, req.params.token, baseUrl),
+            ),
+          )
+        ).flat();
+        return res.json({
+          order: {
+            id: order.id,
+            customerName: order.customerName,
+            status: order.status,
+            amount: order.amount,
+            fulfillmentStatus: orderAny.fulfillmentStatus,
+            fulfillmentError:
+              orderAny.fulfillmentStatus === "failed"
+                ? orderAny.fulfillmentError || "Akses sedang diproses ulang"
+                : null,
+          },
+          product: {
+            id: orderAny.packageId || access.items[0]?.productRegistryId || 0,
+            agentId: null,
+            name: orderAny.itemName || orderAny.packageId || "Produk Gustafta",
+            emoji: "📦",
+            color: "#2563eb",
+            description: "",
+          },
+          type: "canonical",
+          accessItems: access.items,
+          downloads,
+          downloadUrl: downloads[0]?.downloadUrl || null,
+          chatUrl: null,
+          embedCode: null,
+          widgetScript: null,
+          baseUrl,
+        });
+      }
 
       // Resolve agent: from order.agentId (direct agent purchase) or product.agentId
       let resolvedAgentId: number | null = orderAny.agentId || null;
@@ -21488,7 +21566,38 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               .where(eq(storeOrdersTable.id, apiOrder.id));
             console.log(`✅ [Scalev webhook] Order API ${apiOrder.midtransOrderId} → paid (scalev_order_id=${orderId})`);
           }
-          return res.status(200).json({ received: true, note: "api_v1 order marked paid", order_ref: apiOrder.midtransOrderId });
+          try {
+            const { fulfillCanonicalOrder } = await import("./order-fulfillment");
+            const fulfilled = await fulfillCanonicalOrder({
+              orderId: apiOrder.id,
+              providerOrderRef: String(orderId),
+              appBaseUrl: getServerBaseUrl(req),
+            });
+            console.log(
+              `✅ [Scalev webhook] Order API ${apiOrder.midtransOrderId} fulfillment=${fulfilled.status} (${fulfilled.results.join(",")})`,
+            );
+            return res.status(200).json({
+              received: true,
+              note:
+                fulfilled.status === "deferred"
+                  ? "api_v1 order paid; fulfillment pending retry"
+                  : "api_v1 order paid and fulfilled",
+              order_ref: apiOrder.midtransOrderId,
+              fulfillment: fulfilled.status,
+            });
+          } catch (fulfillmentError) {
+            // Pembayaran tetap paid. Scalev menerima 200 agar status provider tidak
+            // berubah; order tersimpan failed dan aman diproses ulang.
+            console.error(
+              `[Scalev webhook] Order API ${apiOrder.midtransOrderId} paid tetapi fulfillment tertunda:`,
+              (fulfillmentError as Error)?.message,
+            );
+            return res.status(200).json({
+              received: true,
+              note: "api_v1 order paid; fulfillment pending retry",
+              order_ref: apiOrder.midtransOrderId,
+            });
+          }
         }
       } catch (corrErr) {
         // Jangan pernah menggagalkan webhook karena lookup korelasi; lanjut ke cabang legacy.

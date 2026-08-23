@@ -22,6 +22,8 @@ interface StoreAccessData {
     customerName: string;
     status: string;
     amount: number;
+    fulfillmentStatus?: string;
+    fulfillmentError?: string | null;
   };
   product: {
     id: number;
@@ -35,9 +37,19 @@ interface StoreAccessData {
   embedCode: string | null;
   widgetScript: string | null;
   baseUrl: string | null;
-  type?: "digital";
+  type?: "digital" | "canonical";
   downloadUrl?: string | null;
   downloads?: Array<{ id: string; fileName: string; label: string; role: string; mimeType: string; sizeBytes: number; downloadUrl: string }>;
+  accessItems?: Array<{
+    productRegistryId: string;
+    name: string;
+    productType: string;
+    accessType: string | null;
+    accessUrl: string | null;
+    expiresAt: string;
+    quotaTotal: number;
+    quotaUsed: number;
+  }>;
   levelOneDiagnostic?: LevelOneDiagnosticAccess | null;
 }
 
@@ -234,9 +246,20 @@ export default function StoreAccess() {
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-500/20 border border-green-500/30 mb-4">
                 <CheckCircle2 className="h-10 w-10 text-green-400" />
               </div>
-              <h1 className="text-3xl font-bold mb-2">{data.type === "digital" ? "File Anda Siap Didownload!" : "Chatbot Anda Siap!"}</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                {data.type === "digital"
+                  ? "File Anda Siap Didownload!"
+                  : data.type === "canonical"
+                    ? "Akses Produk Anda Siap!"
+                    : "Chatbot Anda Siap!"}
+              </h1>
               <p className="text-gray-400">
-                Halo <strong>{data.order.customerName}</strong>, {data.type === "digital" ? "file digital Anda siap didownload di bawah ini." : "berikut semua format akses chatbot Anda."}
+                Halo <strong>{data.order.customerName}</strong>,{" "}
+                {data.type === "digital"
+                  ? "file digital Anda siap didownload di bawah ini."
+                  : data.type === "canonical"
+                    ? "produk yang sudah aktif tercantum di bawah ini."
+                    : "berikut semua format akses chatbot Anda."}
               </p>
             </div>
 
@@ -261,7 +284,7 @@ export default function StoreAccess() {
             </Card>
 
             {/* ── Digital Product: Download Buttons ── */}
-            {data.type === "digital" && (
+            {(data.type === "digital" || (data.type === "canonical" && !!data.downloads?.length)) && (
               <Card className="bg-green-500/10 border-green-500/30">
                 <CardContent className="p-6 space-y-4">
                   <div className="text-center"><BookOpen className="mx-auto h-10 w-10 text-green-400" />
@@ -286,6 +309,50 @@ export default function StoreAccess() {
                   <p className="text-xs text-gray-500">
                     Simpan file di perangkat Anda setelah didownload.
                   </p>
+                </CardContent>
+              </Card>
+            )}
+
+            {data.type === "canonical" && (
+              <Card className="bg-blue-500/10 border-blue-500/30" data-testid="canonical-access-manifest">
+                <CardContent className="p-6 space-y-4">
+                  <div>
+                    <h3 className="font-bold text-lg">Produk yang Aktif</h3>
+                    <p className="text-xs text-gray-400">
+                      Akses ini terikat ke email pembelian dan dapat diklaim saat Anda masuk dengan email yang sama.
+                    </p>
+                  </div>
+                  {data.order.fulfillmentStatus === "failed" && (
+                    <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-200">
+                      Pembayaran sudah diterima. Sebagian akses sedang diproses ulang otomatis.
+                    </div>
+                  )}
+                  {data.accessItems?.map((item) => (
+                    <div
+                      key={item.productRegistryId}
+                      className="flex flex-col gap-3 rounded-xl border border-blue-500/20 bg-black/10 p-4 sm:flex-row sm:items-center"
+                      data-testid={`canonical-access-${item.productRegistryId}`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-xs text-gray-400">
+                          {item.productType} · aktif sampai{" "}
+                          {new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(item.expiresAt))}
+                        </p>
+                      </div>
+                      {item.accessUrl && (
+                        <a href={item.accessUrl} target="_blank" rel="noopener noreferrer">
+                          <Button className="w-full bg-blue-600 text-white hover:bg-blue-700 sm:w-auto">
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Buka Produk
+                          </Button>
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                  {!data.accessItems?.length && data.order.fulfillmentStatus !== "failed" && (
+                    <p className="text-sm text-gray-400">Akses sedang disiapkan. Muat ulang halaman ini beberapa saat lagi.</p>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -451,7 +518,7 @@ export default function StoreAccess() {
             )}
 
             {/* ── Panduan Singkat ── */}
-            {data.type !== "digital" && (
+            {data.type !== "digital" && data.type !== "canonical" && (
             <Card className="bg-white/5 border-white/10">
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-3">

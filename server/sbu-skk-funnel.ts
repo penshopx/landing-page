@@ -724,6 +724,8 @@ export interface FulfillSbuSkkOfferInput {
   manualOrderRef?: string;
   grantedBy?: string;
   appBaseUrl?: string;
+  durationDays?: number;
+  quotaTotal?: number;
 }
 
 /**
@@ -788,8 +790,8 @@ export async function fulfillSbuSkkOffer(
       email: input.buyerEmail,
       productRegistryId,
       agentSlug: SBU_SKK_FUNNEL.tutor.agentSlug,
-      durationDays: SBU_SKK_FUNNEL.tutor.durationDays,
-      quotaTotal: SBU_SKK_FUNNEL.tutor.quotaTotal,
+      durationDays: input.durationDays ?? SBU_SKK_FUNNEL.tutor.durationDays,
+      quotaTotal: input.quotaTotal ?? SBU_SKK_FUNNEL.tutor.quotaTotal,
       source: input.source,
       providerOrderRef: input.providerOrderRef,
       manualOrderRef: input.manualOrderRef,

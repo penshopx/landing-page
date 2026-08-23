@@ -35,12 +35,16 @@ const TEST_PRODUCT_ID = `GST-TST-${RUN.slice(-6).toUpperCase()}`;
 // Produk uji TANPA mapping variant — item registry nyata kini semua termapping
 // (provisioning #313B-1), jadi tes fallback butuh item uji sendiri.
 const TEST_PRODUCT_ID_UNMAPPED = `GST-TSU-${RUN.slice(-6).toUpperCase()}`;
+const TEST_PRODUCT_ID_LATE = `GST-TSL-${RUN.slice(-6).toUpperCase()}`;
+const TEST_PACKAGE_ID = `PKG-TST-${RUN.slice(-6).toUpperCase()}`;
 const API_KEY = "kunci-order-tes-313a";
 const SCALEV_ORDER_ID = `TST${RUN.slice(-8).toUpperCase()}`;
 
 let orderServer: Server; let orderBase: string;
 let routesServer: Server; let routesBase: string;
-let db: any, storeOrders: any, productRegistry: any, eq: any;
+let db: any, storeOrders: any, productRegistry: any, productEntitlements: any;
+let packageRegistry: any, packageVersionSnapshots: any;
+let solutionRegistry: any, sectorRegistry: any, tierRegistry: any, eq: any;
 
 // ── Intersep fetch hanya untuk host Scalev ────────────────────────────────────
 const realFetch = globalThis.fetch;
@@ -79,7 +83,16 @@ before(async () => {
   installScalevMock();
 
   ({ db } = await import("../server/db"));
-  ({ storeOrders, productRegistry } = await import("../shared/schema"));
+  ({
+    storeOrders,
+    productRegistry,
+    productEntitlements,
+    packageRegistry,
+    packageVersionSnapshots,
+    solutionRegistry,
+    sectorRegistry,
+    tierRegistry,
+  } = await import("../shared/schema"));
   ({ eq } = await import("drizzle-orm"));
 
   // Produk registry uji dengan mapping variant Scalev (dibersihkan di after).
@@ -94,6 +107,37 @@ before(async () => {
     status: "ACTIVE",
     visibility: "STANDALONE_ONLY",
     scalevVariantUniqueId: `variant_TES_${RUN}`,
+  } as any);
+  const [solution] = await db.select().from(solutionRegistry).limit(1);
+  const [sector] = await db.select().from(sectorRegistry).limit(1);
+  const [tier] = await db.select().from(tierRegistry).limit(1);
+  assert.ok(solution && sector && tier, "Registry dasar paket harus tersedia");
+  const [testPackage] = await db.insert(packageRegistry).values({
+    packageId: TEST_PACKAGE_ID,
+    solutionId: solution.id,
+    sectorId: sector.id,
+    tierId: tier.id,
+    name: `Paket Tes Fulfillment ${RUN}`,
+    slug: `paket-tes-fulfillment-${RUN}`,
+    status: "ACTIVE",
+    durationValue: 3,
+    durationUnit: "MONTH",
+    price: 168000,
+    version: 1,
+  } as any).returning();
+  await db.insert(packageVersionSnapshots).values({
+    packageDbId: testPackage.id,
+    packageId: TEST_PACKAGE_ID,
+    version: 1,
+    name: testPackage.name,
+    price: 168000,
+    currency: "IDR",
+    durationValue: 3,
+    durationUnit: "MONTH",
+    composition: [
+      { productId: 0, productRegistryId: TEST_PRODUCT_ID, productName: "Komponen A", accessLevel: "FULL", usageLimit: 4, isRequired: true, sortOrder: 0 },
+      { productId: 0, productRegistryId: TEST_PRODUCT_ID_UNMAPPED, productName: "Komponen B", accessLevel: "LIMITED", usageLimit: 2, isRequired: true, sortOrder: 1 },
+    ],
   } as any);
   await db.insert(productRegistry).values({
     productId: TEST_PRODUCT_ID_UNMAPPED,
@@ -133,9 +177,12 @@ after(async () => {
   globalThis.fetch = realFetch;
   if (!hasDb) return;
   try {
+    await db.delete(productEntitlements).where(eq(productEntitlements.email, TEST_EMAIL));
     await db.delete(storeOrders).where(eq(storeOrders.customerEmail, TEST_EMAIL));
+    await db.delete(packageRegistry).where(eq(packageRegistry.packageId, TEST_PACKAGE_ID));
     await db.delete(productRegistry).where(eq(productRegistry.productId, TEST_PRODUCT_ID));
     await db.delete(productRegistry).where(eq(productRegistry.productId, TEST_PRODUCT_ID_UNMAPPED));
+    await db.delete(productRegistry).where(eq(productRegistry.productId, TEST_PRODUCT_ID_LATE));
   } finally {
     orderServer?.close();
     routesServer?.close();
@@ -185,6 +232,7 @@ test("1. mapping variant → SCALEV_ORDER: payment_url Scalev + scalev_order_id 
   assert.equal(row.status, "pending");
   assert.equal(row.amount, 123000);
   assert.equal(row.source, "api_v1");
+  assert.equal(row.productRegistryId, TEST_PRODUCT_ID);
 });
 
 test("2. create Scalev gagal → fallback MANUAL_WA, order tetap pending tanpa scalev_order_id", { skip: SKIP }, async () => {
@@ -213,7 +261,7 @@ test("4a. webhook non-paid TIDAK mengubah status order api_v1", { skip: SKIP }, 
   assert.equal((await getOrderRow(scalevOrderRef)).status, "pending");
 });
 
-test("4b. webhook paid dengan data.order_id cocok → order api_v1 jadi paid (deterministik)", { skip: SKIP }, async () => {
+test("4b. webhook paid dengan data.order_id cocok → paid dan akses produk aktif", { skip: SKIP }, async () => {
   const r = await postWebhook({
     event: "payment_status_changed",
     data: {
@@ -224,13 +272,31 @@ test("4b. webhook paid dengan data.order_id cocok → order api_v1 jadi paid (de
     },
   });
   assert.equal(r.status, 200);
-  assert.equal(r.json.note, "api_v1 order marked paid");
+  assert.equal(r.json.note, "api_v1 order paid and fulfilled");
   assert.equal(r.json.order_ref, scalevOrderRef);
-  assert.equal((await getOrderRow(scalevOrderRef)).status, "paid");
-  // Idempoten: webhook diulang → tetap 200, tetap paid, tanpa duplikasi.
-  const r2 = await postWebhook({ event: "payment_status_changed", data: { order_id: SCALEV_ORDER_ID, payment_status: "paid" } });
+  const paid = await getOrderRow(scalevOrderRef);
+  assert.equal(paid.status, "paid");
+  assert.equal(paid.fulfillmentStatus, "fulfilled");
+  const grants = await db
+    .select()
+    .from(productEntitlements)
+    .where(eq(productEntitlements.providerOrderRef, SCALEV_ORDER_ID));
+  assert.equal(grants.length, 1);
+  assert.equal(grants[0].productRegistryId, TEST_PRODUCT_ID);
+  assert.equal(grants[0].email, TEST_EMAIL);
+  // Idempoten juga saat webhook diulang bersamaan.
+  const [r2, r3] = await Promise.all([
+    postWebhook({ event: "payment_status_changed", data: { order_id: SCALEV_ORDER_ID, payment_status: "paid" } }),
+    postWebhook({ event: "payment_status_changed", data: { order_id: SCALEV_ORDER_ID, payment_status: "paid" } }),
+  ]);
   assert.equal(r2.status, 200);
+  assert.equal(r3.status, 200);
   assert.equal((await getOrderRow(scalevOrderRef)).status, "paid");
+  const grantsAfterReplay = await db
+    .select()
+    .from(productEntitlements)
+    .where(eq(productEntitlements.providerOrderRef, SCALEV_ORDER_ID));
+  assert.equal(grantsAfterReplay.length, 1);
 });
 
 test("4d. RACE: webhook tiba sebelum scalev_order_id tersimpan → fallback metadata.order_ref menandai paid + backfill", { skip: SKIP }, async () => {
@@ -247,10 +313,128 @@ test("4d. RACE: webhook tiba sebelum scalev_order_id tersimpan → fallback meta
     data: { order_id: raceScalevId, payment_status: "paid", metadata: { order_ref: ref } },
   });
   assert.equal(w.status, 200);
-  assert.equal(w.json.note, "api_v1 order marked paid");
+  assert.equal(w.json.note, "api_v1 order paid and fulfilled");
   const row = await getOrderRow(ref);
   assert.equal(row.status, "paid");
   assert.equal(row.scalevOrderId, raceScalevId); // backfill → retry berikutnya match via order_id
+  assert.equal(row.fulfillmentStatus, "fulfilled");
+});
+
+test("4e. paket paid memberi seluruh komponen snapshot tepat sekali", { skip: SKIP }, async () => {
+  scalevMode = "off";
+  const created = await createOrder({ package_id: TEST_PACKAGE_ID, buyer });
+  assert.equal(created.status, 201);
+  assert.equal(created.json.payment_mode, "MANUAL_WA");
+  const packageScalevId = `PKG${RUN.slice(-7).toUpperCase()}`;
+  const webhook = await postWebhook({
+    event: "payment_status_changed",
+    data: {
+      order_id: packageScalevId,
+      payment_status: "paid",
+      metadata: { order_ref: created.json.order_ref },
+      customer: { email: TEST_EMAIL, name: buyer.name },
+    },
+  });
+  assert.equal(webhook.status, 200);
+  assert.equal(webhook.json.note, "api_v1 order paid and fulfilled");
+  const row = await getOrderRow(created.json.order_ref);
+  assert.equal(row.fulfillmentStatus, "fulfilled");
+  const grants = await db
+    .select()
+    .from(productEntitlements)
+    .where(eq(productEntitlements.providerOrderRef, packageScalevId));
+  assert.deepEqual(
+    grants.map((grant: any) => grant.productRegistryId).sort(),
+    [TEST_PRODUCT_ID, TEST_PRODUCT_ID_UNMAPPED].sort(),
+  );
+  assert.deepEqual(
+    grants.map((grant: any) => grant.quotaTotal).sort((a: number, b: number) => a - b),
+    [2, 4],
+  );
+});
+
+test("4f. gagal sebagian tetap paid lalu recovery melanjutkan komponen tertunda", { skip: SKIP }, async () => {
+  const [pkg] = await db
+    .select()
+    .from(packageRegistry)
+    .where(eq(packageRegistry.packageId, TEST_PACKAGE_ID))
+    .limit(1);
+  await db.update(packageRegistry).set({ version: 2 }).where(eq(packageRegistry.id, pkg.id));
+  await db.insert(packageVersionSnapshots).values({
+    packageDbId: pkg.id,
+    packageId: TEST_PACKAGE_ID,
+    version: 2,
+    name: pkg.name,
+    price: 168000,
+    currency: "IDR",
+    durationValue: 3,
+    durationUnit: "MONTH",
+    composition: [
+      { productId: 0, productRegistryId: TEST_PRODUCT_ID, productName: "Komponen Ada", accessLevel: "FULL", usageLimit: 3, isRequired: true, sortOrder: 0 },
+      { productId: 0, productRegistryId: TEST_PRODUCT_ID_LATE, productName: "Komponen Terlambat", accessLevel: "FULL", usageLimit: 7, isRequired: true, sortOrder: 1 },
+    ],
+  } as any);
+  const created = await createOrder({ package_id: TEST_PACKAGE_ID, buyer });
+  const providerRef = `RETRY${RUN.slice(-6).toUpperCase()}`;
+  const webhook = await postWebhook({
+    event: "payment_status_changed",
+    data: {
+      order_id: providerRef,
+      payment_status: "paid",
+      metadata: { order_ref: created.json.order_ref },
+    },
+  });
+  assert.equal(webhook.status, 200);
+  assert.equal(webhook.json.note, "api_v1 order paid; fulfillment pending retry");
+  const failed = await getOrderRow(created.json.order_ref);
+  assert.equal(failed.status, "paid");
+  assert.equal(failed.fulfillmentStatus, "failed");
+
+  await db
+    .update(storeOrders)
+    .set({ fulfillmentAttemptedAt: new Date(Date.now() - 2 * 60 * 60 * 1000) })
+    .where(eq(storeOrders.id, failed.id));
+  const { reconcileCanonicalOrderFulfillment } = await import("../server/order-fulfillment");
+  await Promise.all([
+    reconcileCanonicalOrderFulfillment(100),
+    reconcileCanonicalOrderFulfillment(100),
+  ]);
+  const failedAgain = await getOrderRow(created.json.order_ref);
+  assert.equal(failedAgain.fulfillmentStatus, "failed");
+  assert.equal(
+    failedAgain.fulfillmentAttempts,
+    failed.fulfillmentAttempts + 1,
+    "dua reconciler paralel hanya boleh memulai satu retry dalam satu jendela backoff",
+  );
+
+  await db.insert(productRegistry).values({
+    productId: TEST_PRODUCT_ID_LATE,
+    name: `Produk Datang Belakangan ${RUN}`,
+    slug: `produk-datang-belakangan-${RUN}`,
+    productType: "DOCUMENT_TOOL",
+    category: "TEST",
+    price: 1000,
+    billingType: "ONE_TIME",
+    status: "ACTIVE",
+    visibility: "STANDALONE_ONLY",
+  } as any);
+  await db
+    .update(storeOrders)
+    .set({ fulfillmentAttemptedAt: new Date(Date.now() - 2 * 60 * 60 * 1000) })
+    .where(eq(storeOrders.id, failed.id));
+  const recovered = await reconcileCanonicalOrderFulfillment(100);
+  assert.ok(recovered.fulfilled >= 1);
+  const finalOrder = await getOrderRow(created.json.order_ref);
+  assert.equal(finalOrder.status, "paid");
+  assert.equal(finalOrder.fulfillmentStatus, "fulfilled");
+  const grants = await db
+    .select()
+    .from(productEntitlements)
+    .where(eq(productEntitlements.providerOrderRef, providerRef));
+  assert.deepEqual(
+    grants.map((grant: any) => grant.productRegistryId).sort(),
+    [TEST_PRODUCT_ID, TEST_PRODUCT_ID_LATE].sort(),
+  );
 });
 
 test("4c. order_id asing → jatuh ke cabang legacy (200), order kita tak tersentuh", { skip: SKIP }, async () => {
