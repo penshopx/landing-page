@@ -15,6 +15,13 @@ description: Server-side Purchase events to Meta from the Scalev webhook — why
 - Access token goes in the POST body, not the URL (avoids proxy/log leakage).
 - Verify config via admin endpoints `/api/admin/meta-capi/status` and `/test` (supports `test_event_code` → Meta Events Manager Test Events tab).
 
+## Test POST is authoritative
+**Rule:** Do not reject a Conversions API token/Pixel pair solely because `GET /{pixelId}?fields=id` returns Graph `code 100` / `GraphMethodException`; verify it with a test-only `POST /{pixelId}/events` and require `events_received=1`.
+
+**Why:** A manually generated Conversions API token was accepted for Purchase ingestion even though the read probe failed; treating the GET probe as authoritative creates a false negative.
+
+**How to apply:** Set `META_TEST_EVENT_CODE`, send a synthetic Purchase with non-real PII, and confirm Meta returns `events_received=1`. Never send a synthetic event without the test code.
+
 ## Pixel ID must be sanitized to digits-only everywhere
 **Rule:** Any place that consumes `META_PIXEL_ID` (or `VITE_META_PIXEL_ID`) must strip non-digits before use — the browser `fbq('init', ...)`, the public config endpoint, and CAPI. **Why:** the secret was once stored as `"ID 2571064406673063"` (copy-paste artifact); an `"ID "` prefix silently breaks both pixel init and CAPI with no error. **How:** `String(raw).replace(/[^0-9]/g,"")` — done in `sanitizePixelId` (server meta-capi + client meta-pixel) and inline in the `/api/config/meta-pixel` route.
 

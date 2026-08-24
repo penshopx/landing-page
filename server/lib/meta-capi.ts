@@ -161,7 +161,10 @@ export async function sendMetaEvent(params: MetaEventParams): Promise<MetaCapiRe
   if (params.eventSourceUrl) event.event_source_url = params.eventSourceUrl;
 
   const body: Record<string, any> = { data: [event] };
-  const testCode = params.testEventCode || process.env.META_TEST_EVENT_CODE;
+  // Never apply the environment test code implicitly. Real webhook events use
+  // this same function and must remain production events. Only an explicit
+  // admin test invocation may opt into Meta Test Events.
+  const testCode = params.testEventCode?.trim();
   if (testCode) body.test_event_code = testCode;
 
   body.access_token = accessToken;

@@ -21563,7 +21563,11 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
   app.post("/api/admin/meta-capi/test", isAuthenticated, requireAdmin, async (req: any, res: any) => {
     try {
       const { sendMetaPurchaseEvent } = await import("./lib/meta-capi");
-      const testEventCode = typeof req.body?.testEventCode === "string" ? req.body.testEventCode : undefined;
+      const testEventCode =
+        (typeof req.body?.testEventCode === "string" && req.body.testEventCode.trim()
+          ? req.body.testEventCode.trim()
+          : undefined) ||
+        process.env.META_TEST_EVENT_CODE;
       const result = await sendMetaPurchaseEvent({
         orderId: `test_${Date.now()}`,
         value: 245000,
