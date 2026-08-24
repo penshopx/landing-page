@@ -10,3 +10,11 @@ description: Why a hosted checkout confirmation page must not be treated as a se
 **Why:** The hosted page can show a confirmation headline and access CTA while the provider API still reports `unpaid`; no local order, entitlement, webhook Purchase, or CAPI Purchase should exist in that state. The page also displayed duplicate-looking access cards even though provider variants showed a quantity of one.
 
 **How to apply:** When a buyer reports payment, query the provider order reference and show only non-PII fields (status, amount, product/quantity). If still unpaid after a short propagation wait, tell them not to pay again blindly: first verify their banking/QRIS receipt and use the provider's payment support path if funds were deducted.
+
+## Safely adopt an early legacy placeholder
+
+**Rule:** If an authenticated paid webhook first creates a `paid_no_mapping` placeholder, later canonical variant resolution may adopt that same delivery row only when its product is still the zero placeholder. Never remap an already-bound product.
+
+**Why:** Scalev can emit multiple paid event shapes for one order. An early event lacked usable variant data and persisted the payment, while the later provider lookup identified the correct Level 1 product; rejecting the placeholder left a verified paid buyer without access.
+
+**How to apply:** Gate adoption on the stable provider-order reference, placeholder product, and `paid_no_mapping` status together; keep the original access token, then let the existing atomic outbox claim handle delivery and retries.

@@ -17,6 +17,7 @@ export interface DigitalDeliveryOrderInput {
   customerPhone: string;
   amount: number;
   midtransOrderId: string;
+  allowPaidNoMappingAdoption?: boolean;
 }
 
 export interface DigitalDeliveryOrder {
@@ -91,6 +92,52 @@ export async function ensureDigitalDeliveryOrder(
       deliveryStatus: inserted.rows[0].delivery_status,
       created: true,
     };
+  }
+
+  // A legacy Scalev webhook can persist an authoritative paid order before it
+  // has enough variant data to identify the digital product. Once the hosted
+  // reconciler verifies the provider payment and resolves the exact product,
+  // adopt only that narrowly-defined placeholder instead of leaving a paid
+  // buyer blocked behind product_id=0.
+  if (input.allowPaidNoMappingAdoption) {
+    const adopted = await pool.query<{
+      id: number;
+      product_id: number;
+      access_token: string;
+      delivery_status: DigitalDeliveryState;
+    }>(
+      `UPDATE store_orders
+          SET product_id=$2,
+              customer_name=$3,
+              customer_email=$4,
+              customer_phone=$5,
+              amount=CASE WHEN $6 > 0 THEN $6 ELSE amount END,
+              status='paid',
+              delivery_status='pending',
+              delivery_claimed_at=NULL,
+              delivery_error=NULL
+        WHERE midtrans_order_id=$1
+          AND product_id=0
+          AND status='paid_no_mapping'
+      RETURNING id, product_id, access_token, delivery_status`,
+      [
+        input.midtransOrderId,
+        input.productId,
+        input.customerName,
+        input.customerEmail,
+        input.customerPhone,
+        input.amount,
+      ],
+    );
+    if (adopted.rows[0]) {
+      return {
+        id: adopted.rows[0].id,
+        productId: adopted.rows[0].product_id,
+        accessToken: adopted.rows[0].access_token,
+        deliveryStatus: adopted.rows[0].delivery_status,
+        created: false,
+      };
+    }
   }
 
   const existing = await pool.query<{

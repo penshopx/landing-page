@@ -22,6 +22,7 @@
 
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
 import express from "express";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -44,10 +45,11 @@ const HOSTED_SCALEV_ORDER_ID = `HST${RUN.slice(-8).toUpperCase()}`;
 const HOSTED_DEFERRED_ORDER_ID = `HSD${RUN.slice(-8).toUpperCase()}`;
 const HOSTED_BACKFILL_ORDER_ID = `HSB${RUN.slice(-8).toUpperCase()}`;
 const LEVEL_ONE_HOSTED_ORDER_ID = `HSL${RUN.slice(-8).toUpperCase()}`;
+const LEVEL_ONE_PLACEHOLDER_ORDER_ID = `HSP${RUN.slice(-8).toUpperCase()}`;
 
 let orderServer: Server; let orderBase: string;
 let routesServer: Server; let routesBase: string;
-let db: any, storeOrders: any, productRegistry: any, productEntitlements: any;
+let db: any, storeOrders: any, storeProducts: any, productRegistry: any, productEntitlements: any;
 let digitalProductFiles: any;
 let packageRegistry: any, packageVersionSnapshots: any;
 let solutionRegistry: any, sectorRegistry: any, tierRegistry: any, eq: any;
@@ -134,6 +136,7 @@ before(async () => {
   ({ db } = await import("../server/db"));
   ({
     storeOrders,
+    storeProducts,
     productRegistry,
     productEntitlements,
     digitalProductFiles,
@@ -623,6 +626,61 @@ test("4e. hosted Level 1 mengirim akses digital yang membuka satu diagnosis", { 
     accessBody.levelOneDiagnostic.choices.map((choice: any) => choice.type),
     ["sbu", "skk"],
   );
+});
+
+test("4e2. hosted Level 1 mengadopsi placeholder paid_no_mapping tanpa menggandakan order", { skip: SKIP }, async () => {
+  const [ebookProduct] = await db
+    .select()
+    .from(storeProducts)
+    .where(eq(storeProducts.name, SBU_SKK_EBOOK.title))
+    .limit(1);
+  assert.ok(ebookProduct?.id, "Produk Store Level 1 harus tersedia");
+
+  const [placeholder] = await db
+    .insert(storeOrders)
+    .values({
+      productId: 0,
+      customerName: buyer.name,
+      customerEmail: TEST_EMAIL,
+      customerPhone: buyer.phone,
+      amount: SBU_SKK_EBOOK.amount,
+      midtransOrderId: `scalev_${LEVEL_ONE_PLACEHOLDER_ORDER_ID}`,
+      accessToken: randomUUID(),
+      status: "paid_no_mapping",
+      deliveryStatus: "pending",
+    } as any)
+    .returning();
+
+  const webhook = await postWebhook({
+    event: "payment_status_changed",
+    data: {
+      order_id: LEVEL_ONE_PLACEHOLDER_ORDER_ID,
+      payment_status: "paid",
+      gross_revenue: String(SBU_SKK_EBOOK.amount),
+      customer: { email: TEST_EMAIL, name: buyer.name, phone: buyer.phone },
+      variants: {
+        [SBU_SKK_EBOOK.title]: {
+          quantity: 1,
+          variant_unique_id: SBU_SKK_EBOOK.scalev.variantUniqueId,
+        },
+      },
+      final_variants: { [SBU_SKK_EBOOK.title]: 1 },
+    },
+  });
+  assert.equal(webhook.status, 200);
+  assert.equal(webhook.json.type, "canonical_hosted_fulfillment");
+  assert.equal(webhook.json.fulfillment, "fulfilled");
+
+  const adopted = await getOrderRow(`scalev_${LEVEL_ONE_PLACEHOLDER_ORDER_ID}`);
+  assert.equal(adopted.id, placeholder.id);
+  assert.equal(adopted.productId, ebookProduct.id);
+  assert.equal(adopted.status, "paid");
+  assert.equal(adopted.deliveryStatus, "sent");
+
+  const canonical = await getOrderRow(
+    `scalev_hosted_${LEVEL_ONE_PLACEHOLDER_ORDER_ID}`,
+  );
+  assert.equal(canonical.fulfillmentStatus, "fulfilled");
 });
 
 test("4f. RACE: webhook tiba sebelum scalev_order_id tersimpan → fallback metadata.order_ref menandai paid + backfill", { skip: SKIP }, async () => {

@@ -779,6 +779,8 @@ export async function fulfillSbuSkkOffer(
       customerPhone: input.buyerWhatsapp || "",
       amount: input.amount,
       midtransOrderId: stableOrderRef,
+      allowPaidNoMappingAdoption:
+        input.source === "scalev" && Boolean(input.providerOrderRef),
     });
     durableBundleOrderId = durableOrder.id;
     results.push(
