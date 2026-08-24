@@ -41,6 +41,7 @@ const TEST_PACKAGE_ID = `PKG-TST-${RUN.slice(-6).toUpperCase()}`;
 const API_KEY = "kunci-order-tes-313a";
 const SCALEV_ORDER_ID = `TST${RUN.slice(-8).toUpperCase()}`;
 const HOSTED_SCALEV_ORDER_ID = `HST${RUN.slice(-8).toUpperCase()}`;
+const HOSTED_DEFERRED_ORDER_ID = `HSD${RUN.slice(-8).toUpperCase()}`;
 const HOSTED_BACKFILL_ORDER_ID = `HSB${RUN.slice(-8).toUpperCase()}`;
 const LEVEL_ONE_HOSTED_ORDER_ID = `HSL${RUN.slice(-8).toUpperCase()}`;
 
@@ -56,6 +57,8 @@ const realFetch = globalThis.fetch;
 type ScalevMode = "ok" | "fail" | "off";
 let scalevMode: ScalevMode = "off";
 let scalevCalls: any[] = [];
+let metaCalls: any[] = [];
+let metaMode: "ok" | "fail" = "ok";
 
 function installScalevMock() {
   globalThis.fetch = (async (input: any, init?: any) => {
@@ -65,6 +68,22 @@ function installScalevMock() {
         status: 201,
         headers: { "Content-Type": "application/json" },
       });
+    }
+    if (url.includes("graph.facebook.com")) {
+      metaCalls.push({
+        url,
+        body: init?.body ? JSON.parse(init.body) : null,
+      });
+      if (metaMode === "fail") {
+        return new Response(
+          JSON.stringify({ error: { message: "simulated Meta failure" } }),
+          { status: 500, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      return new Response(
+        JSON.stringify({ events_received: 1, fbtrace_id: `trace-${RUN}` }),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      );
     }
     if (url.includes("api.scalev.com")) {
       scalevCalls.push({ url, body: init?.body ? JSON.parse(init.body) : null });
@@ -239,6 +258,16 @@ const getOrderRow = async (orderRef: string) => {
   const rows = await db.select().from(storeOrders).where(eq(storeOrders.midtransOrderId, orderRef)).limit(1);
   return rows[0];
 };
+const waitForMetaCall = async (eventId: string) => {
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const call = metaCalls.find(
+      (entry) => entry.body?.data?.[0]?.event_id === eventId,
+    );
+    if (call) return call;
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  throw new Error(`Meta call ${eventId} tidak diterima`);
+};
 
 let scalevOrderRef = "";
 
@@ -330,6 +359,79 @@ test("4b. webhook paid dengan data.order_id cocok → paid dan akses produk akti
   assert.equal(grantsAfterReplay.length, 1);
 });
 
+test("4b2. order api_v1 paid tetap meneruskan Purchase ke Meta", { skip: SKIP }, async () => {
+  process.env.META_CAPI_ACCESS_TOKEN = "test-capi-token";
+  process.env.META_PIXEL_ID = "1234567890";
+  metaCalls = [];
+  try {
+    const response = await postWebhook({
+      event: "payment_status_changed",
+      data: {
+        order_id: SCALEV_ORDER_ID,
+        payment_status: "paid",
+        gross_revenue: "123000",
+        product_name: `Produk Tes 313A ${RUN}`,
+        customer: {
+          email: TEST_EMAIL,
+          name: buyer.name,
+          phone: "081111111",
+        },
+        metadata: {
+          fbp: "fb.1.test.browser",
+          fbc: "fb.1.test.click",
+          esu: "https://gustafta.my.id/ebook-sbu-skk",
+        },
+      },
+    });
+    assert.equal(response.status, 200);
+    const call = await waitForMetaCall(`scalev_${SCALEV_ORDER_ID}`);
+    const event = call.body.data[0];
+    assert.equal(event.event_name, "Purchase");
+    assert.equal(event.custom_data.value, 123000);
+    assert.equal(event.custom_data.currency, "IDR");
+    assert.equal(event.custom_data.content_name, `Produk Tes 313A ${RUN}`);
+    assert.equal(event.event_source_url, "https://gustafta.my.id/ebook-sbu-skk");
+    assert.equal(event.user_data.fbp, "fb.1.test.browser");
+    assert.equal(event.user_data.fbc, "fb.1.test.click");
+    assert.ok(!JSON.stringify(call.body).includes(TEST_EMAIL));
+  } finally {
+    delete process.env.META_CAPI_ACCESS_TOKEN;
+    delete process.env.META_PIXEL_ID;
+  }
+});
+
+test("4b3. kegagalan Meta tidak menggagalkan webhook atau fulfillment", { skip: SKIP }, async () => {
+  process.env.META_CAPI_ACCESS_TOKEN = "test-capi-token";
+  process.env.META_PIXEL_ID = "1234567890";
+  metaMode = "fail";
+  metaCalls = [];
+  try {
+    const response = await postWebhook({
+      event: "payment_status_changed",
+      data: {
+        order_id: SCALEV_ORDER_ID,
+        payment_status: "paid",
+        gross_revenue: "123000",
+        customer: {
+          email: TEST_EMAIL,
+          name: buyer.name,
+          phone: "081111111",
+        },
+      },
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.json.note, "api_v1 order paid and fulfilled");
+    await waitForMetaCall(`scalev_${SCALEV_ORDER_ID}`);
+    const order = await getOrderRow(scalevOrderRef);
+    assert.equal(order.status, "paid");
+    assert.equal(order.fulfillmentStatus, "fulfilled");
+  } finally {
+    metaMode = "ok";
+    delete process.env.META_CAPI_ACCESS_TOKEN;
+    delete process.env.META_PIXEL_ID;
+  }
+});
+
 test("4c. hosted Scalev paid membuat order kanonik + entitlement tepat sekali", { skip: SKIP }, async () => {
   const payload = {
     event: "payment_status_changed",
@@ -371,6 +473,85 @@ test("4c. hosted Scalev paid membuat order kanonik + entitlement tepat sekali", 
     .where(eq(productEntitlements.providerOrderRef, HOSTED_SCALEV_ORDER_ID));
   assert.equal(grants.length, 1);
   assert.equal(grants[0].productRegistryId, TEST_PRODUCT_ID);
+});
+
+test("4c2. hosted Scalev paid tetap meneruskan Purchase ke Meta", { skip: SKIP }, async () => {
+  process.env.META_CAPI_ACCESS_TOKEN = "test-capi-token";
+  process.env.META_PIXEL_ID = "1234567890";
+  metaCalls = [];
+  try {
+    const response = await postWebhook({
+      event: "payment_status_changed",
+      data: {
+        order_id: HOSTED_SCALEV_ORDER_ID,
+        payment_status: "paid",
+        gross_revenue: "123000",
+        customer: {
+          email: TEST_EMAIL,
+          name: buyer.name,
+          phone: "081111111",
+        },
+        variants: {
+          [`Produk Tes 313A ${RUN}`]: {
+            quantity: 1,
+            variant_unique_id: `variant_TES_${RUN}`,
+          },
+        },
+        final_variants: { [`Produk Tes 313A ${RUN}`]: 1 },
+      },
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.json.type, "canonical_hosted_fulfillment");
+    const call = await waitForMetaCall(`scalev_${HOSTED_SCALEV_ORDER_ID}`);
+    const event = call.body.data[0];
+    assert.equal(event.event_name, "Purchase");
+    assert.equal(event.custom_data.value, 123000);
+    assert.equal(event.custom_data.currency, "IDR");
+    assert.equal(event.custom_data.content_name, `Produk Tes 313A ${RUN}`);
+    assert.ok(!JSON.stringify(call.body).includes(TEST_EMAIL));
+  } finally {
+    delete process.env.META_CAPI_ACCESS_TOKEN;
+    delete process.env.META_PIXEL_ID;
+  }
+});
+
+test("4c3. hosted paid yang fulfillment-nya tertunda tetap mengirim Purchase", { skip: SKIP }, async () => {
+  process.env.META_CAPI_ACCESS_TOKEN = "test-capi-token";
+  process.env.META_PIXEL_ID = "1234567890";
+  metaCalls = [];
+  try {
+    const response = await postWebhook({
+      event: "payment_status_changed",
+      data: {
+        order_id: HOSTED_DEFERRED_ORDER_ID,
+        payment_status: "paid",
+        gross_revenue: "123000",
+        customer: {
+          name: buyer.name,
+          phone: "081111111",
+        },
+        variants: {
+          [`Produk Tes 313A ${RUN}`]: {
+            quantity: 1,
+            variant_unique_id: `variant_TES_${RUN}`,
+          },
+        },
+        final_variants: { [`Produk Tes 313A ${RUN}`]: 1 },
+      },
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.json.type, "canonical_hosted_fulfillment");
+    assert.equal(
+      response.json.note,
+      "hosted Scalev order paid; fulfillment pending retry",
+    );
+    const call = await waitForMetaCall(`scalev_${HOSTED_DEFERRED_ORDER_ID}`);
+    assert.equal(call.body.data[0].event_name, "Purchase");
+    assert.equal(call.body.data[0].custom_data.value, 123000);
+  } finally {
+    delete process.env.META_CAPI_ACCESS_TOKEN;
+    delete process.env.META_PIXEL_ID;
+  }
 });
 
 test("4d. hosted order historis dapat direkonsiliasi ulang dari API provider", { skip: SKIP }, async () => {

@@ -21641,6 +21641,59 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         return res.status(200).json({ received: true, note: `Payment status: ${paymentStatus}` });
       }
 
+      // Meta must observe every paid Scalev path, including canonical API and
+      // hosted orders that return before the legacy handler below. This stays
+      // asynchronous: a Meta outage must never delay fulfillment or cause
+      // Scalev to retry an otherwise valid payment webhook.
+      const queueMetaPurchase = (options?: {
+        value?: number;
+        contentName?: string;
+      }) => {
+        void (async () => {
+          try {
+            const { sendMetaPurchaseEvent } = await import("./lib/meta-capi");
+            // Use a creator-specific pixel where the Scalev product mapping
+            // points to an agent; otherwise send to the platform pixel.
+            let agentPixelId: string | undefined;
+            let mappedContentName: string | undefined;
+            for (const pName of Object.keys(finalVariants)) {
+              const mapping = await storage.getScalevMappingByProductName(pName).catch(() => null);
+              if (mapping?.agentId) {
+                const agent: any = await storage.getAgent(String(mapping.agentId)).catch(() => null);
+                if (agent?.metaPixelId) agentPixelId = agent.metaPixelId;
+                if (agent?.name) mappedContentName = agent.name;
+                break;
+              }
+            }
+            const result = await sendMetaPurchaseEvent({
+              orderId,
+              value: options?.value ?? grossRevenue,
+              currency: "IDR",
+              email: customerEmail || undefined,
+              phone: customerPhone || undefined,
+              name: customerName || undefined,
+              contentName:
+                options?.contentName ||
+                mappedContentName ||
+                data.product_name ||
+                data.name ||
+                Object.keys(finalVariants)[0] ||
+                undefined,
+              pixelId: agentPixelId,
+              fbp: metaFbp,
+              fbc: metaFbc,
+              externalId: customerEmail || undefined,
+              eventSourceUrl: metaEventSourceUrl,
+            });
+            if (!result.sent && result.skippedReason) {
+              console.log(`[Meta CAPI] Dilewati untuk order ${orderId}: ${result.skippedReason}`);
+            }
+          } catch (capiErr: any) {
+            console.error("[Meta CAPI] Error tak terduga:", capiErr?.message);
+          }
+        })();
+      };
+
       // ── Task #313A: korelasi deterministik order Unified Order API (api_v1) ──
       // Order yang dibuat server-side via Scalev v3 menyimpan scalev_order_id
       // saat create. Webhook mencocokkan data.order_id ke kolom itu — tanpa
@@ -21657,7 +21710,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         const { storeOrders: storeOrdersTable } = await import("@shared/schema");
         const { eq, and } = await import("drizzle-orm");
         let apiOrderRows = await dbConn
-          .select({ id: storeOrdersTable.id, status: storeOrdersTable.status, midtransOrderId: storeOrdersTable.midtransOrderId, scalevOrderId: storeOrdersTable.scalevOrderId })
+          .select({ id: storeOrdersTable.id, status: storeOrdersTable.status, midtransOrderId: storeOrdersTable.midtransOrderId, scalevOrderId: storeOrdersTable.scalevOrderId, amount: storeOrdersTable.amount })
           .from(storeOrdersTable)
           .where(and(
             eq(storeOrdersTable.scalevOrderId, String(orderId)),
@@ -21668,7 +21721,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
           const metaRef = String((data as any)?.metadata?.order_ref || "").trim();
           if (metaRef.startsWith("ORD-")) {
             apiOrderRows = await dbConn
-              .select({ id: storeOrdersTable.id, status: storeOrdersTable.status, midtransOrderId: storeOrdersTable.midtransOrderId, scalevOrderId: storeOrdersTable.scalevOrderId })
+              .select({ id: storeOrdersTable.id, status: storeOrdersTable.status, midtransOrderId: storeOrdersTable.midtransOrderId, scalevOrderId: storeOrdersTable.scalevOrderId, amount: storeOrdersTable.amount })
               .from(storeOrdersTable)
               .where(and(eq(storeOrdersTable.midtransOrderId, metaRef), eq(storeOrdersTable.source, "api_v1")))
               .limit(1);
@@ -21683,6 +21736,9 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
               .where(eq(storeOrdersTable.id, apiOrder.id));
             console.log(`✅ [Scalev webhook] Order API ${apiOrder.midtransOrderId} → paid (scalev_order_id=${orderId})`);
           }
+          queueMetaPurchase({
+            value: grossRevenue || Number(apiOrder.amount) || 0,
+          });
           try {
             const { fulfillCanonicalOrder } = await import("./order-fulfillment");
             const fulfilled = await fulfillCanonicalOrder({
@@ -21720,6 +21776,11 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         // Jangan pernah menggagalkan webhook karena lookup korelasi; lanjut ke cabang legacy.
         console.error("[Scalev webhook] api_v1 correlation lookup error:", (corrErr as Error)?.message);
       }
+
+      // From this point the payment is either a hosted canonical order or a
+      // legacy Scalev order. Queue Purchase before reconciliation so even a
+      // paid order whose fulfillment is deferred still reaches Meta.
+      queueMetaPurchase();
 
       // ── Paid order created directly in the hosted Scalev storefront ─────────
       // These orders never pass through POST /api/v1/orders, so create one
@@ -21789,46 +21850,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
       }
 
       // ── Meta Conversions API: kirim event Purchase (fire-and-forget) ─────────
-      // Jembatan Scalev → Meta: integrasi langsung Scalev↔Meta sering gagal, jadi
-      // Gustafta yang meneruskan event Purchase server-side. Meta dedup via
-      // event_id = scalev_{orderId}, jadi aman walau webhook diulang sebelum order
-      // tercatat. JANGAN pernah blokir/ gagalkan webhook karena CAPI.
-      (async () => {
-        try {
-          const { sendMetaPurchaseEvent } = await import("./lib/meta-capi");
-          // Pakai pixel per-agen bila order terkait agen dengan metaPixelId
-          let agentPixelId: string | undefined;
-          let contentName: string | undefined;
-          for (const pName of Object.keys(finalVariants)) {
-            const m = await storage.getScalevMappingByProductName(pName).catch(() => null);
-            if (m?.agentId) {
-              const ag: any = await storage.getAgent(String(m.agentId)).catch(() => null);
-              if (ag?.metaPixelId) agentPixelId = ag.metaPixelId;
-              if (ag?.name) contentName = ag.name;
-              break;
-            }
-          }
-          const result = await sendMetaPurchaseEvent({
-            orderId,
-            value: grossRevenue,
-            currency: "IDR",
-            email: customerEmail || undefined,
-            phone: customerPhone || undefined,
-            name: customerName || undefined,
-            contentName: contentName || Object.keys(finalVariants)[0] || undefined,
-            pixelId: agentPixelId,
-            fbp: metaFbp,
-            fbc: metaFbc,
-            externalId: customerEmail || undefined,
-            eventSourceUrl: metaEventSourceUrl,
-          });
-          if (!result.sent && result.skippedReason) {
-            console.log(`[Meta CAPI] Dilewati untuk order ${orderId}: ${result.skippedReason}`);
-          }
-        } catch (capiErr: any) {
-          console.error("[Meta CAPI] Error tak terduga:", capiErr?.message);
-        }
-      })();
+      // Purchase was already queued before hosted/legacy reconciliation above.
       // ─────────────────────────────────────────────────────────────────────────
 
       // ── Handle Gustafta Platform Subscription Plans ──────────────────────────
