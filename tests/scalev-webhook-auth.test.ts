@@ -32,10 +32,11 @@ test("signing secret only + valid HMAC hex → accept via signature", () => {
   reset();
   process.env.SCALEV_SIGNING_SECRET = "signkey";
   const hex = createHmac("sha256", "signkey").update(RAW).digest("hex");
-  const r = verifyScalevWebhookAuth(RAW, { "x-signature": hex }, {});
+  const r = verifyScalevWebhookAuth(RAW, { "x-scalev-hmac-sha256": hex }, {});
   assert.equal(r.authorized, true);
   assert.equal(r.method, "signature");
   assert.equal(r.sigValid, true);
+  assert.equal(r.sigHeader, "x-scalev-hmac-sha256");
   reset();
 });
 

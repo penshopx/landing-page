@@ -260,12 +260,18 @@ test("GET /api/store/access/:token returns downloads array for paid order", asyn
   const suppDl = body.downloads.find((d: any) => d.role === "supplement");
   assert.ok(mainDl, "Must have main file");
   assert.ok(suppDl, "Must have supplement file");
-  assert.ok(mainDl.downloadUrl.includes("/download/"), "downloadUrl must include /download/:id");
-  assert.ok(suppDl.downloadUrl.includes("/download/"), "downloadUrl must include /download/:id");
+  assert.match(
+    mainDl.downloadUrl,
+    new RegExp(`/download/product/${SBU_SKK_EBOOK.registryProductId}/role/main$`),
+  );
+  assert.match(
+    suppDl.downloadUrl,
+    new RegExp(`/download/product/${SBU_SKK_EBOOK.registryProductId}/role/supplement$`),
+  );
 });
 
-// ── 4. Cross-product file access denied ──────────────────────────────────────
-test("GET /api/store/access/:token/download/:fileId denies access to files from different product", async () => {
+// ── 4. Stale numeric download links remain usable ────────────────────────────
+test("GET /api/store/access/:token/download/:fileId falls back to the current main file when the old ID is gone", async () => {
   if (!serverReady || !storeProductId) return;
   const token = randomUUID();
   const [order] = await db.insert(storeOrders).values({
@@ -284,10 +290,11 @@ test("GET /api/store/access/:token/download/:fileId denies access to files from 
   } as any).returning({ id: storeOrders.id });
   createdOrderIds.push(order.id);
 
-  // Try fileId=1 which may belong to a different product
-  // The test verifies the endpoint either returns 403 (cross-product) or 404 (file not in this product)
-  const res = await fetch(`${SERVER_URL}/api/store/access/${token}/download/999999`);
-  assert.ok([403, 404].includes(res.status), `Expected 403 or 404, got ${res.status}`);
+  const res = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/download/2147483647`,
+  );
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-type") || "", /^application\/pdf/i);
 });
 
 // ── 5. Pending order rejected ─────────────────────────────────────────────────

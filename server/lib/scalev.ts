@@ -157,3 +157,39 @@ export async function createScalevOrder(params: {
   }
   return { scalevOrderId, scalevUuid: d.id ? String(d.id) : null, checkoutUrl };
 }
+
+/**
+ * Fetch one existing Scalev order for a tightly-scoped reconciliation/backfill.
+ * The API key stays server-side; callers receive only the provider payload.
+ */
+export async function getScalevOrder(orderId: string): Promise<any> {
+  const apiKey = process.env.SCALEV_API_KEY;
+  if (!apiKey) throw new Error("SCALEV_API_KEY tidak ditemukan di environment.");
+  const safeOrderId = String(orderId || "").trim();
+  if (!/^[A-Za-z0-9_-]{6,80}$/.test(safeOrderId)) {
+    throw new Error("Referensi order Scalev tidak valid.");
+  }
+
+  const res = await fetch(
+    `${SCALEV_V3_API_URL}/orders/${encodeURIComponent(safeOrderId)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        Accept: "application/json",
+      },
+    },
+  );
+  const json = (await res.json().catch(() => null)) as any;
+  const data = json?.data ?? json;
+  if (!res.ok || !data) {
+    throw new Error(
+      `Scalev v3 get order gagal: HTTP ${res.status} ${JSON.stringify(
+        json?.errors || json?.error || json?.message || "",
+      ).slice(0, 300)}`,
+    );
+  }
+  if (String(data.order_id || "") !== safeOrderId) {
+    throw new Error("Respons Scalev tidak cocok dengan referensi order.");
+  }
+  return data;
+}

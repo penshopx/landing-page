@@ -4,7 +4,12 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { db, pool } from "../server/db";
-import { storeOrders, storeProducts } from "../shared/schema";
+import {
+  digitalProductFiles,
+  productRegistry,
+  storeOrders,
+  storeProducts,
+} from "../shared/schema";
 import { SBU_SKK_EBOOK } from "../shared/sbu-skk-ebook";
 import { CONTRACTOR_L1_EBOOKS } from "../server/sales-ladder-blueprint";
 import { inArray } from "drizzle-orm";
@@ -13,6 +18,7 @@ const SERVER_URL = `http://localhost:${process.env.PORT || 5000}`;
 const RUN = `sbu_skk_${Date.now()}_${randomUUID().slice(0, 8)}`;
 const createdOrderIds: number[] = [];
 const createdProductIds: number[] = [];
+const createdRegistryIds: string[] = [];
 let storeProductId = 0;
 // v2.1.0 canonical main PDF + retained toolkit hashes
 const MAIN_EBOOK_SHA256 = "c9d3541026dc15f81a13600b5f574e1145562c9ffa6d0c4ca768b845aec01ffb";
@@ -117,6 +123,12 @@ after(async () => {
   }
   if (createdProductIds.length) {
     await db.delete(storeProducts).where(inArray(storeProducts.id, createdProductIds)).catch(() => {});
+  }
+  if (createdRegistryIds.length) {
+    await db
+      .delete(productRegistry)
+      .where(inArray(productRegistry.productId, createdRegistryIds))
+      .catch(() => {});
   }
 });
 
@@ -389,7 +401,10 @@ test("token order paid menerima endpoint internal dan byte PDF yang hash-nya ben
     ["sbu", "skk"],
   );
   const downloadUrl = new URL(body.downloadUrl, SERVER_URL);
-  assert.equal(downloadUrl.pathname, `/api/store/access/${token}/download`);
+  assert.equal(
+    downloadUrl.pathname,
+    `/api/store/access/${token}/download/product/${SBU_SKK_EBOOK.registryProductId}/role/main`,
+  );
   assert.ok(!JSON.stringify(body).includes("db-object:"));
 
   const download = await fetch(`${SERVER_URL}${downloadUrl.pathname}`);
@@ -404,8 +419,24 @@ test("token order paid menerima endpoint internal dan byte PDF yang hash-nya ben
   assert.equal(bytes.subarray(0, 5).toString("ascii"), "%PDF-");
   assert.equal(createHash("sha256").update(bytes).digest("hex"), expectedPdfSha256);
 
+  const staleMain = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/download/2147483647`,
+  );
+  assert.equal(staleMain.status, 200);
+  assert.equal(
+    createHash("sha256")
+      .update(Buffer.from(await staleMain.arrayBuffer()))
+      .digest("hex"),
+    expectedPdfSha256,
+    "URL ID file yang sudah basi harus jatuh ke PDF utama terbaru milik produk yang sama",
+  );
+
   const supplementMeta = body.downloads.find(
     (file: any) => file.role === "supplement",
+  );
+  assert.equal(
+    new URL(supplementMeta.downloadUrl, SERVER_URL).pathname,
+    `/api/store/access/${token}/download/product/${SBU_SKK_EBOOK.registryProductId}/role/supplement`,
   );
   const supplement = await fetch(
     `${SERVER_URL}${new URL(supplementMeta.downloadUrl, SERVER_URL).pathname}${new URL(supplementMeta.downloadUrl, SERVER_URL).search}`,
@@ -417,6 +448,48 @@ test("token order paid menerima endpoint internal dan byte PDF yang hash-nya ben
       .digest("hex"),
     SUPPLEMENT_SHA256,
   );
+});
+
+test("token produk A tidak dapat mengunduh file nyata milik produk B", async () => {
+  const token = randomUUID();
+  await createOrder("paid", token);
+  const suffix = randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
+  const foreignRegistryId = `GST-TST-${suffix}`;
+  createdRegistryIds.push(foreignRegistryId);
+  await db.insert(productRegistry).values({
+    productId: foreignRegistryId,
+    name: `Produk Asing ${suffix}`,
+    slug: `produk-asing-${suffix.toLowerCase()}`,
+    productType: "KNOWLEDGE",
+    category: "TEST",
+    status: "ACTIVE",
+  });
+  const foreignBytes = Buffer.from("%PDF-1.4\nforeign-test-file\n%%EOF");
+  const [foreignFile] = await db
+    .insert(digitalProductFiles)
+    .values({
+      productRegistryId: foreignRegistryId,
+      storageKey: `tests/${RUN}/${suffix}.pdf`,
+      fileName: "foreign.pdf",
+      mimeType: "application/pdf",
+      sizeBytes: foreignBytes.length,
+      sha256: createHash("sha256").update(foreignBytes).digest("hex"),
+      content: foreignBytes,
+      sortOrder: 0,
+      role: "main",
+      label: "Foreign",
+    })
+    .returning({ id: digitalProductFiles.id });
+
+  const byId = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/download/${foreignFile.id}`,
+  );
+  assert.equal(byId.status, 403);
+
+  const byProductRole = await fetch(
+    `${SERVER_URL}/api/store/access/${token}/download/product/${foreignRegistryId}/role/main`,
+  );
+  assert.equal(byProductRole.status, 403);
 });
 
 test("diagnosis paid menyimpan satu pilihan serta hanya mengembalikan skor dan status", async () => {

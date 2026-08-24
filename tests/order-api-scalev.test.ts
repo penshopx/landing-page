@@ -25,6 +25,7 @@ import assert from "node:assert/strict";
 import express from "express";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
+import { SBU_SKK_EBOOK } from "../shared/sbu-skk-ebook";
 
 const hasDb = !!process.env.DATABASE_URL;
 const SKIP = hasDb ? false : "DATABASE_URL tidak diset — lewati tes integrasi DB";
@@ -39,10 +40,14 @@ const TEST_PRODUCT_ID_LATE = `GST-TSL-${RUN.slice(-6).toUpperCase()}`;
 const TEST_PACKAGE_ID = `PKG-TST-${RUN.slice(-6).toUpperCase()}`;
 const API_KEY = "kunci-order-tes-313a";
 const SCALEV_ORDER_ID = `TST${RUN.slice(-8).toUpperCase()}`;
+const HOSTED_SCALEV_ORDER_ID = `HST${RUN.slice(-8).toUpperCase()}`;
+const HOSTED_BACKFILL_ORDER_ID = `HSB${RUN.slice(-8).toUpperCase()}`;
+const LEVEL_ONE_HOSTED_ORDER_ID = `HSL${RUN.slice(-8).toUpperCase()}`;
 
 let orderServer: Server; let orderBase: string;
 let routesServer: Server; let routesBase: string;
 let db: any, storeOrders: any, productRegistry: any, productEntitlements: any;
+let digitalProductFiles: any;
 let packageRegistry: any, packageVersionSnapshots: any;
 let solutionRegistry: any, sectorRegistry: any, tierRegistry: any, eq: any;
 
@@ -55,10 +60,35 @@ let scalevCalls: any[] = [];
 function installScalevMock() {
   globalThis.fetch = (async (input: any, init?: any) => {
     const url = typeof input === "string" ? input : input?.url ?? String(input);
+    if (url.includes("api.brevo.com")) {
+      return new Response(JSON.stringify({ messageId: `test-${RUN}` }), {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     if (url.includes("api.scalev.com")) {
       scalevCalls.push({ url, body: init?.body ? JSON.parse(init.body) : null });
       if (scalevMode === "fail") {
         return new Response(JSON.stringify({ error: "simulated failure" }), { status: 500 });
+      }
+      if ((init?.method || "GET").toUpperCase() === "GET") {
+        const providerOrderRef = decodeURIComponent(new URL(url).pathname.split("/").pop() || "");
+        return new Response(JSON.stringify({
+          data: {
+            order_id: providerOrderRef,
+            status: "completed",
+            payment_status: "paid",
+            gross_revenue: "123000",
+            customer: { email: TEST_EMAIL, name: buyer.name, phone: "081111111" },
+            variants: {
+              [`Produk Tes 313A ${RUN}`]: {
+                quantity: 1,
+                variant_unique_id: `variant_TES_${RUN}`,
+              },
+            },
+            final_variants: { [`Produk Tes 313A ${RUN}`]: 1 },
+          },
+        }), { status: 200, headers: { "Content-Type": "application/json" } });
       }
       return new Response(JSON.stringify({
         data: {
@@ -87,6 +117,7 @@ before(async () => {
     storeOrders,
     productRegistry,
     productEntitlements,
+    digitalProductFiles,
     packageRegistry,
     packageVersionSnapshots,
     solutionRegistry,
@@ -299,7 +330,121 @@ test("4b. webhook paid dengan data.order_id cocok → paid dan akses produk akti
   assert.equal(grantsAfterReplay.length, 1);
 });
 
-test("4d. RACE: webhook tiba sebelum scalev_order_id tersimpan → fallback metadata.order_ref menandai paid + backfill", { skip: SKIP }, async () => {
+test("4c. hosted Scalev paid membuat order kanonik + entitlement tepat sekali", { skip: SKIP }, async () => {
+  const payload = {
+    event: "payment_status_changed",
+    data: {
+      order_id: HOSTED_SCALEV_ORDER_ID,
+      payment_status: "paid",
+      gross_revenue: "123000",
+      customer: { email: TEST_EMAIL, name: buyer.name, phone: "081111111" },
+      variants: {
+        [`Produk Tes 313A ${RUN}`]: {
+          quantity: 1,
+          variant_unique_id: `variant_TES_${RUN}`,
+        },
+      },
+      final_variants: { [`Produk Tes 313A ${RUN}`]: 1 },
+    },
+  };
+  const [first, replay] = await Promise.all([
+    postWebhook(payload),
+    postWebhook(payload),
+  ]);
+  assert.equal(first.status, 200);
+  assert.equal(replay.status, 200);
+  assert.equal(first.json.type, "canonical_hosted_fulfillment");
+  assert.equal(replay.json.type, "canonical_hosted_fulfillment");
+
+  const hostedRows = await db
+    .select()
+    .from(storeOrders)
+    .where(eq(storeOrders.midtransOrderId, `scalev_hosted_${HOSTED_SCALEV_ORDER_ID}`));
+  assert.equal(hostedRows.length, 1);
+  assert.equal(hostedRows[0].source, "scalev_hosted");
+  assert.equal(hostedRows[0].status, "paid");
+  assert.equal(hostedRows[0].fulfillmentStatus, "fulfilled");
+  assert.equal(hostedRows[0].productRegistryId, TEST_PRODUCT_ID);
+  const grants = await db
+    .select()
+    .from(productEntitlements)
+    .where(eq(productEntitlements.providerOrderRef, HOSTED_SCALEV_ORDER_ID));
+  assert.equal(grants.length, 1);
+  assert.equal(grants[0].productRegistryId, TEST_PRODUCT_ID);
+});
+
+test("4d. hosted order historis dapat direkonsiliasi ulang dari API provider", { skip: SKIP }, async () => {
+  scalevMode = "ok";
+  const { reconcileHostedScalevOrderFromProvider } = await import(
+    "../server/scalev-hosted-order"
+  );
+  const first = await reconcileHostedScalevOrderFromProvider({
+    providerOrderRef: HOSTED_BACKFILL_ORDER_ID,
+  });
+  const replay = await reconcileHostedScalevOrderFromProvider({
+    providerOrderRef: HOSTED_BACKFILL_ORDER_ID,
+  });
+  assert.equal(first.matched, true);
+  assert.equal(replay.matched, true);
+  assert.ok(["fulfilled", "existing"].includes(String(replay.fulfillment)));
+  const rows = await db
+    .select()
+    .from(storeOrders)
+    .where(eq(storeOrders.midtransOrderId, `scalev_hosted_${HOSTED_BACKFILL_ORDER_ID}`));
+  assert.equal(rows.length, 1);
+  const grants = await db
+    .select()
+    .from(productEntitlements)
+    .where(eq(productEntitlements.providerOrderRef, HOSTED_BACKFILL_ORDER_ID));
+  assert.equal(grants.length, 1);
+});
+
+test("4e. hosted Level 1 mengirim akses digital yang membuka satu diagnosis", { skip: SKIP }, async () => {
+  const webhook = await postWebhook({
+    event: "payment_status_changed",
+    data: {
+      order_id: LEVEL_ONE_HOSTED_ORDER_ID,
+      payment_status: "paid",
+      gross_revenue: String(SBU_SKK_EBOOK.amount),
+      customer: { email: TEST_EMAIL, name: buyer.name, phone: "081111111" },
+      variants: {
+        [SBU_SKK_EBOOK.title]: {
+          quantity: 1,
+          variant_unique_id: SBU_SKK_EBOOK.scalev.variantUniqueId,
+        },
+      },
+      final_variants: { [SBU_SKK_EBOOK.title]: 1 },
+    },
+  });
+  assert.equal(webhook.status, 200);
+  assert.equal(webhook.json.type, "canonical_hosted_fulfillment");
+  assert.equal(webhook.json.fulfillment, "fulfilled");
+
+  const canonical = await getOrderRow(
+    `scalev_hosted_${LEVEL_ONE_HOSTED_ORDER_ID}`,
+  );
+  assert.equal(canonical.source, "scalev_hosted");
+  assert.equal(canonical.productRegistryId, SBU_SKK_EBOOK.registryProductId);
+  assert.equal(canonical.fulfillmentStatus, "fulfilled");
+
+  const digital = await getOrderRow(`scalev_${LEVEL_ONE_HOSTED_ORDER_ID}`);
+  assert.equal(digital.status, "paid");
+  assert.equal(digital.deliveryStatus, "sent");
+  const access = await fetch(
+    `${routesBase}/api/store/access/${digital.accessToken}`,
+  );
+  assert.equal(access.status, 200);
+  const accessBody = await access.json();
+  assert.equal(accessBody.type, "digital");
+  assert.equal(accessBody.product.name, SBU_SKK_EBOOK.title);
+  assert.equal(accessBody.levelOneDiagnostic.eligible, true);
+  assert.deepEqual(
+    accessBody.levelOneDiagnostic.choices.map((choice: any) => choice.type),
+    ["sbu", "skk"],
+  );
+});
+
+test("4f. RACE: webhook tiba sebelum scalev_order_id tersimpan → fallback metadata.order_ref menandai paid + backfill", { skip: SKIP }, async () => {
   // Simulasikan race: order api_v1 pending TANPA scalev_order_id (persist belum sempat).
   scalevMode = "fail"; // create Scalev "gagal" → order MANUAL_WA tanpa scalev_order_id
   const r = await createOrder({ product_id: TEST_PRODUCT_ID, buyer });
@@ -320,8 +465,36 @@ test("4d. RACE: webhook tiba sebelum scalev_order_id tersimpan → fallback meta
   assert.equal(row.fulfillmentStatus, "fulfilled");
 });
 
-test("4e. paket paid memberi seluruh komponen snapshot tepat sekali", { skip: SKIP }, async () => {
+test("4g. paket paid memberi seluruh komponen snapshot tepat sekali", { skip: SKIP }, async () => {
   scalevMode = "off";
+  const componentABytes = Buffer.from("%PDF-1.4\ncomponent-a\n%%EOF");
+  const componentBBytes = Buffer.from("%PDF-1.4\ncomponent-b\n%%EOF");
+  await db.insert(digitalProductFiles).values([
+    {
+      productRegistryId: TEST_PRODUCT_ID,
+      storageKey: `tests/${RUN}/component-a.pdf`,
+      fileName: "component-a.pdf",
+      mimeType: "application/pdf",
+      sizeBytes: componentABytes.length,
+      sha256: "a".repeat(64),
+      content: componentABytes,
+      sortOrder: 0,
+      role: "main",
+      label: "Komponen A",
+    },
+    {
+      productRegistryId: TEST_PRODUCT_ID_UNMAPPED,
+      storageKey: `tests/${RUN}/component-b.pdf`,
+      fileName: "component-b.pdf",
+      mimeType: "application/pdf",
+      sizeBytes: componentBBytes.length,
+      sha256: "b".repeat(64),
+      content: componentBBytes,
+      sortOrder: 0,
+      role: "main",
+      label: "Komponen B",
+    },
+  ]);
   const created = await createOrder({ package_id: TEST_PACKAGE_ID, buyer });
   assert.equal(created.status, 201);
   assert.equal(created.json.payment_mode, "MANUAL_WA");
@@ -351,9 +524,50 @@ test("4e. paket paid memberi seluruh komponen snapshot tepat sekali", { skip: SK
     grants.map((grant: any) => grant.quotaTotal).sort((a: number, b: number) => a - b),
     [2, 4],
   );
+
+  const accessResponse = await fetch(
+    `${routesBase}/api/store/access/${row.accessToken}`,
+  );
+  assert.equal(accessResponse.status, 200);
+  const accessBody = await accessResponse.json();
+  assert.equal(accessBody.type, "canonical");
+  assert.equal(accessBody.downloads.length, 2);
+  const componentA = accessBody.downloads.find(
+    (file: any) => file.downloadUrl.includes(`/product/${TEST_PRODUCT_ID}/`),
+  );
+  const componentB = accessBody.downloads.find(
+    (file: any) =>
+      file.downloadUrl.includes(`/product/${TEST_PRODUCT_ID_UNMAPPED}/`),
+  );
+  assert.ok(componentA && componentB);
+  assert.notEqual(componentA.downloadUrl, componentB.downloadUrl);
+  const componentAPath = new URL(componentA.downloadUrl).pathname;
+  const componentBPath = new URL(componentB.downloadUrl).pathname;
+  const [downloadA, downloadB] = await Promise.all([
+    fetch(`${routesBase}${componentAPath}`),
+    fetch(`${routesBase}${componentBPath}`),
+  ]);
+  assert.equal(downloadA.status, 200);
+  assert.equal(downloadB.status, 200);
+  assert.deepEqual(
+    Buffer.from(await downloadA.arrayBuffer()),
+    componentABytes,
+  );
+  assert.deepEqual(
+    Buffer.from(await downloadB.arrayBuffer()),
+    componentBBytes,
+  );
+  const ambiguousStale = await fetch(
+    `${routesBase}/api/store/access/${row.accessToken}/download/2147483647`,
+  );
+  assert.equal(
+    ambiguousStale.status,
+    403,
+    "fallback ID basi tidak boleh memilih file secara ambigu pada paket multi-produk",
+  );
 });
 
-test("4f. gagal sebagian tetap paid lalu recovery melanjutkan komponen tertunda", { skip: SKIP }, async () => {
+test("4h. gagal sebagian tetap paid lalu recovery melanjutkan komponen tertunda", { skip: SKIP }, async () => {
   const [pkg] = await db
     .select()
     .from(packageRegistry)
@@ -437,7 +651,7 @@ test("4f. gagal sebagian tetap paid lalu recovery melanjutkan komponen tertunda"
   );
 });
 
-test("4c. order_id asing → jatuh ke cabang legacy (200), order kita tak tersentuh", { skip: SKIP }, async () => {
+test("4i. order_id asing → jatuh ke cabang legacy (200), order kita tak tersentuh", { skip: SKIP }, async () => {
   const r = await postWebhook({
     event: "payment_status_changed",
     data: { order_id: `LEGACY-${RUN}`, payment_status: "paid", product_name: `Produk Tak Dikenal ${RUN}`, customer: { email: TEST_EMAIL, name: "X" } },
@@ -445,4 +659,64 @@ test("4c. order_id asing → jatuh ke cabang legacy (200), order kita tak tersen
   assert.equal(r.status, 200);
   assert.notEqual(r.json.note, "api_v1 order marked paid");
   assert.equal((await getOrderRow(scalevOrderRef)).status, "paid");
+});
+
+test("4j. row legacy dengan scalev_order_id tidak dicegat korelasi api_v1", { skip: SKIP }, async () => {
+  const providerRef = `LCY${RUN.slice(-8).toUpperCase()}`;
+  const legacyRef = `legacy_probe_${RUN}`;
+  await db.insert(storeOrders).values({
+    productId: 0,
+    customerName: buyer.name,
+    customerEmail: TEST_EMAIL,
+    customerPhone: "",
+    amount: 1,
+    midtransOrderId: legacyRef,
+    accessToken: `legacy-token-${RUN}`,
+    status: "pending",
+    source: null,
+    scalevOrderId: providerRef,
+  } as any);
+  const response = await postWebhook({
+    event: "payment_status_changed",
+    data: {
+      order_id: providerRef,
+      payment_status: "paid",
+      product_name: `Produk Legacy Tak Dikenal ${RUN}`,
+      customer: { email: TEST_EMAIL, name: buyer.name },
+    },
+  });
+  assert.equal(response.status, 200);
+  assert.notEqual(response.json.type, "canonical_hosted_fulfillment");
+  assert.notEqual(response.json.note, "api_v1 order paid and fulfilled");
+  assert.equal((await getOrderRow(legacyRef)).status, "pending");
+});
+
+test("4k. row legacy tidak memotong handler subscription Scalev", { skip: SKIP }, async () => {
+  const providerRef = `SUB${RUN.slice(-8).toUpperCase()}`;
+  const legacyRef = `subscription_probe_${RUN}`;
+  await db.insert(storeOrders).values({
+    productId: 0,
+    customerName: buyer.name,
+    customerEmail: TEST_EMAIL,
+    customerPhone: "",
+    amount: 199000,
+    midtransOrderId: legacyRef,
+    accessToken: `subscription-token-${RUN}`,
+    status: "pending",
+    source: null,
+    scalevOrderId: providerRef,
+  } as any);
+  const response = await postWebhook({
+    event: "payment_status_changed",
+    data: {
+      order_id: providerRef,
+      payment_status: "paid",
+      gross_revenue: "199000",
+      product_slug: "gustafta-paket-1-bulan",
+      customer: { email: TEST_EMAIL, name: buyer.name },
+    },
+  });
+  assert.equal(response.status, 200);
+  assert.equal(response.json.type, "platform_subscription");
+  assert.equal((await getOrderRow(legacyRef)).status, "pending");
 });

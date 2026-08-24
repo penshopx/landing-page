@@ -7,7 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import {
   Bot, MessageSquare, Copy, CheckCircle2, ExternalLink,
-  Smartphone, Code2, Globe, Zap, Package, BookOpen, AlertTriangle
+  Smartphone, Code2, Globe, Zap, Package, BookOpen, AlertTriangle,
+  ClipboardCheck
 } from "lucide-react";
 import { useState } from "react";
 import { useContactNumbers } from "@/lib/contact";
@@ -282,6 +283,30 @@ export default function StoreAccess() {
                 </div>
               </CardContent>
             </Card>
+
+            {data.type === "digital" && data.levelOneDiagnostic && token && (
+              <Card
+                className="border-sky-400/30 bg-sky-400/[.08]"
+                data-testid="level-one-diagnostic-link-card"
+              >
+                <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-3">
+                    <ClipboardCheck className="mt-0.5 h-6 w-6 shrink-0 text-sky-300" />
+                    <div>
+                      <p className="font-bold text-white">Bonus diagnosis Level 1 Anda</p>
+                      <p className="mt-1 text-sm text-gray-300">
+                        Pilih satu: Cek Kesiapan SBU atau Cek Kesiapan SKK.
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild className="bg-sky-500 text-white hover:bg-sky-600">
+                    <a href="#level-one-diagnostic" data-testid="button-open-level-one-diagnostic">
+                      Mulai diagnosis SBU/SKK
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
             {/* ── Digital Product: Download Buttons ── */}
             {(data.type === "digital" || (data.type === "canonical" && !!data.downloads?.length)) && (

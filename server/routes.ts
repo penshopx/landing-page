@@ -8737,15 +8737,32 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
 
   // GET /api/store/access/:token/download/:fileId — stream a specific file by DB id
   // for multi-file paid fulfillment. Verifies token paid + file belongs to product.
-  app.get("/api/store/access/:token/download/:fileId", async (req, res) => {
+  const servePaidStoreAccessFile = async (req: any, res: any) => {
     try {
       const order = await storage.getStoreOrderByAccessToken(req.params.token);
       if (!order) return res.status(404).json({ error: "Access token tidak valid" });
       if (String(order.status).toLowerCase() !== "paid") {
         return res.status(403).json({ error: "Pembayaran belum dikonfirmasi" });
       }
-      const fileId = parseInt(req.params.fileId, 10);
-      if (!fileId || isNaN(fileId)) return res.status(400).json({ error: "File ID tidak valid" });
+      const requestedRole =
+        typeof req.params.role === "string" ? req.params.role.trim().toLowerCase() : "";
+      if (requestedRole && !/^[a-z0-9_-]{1,64}$/.test(requestedRole)) {
+        return res.status(400).json({ error: "Peran file tidak valid" });
+      }
+      const requestedProductRegistryId =
+        typeof req.params.productRegistryId === "string"
+          ? req.params.productRegistryId.trim()
+          : "";
+      if (
+        requestedProductRegistryId &&
+        !/^[A-Za-z0-9_-]{1,40}$/.test(requestedProductRegistryId)
+      ) {
+        return res.status(400).json({ error: "ID produk tidak valid" });
+      }
+      const fileId = requestedRole ? null : parseInt(req.params.fileId, 10);
+      if (!requestedRole && (!fileId || isNaN(fileId))) {
+        return res.status(400).json({ error: "File ID tidak valid" });
+      }
 
       if ((order as any).source === "api_v1") {
         const { getCanonicalOrderAccess } = await import("./order-fulfillment");
@@ -8753,24 +8770,68 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
         if (access.productRegistryIds.length === 0) {
           return res.status(403).json({ error: "Akses produk belum selesai diproses" });
         }
-        const fileRow = await pool.query<{
+        const allowedProductRegistryIds = requestedProductRegistryId
+          ? access.productRegistryIds.includes(requestedProductRegistryId)
+            ? [requestedProductRegistryId]
+            : []
+          : access.productRegistryIds;
+        if (allowedProductRegistryIds.length === 0) {
+          return res.status(403).json({ error: "Produk tidak dimiliki oleh order ini" });
+        }
+        if (requestedRole && allowedProductRegistryIds.length !== 1) {
+          return res.status(400).json({ error: "Produk file harus ditentukan" });
+        }
+        type PaidFileRow = {
           file_name: string;
           mime_type: string;
           size_bytes: number;
           content: Buffer;
           sha256: string;
-        }>(
-          `SELECT file_name, mime_type, size_bytes, content, sha256
-             FROM digital_product_files
-            WHERE id=$1
-              AND product_registry_id = ANY($2::text[])
-            LIMIT 1`,
-          [fileId, access.productRegistryIds],
-        );
-        if (!fileRow.rows[0]) {
+        };
+        let file = requestedRole
+          ? (
+              await pool.query<PaidFileRow>(
+                `SELECT file_name, mime_type, size_bytes, content, sha256
+                   FROM digital_product_files
+                  WHERE role=$1
+                    AND product_registry_id = ANY($2::text[])
+                  ORDER BY sort_order
+                  LIMIT 1`,
+                [requestedRole, allowedProductRegistryIds],
+              )
+            ).rows[0]
+          : (
+              await pool.query<PaidFileRow>(
+                `SELECT file_name, mime_type, size_bytes, content, sha256
+                   FROM digital_product_files
+                  WHERE id=$1
+                    AND product_registry_id = ANY($2::text[])
+                  LIMIT 1`,
+                [fileId, allowedProductRegistryIds],
+              )
+            ).rows[0];
+        if (!file && fileId) {
+          const idStillExists = await pool.query(
+            `SELECT 1 FROM digital_product_files WHERE id=$1 LIMIT 1`,
+            [fileId],
+          );
+          if (!idStillExists.rows[0] && allowedProductRegistryIds.length === 1) {
+            file = (
+              await pool.query<PaidFileRow>(
+                `SELECT file_name, mime_type, size_bytes, content, sha256
+                   FROM digital_product_files
+                  WHERE role='main'
+                    AND product_registry_id = ANY($1::text[])
+                  ORDER BY sort_order
+                  LIMIT 1`,
+                [allowedProductRegistryIds],
+              )
+            ).rows[0];
+          }
+        }
+        if (!file) {
           return res.status(403).json({ error: "File tidak dimiliki oleh order ini" });
         }
-        const file = fileRow.rows[0];
         const content = Buffer.isBuffer(file.content)
           ? file.content
           : Buffer.from(file.content);
@@ -8808,25 +8869,63 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       );
       const productRegistryId = regRow.rows[0]?.product_id;
       if (!productRegistryId) return res.status(404).json({ error: "Registri produk tidak ditemukan" });
+      if (
+        requestedProductRegistryId &&
+        requestedProductRegistryId !== productRegistryId
+      ) {
+        return res.status(403).json({ error: "Produk tidak dimiliki oleh order ini" });
+      }
 
       // Verify file belongs to this product (anti-IDOR / cross-product denied)
-      const fileRow = await pool.query<{
+      type PaidFileRow = {
         file_name: string;
         mime_type: string;
         size_bytes: number;
         content: Buffer;
         sha256: string;
-      }>(
-        `SELECT file_name, mime_type, size_bytes, content, sha256
-           FROM digital_product_files
-          WHERE id=$1 AND product_registry_id=$2
-          LIMIT 1`,
-        [fileId, productRegistryId],
-      );
-      if (!fileRow.rows[0]) {
+      };
+      let file = requestedRole
+        ? (
+            await pool.query<PaidFileRow>(
+              `SELECT file_name, mime_type, size_bytes, content, sha256
+                 FROM digital_product_files
+                WHERE role=$1 AND product_registry_id=$2
+                ORDER BY sort_order
+                LIMIT 1`,
+              [requestedRole, productRegistryId],
+            )
+          ).rows[0]
+        : (
+            await pool.query<PaidFileRow>(
+              `SELECT file_name, mime_type, size_bytes, content, sha256
+                 FROM digital_product_files
+                WHERE id=$1 AND product_registry_id=$2
+                LIMIT 1`,
+              [fileId, productRegistryId],
+            )
+          ).rows[0];
+      if (!file && fileId) {
+        const idStillExists = await pool.query(
+          `SELECT 1 FROM digital_product_files WHERE id=$1 LIMIT 1`,
+          [fileId],
+        );
+        if (!idStillExists.rows[0]) {
+          file = (
+            await pool.query<PaidFileRow>(
+              `SELECT file_name, mime_type, size_bytes, content, sha256
+                 FROM digital_product_files
+                WHERE role='main' AND product_registry_id=$1
+                ORDER BY sort_order
+                LIMIT 1`,
+              [productRegistryId],
+            )
+          ).rows[0];
+        }
+      }
+      if (!file) {
         return res.status(403).json({ error: "File tidak dimiliki oleh produk ini" });
       }
-      const f = fileRow.rows[0];
+      const f = file;
       const buf = Buffer.isBuffer(f.content) ? f.content : Buffer.from(f.content);
       const safeAsciiName = f.file_name.replace(/["\r\n]/g, "_");
       res.setHeader("Content-Type", f.mime_type);
@@ -8839,7 +8938,19 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
       console.error("[StoreAccess/fileId] Gagal mengirim file:", error);
       return res.status(500).json({ error: "Gagal menyiapkan file" });
     }
-  });
+  };
+  app.get(
+    "/api/store/access/:token/download/product/:productRegistryId/role/:role",
+    servePaidStoreAccessFile,
+  );
+  app.get(
+    "/api/store/access/:token/download/role/:role",
+    servePaidStoreAccessFile,
+  );
+  app.get(
+    "/api/store/access/:token/download/:fileId",
+    servePaidStoreAccessFile,
+  );
 
   // GET /api/store/access/:token/download — stream a digital file only after
   // the opaque order token has been verified as paid.
@@ -8982,6 +9093,9 @@ Sampaikan dengan natural, misalnya: "Untuk jawaban yang lebih lengkap dan pembua
                 baseUrl,
               );
               downloads = augmented.downloads;
+              if (downloads[0]?.downloadUrl) {
+                downloadUrl = downloads[0].downloadUrl;
+              }
               (res.locals as any).levelOneDiagnostic =
                 augmented.levelOneDiagnostic;
             }
@@ -21545,7 +21659,10 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         let apiOrderRows = await dbConn
           .select({ id: storeOrdersTable.id, status: storeOrdersTable.status, midtransOrderId: storeOrdersTable.midtransOrderId, scalevOrderId: storeOrdersTable.scalevOrderId })
           .from(storeOrdersTable)
-          .where(eq(storeOrdersTable.scalevOrderId, String(orderId)))
+          .where(and(
+            eq(storeOrdersTable.scalevOrderId, String(orderId)),
+            eq(storeOrdersTable.source, "api_v1"),
+          ))
           .limit(1);
         if (!apiOrderRows[0]) {
           const metaRef = String((data as any)?.metadata?.order_ref || "").trim();
@@ -21604,87 +21721,55 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         console.error("[Scalev webhook] api_v1 correlation lookup error:", (corrErr as Error)?.message);
       }
 
-      // ── SBU-SKK funnel products with future official Scalev variants ────────
-      // Match only the canonical registry variant_unique_id. Until an official
-      // mapping is saved, this branch is inert and manual WA fulfillment remains.
-      const sbuVariantUniqueIds = new Set<string>();
-      const collectSbuVariant = (value: any): void => {
-        if (value == null) return;
-        if (typeof value === "string") {
-          if (value.startsWith("variant_")) sbuVariantUniqueIds.add(value);
-          return;
-        }
-        if (Array.isArray(value)) {
-          value.forEach(collectSbuVariant);
-          return;
-        }
-        if (typeof value === "object") {
-          collectSbuVariant(value.variant_id);
-          collectSbuVariant(value.variantId);
-          collectSbuVariant(value.id);
-          collectSbuVariant(value.variant_unique_id);
-          collectSbuVariant(value.variantUniqueId);
-          collectSbuVariant(value.unique_id);
-        }
-      };
-      collectSbuVariant(data.variant_id);
-      collectSbuVariant(data.variantId);
-      collectSbuVariant(data.variant);
-      collectSbuVariant(data.variants);
-      collectSbuVariant(data.items);
-      collectSbuVariant(data.line_items);
-      collectSbuVariant(data.order_items);
-
-      if (customerEmail && sbuVariantUniqueIds.size > 0) {
-        const { SBU_SKK_FUNNEL } = await import("@shared/sbu-skk-ebook");
-        const canonicalProductIds = [
-          SBU_SKK_FUNNEL.tutor.registryProductId,
-          SBU_SKK_FUNNEL.bundle.registryProductId,
-          SBU_SKK_FUNNEL.aiSpecialist.registryProductId,
-        ];
-        const matchedProducts = await pool.query<{ product_id: string }>(
-          `SELECT product_id
-             FROM product_registry
-            WHERE status='ACTIVE'
-              AND product_id = ANY($1::text[])
-              AND scalev_variant_unique_id = ANY($2::text[])`,
-          [canonicalProductIds, Array.from(sbuVariantUniqueIds)],
+      // ── Paid order created directly in the hosted Scalev storefront ─────────
+      // These orders never pass through POST /api/v1/orders, so create one
+      // canonical local order from the exact registry variant mapping before
+      // falling through to legacy subscription/digital-product handling.
+      try {
+        const { reconcileHostedScalevOrder } = await import(
+          "./scalev-hosted-order"
         );
-        if ((matchedProducts.rowCount || 0) > 1) {
-          throw new Error(
-            `Variant Scalev SBU-SKK cocok ke ${matchedProducts.rowCount} produk; fulfillment dihentikan.`,
-          );
-        }
-        if (matchedProducts.rows[0]) {
-          const {
-            fulfillSbuSkkOffer,
-            getSbuSkkOfferKeyByProductId,
-          } = await import("./sbu-skk-funnel");
-          const offerKey = getSbuSkkOfferKeyByProductId(
-            matchedProducts.rows[0].product_id,
-          );
-          if (!offerKey) {
-            throw new Error("Produk registry SBU-SKK tidak memiliki konfigurasi fulfillment.");
-          }
-          const fulfilled = await fulfillSbuSkkOffer({
-            offerKey,
-            buyerName: customerName || "Customer",
-            buyerEmail: customerEmail,
-            buyerWhatsapp: customerPhone || null,
-            amount: Math.round(grossRevenue),
-            source: "scalev",
-            providerOrderRef: String(orderId),
-            appBaseUrl: getServerBaseUrl(req),
-          });
+        const itemNames = Object.keys(data.final_variants || data.variants || {});
+        const hosted = await reconcileHostedScalevOrder({
+          providerOrderRef: String(orderId),
+          variantSources: [
+            data.variant_id,
+            data.variantId,
+            data.variant,
+            data.variants,
+            data.items,
+            data.line_items,
+            data.order_items,
+          ],
+          customerName: customerName || "Customer",
+          customerEmail,
+          customerPhone,
+          amount: Math.round(grossRevenue),
+          itemName: data.product_name || data.name || itemNames[0] || "",
+          appBaseUrl: getServerBaseUrl(req),
+        });
+        if (hosted.matched) {
           console.log(
-            `[Scalev] SBU-SKK ${offerKey} fulfilled for order ${orderId}: ${fulfilled.results.join(",")}`,
+            `✅ [Scalev webhook] Hosted order ${orderId} fulfillment=${hosted.fulfillment} (${(hosted.results || []).join(",")})`,
           );
           return res.status(200).json({
             received: true,
-            type: "sbu_skk_fulfillment",
-            offerKey,
+            type: "canonical_hosted_fulfillment",
+            fulfillment: hosted.fulfillment,
           });
         }
+      } catch (hostedError) {
+        // Payment remains paid. A durable hosted order (when mapping succeeded)
+        // is picked up by the same recovery sweep as api_v1 orders.
+        console.error(
+          `[Scalev webhook] Hosted order ${orderId} paid tetapi fulfillment tertunda:`,
+          (hostedError as Error)?.message,
+        );
+        return res.status(200).json({
+          received: true,
+          type: "canonical_hosted_fulfillment",
+          note: "hosted Scalev order paid; fulfillment pending retry",
+        });
       }
 
       // Check duplicate (use midtransOrderId field to store scalev orderId)

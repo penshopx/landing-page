@@ -98,3 +98,4 @@
 - [Paid-order retry locks](paid-order-retry-locks.md) — a retry due-check must run again after taking the per-order lock, or parallel workers defeat backoff sequentially.
 - [External agent runtime adoption](external-agent-runtime-adoption.md) — OpenClaw/Hermes stay optional and pilot-led; earn production scope through safety and proven value.
 - [Carousel video loop resilience](carousel-video-loop-resilience.md) — muted autoplay needs readiness retries; finish via time threshold plus ended and timer fallbacks.
+- [Stable paid downloads](stable-paid-download-identifiers.md) — canonical URLs use product+role; stale numeric fallback only when one entitled product is unambiguous.

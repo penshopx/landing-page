@@ -242,6 +242,7 @@ function safeEq(a: string, b: string): boolean {
 }
 
 const SIGNATURE_HEADER_CANDIDATES = [
+  "x-scalev-hmac-sha256",
   "x-scalev-signature",
   "x-signature",
   "x-webhook-signature",

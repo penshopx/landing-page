@@ -598,7 +598,10 @@ export async function getPaidDownloads(
     role: row.role,
     mimeType: row.mime_type,
     sizeBytes: row.size_bytes,
-    downloadUrl: `${baseUrl}/api/store/access/${encodeURIComponent(accessToken)}/download/${row.id}`,
+    downloadUrl:
+      `${baseUrl}/api/store/access/${encodeURIComponent(accessToken)}` +
+      `/download/product/${encodeURIComponent(productRegistryId)}` +
+      `/role/${encodeURIComponent(row.role)}`,
   }));
 }
 
@@ -699,9 +702,14 @@ export async function getLevelOneDiagnosticAccess(
   };
 }
 
-export type SbuSkkOfferKey = "tutor" | "bundle" | "ai-specialist";
+export type SbuSkkOfferKey =
+  | "level-one"
+  | "tutor"
+  | "bundle"
+  | "ai-specialist";
 
 const SBU_SKK_PRODUCT_TO_OFFER = new Map<string, SbuSkkOfferKey>([
+  [SBU_SKK_EBOOK.registryProductId, "level-one"],
   [SBU_SKK_FUNNEL.tutor.registryProductId, "tutor"],
   [SBU_SKK_FUNNEL.bundle.registryProductId, "bundle"],
   [SBU_SKK_FUNNEL.aiSpecialist.registryProductId, "ai-specialist"],
@@ -739,7 +747,7 @@ export async function fulfillSbuSkkOffer(
   let entitlementId: number | null = null;
   let durableBundleOrderId: number | null = null;
 
-  if (input.offerKey === "bundle") {
+  if (input.offerKey === "level-one" || input.offerKey === "bundle") {
     const storeProduct = await pool.query<{ id: number }>(
       `SELECT DISTINCT sp.id
          FROM digital_product_files dpf
@@ -760,7 +768,7 @@ export async function fulfillSbuSkkOffer(
     }
     const stableOrderRef = input.providerOrderRef
       ? `scalev_${fulfillmentRef}`
-      : `bundle_${fulfillmentRef}`;
+      : `${input.offerKey === "level-one" ? "level1" : "bundle"}_${fulfillmentRef}`;
     const { ensureDigitalDeliveryOrder } = await import(
       "./lib/digital-delivery-outbox"
     );

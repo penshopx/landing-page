@@ -10,3 +10,4 @@ description: Gotchas when doing DB work from the code_execution JS sandbox.
 - **`executeSql` returns the command tag, not `RETURNING` rows.** An `INSERT ... RETURNING id` prints `INSERT 0 1`, not the id. To capture generated ids, run a follow-up `SELECT ... WHERE <unique cols>` (e.g. by slug) after the insert.
 - **SELECT output is CSV** with a header line, then rows. Parse accordingly.
 - For long text (system prompts) inserted via `executeSql`, escape single quotes by doubling them (`'` → `''`); jsonb via a JSON string literal cast `...'::jsonb`.
+- **Do not assume project ESM semantics outside the project root.** Temporary TypeScript execution can be treated as CommonJS there, so top-level `await` and dynamic import-specifier variables are not portable.

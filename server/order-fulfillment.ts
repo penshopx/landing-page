@@ -24,6 +24,12 @@ type FulfillmentOrder = {
   fulfillment_attempted_at: Date | null;
 };
 
+const CANONICAL_ORDER_SOURCES = new Set(["api_v1", "scalev_hosted"]);
+
+function isCanonicalOrderSource(source: string | null): boolean {
+  return CANONICAL_ORDER_SOURCES.has(String(source || ""));
+}
+
 export type CanonicalAccessItem = {
   productRegistryId: string;
   name: string;
@@ -182,7 +188,10 @@ async function grantComponent(
           : Math.max(1, Math.trunc(component.usageLimit)),
     });
     results.push(...fulfilled.results);
-    if (offerKey !== "ai-specialist") return results;
+    // Level 1 also keeps a generic registry entitlement so canonical access
+    // manifests remain complete, while its durable digital order supplies the
+    // access token used by the one-time SBU/SKK diagnosis.
+    if (offerKey !== "ai-specialist" && offerKey !== "level-one") return results;
   }
 
   const user = await pool.query<{ id: string }>(
@@ -229,8 +238,8 @@ export async function fulfillCanonicalOrder(params: {
   try {
     await lockClient.query("SELECT pg_advisory_lock($1)", [params.orderId]);
     const order = await loadOrder(params.orderId);
-    if (order.source !== "api_v1") {
-      throw new Error("Order bukan berasal dari Unified Order API.");
+    if (!isCanonicalOrderSource(order.source)) {
+      throw new Error("Order bukan berasal dari jalur order kanonik.");
     }
     if (order.status !== "paid") {
       throw new Error("Fulfillment hanya dapat dijalankan untuk order paid.");
@@ -329,7 +338,7 @@ export async function reconcileCanonicalOrderFulfillment(
   }>(
     `SELECT id, scalev_order_id
        FROM store_orders
-      WHERE source='api_v1'
+       WHERE source IN ('api_v1', 'scalev_hosted')
         AND status='paid'
         AND (
           fulfillment_status='pending'
@@ -389,7 +398,7 @@ export async function getCanonicalOrderAccess(orderId: number): Promise<{
   productRegistryIds: string[];
 }> {
   const order = await loadOrder(orderId);
-  if (order.source !== "api_v1" || order.status !== "paid") {
+  if (!isCanonicalOrderSource(order.source) || order.status !== "paid") {
     return { items: [], productRegistryIds: [] };
   }
   const providerRef = String(order.scalev_order_id || "").trim();
