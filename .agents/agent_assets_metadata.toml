@@ -229,3 +229,10 @@ uri = "file://attached_assets/ebook/kas-merah-premium.pdf"
 type = "pdf"
 title = "EBOOK PREMIUM (revisi) — KAS MERAH, RAB HIJAU, 98 hal."
 description = "Lampiran A1–A6 lengkap; kotak warna kuadran & simbol status kini tampil benar. Password: GUSTAFTA2026"
+
+[[outputs]]
+id = "D1wq1PXazD3QUGXyouRld"
+uri = "file://client/public/og-gustafta-platform.png"
+type = "image"
+title = "Social Preview Gustafta"
+description = "Gambar pratinjau tautan 1200×630 dengan logo resmi Gustafta untuk WhatsApp, Facebook, LinkedIn, dan X."
