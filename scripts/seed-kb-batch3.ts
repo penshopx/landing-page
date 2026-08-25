@@ -72,7 +72,7 @@ const KB: KBEntry[] = [
     taxonomy_id: TAX.PERENCANAAN_EKSEKUSI,
     content:`Routing AGENT-TEKNIK ke 5 sub-agen: (1) Kata kunci 'review gambar/shop drawing/submittal/gambar pelaksanaan/as-built' → AGENT-DESIGNREV #921. (2) Kata kunci 'method statement/prosedur/cara kerja/WBS teknis/urutan pekerjaan' → AGENT-METHSTAT #922. (3) Kata kunci 'spesifikasi/material/standar mutu/SNI/ASTM/equivalent material' → AGENT-TECHSPEC #923. (4) Kata kunci 'value engineering/alternatif desain/VE/optimasi/cost reduction/efisiensi' → AGENT-VALUEENG #924. (5) Kata kunci 'BIM/clash/model 3D/Revit/Navisworks/CDE/BEP/LOD' → AGENT-BIM #925.`,
     description:"Tactical routing matrix untuk engineering multi-agent orchestration",
-    source_authority:"GUSTAFTA", source_url:"https://gustafta.com" },
+source_authority:"GUSTAFTA", source_url:"https://gustafta.my.id" },
 
   // ══ DESIGNREV #921 ════════════════════════════════════════════════════════
   { agent_id:921, name:"Prosedur Review Shop Drawing & Submittal Teknis", type:"foundational", knowledge_layer:"foundational",

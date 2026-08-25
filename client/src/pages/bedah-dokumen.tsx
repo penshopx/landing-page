@@ -208,7 +208,7 @@ ${(meta.rekomendasi ?? []).length > 0 ? `
 
 <div class="footer">
   <div>Dibuat oleh: <strong>${bureauName || "Biro Jasa Anda"}</strong></div>
-  <div>Didukung teknologi <strong>Gustafta AI</strong> &nbsp;|&nbsp; gustafta.com</div>
+  <div>Didukung teknologi <strong>Gustafta AI</strong> &nbsp;|&nbsp; gustafta.my.id</div>
 </div>
 
 <button class="print-btn no-print" onclick="window.print()">🖨️ Simpan / Cetak PDF</button>

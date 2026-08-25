@@ -403,7 +403,7 @@ export default function MySubscriptionPage() {
             target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
             Hubungi support via WhatsApp
           </a>{" "}atau{" "}
-          <a href="mailto:hello@gustafta.com" className="text-primary hover:underline">hello@gustafta.com</a>
+          <a href="mailto:hello@gustafta.my.id" className="text-primary hover:underline">hello@gustafta.my.id</a>
         </div>
       </div>
     </div>

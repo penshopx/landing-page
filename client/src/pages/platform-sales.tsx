@@ -857,7 +857,7 @@ export default function PlatformSalesPage() {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </a>
-              <a href="mailto:hello@gustafta.com?subject=Pertanyaan tentang Gustafta Apps">
+              <a href="mailto:hello@gustafta.my.id?subject=Pertanyaan tentang Gustafta Apps">
                 <Button size="lg" variant="outline" className="w-full sm:w-auto gap-2 px-8 py-6 text-lg border-primary/30" data-testid="button-final-email">
                   <Mail className="h-5 w-5" />
                   Kirim Email

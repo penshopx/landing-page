@@ -628,7 +628,7 @@ export default function GustaFtaFrameworkPage() {
               GUSTAFTA hadir untuk membantu Anda mengubahnya menjadi AI yang bekerja.
             </p>
             <div className="mt-6 text-xs text-blue-200">
-              GUSTAFTA · Platform untuk Para Perakit AI · gustafta.com
+              GUSTAFTA · Platform untuk Para Perakit AI · gustafta.my.id
             </div>
           </div>
         </section>

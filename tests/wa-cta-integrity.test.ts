@@ -208,7 +208,7 @@ describe("admin.tsx WA phone validation guard", () => {
   test("E.164 regex /^62\\d{8,}$/ rejects email-as-phone", () => {
     const re = /^62\d{8,}$/;
     assert.ok(!re.test("user@example.com"), "regex must reject email addresses");
-    assert.ok(!re.test("admin@gustafta.com"), "regex must reject email addresses");
+    assert.ok(!re.test("admin@gustafta.my.id"), "regex must reject email addresses");
   });
 
   test("E.164 regex /^62\\d{8,}$/ rejects empty string", () => {

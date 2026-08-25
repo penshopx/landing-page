@@ -102,7 +102,7 @@ export default function VerifySertifikat() {
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <Link href="/" className="text-slate-400 hover:text-white text-sm flex items-center gap-1">
-            <ExternalLink className="h-3.5 w-3.5" /> gustafta.com
+            <ExternalLink className="h-3.5 w-3.5" /> gustafta.my.id
           </Link>
           <div className="flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 rounded-full px-3 py-1">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />

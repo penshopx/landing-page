@@ -144,7 +144,7 @@ export async function fetchGoogleNews(
   const res = await fetch(url, {
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (compatible; GustaftaResearch/1.0; +https://gustafta.com)",
+  "Mozilla/5.0 (compatible; GustaftaResearch/1.0; +https://gustafta.my.id)",
     },
     signal: AbortSignal.timeout(20000),
   });

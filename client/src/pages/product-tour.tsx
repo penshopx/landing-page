@@ -202,7 +202,7 @@ const TOUR_STEPS: TourStep[] = [
           <pre className="text-xs text-green-400 font-mono leading-relaxed whitespace-pre-wrap">
 {`<!-- Gustafta Widget -->
 <script 
-  src="https://app.gustafta.com
+  src="https://gustafta.my.id
        /widget/loader.js"
   data-agent-id="123">
 </script>

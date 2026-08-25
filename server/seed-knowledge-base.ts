@@ -747,7 +747,7 @@ Orchestrator (DeepSeek Classifier) → ~$0.0001/call
 **Cara Akses Admin Panel:**
 1. Login ke Gustafta
 2. Klik tombol "Admin" di navbar (hanya muncul jika akun Anda adalah admin)
-3. Atau langsung akses URL: gustafta.com/admin
+3. Atau langsung akses URL: gustafta.my.id/admin
 
 **Cara Menjadi Admin:**
 - Ditetapkan oleh sistem melalui variabel ADMIN_USER_IDS (ID user terpercaya)

@@ -3256,7 +3256,7 @@ export default function AdminPage() {
                         <p className="font-semibold text-blue-700 dark:text-blue-300">📋 Langkah setup domain di Brevo:</p>
                         <ol className="text-xs text-blue-700 dark:text-blue-300 space-y-1.5 list-decimal list-inside">
                           <li>Login ke <a href="https://app.brevo.com" target="_blank" rel="noreferrer" className="underline">app.brevo.com</a> → Senders &amp; IPs → Domains</li>
-                          <li>Klik <strong>Add a new domain</strong> → masukkan <code className="bg-blue-100 dark:bg-blue-900/40 px-1 rounded">gustafta.com</code></li>
+                          <li>Klik <strong>Add a new domain</strong> → masukkan <code className="bg-blue-100 dark:bg-blue-900/40 px-1 rounded">gustafta.my.id</code></li>
                           <li>Brevo akan tampilkan 3 DNS records: SPF, DKIM, dan DMARC</li>
                           <li>Tambahkan records tersebut ke DNS manager domain (Namecheap/Cloudflare/dll)</li>
                           <li>Kembali ke Brevo → klik <strong>Authenticate</strong> → tunggu propagasi (5–30 menit)</li>
@@ -3323,16 +3323,16 @@ export default function AdminPage() {
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">DNS Records yang Diperlukan (referensi)</p>
                     <div className="space-y-2 text-xs font-mono">
                       <div className="bg-background rounded p-2 border">
-                        <span className="text-muted-foreground">SPF (TXT @ gustafta.com):</span><br />
+                        <span className="text-muted-foreground">SPF (TXT @ gustafta.my.id):</span><br />
                         <span className="text-green-600 dark:text-green-400 break-all">v=spf1 include:spf.brevo.com mx ~all</span>
                       </div>
                       <div className="bg-background rounded p-2 border">
-                        <span className="text-muted-foreground">DKIM (TXT mail._domainkey.gustafta.com):</span><br />
+                        <span className="text-muted-foreground">DKIM (TXT mail._domainkey.gustafta.my.id):</span><br />
                         <span className="text-muted-foreground text-[10px]">→ Salin nilai DKIM dari dashboard Brevo (unik per akun)</span>
                       </div>
                       <div className="bg-background rounded p-2 border">
-                        <span className="text-muted-foreground">DMARC (TXT _dmarc.gustafta.com):</span><br />
-                        <span className="text-green-600 dark:text-green-400 break-all">v=DMARC1; p=none; rua=mailto:admin@gustafta.com</span>
+                        <span className="text-muted-foreground">DMARC (TXT _dmarc.gustafta.my.id):</span><br />
+                        <span className="text-green-600 dark:text-green-400 break-all">v=DMARC1; p=none; rua=mailto:admin@gustafta.my.id</span>
                       </div>
                     </div>
                   </div>

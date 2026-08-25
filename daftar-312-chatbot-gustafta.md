@@ -364,4 +364,4 @@ Update: Juli 2026 | Total: 312 | Tim Multi-Agen: 67 | Spesialis: 245
 | 2 | **Gustafta Helpdesk** | Asisten Agentic resmi platform Gustafta — selalu siap bantu! | 📋 Analisis | /demo/gustafta-helpdesk |
 
 ---
-*Gustafta AI Platform · WA: 081287941900 · gustafta.com/store*
+*Gustafta AI Platform · WA: 081287941900 · gustafta.my.id/store*

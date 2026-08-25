@@ -19,7 +19,7 @@ cloning the inline Brevo fetch from `server/replit_integrations/auth/emailAuth.t
 
 **Why:** `BREVO_API_KEY` is a secret that can be absent (see
 `email-verification-brevo.md`); emails must degrade silently in dev and never
-crash prod. Sender defaults: `BREVO_SENDER_EMAIL` or `noreply@gustafta.com`.
+crash prod. Sender defaults: `BREVO_SENDER_EMAIL` or `noreply@gustafta.my.id`.
 Dashboard CTA links derive from `REPLIT_DEV_DOMAIN`.
 
 **How to apply:** import from `./lib/email`, build the message, fire-and-forget

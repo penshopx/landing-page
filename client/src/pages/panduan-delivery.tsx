@@ -313,7 +313,7 @@ function getProducts(contact: ContactDisplay): Product[] {
         label: "Deliver: share link demo / embed code / widget",
         detail: "Pilih salah satu cara deliver:\n(A) Link Demo: /demo/:agentId — halaman chat publik langsung\n(B) Embed Widget: kode <script> yang bisa dipasang di website customer\n(C) Akses Dashboard: customer login dan kelola sendiri",
         tip: "Link demo paling mudah untuk delivery cepat. Embed widget paling populer untuk integrasi ke website customer.",
-        code: "<script src=\"https://gustafta.com/widget.js\" data-agent=\"AGENT_ID\"></script>",
+        code: "<script src=\"https://gustafta.my.id/widget.js\" data-agent=\"AGENT_ID\"></script>",
       },
       {
         who: "customer",

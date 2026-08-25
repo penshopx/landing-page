@@ -89,8 +89,8 @@ export default function LmsVerify() {
               </div>
               <div className="w-full max-w-xs mt-2 rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-xs text-red-700">
                 Jika Anda yakin sertifikat ini valid, hubungi{" "}
-                <a href="mailto:hello@gustafta.com" className="underline font-medium">
-                  hello@gustafta.com
+                <a href="mailto:hello@gustafta.my.id" className="underline font-medium">
+                  hello@gustafta.my.id
                 </a>
               </div>
             </div>
@@ -178,7 +178,7 @@ export default function LmsVerify() {
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-slate-700">Gustafta Academy</p>
-                      <p className="text-xs text-slate-400">gustafta.com/academy</p>
+                      <p className="text-xs text-slate-400">gustafta.my.id/academy</p>
                     </div>
                   </div>
                   <p className="text-xs text-slate-400 text-right">

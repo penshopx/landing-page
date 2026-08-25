@@ -263,7 +263,7 @@ const AFFILIATE_STEPS = [
             <p className="text-xs font-bold text-gray-500 mb-3">🔗 Link Affiliate Personalmu</p>
             <div className="bg-violet-50 border border-violet-300 rounded-xl p-3 mb-3">
               <p className="text-[10px] text-violet-500 mb-1 font-medium">Link Unikmu</p>
-              <p className="text-xs font-mono text-violet-800 break-all">gustafta.com/ref/<strong>ahmad-fauzi-x7k2</strong></p>
+              <p className="text-xs font-mono text-violet-800 break-all">gustafta.my.id/ref/<strong>ahmad-fauzi-x7k2</strong></p>
             </div>
             <button
               onClick={() => { setCopied(true); setTimeout(() => setCopied(false), 2000); }}
@@ -296,7 +296,7 @@ const AFFILIATE_STEPS = [
           <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-3">
             <p className="text-[10px] text-green-600 font-bold mb-1">📋 Template WhatsApp Broadcast</p>
             <p className="text-xs text-gray-700 leading-relaxed italic">
-              "Teman-teman kontraktor, ada tools AI baru yang bisa bantu persiapan SKK & SBU kamu lebih cepat. Coba gratis dulu di sini: gustafta.com/ref/ahmad-fauzi-x7k2"
+              "Teman-teman kontraktor, ada tools AI baru yang bisa bantu persiapan SKK & SBU kamu lebih cepat. Coba gratis dulu di sini: gustafta.my.id/ref/ahmad-fauzi-x7k2"
             </p>
           </div>
           <p className="text-[10px] text-gray-500 mb-2 font-medium">Bagikan ke:</p>

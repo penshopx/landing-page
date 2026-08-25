@@ -139,7 +139,7 @@ describe("LmsVerify — studentName fallback email-prefix", () => {
     });
 
     expect(screen.getAllByText(CODE).length).toBeGreaterThan(0);
-    expect(screen.getByText("hello@gustafta.com")).toBeTruthy();
+    expect(screen.getByText("hello@gustafta.my.id")).toBeTruthy();
     expect(screen.queryByText("Sertifikat Valid & Asli")).toBeNull();
     expect(screen.queryByText(EMAIL_PREFIX)).toBeNull();
   });

@@ -21572,7 +21572,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
         orderId: `test_${Date.now()}`,
         value: 245000,
         currency: "IDR",
-        email: req.body?.email || "test@gustafta.com",
+        email: req.body?.email || "test@gustafta.my.id",
         phone: req.body?.phone || "081234567890",
         name: req.body?.name || "Test Pembeli",
         contentName: "Tes Meta CAPI Gustafta",
@@ -22827,7 +22827,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     try {
       const { sendEmail } = await import("./lib/email");
       // Recipient: configurable via system_config key "brevo_alert_email", fallback ke env/hardcode
-      let adminEmail = process.env.BREVO_ALERT_EMAIL || "support@gustafta.com";
+      let adminEmail = process.env.BREVO_ALERT_EMAIL || "support@gustafta.my.id";
       try {
         const cfgRows = await db.select({ value: systemConfig.value })
           .from(systemConfig).where(eq(systemConfig.key, "brevo_alert_email")).limit(1);
@@ -23025,7 +23025,7 @@ Return HANYA JSON berikut (tanpa penjelasan lain):
     const total = _brevoStats.delivered + _brevoStats.bounced + _brevoStats.spam;
     const bounceRate = total > 0 ? ((_brevoStats.bounced + _brevoStats.spam) / total) : 0;
     // Ambil konfigurasi alert recipient dari system_config
-    let alertRecipient = process.env.BREVO_ALERT_EMAIL || "support@gustafta.com";
+    let alertRecipient = process.env.BREVO_ALERT_EMAIL || "support@gustafta.my.id";
     try {
       const cfgRows = await db.select({ value: systemConfig.value })
         .from(systemConfig).where(eq(systemConfig.key, "brevo_alert_email")).limit(1);
