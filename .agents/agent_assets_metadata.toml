@@ -234,5 +234,5 @@ description = "Lampiran A1–A6 lengkap; kotak warna kuadran & simbol status kin
 id = "D1wq1PXazD3QUGXyouRld"
 uri = "file://client/public/og-gustafta-platform.png"
 type = "image"
-title = "Social Preview Gustafta — Kotak Proporsional"
-description = "Kotak Workroom telah dipendekkan mengikuti panjang teks dengan padding kiri-kanan yang seimbang."
+title = "Social Preview Gustafta — Spasi Final"
+description = "Label Workroom diperbesar, jarak vertikal diperjelas, dan teks Kontraktor digeser agar terpisah dari label Untuk."
