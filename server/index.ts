@@ -189,6 +189,7 @@ import { seedSbuSkkFunnel } from "./seed-sbu-skk-funnel";
 import { ensureSbuSkkFunnelSchema } from "./sbu-skk-funnel-schema";
 import { registerSbuReadinessEventIngress } from "./sbu-skk-funnel";
 import { startDigitalDeliveryOutboxWorker } from "./lib/digital-delivery-outbox";
+import { registerSbuSkkStaticLanding } from "./sbu-skk-static-landing";
 
 const seedModuleRegistry: Record<string, any> = {
   "./seed-knowledge-base": M_knowledgeBase,
@@ -348,6 +349,10 @@ app.use(express.urlencoded({ extended: false }));
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
+
+// Landing iklan mandiri: HTML/CSS inline, tanpa bootstrap React atau query DB.
+// Daftarkan sebelum route aplikasi agar URL ini tidak jatuh ke SPA catch-all.
+registerSbuSkkStaticLanding(app);
 
 app.get("/sw.js", (req, res, next) => {
   res.set({
