@@ -85,3 +85,11 @@ PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
 VITE_PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
 NOTIFY_WEBHOOK_KEY = "98769346a8ad80072d68973c680d4db6"
 SCALEV_STORE_UNIQUE_ID = "store_Q6KHvqE8njFjGsS44N7wcP8d"
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
+localPort = 23636
+externalPort = 80
