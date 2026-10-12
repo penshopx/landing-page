@@ -1,0 +1,45 @@
+name: Isolated ecosystem alarm receipt test
+
+# Deliberately no schedule, push, pull_request_target, or workflow_run trigger.
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "dry-run: offline; arm: one test ping; inspect: read status; recover: one recovery ping"
+        type: choice
+        options:
+          - dry-run
+          - arm
+          - inspect
+          - recover
+        default: dry-run
+      confirm_isolated_check:
+        description: "I confirm this is a disposable check with reminders disabled; arm/recover may notify Email and Telegram"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ecosystem-isolated-receipt-test
+  cancel-in-progress: false
+
+jobs:
+  receipt-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    # Configure this environment with a reviewer and fixture-only secrets.
+    environment: monitoring-receipt-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run fixture-only receipt test
+        env:
+          ACTION: ${{ inputs.action }}
+          CONFIRM_ISOLATED_RECEIPT_TEST: ${{ inputs.confirm_isolated_check }}
+          ECOSYSTEM_RECEIPT_TEST_HEARTBEAT_URL: ${{ secrets.ECOSYSTEM_RECEIPT_TEST_HEARTBEAT_URL }}
+          ECOSYSTEM_RECEIPT_TEST_READONLY_KEY: ${{ secrets.ECOSYSTEM_RECEIPT_TEST_READONLY_KEY }}
+        run: node scripts/test-ecosystem-alert-receipt.mjs "$ACTION"
