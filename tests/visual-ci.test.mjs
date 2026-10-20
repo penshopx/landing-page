@@ -33,6 +33,10 @@ test("visual CI runs automatically, compares only, and retains complete reports 
   assert.match(workflow, /runs-on: ubuntu-24\.04/);
   // An actual Node runtime release, not the @types/node dependency version.
   assert.match(workflow, /node-version: "20\.20\.0"/);
+  assert.match(workflow, /node --test tests\/visual-ci-lock\.test\.mjs/);
+  assert.match(workflow, /node scripts\/prepare-visual-ci-lock\.mjs/);
+  assert.match(workflow, /await import\('express'\)/);
+  assert.match(workflow, /await import\('puppeteer-core'\)/);
   assert.match(workflow, /npm run visual:setup/);
   assert.match(workflow, /npm run visual:ci/);
   assert.match(workflow, /if: \$\{\{ always\(\) \}\}/);

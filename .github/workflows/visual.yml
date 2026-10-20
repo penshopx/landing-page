@@ -25,7 +25,13 @@ jobs:
         with:
           node-version: "20.20.0"
           cache: npm
+      - name: Prepare portable locked dependencies for the GitHub runner
+        run: |
+          node --test tests/visual-ci-lock.test.mjs
+          node scripts/prepare-visual-ci-lock.mjs
       - run: npm ci
+      - name: Verify installed visual runtime modules
+        run: node --input-type=module -e "await import('express'); await import('puppeteer-core'); await import('vite');"
       - name: Install Linux browser runtime libraries (fonts come from pinned archives)
         run: |
           sudo apt-get update
