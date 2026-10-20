@@ -13,6 +13,7 @@ const rules = [
 const variable = "(?:(?:DEEPSEEK|GEMINI|QWEN|NVIDIA|OPENROUTER|META_CAPI|META_PIXEL|SCALEV|BREVO|FONNTE|TENDER_INGEST)[A-Z_]*(?:API_KEY|ACCESS_TOKEN|WEBHOOK_SECRET|KEY)|SESSION_SECRET|NOTIFY_WEBHOOK_KEY)";
 const quotedAssignment = new RegExp(`\\b${variable}\\s*=\\s*(["'])([A-Za-z0-9_.-]{16,})\\1`);
 const fonnteAssignment = /\bFONNTE_API_KEY\s*=\s*(["'])[A-Za-z0-9_-]{10,}\1/;
+const bareFonnteAssignment = /\bFONNTE_API_KEY\s*=\s*[A-Za-z0-9_-]{10,}\s*$/;
 const bareAssignment = new RegExp(`\\b${variable}\\s*=\\s*[A-Za-z0-9_.-]{16,}\\s*$`);
 
 export function findProjectSecretMatches(text, path) {
@@ -20,7 +21,7 @@ export function findProjectSecretMatches(text, path) {
   return text.split(/\r?\n/).flatMap((line, index) => {
     const matches = rules.filter(([, expression]) => expression.test(line)).map(([name]) => name);
     if (quotedAssignment.test(line) || fonnteAssignment.test(line)
-        || (config && bareAssignment.test(line))) matches.push("literal-credential-assignment");
+        || (config && (bareAssignment.test(line) || bareFonnteAssignment.test(line)))) matches.push("literal-credential-assignment");
     if (path.endsWith(".replit") && /^\s*\[userenv\.shared\]\s*(?:#.*)?$/.test(line)) {
       matches.push("shared-env-in-tracked-config");
     }

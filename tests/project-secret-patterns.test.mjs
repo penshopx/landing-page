@@ -22,6 +22,7 @@ test("all provider prefixes and literal assignments are still blocked without ex
     assert.ok(!JSON.stringify(findings).includes(value));
   }
   assert.ok(findProjectSecretMatches('GEMINI_API_KEY=' + "H".repeat(30), ".env").length);
+  assert.ok(findProjectSecretMatches('FONNTE_API_KEY=' + "I".repeat(12), ".env").length);
 });
 
 test("ordinary identifiers, URL slugs, environment references and documentation are not credentials", () => {

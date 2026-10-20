@@ -80,6 +80,8 @@ Pada Linux biasa, `CHROME_PATH` dapat menunjuk ke `$PWD/generated-artifacts/visu
 
 Delapan PNG referensi juga diperiksa terhadap `baselines/sha256.json` sebelum browser dijalankan. Ini mendeteksi kerusakan saat transfer atau checkout, terpisah dari regresi tampilan. Jika referensi memang diperbarui dengan persetujuan peninjau, tinjau PNG dan perbarui checksum terkait dalam PR yang sama (`sha256sum tests/visual/baselines/*.png`). Jangan mengubah manifest untuk menerima PNG rusak atau membuat CI hijau tanpa tinjauan.
 
+Referensi awal dibuat dari frontend workspace, yang lebih baru daripada frontend pada branch GitHub sasaran ketika paket CI disiapkan. Paket CI saja tidak membawa seluruh perubahan aplikasi itu. Selisih navigasi dan tata letak yang muncul setelah pembandingan berjalan harus ditinjau sebagai perbedaan sumber aplikasi: pengelola perlu menentukan apakah perubahan frontend terkait ikut dibawa, atau referensi untuk revisi GitHub ditinjau dan disetujui secara terpisah. Jangan otomatis mengganti referensi atau mengubah tampilan aplikasi hanya untuk meloloskan pemeriksaan.
+
 ### Catatan kesiapan PR dan kredensial webhook
 
 Workflow tes umum harus memakai persiapan lockfile portable yang sama sebelum `npm ci`; pemasangan ulang saja masih memakai URL internal yang direkam di lockfile. Tes clipboard sertifikat memeriksa URL absolut dari `window.location.origin`, bukan memaksa domain produksi pada setiap lingkungan.
