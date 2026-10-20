@@ -18,6 +18,7 @@
 
 import { test, before, after } from "node:test";
 import assert from "node:assert/strict";
+import { validateCiDatabaseEnvironment } from "../scripts/ci-test-database-guard.mjs";
 import express from "express";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -36,9 +37,13 @@ let server: Server;
 let baseUrl: string;
 let db: any, pool: any, users: any, subscriptionsTable: any, eq: any, like: any;
 let storageDb: any;
+let fixtureReady = false;
 
 before(async () => {
   if (!hasDb) return;
+  validateCiDatabaseEnvironment(process.env);
+  // Synthetic, process-local credential: never uses a provider/workspace secret.
+  process.env.SCALEV_WEBHOOK_SECRET = ["ci", "webhook", RUN].join("-");
 
   // Jangan pernah kirim event Purchase sungguhan ke Meta dari test.
   delete process.env.META_CAPI_ACCESS_TOKEN;
@@ -49,6 +54,7 @@ before(async () => {
   ({ subscriptionsTable } = await import("../shared/schema"));
   ({ eq, like } = await import("drizzle-orm"));
   ({ storage: storageDb } = await import("../server/storage"));
+  fixtureReady = true;
   const { registerRoutes } = await import("../server/routes");
 
   await db.insert(users).values({
@@ -75,7 +81,7 @@ before(async () => {
 });
 
 after(async () => {
-  if (!hasDb) return;
+  if (!fixtureReady) return;
   try {
     await db.delete(subscriptionsTable).where(eq(subscriptionsTable.userId, TEST_USER_ID));
     await db.delete(users).where(eq(users.id, TEST_USER_ID));
@@ -109,7 +115,7 @@ function buildPayload(opts: { orderId: string; paymentStatus: string }): object 
 /**
  * POST ke /api/webhooks/scalev. Auth lolos via shared secret
  * (SCALEV_WEBHOOK_SECRET → header x-scalev-secret); bila tidak dikonfigurasi,
- * handler menerima tanpa secret (mode legacy).
+ * fixture tetap mengirim secret sintetis; produksi tetap menolak auth kosong.
  */
 async function postWebhook(payload: object): Promise<{ status: number; body: any }> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -127,6 +133,17 @@ async function postWebhook(payload: object): Promise<{ status: number; body: any
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
+
+test("webhook tanpa secret tetap ditolak sebelum transaksi dibuat", { skip: SKIP }, async () => {
+  const response = await fetch(`${baseUrl}/api/webhooks/scalev`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(buildPayload({ orderId: ORDER_ID, paymentStatus: "paid" })),
+  });
+  assert.equal(response.status, 401);
+  const rows = await db.select().from(subscriptionsTable)
+    .where(eq(subscriptionsTable.orderId, EXPECTED_STORED_ORDER_ID));
+  assert.equal(rows.length, 0, "auth kosong tidak boleh mengaktifkan langganan");
+});
 
 test("webhook paid → subscriptions_new baris active dengan order_id benar", { skip: SKIP }, async () => {
   const { status, body } = await postWebhook(buildPayload({ orderId: ORDER_ID, paymentStatus: "paid" }));

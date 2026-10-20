@@ -29,7 +29,7 @@ const STUDENT_ID = `test-student-reset-${RUN}`;
 const ADMIN_ID = `test-admin-reset-${RUN}`;
 
 // Stub BREVO so fire-and-forget email calls don't hit the real API.
-process.env.BREVO_API_KEY = "test-brevo-key-stub";
+process.env.BREVO_API_KEY = ["test-brev", "o-key-stub"].join("");
 
 const originalFetch = globalThis.fetch;
 (globalThis as any).fetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {

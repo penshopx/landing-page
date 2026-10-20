@@ -6,12 +6,21 @@ import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useFeatureAccess } from "@/hooks/use-feature-access";
 import { usePartnerBranding, toDirectImageUrl, type PartnerBranding } from "@/hooks/use-partner-branding";
 import { trackLead } from "@/lib/meta-pixel";
 import { useContactNumbers } from "@/lib/contact";
-import { Bot, Sparkles, LayoutGrid, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, Briefcase, Building2, FolderKanban } from "lucide-react";
+import { ISO_ECOSYSTEM_APPS, PROJECT_ECOSYSTEM_APPS } from "@/data/ecosystem-apps";
+import { Bot, Sparkles, LayoutGrid, LogIn, LogOut, Menu, CreditCard, LayoutDashboard, Smartphone, Shield, Crown, User, MessageCircle, Zap, FileDown, Stethoscope, Route, Users2, FileSearch, ArrowRight, Brain, Award, GraduationCap, FileText, ClipboardList, HardDrive, FileCheck2, Briefcase, Building2, FolderKanban, ExternalLink, ChevronDown, Scale } from "lucide-react";
 
 
 const PLAN_BADGE_CONFIG: Record<string, { label: string; className: string }> = {
@@ -252,7 +261,7 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
     { href: "/klinik-konsultasi", label: "Klinik Konsultasi",   icon: Stethoscope },
     { href: "/bedah-dokumen",     label: "Bedah Dokumen",       icon: FileSearch },
     { href: "/brain-project",     label: "Brain Project",       icon: Brain },
-    { href: "/asisten-ai",        label: "Asisten AI",          icon: Sparkles },
+    { href: "https://konstruksi-ai.gustafta.my.id", label: "KonstruksiAI", icon: Sparkles, external: true },
     { href: "/ebook",             label: "Ebook",               icon: FileText },
     { href: "/kompetensi-hub",    label: "Ekosistem Kompetensi",icon: Award },
   ];
@@ -261,26 +270,57 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
   const navSolusi = [
     { href: "/kontraktor",    label: "Kontraktor",    icon: Building2 },
     { href: "/biro-jasa",     label: "Biro Jasa",     icon: Briefcase },
-    { href: "/konsultan-iso", label: "Konsultan ISO", icon: ClipboardList },
+    { href: "/konsultan-iso", label: "Konsultan ISO", icon: ClipboardList, group: "iso" },
     { href: "/cek-kesiapan-sbu", label: "Portal SBU", icon: Building2, badge: "Mulai" },
     { href: "/skk",           label: "Portal SKK",    icon: GraduationCap, badge: "Ekosistem" },
     { href: "/tender",        label: "Portal Tender", icon: FileText },
-    { href: "/ruang-proyek",  label: "Portal Proyek", icon: FolderKanban },
+    { href: "/ruang-proyek",  label: "Portal Proyek", icon: FolderKanban, group: "proyek" },
   ];
 
   // Baris 2 — tools & layanan spesifik
   const navRow2 = [
-    { href: "/ruang-kelola",           label: "Radar Legalitas",           icon: ClipboardList },
+    { href: "https://lkpm-bkpm.gustafta.my.id", label: "LKPM", icon: ClipboardList, external: true },
+    { href: "https://lkut-pub.gustafta.my.id", label: "LKUT–PUB", icon: Building2, external: true },
+    { href: "https://lexcom.gustafta.my.id", label: "LexCom", icon: Scale, external: true },
     { href: "/ruang-simpan",           label: "Ruang Simpan",           icon: HardDrive },
     { href: "/dokumen-proyek",         label: "Dokumen Proyek",         icon: FileCheck2 },
-    { href: "/klinik-uji-kompetensi",  label: "Bimtek SKK",       icon: GraduationCap },
-    { href: "/executive-summary",      label: "PKB-PUB",    icon: FileText },
+    { href: "https://bimtek-skk.gustafta.my.id", label: "Bimtek SKK", icon: GraduationCap, external: true },
+    { href: "/executive-summary",      label: "EXUM-PKB",   icon: FileText },
     { href: "/mini-apps",              label: "Mini Apps",        icon: LayoutGrid },
     { href: "/produk",                 label: "Produk",           icon: Zap },
   ];
 
+  const isoApps = [
+    { href: "/konsultan-iso", label: "Konsultan ISO", description: "Pendampingan implementasi sistem manajemen", icon: ClipboardList },
+    ...ISO_ECOSYSTEM_APPS.map((app) => ({
+      href: app.href,
+      label: app.name,
+      description: app.description,
+      icon: app.icon,
+      external: true as const,
+    })),
+  ];
+
+  const projectApps = [
+    { href: "/ruang-proyek", label: "Ruang Proyek", description: "Portofolio dan ruang kerja proyek", icon: FolderKanban },
+    ...PROJECT_ECOSYSTEM_APPS.map((app) => ({
+      href: app.href,
+      label: app.name,
+      description: app.description,
+      icon: app.icon,
+      external: true as const,
+    })),
+  ];
+
   // Untuk mobile: semua item gabungan
-  const allNavItems = partnerItems ?? [...navSolusi, ...navRow1, ...navRow2];
+  const groupedMobileItems = [
+    ...navSolusi.filter((item) => !("group" in item)),
+    ...isoApps,
+    ...projectApps,
+    ...navRow1,
+    ...navRow2,
+  ];
+  const allNavItems = partnerItems ?? groupedMobileItems;
 
   const isActive = (href: string) => location === href;
   const scrollToLandingSection = (sectionId: string) => {
@@ -431,27 +471,43 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
                     </Link>
                   )}
                   <div className="border-t pt-2 mt-1 flex flex-col gap-1">
-                    {allNavItems.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          if (item.href === "/#jalur-sbu-skk") {
-                            window.setTimeout(() => scrollToLandingSection("jalur-sbu-skk"), 400);
-                          }
-                        }}
-                        data-testid={item.href === "/#jalur-sbu-skk" ? "mobile-nav-sbu-skk" : undefined}
-                      >
+                    {allNavItems.map((item) => {
+                      const button = (
                         <Button
                           variant={isActive(item.href) ? "secondary" : "ghost"}
-                          className={`w-full justify-start ${"subtle" in item && item.subtle ? "text-muted-foreground" : ""}`}
+                          className="w-full justify-start"
                         >
                           <item.icon className="h-4 w-4 mr-2" />
                           {item.label}
+                          {"external" in item && Boolean(item.external) && <ExternalLink className="h-3.5 w-3.5 ml-auto" />}
                         </Button>
-                      </Link>
-                    ))}
+                      );
+                      return "external" in item && item.external ? (
+                        <a
+                          key={item.href}
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          {button}
+                        </a>
+                      ) : (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            if (item.href === "/#jalur-sbu-skk") {
+                              window.setTimeout(() => scrollToLandingSection("jalur-sbu-skk"), 400);
+                            }
+                          }}
+                          data-testid={item.href === "/#jalur-sbu-skk" ? "mobile-nav-sbu-skk" : undefined}
+                        >
+                          {button}
+                        </Link>
+                      );
+                    })}
                   </div>
                   {isAuthenticated && !partner && (
                     <Link href="/my-subscription" onClick={() => setMobileMenuOpen(false)}>
@@ -540,13 +596,8 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
           <nav className="hidden md:flex flex-col border-t border-border/50">
             {/* Baris 1 — kategori utama */}
             <div className="flex items-center justify-center gap-0.5 h-10">
-              {navRow1.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  data-testid={item.href === "/#jalur-sbu-skk" ? "nav-sbu-skk" : undefined}
-                  onClick={item.href === "/#jalur-sbu-skk" ? () => scrollToLandingSection("jalur-sbu-skk") : undefined}
-                >
+              {navRow1.map((item) => {
+                const button = (
                   <Button
                     variant={isActive(item.href) ? "secondary" : "ghost"}
                     size="sm"
@@ -559,14 +610,26 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
                       </span>
                     )}
                   </Button>
-                </Link>
-              ))}
+                );
+                return "external" in item && item.external ? (
+                  <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">{button}</a>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    data-testid={item.href === "/#jalur-sbu-skk" ? "nav-sbu-skk" : undefined}
+                    onClick={item.href === "/#jalur-sbu-skk" ? () => scrollToLandingSection("jalur-sbu-skk") : undefined}
+                  >
+                    {button}
+                  </Link>
+                );
+              })}
             </div>
             {/* Baris 1.5 — solusi per segmen */}
             <div className="flex items-center justify-center gap-0.5 h-8 border-t border-border/30 bg-emerald-50/50 dark:bg-emerald-950/10">
               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mr-1">Solusi untuk:</span>
-              {navSolusi.map((item) => (
-                <Link key={item.href} href={item.href}>
+              {navSolusi.map((item) => {
+                const button = (
                   <Button
                     variant={isActive(item.href) ? "secondary" : "ghost"}
                     size="sm"
@@ -578,14 +641,46 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
                         {item.badge}
                       </span>
                     )}
+                    {"group" in item && item.group && <ChevronDown className="h-3 w-3 ml-1" />}
                   </Button>
-                </Link>
-              ))}
+                );
+                if ("group" in item && item.group) {
+                  const apps = item.group === "iso" ? isoApps : projectApps;
+                  return (
+                    <DropdownMenu key={item.href}>
+                      <DropdownMenuTrigger asChild>{button}</DropdownMenuTrigger>
+                      <DropdownMenuContent align="center" className="w-72">
+                        <DropdownMenuLabel>{item.group === "iso" ? "Konsultan ISO" : "Ekosistem Proyek"}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {apps.map((app) => (
+                          <DropdownMenuItem key={app.href} asChild>
+                            {"external" in app && app.external ? (
+                              <a href={app.href} target="_blank" rel="noopener noreferrer" className="flex items-start gap-2 cursor-pointer">
+                                <div className="flex-1">
+                                  <div className="font-medium">{app.label}</div>
+                                  <div className="text-xs text-muted-foreground">{app.description}</div>
+                                </div>
+                                <ExternalLink className="h-3.5 w-3.5 mt-1" />
+                              </a>
+                            ) : (
+                              <Link href={app.href} className="flex flex-col items-start cursor-pointer">
+                                <span className="font-medium">{app.label}</span>
+                                <span className="text-xs text-muted-foreground">{app.description}</span>
+                              </Link>
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
+                }
+                return <Link key={item.href} href={item.href}>{button}</Link>;
+              })}
             </div>
             {/* Baris 2 — tools & layanan spesifik */}
             <div className="flex items-center justify-center gap-0.5 h-9 border-t border-border/30 bg-muted/20">
-              {navRow2.map((item) => (
-                <Link key={item.href} href={item.href}>
+              {navRow2.map((item) => {
+                const button = (
                   <Button
                     variant={isActive(item.href) ? "secondary" : "ghost"}
                     size="sm"
@@ -596,9 +691,15 @@ export function SharedHeader({ transparent }: SharedHeaderProps) {
                     }`}
                   >
                     {item.label}
+                    {"external" in item && item.external && <ExternalLink className="h-3 w-3 ml-1" />}
                   </Button>
-                </Link>
-              ))}
+                );
+                return "external" in item && item.external ? (
+                  <a key={item.href} href={item.href} target="_blank" rel="noopener noreferrer">{button}</a>
+                ) : (
+                  <Link key={item.href} href={item.href}>{button}</Link>
+                );
+              })}
               {isAuthenticated && (
                 <Link href="/my-subscription">
                   <Button
