@@ -29,3 +29,13 @@ test("provisioning proves empty database identity before importing application D
   assert.ok(source.indexOf('client.query("COMMIT")') < source.indexOf('import("../server/db")'));
   assert.ok(!/DROP (?:SCHEMA|DATABASE)|secrets\.DATABASE_URL/.test(source));
 });
+
+test("HTTP fixture proves its disposable marker and owns an ephemeral loopback server", () => {
+  const source = readFileSync(new URL("./ci-isolated-app.ts", import.meta.url), "utf8");
+  assert.ok(source.indexOf("validateCiDatabaseEnvironment(process.env)") < source.indexOf('import("../server/db")'));
+  assert.ok(source.indexOf("proof.rowCount !== 1") < source.indexOf("registerRoutes(server, app)"));
+  assert.match(source, /server\.listen\(0, "127\.0\.0\.1"/);
+  assert.match(source, /req\.rawBody = buf/);
+  assert.match(source, /server\.closeAllConnections\(\)/);
+  assert.ok(!source.includes("localhost:5000"));
+});
