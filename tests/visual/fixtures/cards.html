@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="id">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fixture kartu pemeriksaan visual</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: #111827; color: #f8fafc; font-family: sans-serif; }
+  h1 { font-size: 24px; margin: 0 0 24px; }
+  .card { width: min(100%, 560px); height: 280px; padding: 32px; background: #1e293b; }
+  .ring-2 { box-shadow: inset 0 0 0 12px #a78bfa; }
+  body[data-variant="color"] .prose { background: #c2410c; }
+  body[data-variant="ring"] .ring-2 { box-shadow: inset 0 0 0 12px #22c55e; }
+</style>
+<body data-variant="{{variant}}">
+<h1>{{heading}}</h1>
+<div id="hierarchy">
+  <article class="card {{classes}}">
+    <h2>Kartu penting</h2>
+    <p>Warna dan ring harus tetap terdeteksi oleh pemeriksaan visual.</p>
+  </article>
+</div>
+</body>
+</html>

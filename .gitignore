@@ -8,3 +8,7 @@ secrets.env
 
 # Database backup dumps (contain full user data — never commit)
 backups/
+
+# Generated visual tooling, builds and comparison reports
+/generated-artifacts/
+/tests/visual/results*/

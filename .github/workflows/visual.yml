@@ -1,0 +1,68 @@
+name: Visual regression
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    name: Public application visual gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: "true"
+      TZ: UTC
+      LANG: en_US.UTF-8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.20.0"
+          cache: npm
+      - run: npm ci
+      - name: Install Linux browser runtime libraries (fonts come from pinned archives)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libasound2t64 libatk-bridge2.0-0t64 libatk1.0-0t64 libatspi2.0-0t64 \
+            libcairo2 libcups2t64 libdbus-1-3 libgbm1 libglib2.0-0t64 libnspr4 \
+            libnss3 libpango-1.0-0 libudev1 libx11-6 libxcb1 libxcomposite1 \
+            libxdamage1 libxext6 libxfixes3 libxkbcommon0 libxrandr2 \
+            curl unzip fontconfig
+      - name: Verify visual gate contracts
+        run: npm run test:visual-ci
+      - name: Prepare checksum-pinned Chromium and fonts
+        run: npm run visual:setup
+      - name: Prove card regressions fail with isolated local fixtures
+        env:
+          CHROME_PATH: ${{ github.workspace }}/generated-artifacts/visual-env/chrome-linux64/chrome
+          FONTCONFIG_FILE: ${{ github.workspace }}/generated-artifacts/visual-env/fonts.conf
+          VISUAL_EXPECTED_CHROME: "138.0.7204.100"
+        run: npm run test:visual-negative
+      - name: Build, start application frontend and compare reviewed references
+        run: npm run visual:ci
+      - name: Upload visual report, actual images, diffs and references
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-comparison-${{ github.run_id }}-${{ github.run_attempt }}
+          # Preserve results/../baselines paths used by report.html.
+          path: |
+            tests/visual/results/
+            tests/visual/baselines/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Upload isolated negative-test evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-negative-${{ github.run_id }}-${{ github.run_attempt }}
+          path: generated-artifacts/visual-negative-*/
+          retention-days: 14
+          if-no-files-found: error
