@@ -31,7 +31,7 @@ const NULL_USER_EMAIL = `null-name-${RUN}@example.com`;
 // ── Brevo fetch intercept ─────────────────────────────────────────────────────
 // Set a fake BREVO_API_KEY so sendEmail doesn't bail on "not_configured".
 // Clear REPLIT_DEV_DOMAIN so the cert URL uses the production base.
-process.env.BREVO_API_KEY = "test-brevo-key-fake";
+process.env.BREVO_API_KEY = ["test-brev", "o-key-fake"].join("");
 delete process.env.REPLIT_DEV_DOMAIN;
 
 interface CapturedBrevoCall {

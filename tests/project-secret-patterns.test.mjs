@@ -28,6 +28,7 @@ test("ordinary identifiers, URL slugs, environment references and documentation 
   const lines = [
     "task_description: string", "task_context_metadata: json",
     "https://example.test/ask-construction-professional",
+    "/demo/draft-sk-direktur-lsp-tim-pusat-komite",
     "const GEMINI_API_KEY = process.env.GEMINI_API_KEY;",
     "const BREVO_API_KEY = process.env.BREVO_API_KEY || '';",
     "Use [userenv.shared] only for non-sensitive configuration.",

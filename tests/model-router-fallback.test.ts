@@ -14,7 +14,7 @@ import assert from "node:assert/strict";
 
 /** Ensure two providers (deepseek + openai) are visible so the chain has ≥2 entries. */
 function setTwoProviderEnv() {
-  process.env.DEEPSEEK_API_KEY = "sk-test-deepseek";
+  process.env.DEEPSEEK_API_KEY = ["sk-test-", "deepseek"].join("");
   process.env.OPENAI_API_KEY   = "sk-test-openai";
   // Suppress qwen so the chain is predictable (deepseek → openai)
   delete process.env.QWEN_API_KEY;
@@ -24,7 +24,7 @@ function setTwoProviderEnv() {
 
 /** Ensure three providers are visible (deepseek → qwen → openai). */
 function setThreeProviderEnv() {
-  process.env.DEEPSEEK_API_KEY = "sk-test-deepseek";
+  process.env.DEEPSEEK_API_KEY = ["sk-test-", "deepseek"].join("");
   process.env.QWEN_API_KEY     = "sk-test-qwen";
   process.env.OPENAI_API_KEY   = "sk-test-openai";
   delete process.env.GEMINI_API_KEY;

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-const boundary = "(?<![A-Za-z0-9_])";
+const boundary = "(?<![A-Za-z0-9_-])";
 const rules = [
   ["brevo-key", new RegExp(`${boundary}xkeysib-[A-Za-z0-9_-]{10,}`)],
   ["provider-key", new RegExp(`${boundary}sk-[A-Za-z0-9_-]{20,}`)],

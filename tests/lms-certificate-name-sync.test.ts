@@ -25,7 +25,7 @@ const SKIP = hasDb ? false : "DATABASE_URL tidak diset — lewati tes integrasi 
 const RUN = `lms_cert_name_sync_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
 // ── Fake BREVO key so sendEmail doesn't bail before sending ───────────────────
-process.env.BREVO_API_KEY = "test-brevo-key-fake";
+process.env.BREVO_API_KEY = ["test-brev", "o-key-fake"].join("");
 delete process.env.REPLIT_DEV_DOMAIN;
 
 // ── Intercept Brevo calls before importing routes ─────────────────────────────

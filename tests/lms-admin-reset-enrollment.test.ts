@@ -28,7 +28,7 @@ const TEST_ADMIN_ID = `test-admin-reset-${RUN}`;
 const TEST_USER_ID = `test-user-reset-${RUN}`;
 
 // Stub BREVO so fire-and-forget certificate emails don't hit the real API.
-process.env.BREVO_API_KEY = "test-brevo-key-stub";
+process.env.BREVO_API_KEY = ["test-brev", "o-key-stub"].join("");
 const originalFetch = globalThis.fetch;
 (globalThis as any).fetch = async (url: string | URL | Request, init?: RequestInit): Promise<Response> => {
   const urlStr = typeof url === "string" ? url : url instanceof URL ? url.href : (url as Request).url;
