@@ -82,6 +82,10 @@ Delapan PNG referensi juga diperiksa terhadap `baselines/sha256.json` sebelum br
 
 Referensi awal dibuat dari frontend workspace, yang lebih baru daripada frontend pada branch GitHub sasaran ketika paket CI disiapkan. Paket CI saja tidak membawa seluruh perubahan aplikasi itu. Selisih navigasi dan tata letak yang muncul setelah pembandingan berjalan harus ditinjau sebagai perbedaan sumber aplikasi: pengelola perlu menentukan apakah perubahan frontend terkait ikut dibawa, atau referensi untuk revisi GitHub ditinjau dan disetujui secara terpisah. Jangan otomatis mengganti referensi atau mengubah tampilan aplikasi hanya untuk meloloskan pemeriksaan.
 
+Pengelola memilih mempertahankan referensi workspace. Karena itu PR juga menyertakan navigasi ekosistem dan konfigurasi Tailwind/Vite/CSS yang menghasilkan referensi tersebut. Tidak ada pembaruan PNG atau pelonggaran ambang. Tailwind 4 memakai versi dan checksum yang sudah ada pada dependensi plugin Vite; dependensi aplikasi lain tidak dinaikkan.
+
+Tes umum memakai layanan PostgreSQL 16 sementara milik job GitHub, bukan secret `DATABASE_URL` repositori. Guard memeriksa runner, mode test, host loopback, nama database khusus, kesesuaian kedua URL, serta ketiadaan jalur pooled dan kredensial provider nyata. Persiapan menolak database yang sudah berisi objek, membuat schema dari sumber aplikasi, dan hanya menanam data produk; tidak menyalin data pelanggan atau transaksi. Layanan beserta volumenya dibuang otomatis saat job berakhir.
+
 ### Catatan kesiapan PR dan kredensial webhook
 
 Workflow tes umum harus memakai persiapan lockfile portable yang sama sebelum `npm ci`; pemasangan ulang saja masih memakai URL internal yang direkam di lockfile. Tes clipboard sertifikat memeriksa URL absolut dari `window.location.origin`, bukan memaksa domain produksi pada setiap lingkungan.
