@@ -15,6 +15,17 @@ const baselineNames = [
 const hashes = () => baselineNames.map((name) => createHash("sha256")
   .update(readFileSync(new URL(`./visual/baselines/${name}.png`, import.meta.url))).digest("hex"));
 
+test("every reviewed baseline is a complete PNG matching its approved content checksum", () => {
+  const manifest = JSON.parse(read("tests/visual/baselines/sha256.json"));
+  assert.deepEqual(Object.keys(manifest).sort(), baselineNames.map(n => `${n}.png`).sort());
+  for (const [name, expected] of Object.entries(manifest)) {
+    const image = readFileSync(new URL(`./visual/baselines/${name}`, import.meta.url));
+    assert.equal(image.subarray(0, 8).toString("hex"), "89504e470d0a1a0a", name);
+    assert.equal(createHash("sha256").update(image).digest("hex"), expected, name);
+    assert.equal(image.subarray(-12).toString("hex"), "0000000049454e44ae426082", name);
+  }
+});
+
 test("CI cannot update reviewed reference images, even without a browser", () => {
   const before = hashes();
   const result = spawnSync(process.execPath, ["scripts/check-visual.mjs", "--update"], {

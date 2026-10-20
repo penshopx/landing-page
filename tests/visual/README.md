@@ -78,6 +78,16 @@ Pada Linux biasa, `CHROME_PATH` dapat menunjuk ke `$PWD/generated-artifacts/visu
 
 `npm run test:visual-ci` memeriksa pemicu CI, pin/checksum font dan browser, unggahan laporan, serta penolakan pembaruan referensi dan laporan ketika lingkungan belum siap. Hasil di `results/` sengaja tidak dilacak.
 
+Delapan PNG referensi juga diperiksa terhadap `baselines/sha256.json` sebelum browser dijalankan. Ini mendeteksi kerusakan saat transfer atau checkout, terpisah dari regresi tampilan. Jika referensi memang diperbarui dengan persetujuan peninjau, tinjau PNG dan perbarui checksum terkait dalam PR yang sama (`sha256sum tests/visual/baselines/*.png`). Jangan mengubah manifest untuk menerima PNG rusak atau membuat CI hijau tanpa tinjauan.
+
+### Catatan kesiapan PR dan kredensial webhook
+
+Workflow tes umum harus memakai persiapan lockfile portable yang sama sebelum `npm ci`; pemasangan ulang saja masih memakai URL internal yang direkam di lockfile. Tes clipboard sertifikat memeriksa URL absolut dari `window.location.origin`, bukan memaksa domain produksi pada setiap lingkungan.
+
+Pemindaian Gitleaks tetap aktif. Pemeriksaan tambahan membedakan prefix kunci dari bagian identifier/slug biasa dan assignment literal dari referensi `process.env`. Log hanya berisi lokasi dan nama aturan, bukan baris yang cocok atau nilai kredensial. Bagian `[userenv.shared]` tetap ditolak pada konfigurasi `.replit` yang dilacak, tetapi penyebutannya dalam dokumentasi tidak dianggap kebocoran.
+
+PR persiapan memindahkan konfigurasi nonrahasia ke `[env]` dan menghapus `NOTIFY_WEBHOOK_KEY` serta URL webhook yang membawa kunci dari konfigurasi terlacak. Ini **tidak** merotasi nilai lama atau menghapusnya dari riwayat Git/log CI yang sudah terbit. Sebelum merge, pengelola harus menyediakan pengganti melalui Secrets dan merotasi kunci webhook, serta menilai kebutuhan membersihkan log/riwayat lama. Tanpa konfigurasi pengganti, endpoint notifikasi terkait dapat menjadi tidak tersedia setelah perubahan diterapkan. Tidak ada perubahan Secret/runtime, merge, atau deployment yang dilakukan oleh PR ini.
+
 ## Uji negatif terisolasi: warna kartu dan ring
 
 ```sh

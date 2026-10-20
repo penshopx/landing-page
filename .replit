@@ -9,6 +9,26 @@ packages = ["git"]
 [env]
 PORT = "5000"
 
+# Non-sensitive application configuration; webhook credentials belong in Secrets.
+ADMIN_EMAILS = "tutip98@outlook.com"
+ADMIN_USER_IDS = "58349984,58848919,59024982"
+BREVO_SENDER_EMAIL = "noreply@gustafta.my.id"
+DEEPSEEK_MODEL = "deepseek-chat"
+GEMINI_MODEL = "gemini-2.5-pro"
+OPENAI_MODEL = "gpt-4o"
+PROD_URL = "https://gustafta.my.id"
+QWEN_MODEL = "qwen-plus"
+SCALEV_CHATBOT_SLUG = "gustafta"
+SCALEV_SIGNATURE_STRICT = "true"
+SMTP_HOST = "smtp-relay.brevo.com"
+SMTP_PORT = "587"
+SUPERADMIN_EMAILS = "penshopx@gmail.com"
+SUPABASE_URL = "https://jehmmndmrqyrififkqux.supabase.co"
+NOTIFICATION_PHONE = "081287941900"
+PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
+VITE_PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
+SCALEV_STORE_UNIQUE_ID = "store_Q6KHvqE8njFjGsS44N7wcP8d"
+
 [deployment]
 deploymentTarget = "autoscale"
 run = ["node", "./dist/index.cjs"]
@@ -63,28 +83,6 @@ path = "scripts/post-merge.sh"
 timeoutMs = 20000
 
 [userenv]
-
-[userenv.shared]
-ADMIN_EMAILS = "tutip98@outlook.com"
-ADMIN_USER_IDS = "58349984,58848919,59024982"
-BREVO_SENDER_EMAIL = "noreply@gustafta.my.id"
-DEEPSEEK_MODEL = "deepseek-chat"
-GEMINI_MODEL = "gemini-2.5-pro"
-OPENAI_MODEL = "gpt-4o"
-PROD_URL = "https://gustafta.my.id"
-QWEN_MODEL = "qwen-plus"
-SCALEV_CHATBOT_SLUG = "gustafta"
-SCALEV_SIGNATURE_STRICT = "true"
-SMTP_HOST = "smtp-relay.brevo.com"
-SMTP_PORT = "587"
-SUPERADMIN_EMAILS = "penshopx@gmail.com"
-SUPABASE_URL = "https://jehmmndmrqyrififkqux.supabase.co"
-NOTIFICATION_PHONE = "081287941900"
-NOTIFICATION_WEBHOOK_URL = "https://gustafta.my.id/api/notify-fonnte?key=98769346a8ad80072d68973c680d4db6"
-PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
-VITE_PAYMENT_BASE_URL = "https://bayar.dokumenproyek.com"
-NOTIFY_WEBHOOK_KEY = "98769346a8ad80072d68973c680d4db6"
-SCALEV_STORE_UNIQUE_ID = "store_Q6KHvqE8njFjGsS44N7wcP8d"
 
 [[ports]]
 localPort = 5000
