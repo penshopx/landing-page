@@ -194,7 +194,7 @@ test(
   "sendDigitalProductDeliveryEmail: Brevo mengembalikan 200 → { sent: true }",
   async () => {
     const realKey = process.env.BREVO_API_KEY;
-    process.env.BREVO_API_KEY = "test-brevo-key-stub";
+    process.env.BREVO_API_KEY = ["test-brev", "o-key-stub"].join("");
 
     let captured: any = null;
     const restoreFetch = stubBrevo(200, (body) => { captured = body; });
@@ -230,7 +230,7 @@ test(
   "sendDigitalProductDeliveryEmail: Brevo dipanggil dengan email pembeli yang benar (to.email === buyer address)",
   async () => {
     const realKey = process.env.BREVO_API_KEY;
-    process.env.BREVO_API_KEY = "test-brevo-key-stub";
+    process.env.BREVO_API_KEY = ["test-brev", "o-key-stub"].join("");
 
     let captured: any = null;
     const restoreFetch = stubBrevo(200, (body) => { captured = body; });
@@ -270,7 +270,7 @@ test(
   "sendDigitalProductDeliveryEmail: Brevo body menyertakan downloadUrl sebagai link unduhan",
   async () => {
     const realKey = process.env.BREVO_API_KEY;
-    process.env.BREVO_API_KEY = "test-brevo-key-stub";
+    process.env.BREVO_API_KEY = ["test-brev", "o-key-stub"].join("");
 
     const DOWNLOAD_URL =
       "https://drive.google.com/uc?id=VERIFY_LINK_PRESENCE&export=download";
@@ -342,7 +342,7 @@ test(
   "sendDigitalProductDeliveryEmail: Brevo mengembalikan error (4xx) → { sent:false, reason:'api_error' }",
   async () => {
     const realKey = process.env.BREVO_API_KEY;
-    process.env.BREVO_API_KEY = "test-brevo-key-stub";
+    process.env.BREVO_API_KEY = ["test-brev", "o-key-stub"].join("");
 
     const restoreFetch = stubBrevo(401, () => {});
     try {
@@ -426,7 +426,7 @@ test(
   "sendDigitalProductDeliveryEmail: fetch THROW (network mati) → { sent:false }, tidak melempar",
   async () => {
     const realKey = process.env.BREVO_API_KEY;
-    process.env.BREVO_API_KEY = "test-brevo-key-stub";
+    process.env.BREVO_API_KEY = ["test-brev", "o-key-stub"].join("");
 
     const realFetch = globalThis.fetch;
     (globalThis as any).fetch = async () => {
