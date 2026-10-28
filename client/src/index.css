@@ -422,6 +422,3 @@
 .animate-group-open {
   animation: group-open 0.14s ease-out;
 }
-
-/* Isolated visual-gate proof: never merge this change. */
-html { filter: invert(1) !important; }
