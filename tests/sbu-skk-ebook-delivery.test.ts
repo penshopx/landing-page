@@ -14,7 +14,9 @@ import { SBU_SKK_EBOOK } from "../shared/sbu-skk-ebook";
 import { CONTRACTOR_L1_EBOOKS } from "../server/sales-ladder-blueprint";
 import { inArray } from "drizzle-orm";
 
-const SERVER_URL = `http://localhost:${process.env.PORT || 5000}`;
+import { startCiIsolatedApp } from "./ci-isolated-app";
+let SERVER_URL: string;
+let isolatedApp: Awaited<ReturnType<typeof startCiIsolatedApp>> | undefined;
 const RUN = `sbu_skk_${Date.now()}_${randomUUID().slice(0, 8)}`;
 const createdOrderIds: number[] = [];
 const createdProductIds: number[] = [];
@@ -70,6 +72,8 @@ async function createOrder(status: "pending" | "paid", token: string): Promise<n
 }
 
 before(async () => {
+  isolatedApp = await startCiIsolatedApp();
+  SERVER_URL = isolatedApp.url;
   const product = await pool.query<{ id: number }>(
     `SELECT id
        FROM store_products
@@ -130,6 +134,7 @@ after(async () => {
       .where(inArray(productRegistry.productId, createdRegistryIds))
       .catch(() => {});
   }
+  if (isolatedApp) await isolatedApp.close();
 });
 
 test("metadata kanonik menetapkan identitas, harga, dan Scalev variant yang disetujui", () => {

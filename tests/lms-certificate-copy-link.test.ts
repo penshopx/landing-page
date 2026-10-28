@@ -34,8 +34,8 @@ test("Tombol salin memanggil navigator.clipboard.writeText di onClick", () => {
   );
 });
 
-// ── 3. URL yang ditulis ke clipboard menggunakan domain produksi penuh ─────────
-test("navigator.clipboard.writeText menggunakan domain produksi gustafta.my.id", () => {
+// ── 3. URL clipboard absolut mengikuti origin aplikasi yang sedang dibuka ─────
+test("navigator.clipboard.writeText menggunakan origin aplikasi, bukan domain hardcoded", () => {
   const writeTextIdx = src.indexOf("navigator.clipboard.writeText");
   assert.ok(
     writeTextIdx !== -1,
@@ -47,10 +47,9 @@ test("navigator.clipboard.writeText menggunakan domain produksi gustafta.my.id",
 
   assert.match(
     context,
-    /https:\/\/gustafta\.my\.id\/lms\/verify\//,
-    "Argumen writeText HARUS mengandung https://gustafta.my.id/lms/verify/ " +
-      "agar URL yang disalin adalah URL absolut yang dapat diakses publik, " +
-      "bukan path relatif yang akan menghasilkan tautan rusak.",
+    /\$\{window\.location\.origin\}\/lms\/verify\//,
+    "Argumen writeText harus memakai origin aplikasi dan path verifikasi agar " +
+      "tautan absolut tetap benar pada domain aplikasi yang sedang dibuka.",
   );
 });
 
@@ -74,7 +73,7 @@ test("navigator.clipboard.writeText menginterpolasi cert.certificateCode", () =>
 });
 
 // ── 5. Konsistensi prefix URL di seluruh argumen writeText ────────────────────
-test("URL yang disalin ke clipboard dimulai dengan https:// (bukan path relatif)", () => {
+test("URL clipboard diawali origin browser, bukan path relatif", () => {
   // Pastikan tidak ada writeText yang menerima path relatif seperti /lms/verify/
   const writeTextIdx = src.indexOf("navigator.clipboard.writeText");
   assert.ok(
@@ -87,9 +86,8 @@ test("URL yang disalin ke clipboard dimulai dengan https:// (bukan path relatif)
   // Harus ada https:// sebelum domain
   assert.match(
     context,
-    /writeText\s*\(\s*`https:\/\//,
-    "Argumen writeText HARUS dimulai dengan https:// — bukan path relatif " +
-      "(/lms/...) — karena path relatif tidak dapat digunakan saat siswa " +
-      "menempel URL ke email atau aplikasi chat.",
+    /writeText\s*\(\s*`\$\{window\.location\.origin\}\/lms\/verify\//,
+    "Argumen writeText harus diawali origin browser; path relatif tidak dapat " +
+      "dipakai ketika siswa menempel tautan di email atau aplikasi chat.",
   );
 });

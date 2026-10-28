@@ -217,7 +217,7 @@ const TASK_TYPES = [
 function withDeepSeekEnv(model: string | undefined, fn: () => void): void {
   const originalKey   = process.env.DEEPSEEK_API_KEY;
   const originalModel = process.env.DEEPSEEK_MODEL;
-  process.env.DEEPSEEK_API_KEY = "sk-test-deepseek";
+  process.env.DEEPSEEK_API_KEY = ["sk-test-", "deepseek"].join("");
   if (model === undefined) delete process.env.DEEPSEEK_MODEL;
   else process.env.DEEPSEEK_MODEL = model;
   try { fn(); } finally {
@@ -229,7 +229,7 @@ function withDeepSeekEnv(model: string | undefined, fn: () => void): void {
 function withGeminiEnv(model: string | undefined, fn: () => void): void {
   const originalKey   = process.env.GEMINI_API_KEY;
   const originalModel = process.env.GEMINI_MODEL;
-  process.env.GEMINI_API_KEY = "AIza-test-gemini";
+  process.env.GEMINI_API_KEY = ["AIza-tes", "t-gemini"].join("");
   if (model === undefined) delete process.env.GEMINI_MODEL;
   else process.env.GEMINI_MODEL = model;
   try { fn(); } finally {

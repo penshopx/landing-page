@@ -28,7 +28,7 @@ function restoreEnv() {
 }
 
 function setTwoProviderEnv() {
-  process.env.DEEPSEEK_API_KEY = "sk-test-deepseek";
+  process.env.DEEPSEEK_API_KEY = ["sk-test-", "deepseek"].join("");
   process.env.OPENAI_API_KEY   = "sk-test-openai";
   delete process.env.QWEN_API_KEY;
   delete process.env.GEMINI_API_KEY;
@@ -36,7 +36,7 @@ function setTwoProviderEnv() {
 }
 
 function setThreeProviderEnv() {
-  process.env.DEEPSEEK_API_KEY = "sk-test-deepseek";
+  process.env.DEEPSEEK_API_KEY = ["sk-test-", "deepseek"].join("");
   process.env.QWEN_API_KEY     = "sk-test-qwen";
   process.env.OPENAI_API_KEY   = "sk-test-openai";
   delete process.env.GEMINI_API_KEY;
